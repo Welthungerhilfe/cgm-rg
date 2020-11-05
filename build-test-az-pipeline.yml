@@ -14,7 +14,7 @@ variables:
   imageRepository: 'cgmresultgeneration'
   dockerId: 'cgmrgtest'
   containerRegistry: 'cgmrgtest.azurecr.io'
-  dockerfilePath: '**/Dockerfile.build'
+  dockerfilePath: 'Dockerfile.build'
   tag: '$(Build.BuildId)'
   buildConfiguration: 'BuildAndTest'  
   # Agent VM image name
