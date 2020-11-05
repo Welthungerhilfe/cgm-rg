@@ -12,6 +12,7 @@ variables:
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '01d8e191-0132-47ae-bec0-cbdcf8e96a09'
   imageRepository: 'cgmresultgeneration'
+  dockerId: 'cgmrgtest'
   containerRegistry: 'cgmrgtest.azurecr.io'
   dockerfilePath: '**/Dockerfile.build'
   tag: '$(Build.BuildId)'
@@ -19,21 +20,26 @@ variables:
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
-stages:
-- stage: Build
-  displayName: Build and push stage
-  jobs:  
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImageName)
-    steps:
-    - task: Docker@2
-      displayName: Build and push an image to container registry
-      inputs:
-        command: build
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+
+  # Build Docker image for this app, to be published to Docker Registry
+  pool:
+    vmImage: $(vmImageName)
+  variables:
+    buildConfiguration: 'BuildAndTest'
+  steps:
+  - script: |
+      docker build -f $(dockerfilePath) -t $(dockerId)/build:$(tag) .
+      docker run --name cgmrg_buildandtest --rm -d $(dockerId)/build:$(tag)
+      docker cp cgmrg_buildandtest:app/coverage.xml $(System.DefaultWorkingDirectory)
+      docker stop cgmrg_buildandtest
+
+  # Publish code coverage results
+  # Publish Cobertura or JaCoCo code coverage results from a build
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      #codeCoverageTool: 'JaCoCo' # Options: cobertura, jaCoCo
+      summaryFileLocation: coverage.xml
+      #pathToSources: # Optional
+      #reportDirectory: # Optional
+      #additionalCodeCoverageFiles: # Optional
+      failIfCoverageEmpty: true # Optional

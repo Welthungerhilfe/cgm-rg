@@ -7,4 +7,4 @@ RUN pip install -r requirements.txt
 
 ADD . /app
 
-CMD ["pytest", "--cov=src", "-v"]
+CMD ["pytest", "--cov-report xml:coverage.xml", "--cov=src"]
