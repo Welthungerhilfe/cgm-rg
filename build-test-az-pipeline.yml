@@ -30,8 +30,8 @@ steps:
   displayName: 'Build'
 - script: docker run --name test --rm -d $(dockerId)/build:$(tag)
   displayName: 'Run'
-#- script: docker exec -it test ls
-#  displayName: 'LS'
+- script: docker ps
+  displayName: 'Show running container'
 - script: docker cp test:/app/test-output.xml  $(System.DefaultWorkingDirectory)
   displayName: 'Copy'
 - script: docker stop test
