@@ -31,7 +31,7 @@ steps:
 - script: |
     docker run --name test --rm -d $(dockerId)/build:$(tag)
     docker ps
-    docker exec -it test ls
+    docker exec test ls
     docker cp test:/app/test-output.xml  $(System.DefaultWorkingDirectory)
   displayName: 'Copy'
 - script: docker stop test
