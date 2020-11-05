@@ -29,6 +29,7 @@ steps:
 - script: |
     docker build -f $(dockerfilePath) -t $(dockerId)/build:$(tag) .
     docker run --name cgmrg_buildandtest --rm -d $(dockerId)/build:$(tag)
+    docker exec  -it cgmrg_buildandtest ls -l
     docker cp cgmrg_buildandtest:app/coverage.xml $(System.DefaultWorkingDirectory)
     docker stop cgmrg_buildandtest
 
