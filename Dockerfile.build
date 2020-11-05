@@ -7,5 +7,5 @@ RUN pip install -r requirements.txt
 
 ADD . /app
 
-RUN pytest --cov=src --cov-report=html:reports/html_dir --cov-report=xml:reports/coverage.xml
+RUN pytest --cov=src --cov-report=xml
 CMD ["echo", "hello world"]
