@@ -28,9 +28,10 @@ pool:
 steps:
 - script: docker build -f $(dockerfilePath) -t $(dockerId)/build:$(tag) .
   displayName: 'Build'
-- script: |
+- bash: |
     docker run --name test --rm -d $(dockerId)/build:$(tag)
-    docker ps
+    docker ps -q --filter="NAME={test}"
+    docker exec $(docker ps -q --filter="NAME={test}") bash
     docker exec test ls
     docker cp test:/app/test-output.xml  $(System.DefaultWorkingDirectory)
   displayName: 'Copy'
