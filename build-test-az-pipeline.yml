@@ -30,7 +30,6 @@ steps:
   displayName: 'Build'
 - bash: |
     docker run --name test -d $(dockerId)/build:$(tag)
-    docker ps -q --filter="name={test}"
     docker cp test:/app/test-output.xml $(System.DefaultWorkingDirectory)
     docker ps -a
   displayName: 'Copy'
