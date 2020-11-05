@@ -13,7 +13,7 @@ variables:
   dockerRegistryServiceConnection: '01d8e191-0132-47ae-bec0-cbdcf8e96a09'
   imageRepository: 'cgmresultgeneration'
   containerRegistry: 'cgmrgtest.azurecr.io'
-  dockerfilePath: '**/Dockerfile'
+  dockerfilePath: '**/Dockerfile.build'
   tag: '$(Build.BuildId)'
   
   # Agent VM image name
@@ -31,7 +31,7 @@ stages:
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
-        command: buildAndPush
+        command: build
         repository: $(imageRepository)
         dockerfile: $(dockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
