@@ -31,9 +31,9 @@ steps:
 - bash: |
     docker run --name test --rm -d $(dockerId)/build:$(tag)
     docker ps -q --filter="NAME={test}"
-    docker exec $(docker ps -q --filter="NAME={test}") bash
-    docker exec test ls
+    docker exec $(docker ps -q --filter="NAME={test}") ls
     docker cp test:/app/test-output.xml  $(System.DefaultWorkingDirectory)
+    docker ps
   displayName: 'Copy'
 - script: docker stop test
   displayName: 'Stop'
