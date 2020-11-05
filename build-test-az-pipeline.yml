@@ -30,6 +30,8 @@ steps:
   displayName: 'Build'
 - script: docker run --name cgmrg_buildandtest --rm -d $(dockerId)/build:$(tag)
   displayName: 'Run'
+- script: docker exec -it cgmrg_buildandtest ls -l
+  displayName: 'LS'
 - script: docker cp cgmrg_buildandtest:/app/test-output.xml  $(System.DefaultWorkingDirectory)
   displayName: 'Copy'
 - script: docker stop cgmrg_buildandtest
