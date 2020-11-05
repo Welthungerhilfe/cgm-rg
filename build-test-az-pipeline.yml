@@ -16,7 +16,7 @@ variables:
   containerRegistry: 'cgmrgtest.azurecr.io'
   dockerfilePath: '**/Dockerfile.build'
   tag: '$(Build.BuildId)'
-  
+  buildConfiguration: 'BuildAndTest'  
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
@@ -24,8 +24,7 @@ variables:
 # Build Docker image for this app, to be published to Docker Registry
 pool:
   vmImage: $(vmImageName)
-variables:
-  buildConfiguration: 'BuildAndTest'
+
 steps:
 - script: |
     docker build -f $(dockerfilePath) -t $(dockerId)/build:$(tag) .
