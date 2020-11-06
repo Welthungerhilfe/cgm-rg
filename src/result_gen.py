@@ -18,6 +18,7 @@ from datetime import datetime
 import preprocessing
 from pyntcloud import PyntCloud
 import download_and_upload_blobs
+import config
 
 def load_pcd_as_ndarray(pcd_path):
     """

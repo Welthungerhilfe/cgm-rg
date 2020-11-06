@@ -21,7 +21,7 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import json
 import psycopg2.extras
 import os
-
+import config
 
 def connect_to_default_database():
     """
@@ -43,12 +43,12 @@ def connect_to_main_database():
     Connect to the main database. Uses database name and credentials from the JSON file.
     """
     
-    dbname=os.environ['DB_NAME']
-    user=os.environ['DB_USER']
-    host=os.environ['DB_HOST']
-    password=os.environ['DB_PASSWD']
-    port=os.environ['DB_PORT']
-    sslmode=os.environ['DB_SSL_MODE']
+    dbname=config.DB_NAME
+    user=confdbname=config.DB_USER
+    host=confdbname=config.DB_HOST
+    password=confdbname=config.DB_PASSWD
+    port=confdbname=config.DB_PORT
+    sslmode=confdbname=config.DB_SSL_MODE
     return DatabaseInterface(dbname=dbname, user=user, host=host, password=password, port=port, sslmode=sslmode)
     
     

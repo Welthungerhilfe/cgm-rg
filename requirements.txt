@@ -7,4 +7,4 @@ scipy==1.3.2
 scikit-image==0.17.2
 pyntcloud==0.0.1
 bunch==1.0.1
-azureml-core==1.12.0
+azureml-core==1.16.0

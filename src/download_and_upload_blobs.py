@@ -1,9 +1,9 @@
 from azure.storage.blob import BlockBlobService, PublicAccess
 import os
+import config
 
-
-ACC_NAME = os.environ['ACC_NAME']
-ACC_KEY = os.environ['ACC_KEY']
+ACC_NAME = config.ACC_NAME
+ACC_KEY = config.ACC_KEY
 
 block_blob_service = BlockBlobService(account_name=ACC_NAME, account_key=ACC_KEY)
 
