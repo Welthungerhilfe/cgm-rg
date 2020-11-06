@@ -15,11 +15,13 @@ def download_blobs(file_list, container_name):
     """
 
     for file in file_list:
+        file_directory = os.path.dirname(file)
+        if os.path.isdir(file_directory) == False:
+            os.makedirs(file_directory)
         try:
             block_blob_service.get_blob_to_path(container_name, file, file)
         except Exception as error:
             print(error)
-
 
 
 def upload_blobs(file_list, container_name):

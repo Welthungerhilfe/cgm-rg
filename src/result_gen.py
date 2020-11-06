@@ -517,11 +517,14 @@ def main():
             if "camera_calibration.txt" in file:
                 calibration_file = file
         
-        calibration = preprocessing.parseCalibration(calibration_file)
+        try:
+            calibration = preprocessing.parseCalibration(calibration_file)
+        except Exception as error:
+            print(error)
 
         artifact_present = []
         for artifact in artifact_list:
-            if os.path.isfile(artifact[3]):
+            if os.path.isfile(artifact[3]) and 'depth' in artifact[3]:
                 artifact_present.append(artifact)
 
         print("no of artifacts present ", len(artifact_present))
