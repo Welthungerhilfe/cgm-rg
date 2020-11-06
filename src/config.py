@@ -1,8 +1,8 @@
 import os
 
 STORAGE_SECRET = os.environ['STORAGE_ACC']
-ACC_KEY = STORAGE_SECRET.split(';')[0]
-ACC_NAME = STORAGE_SECRET.split(';')[1]
+ACC_NAME = STORAGE_SECRET.split(';')[0]
+ACC_KEY = STORAGE_SECRET.split(';')[1]
 
 
 DATABASE_CONFIG = os.environ['DB_CONFIG']

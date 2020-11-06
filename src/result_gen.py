@@ -433,7 +433,7 @@ def upload_to_queue(storage_account_name, json_path, db_connector):
 
     return flag
 
-def get_file_name(destination_folder, model_id, qr_code):
+def get_file_name(destination_folder, model_id, qr_code, environment):
     filename = '{0}-{1}-{2}-{3}.json'.format(model_id, qr_code,random.randint(10000, 99999))
     folder = '{0}/{1}/'.format(destination_folder, model_id)
     return filename, folder
