@@ -15,7 +15,10 @@ def download_blobs(file_list, container_name):
     """
 
     for file in file_list:
-        block_blob_service.get_blob_to_path(container_name, file, file)
+        try:
+            block_blob_service.get_blob_to_path(container_name, file, file)
+        except Exception as error:
+            print(error)
 
 
 
@@ -26,4 +29,7 @@ def upload_blobs(file_list, container_name):
 
 
     for (local_file_name, blob_file_name) in file_list:
-        block_blob_service.create_blob_from_path(container_name, blob_file_name, local_file_name)
+        try:
+            block_blob_service.create_blob_from_path(container_name, blob_file_name, local_file_name)
+        except Exception as error:
+            print(error)

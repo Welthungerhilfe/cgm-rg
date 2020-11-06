@@ -482,7 +482,7 @@ def main():
 
     replace_path = 'qrcode/'
 
-    measure_id = [('24675719efe635df_measure_1604424965938_dw2WjWUdv6JnQn37',), ('1e7a0527a2e148ec_measure_1603966156661_H8OJeVlOykvIkvXT',)]
+    measure_id = [('c66050300c1ab684_measure_1601356048051_vj7fOLrU2dYwWDOT',), ('c66050300c1ab684_measure_1601356093034_CFIfgb2SFufC7Pe9',)]
 
     print(len(measure_id))
 
