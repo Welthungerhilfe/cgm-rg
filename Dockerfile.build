@@ -7,7 +7,4 @@ RUN pip install -r requirements.txt
 
 ADD . /app
 
-#Below is giving  2020-11-06T07:16:38.809642957Z ERROR: file not found: --cov-report term-missing
-#ENTRYPOINT ["pytest", "--tb=short", "-q", "--cov-report term-missing", "--cov=src"]
-
 ENTRYPOINT ["pytest", "--cov=src"]
