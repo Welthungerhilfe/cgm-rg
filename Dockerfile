@@ -7,4 +7,4 @@ RUN pip install -r requirements.txt
 
 ADD . /app
 
-CMD ["python", "src/check_blob_access.py"]
+CMD ["python", "src/result_gen.py"]
