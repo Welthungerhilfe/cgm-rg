@@ -30,7 +30,7 @@ steps:
   displayName: 'Build'
 - bash: |
     docker run -e ACC_NAME=$(ACC_NAME) -e ACC_KEY=$(ACC_KEY) --name test -d $(dockerId)/build:$(tag)
-    docker exec -d test coverage report
+    docker exec -d test "coverage run && coverage report"
     docker stop test
     docker logs -t test
     docker cp test:/app/test-output.xml $(System.DefaultWorkingDirectory)
