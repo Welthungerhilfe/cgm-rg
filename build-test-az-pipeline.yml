@@ -34,6 +34,7 @@ steps:
     docker stop test
     docker logs -t test
     docker cp test:/app/test-output.xml $(System.DefaultWorkingDirectory)
+    docker cp test:/app/coverage.xml $(System.DefaultWorkingDirectory)
   displayName: 'Copy Test Report'
 
 - task: PublishTestResults@2
