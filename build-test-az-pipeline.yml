@@ -30,8 +30,11 @@ steps:
   displayName: 'Build'
 - bash: |
     docker run -e ACC_NAME=$(ACC_NAME) -e ACC_KEY=$(ACC_KEY) --name test -d $(dockerId)/build:$(tag)
+    docker ps -a
     docker cp test:/app/test-output.xml $(System.DefaultWorkingDirectory)
+    docker ps -a
     docker stop test
+    docker logs -t test
   displayName: 'Copy Test Report'
 
 - task: PublishTestResults@2
