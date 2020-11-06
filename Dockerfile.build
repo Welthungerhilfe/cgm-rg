@@ -9,4 +9,4 @@ ADD . /app
 
 #RUN pytest --cov=src
 
-ENTRYPOINT ["pytest", "--cov-report xml", "--cov=src"]
+ENTRYPOINT ["pytest", "--tb=short", "-q", "--cov-report term-missing", "--cov=src"]
