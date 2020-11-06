@@ -29,12 +29,10 @@ steps:
 - script: docker build -f $(dockerfilePath) -t $(dockerId)/build:$(tag) .
   displayName: 'Build'
 - bash: |
-    docker run --name test -d $(dockerId)/build:$(tag)
+    docker run -e ACC_NAME=$(ACC_NAME) -e ACC_KEY=$(ACC_KEY) --name test -d $(dockerId)/build:$(tag)
     docker cp test:/app/test-output.xml $(System.DefaultWorkingDirectory)
-    docker ps -a
-  displayName: 'Copy'
-- script: docker stop test
-  displayName: 'Stop'
+    docker stop test
+  displayName: 'Copy Test Report'
 
 - task: PublishTestResults@2
   inputs:

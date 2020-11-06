@@ -9,7 +9,6 @@ def test_blob_access():
     '''
     Test case to check the blob access
     '''
-    '''
     ACC_NAME = os.environ['ACC_NAME']
     ACC_KEY = os.environ['ACC_KEY']
 
@@ -28,5 +27,4 @@ def test_blob_access():
     download_text = blob_access.download_text_blob(block_blob_service, container_name, file_name)
 
     assert upload_text == download_text
-    '''
-    assert 1 == 1
+    #assert 1 == 1
