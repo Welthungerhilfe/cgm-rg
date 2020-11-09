@@ -447,15 +447,15 @@ def depth_exists(id, connector):
     return exists[0][0]
 
 def main():
-    #if len(sys.argv) != 7:
-    #    print("Please provide destination folder and database connection file and storage account name and model_id.")
-    #    exit(1)
+    if len(sys.argv) != 3:
+        print("Please provide model_id and endpoint name.")
+        exit(1)
 
     #destination_folder = str(sys.argv[1])
     #db_connection_file = str(sys.argv[2])
     #storage_account_name = str(sys.argv[3])
-    #model_id = str(sys.argv[4])
-    #service = str(sys.argv[5])
+    model_id = str(sys.argv[1])
+    service = str(sys.argv[2])
     #calibration_file = str(sys.argv[6])
     #container_name = str(sys.argv[7])
 
@@ -482,8 +482,6 @@ def main():
     measure_id = main_connector.execute(select_measures, fetch_all=True)
 
     replace_path = 'qrcode/'
-
-    measure_id = [('c66050300c1ab684_measure_1601356048051_vj7fOLrU2dYwWDOT',), ('c66050300c1ab684_measure_1601356093034_CFIfgb2SFufC7Pe9',)]
 
     print(len(measure_id))
 

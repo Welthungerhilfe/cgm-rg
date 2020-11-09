@@ -1,21 +1,25 @@
+import json
 import os
 
-STORAGE_SECRET = os.environ['STORAGE_ACC']
-ACC_NAME = STORAGE_SECRET.split(';')[0]
-ACC_KEY = STORAGE_SECRET.split(';')[1]
+connection_file = os.path.expanduser("~/src/dbconnection.json")
+
+with open(connection_file) as json_file:
+    json_data = json.load(json_file)
 
 
-DATABASE_CONFIG = os.environ['DB_CONFIG']
-DB_NAME = DATABASE_CONFIG.split(';')[0]
-DB_USER = DATABASE_CONFIG.split(';')[1]
-DB_HOST = DATABASE_CONFIG.split(';')[2]
-DB_PASSWD = DATABASE_CONFIG.split(';')[3]
-DB_PORT = DATABASE_CONFIG.split(';')[4]
-DB_SSL_MODE = DATABASE_CONFIG.split(';')[5]
+ACC_NAME = "cgminbmzci" + json_data["Environment"] + "sa"
+ACC_KEY = json_data["account_key"]
 
 
-AZURE_ML_CONFIG = os.environ['ML_CONFIG']
-TENANT_ID = AZURE_ML_CONFIG.split(';')[0]
-SP_ID = AZURE_ML_CONFIG.split(';')[1]
-SP_PASSWD = AZURE_ML_CONFIG.split(';')[2]
-SUB_ID = AZURE_ML_CONFIG.split(';')[3]
+DB_NAME = json_data["dbname"]
+DB_USER = json_data["user"]
+DB_HOST = json_data["host"]
+DB_PASSWD = json_data["password"]
+DB_PORT = json_data["port"]
+DB_SSL_MODE = json_data["sslmode"]
+
+
+TENANT_ID = json_data["tenant_id"]
+SP_ID = json_data["sp_id"]
+SP_PASSWD = json_data["sp_password"]
+SUB_ID = json_data["sub_id"]
