@@ -1,0 +1,11 @@
+{
+    "dbname": "cgm",
+    "user": "xxxx@xxxxxxx",
+    "host": "xxxxxxx.com",
+    "password": "xxxxxxxx",
+    "port": 5432,
+    "sslmode": "require",
+    "Environment": "ReleaseEnv",
+    "account_key": "Account_key",
+    "tenant_id": "Tenant_id"
+}
