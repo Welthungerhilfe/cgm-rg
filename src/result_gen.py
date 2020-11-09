@@ -459,10 +459,8 @@ def main():
     #calibration_file = str(sys.argv[6])
     #container_name = str(sys.argv[7])
 
-    model_id = "q3_depthmap_height_run_01"
-    service = "q3-depthmap-height-run-01-ci"
     container_name = "scans"
-    destination_folder = '.'
+    destination_folder = '~'
 
     #calibration = preprocessing.parseCalibration(calibration_file)
     preprocessing.setWidth(int(240 * 0.75))
@@ -481,7 +479,7 @@ def main():
     select_measures = "select measure_id from artifact where not exists (SELECT measure_id from measure_result WHERE measure_id=artifact.measure_id and model_id = '{}')".format(model_id) + " and dataformat in ('pcd', 'depth') group by measure_id having count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('100', '104', '200') then 1 end) > 4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('102', '110', '202') then 1 end) >4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('101', '107', '201') then 1 end) > 4;"
     measure_id = main_connector.execute(select_measures, fetch_all=True)
 
-    replace_path = 'qrcode/'
+    replace_path = "~/" + config.ACC_NAME + '/qrcode/'
 
     print(len(measure_id))
 
