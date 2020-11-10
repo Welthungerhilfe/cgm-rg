@@ -1,0 +1,27 @@
+# TODO copyright information
+# this is the file to install the cron jobs to regularily write
+# messages from the Azure Storage Queues into the local filesystem
+#
+#
+#
+# Edit this file to introduce tasks to be run by cron.
+#
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+#
+# For more information see the manual pages of crontab(5) and cron(8)
+#
+
+# m h  dom mon dow   command
+
+### qa environment
+# TODO write with environment variable
+
+* * * * * run-one ~/deployment/run_result_gen_gapnet_height.sh
+
+* * * * * run-one ~/deployment/run_result_gen_20190723_weight.sh
+
+* * * * * run-one ~/deployment/run_result_gen_q3_depthmap_plaincnn_height_run_01.sh
+
+* * * * * run-one ~/deployment/run_result_gen_q3_depthmap_plaincnn_height_run_02.sh
