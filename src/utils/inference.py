@@ -24,6 +24,8 @@ import numpy as np
 from azureml.core import Workspace
 from azureml.core.authentication import ServicePrincipalAuthentication
 
+# To include the config file
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 import config
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"

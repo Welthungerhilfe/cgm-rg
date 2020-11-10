@@ -16,11 +16,15 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import psycopg2
-from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-import json
-import psycopg2.extras
 import os
+import sys
+import json
+import psycopg2
+import psycopg2.extras
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+
+# To include the config file
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 import config
 
 def connect_to_default_database():
