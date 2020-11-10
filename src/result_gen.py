@@ -5,7 +5,7 @@ import random
 import argparse
 import numpy as np
 from bunch import Bunch
-
+import cv2
 import config
 import utils.inference as inference
 import utils.dbutils as dbutils
@@ -452,6 +452,14 @@ class MeasureResultGeneration:
             return False
 
         return True
+
+    def delete_downloaded_artifacts(self):
+        '''
+        Delete all the artifacts downloaded for the scan 
+        '''
+        files = [artifact[3] for artifact in self.artifact_list]
+        for file in files:
+            os.remove(file)
 
         # TODO send results to storage queue
 
