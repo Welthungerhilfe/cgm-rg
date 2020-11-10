@@ -75,14 +75,10 @@ def check_status_code(path, extract_status_code, status_list):
     '''
     Check the artifact belong to one of the status code in status list
     '''
-
-    if extract_status_code(path) in status_list:
-        return True
-    else:
-        return False
+    return extract_status_code(path) in status_list
 
 
-class Measure_Result_Generation:
+class MeasureResultGeneration:
 
     def __init__(
             self,
@@ -104,8 +100,8 @@ class Measure_Result_Generation:
         self.front_status_list = ['100', '104', '200']
         self.back_status_list = ['100', '104', '200']
         self.threesixty_status_list = ['100', '104', '200']
-        self.ACC_NAME = config.ACC_NAME
-        self.ACC_KEY = config.ACC_KEY
+        self.acc_name = config.ACC_NAME
+        self.acc_key = config.ACC_KEY
 
     def get_artifact_list_per_measure(self):
         '''
@@ -149,7 +145,7 @@ class Measure_Result_Generation:
         '''
         files = [artifact[3] for artifact in self.artifact_list]
         block_blob_service = blob_access.connect_blob_storage(
-            self.ACC_NAME, self.ACC_KEY, self.container_name)
+            self.acc_name, self.acc_key, self.container_name)
         blob_access.download_blobs(
             block_blob_service, self.container_name, files)
 
@@ -514,16 +510,16 @@ def main():
              )]
         for id in measure_id:
             id_split = id[0].split('_')
-            delete_measure_result = "delete from measure_result where measure_id = '{}'".format(
+            query_delete_measure_result = "delete from measure_result where measure_id = '{}'".format(
                 id[0]) + " and model_id = '{}';".format(model_id)
             try:
-                main_connector.execute(delete_measure_result)
+                main_connector.execute(query_delete_measure_result)
             except Exception as error:
                 print(error)
-            delete_artifact_result = "delete from artifact_result where model_id = '{}'".format(
+            query_delete_artifact_result = "delete from artifact_result where model_id = '{}'".format(
                 model_id) + " and artifact_id like '{}';".format(id_split[0] + "%" + id_split[2][:-1] + "%")
             try:
-                main_connector.execute(delete_artifact_result)
+                main_connector.execute(query_delete_artifact_result)
             except Exception as error:
                 print(error)
 
@@ -532,7 +528,7 @@ def main():
     print(len(measure_ids))
 
     for measure_id in measure_ids:
-        measure_rg = Measure_Result_Generation(
+        measure_rg = MeasureResultGeneration(
             measure_id, main_connector, replace_path, container_name)
         flag = measure_rg.get_artifact_list_per_measure()
         if not flag:
