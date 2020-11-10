@@ -594,6 +594,8 @@ def main():
         if not flag:
             continue
         measure_rg.update_measure_table_and_blob(model_id, destination_folder)
+        measure_rg.get_pose_results(model_id, service)
+        measure_rg.delete_downloaded_artifacts()
 
     main_connector.cursor.close()
     main_connector.connection.close()
