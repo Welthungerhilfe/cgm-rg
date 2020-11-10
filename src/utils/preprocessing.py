@@ -2,6 +2,7 @@ import zipfile
 import numpy as np
 from pyntcloud import PyntCloud
 from skimage.transform import resize
+import cv2
 
 image_target_height = 240
 image_target_width = 180
@@ -394,3 +395,15 @@ def pcd_processing_gapnet(pcd_paths):
     pointclouds = pointclouds.reshape((-1, 1024, 3))
 
     return pointclouds
+
+
+def posenet_processing(filename):
+    image = cv2.imread(filename)
+    if '_100_' in filename or '_101_' in filename or '_102_' in filename:
+        image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+    elif '_200_' in filename or '_201_' in filename or '_202_' in filename:
+        image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    
+    image=cv2.resize(image,(401,401))
+
+    return image
