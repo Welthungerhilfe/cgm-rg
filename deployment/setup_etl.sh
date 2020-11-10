@@ -6,8 +6,8 @@
 echo "Starting setup"
 
 #echo "Moving files"
-#cp -r ./PythonCode ./cgm-etl && rmdir --ignore-fail-on-non-empty ./PythonCode
-#cp -r ./deployment ./cgm-etl && rmdir --ignore-fail-on-non-empty ./deployment
+cp -r ./src ./cgm-rg && rmdir --ignore-fail-on-non-empty ./src
+cp -r ./deployment ./cgm-rg && rmdir --ignore-fail-on-non-empty ./deployment
 
 echo "Removing cron jobs"
 crontab -r &> /dev/null

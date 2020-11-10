@@ -481,6 +481,21 @@ def main():
 
     replace_path = "~/" + config.ACC_NAME + '/qrcode/'
 
+    if config.ENV == "dev":
+        measure_id = [("c66050300c1ab684_measure_1601356048051_vj7fOLrU2dYwWDOT",), ("c66050300c1ab684_measure_1601356093034_CFIfgb2SFufC7Pe9",), ("c66050300c1ab684_measure_1601355986152_WspeDENLEBteZLRD",), ("c66050300c1ab684_measure_1602060079742_LORX5MwfKQhni3gA",), ("601db192d38c0816_measure_1601379417732_PRBsdWChgw8Qkoe1",)]
+        for id in measure_id:
+            id_split = id[0].split('_')
+            delete_measure_result = "delete from measure_result where measure_id = '{}'".format(id[0]) + " and model_id = '{}';".format(model_id)
+            try:
+                main_connector.execute(delete_measure_result)
+            except Exception as error:
+                print(error)
+            delete_artifact_result = "delete from artifact_result where model_id = '{}'".format(model_id) + " and artifact_id like '{}';".format(id_split[0] + "%" + id_split[2][:-1] + "%")
+            try:
+                main_connector.execute(delete_artifact_result)
+            except Exception as error:
+                print(error)
+
     print(len(measure_id))
 
     for id in measure_id:
