@@ -1,7 +1,7 @@
 import json
 import dbutils
 from datetime import datetime
-
+import numpy as np
 
 def get_measure_insert(
         measure_id,
