@@ -13,6 +13,7 @@ import utils.blob_access as blob_access
 import utils.rgutils as rgutils
 import utils.preprocessing as preprocessing
 
+BASE_PATH = '/storage/emulated/0/Child Growth Monitor Scanner App/'
 
 def get_stats(predictions):
     res = Bunch()
@@ -109,7 +110,7 @@ class MeasureResultGeneration:
         '''
         get_artifacts = "SELECT id, qr_code, create_timestamp, replace('{}'".format(
             self.replace_path)
-        get_artifacts += " || split_part(storage_path,'/storage/emulated/0/Child Growth Monitor Scanner App/', 2), 'measurements', 'measure')"
+        get_artifacts += " || split_part(storage_path, '{}', 2), 'measurements', 'measure')".format(BASE_PATH)
         # where dataformat = '{}'".format(dataformat)
         get_artifacts += "from artifact"
         get_artifacts += " where measure_id = '{}';".format(self.measure_id[0])
@@ -516,8 +517,9 @@ def main():
                 main_connector.execute(query_delete_measure_result)
             except Exception as error:
                 print(error)
-            query_delete_artifact_result = "delete from artifact_result where model_id = '{}'".format(
-                model_id) + " and artifact_id like '{}';".format(id_split[0] + "%" + id_split[2][:-1] + "%")
+            
+            tmp_str = id_split[0] + "%" + id_split[2][:-1] + "%"
+            query_delete_artifact_result = f"delete from artifact_result where model_id = '{model_id}' and artifact_id like '{tmp_str}';"
             try:
                 main_connector.execute(query_delete_artifact_result)
             except Exception as error:
