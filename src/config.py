@@ -9,7 +9,7 @@ with open(connection_file) as json_file:
 
 ACC_NAME = "cgminbmzci" + json_data["Environment"] + "sa"
 ACC_KEY = json_data["account_key"]
-
+ENV = json_data["Environment"]
 
 DB_NAME = json_data["dbname"]
 DB_USER = json_data["user"]
