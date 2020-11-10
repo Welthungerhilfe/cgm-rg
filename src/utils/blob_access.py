@@ -1,12 +1,12 @@
 import os
-#import config
 import datetime
 from azure.storage.blob import BlockBlobService, PublicAccess
 
-#ACC_NAME = config.ACC_NAME
-#ACC_KEY = config.ACC_KEY
+# ACC_NAME = config.ACC_NAME
+# ACC_KEY = config.ACC_KEY
 
-#block_blob_service = BlockBlobService(account_name=ACC_NAME, account_key=ACC_KEY)
+# block_blob_service = BlockBlobService(account_name=ACC_NAME, account_key=ACC_KEY)
+
 
 def create_blob_storage(ACC_NAME, ACC_KEY, container_name):
     '''
@@ -59,7 +59,7 @@ def download_blobs(block_blob_service, container_name, file_list):
     """
     for file in file_list:
         file_directory = os.path.dirname(file)
-        if os.path.isdir(file_directory) == False:
+        if not os.path.isdir(file_directory):
             os.makedirs(file_directory)
         try:
             block_blob_service.get_blob_to_path(container_name, file, file)
@@ -73,7 +73,8 @@ def upload_blobs(block_blob_service, container_name, file_list):
     """
     for (local_file_name, blob_file_name) in file_list:
         try:
-            block_blob_service.create_blob_from_path(container_name, blob_file_name, local_file_name)
+            block_blob_service.create_blob_from_path(
+                container_name, blob_file_name, local_file_name)
         except Exception as error:
             print(error)
 

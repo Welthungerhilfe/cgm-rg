@@ -16,79 +16,90 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+
 import os
 import sys
 import json
-import numpy as np
 
 from azureml.core import Workspace
 from azureml.core.authentication import ServicePrincipalAuthentication
 
 # To include the config file
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
-import config
+sys.path.append(
+    os.path.join(
+        os.path.dirname(
+            os.path.realpath(__file__)),
+        os.pardir))
+
+import config # noqa402
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 
-#TODO generate the config file
-#ws = Workspace.from_config('./ws_config.json')
+# TODO generate the config file
+# ws = Workspace.from_config('./ws_config.json')
 
-#TODO load the weights of passed model and generate results for passed pointclouds
+# TODO load the weights of passed model and generate results for passed
+# pointclouds
+
 
 def get_predictions(pointcloud_numpy, model_id, service):
-    #ws = Workspace.from_config('~/PythonCode/prod_ws_config.json')
-    
-    sp = ServicePrincipalAuthentication(tenant_id=config.TENANT_ID,
-                                    service_principal_id=config.SP_ID,
-                                    service_principal_password=config.SP_PASSWD)
-    
+    # ws = Workspace.from_config('~/PythonCode/prod_ws_config.json')
+
+    sp = ServicePrincipalAuthentication(
+        tenant_id=config.TENANT_ID,
+        service_principal_id=config.SP_ID,
+        service_principal_password=config.SP_PASSWD)
+
     ws = Workspace.get(name="cgm-azureml-prod",
-                   auth=sp,
-                   subscription_id=config.SUB_ID)
-    
+                       auth=sp,
+                       subscription_id=config.SUB_ID)
+
     service = ws.webservices[service]
     pointcloud_json = json.dumps({'data': pointcloud_numpy.tolist()})
-    predictions = service.run(input_data = pointcloud_json)
+    predictions = service.run(input_data=pointcloud_json)
     return predictions
 
+
 def get_pose_prediction(image, service):
-    #ws = Workspace.from_config('~/PythonCode/prod_ws_config.json')
-    
-    sp = ServicePrincipalAuthentication(tenant_id=config.TENANT_ID,
-                                    service_principal_id=config.SP_ID,
-                                    service_principal_password=config.SP_PASSWD)
-    
+    # ws = Workspace.from_config('~/PythonCode/prod_ws_config.json')
+
+    sp = ServicePrincipalAuthentication(
+        tenant_id=config.TENANT_ID,
+        service_principal_id=config.SP_ID,
+        service_principal_password=config.SP_PASSWD)
+
     ws = Workspace.get(name="cgm-azureml-prod",
-                   auth=sp,
-                   subscription_id=config.SUB_ID)
-    
+                       auth=sp,
+                       subscription_id=config.SUB_ID)
+
     service = ws.webservices[service]
     input_image_json = json.dumps({'input_image': image.tolist()})
-    predictions = service.run(input_data = input_image_json)
+    predictions = service.run(input_data=input_image_json)
     return predictions
 
 
 def get_predictions_2(pointcloud_numpy, model_id, service_name):
 
-    #ws = Workspace.from_config('~/PythonCode/prod_ws_config.json')
-    
-    sp = ServicePrincipalAuthentication(tenant_id=config.TENANT_ID,
-                                    service_principal_id=config.SP_ID,
-                                    service_principal_password=config.SP_PASSWD)
-    
+    # ws = Workspace.from_config('~/PythonCode/prod_ws_config.json')
+
+    sp = ServicePrincipalAuthentication(
+        tenant_id=config.TENANT_ID,
+        service_principal_id=config.SP_ID,
+        service_principal_password=config.SP_PASSWD)
+
     ws = Workspace.get(name="cgm-azureml-prod",
-                   auth=sp,
-                   subscription_id=config.SUB_ID)
-    
+                       auth=sp,
+                       subscription_id=config.SUB_ID)
+
     service = ws.webservices[service_name]
     max_size = 20
     predictions = []
     for i in range(0, len(pointcloud_numpy), max_size):
-        print(i, min(len(pointcloud_numpy), i+max_size))
-        pcd_numpy = pointcloud_numpy[i:i+max_size]
-        #service = ws.webservices[service_name]
+        print(i, min(len(pointcloud_numpy), i + max_size))
+        pcd_numpy = pointcloud_numpy[i:i + max_size]
+        # service = ws.webservices[service_name]
         pointcloud_json = json.dumps({'data': pcd_numpy.tolist()})
-        prediction = service.run(input_data = pointcloud_json)
+        prediction = service.run(input_data=pointcloud_json)
         predictions += prediction
 
     return predictions

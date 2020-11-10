@@ -1,7 +1,7 @@
+import preprocessing
 import sys
 sys.path.append("../src")
 
-import preprocessing
 
 def test_that_get_height_works():
     """
@@ -14,9 +14,10 @@ def test_that_get_height_works():
 
     # Verify
     truth = 135
-    assert result==truth
+    assert result == truth
 
     # Cleanup - none required
+
 
 def test_that_get_width_works():
     """
@@ -29,6 +30,6 @@ def test_that_get_width_works():
 
     # Verify
     truth = 180
-    assert result==truth
+    assert result == truth
 
     # Cleanup - none required
