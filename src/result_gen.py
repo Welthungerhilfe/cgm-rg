@@ -92,7 +92,8 @@ class Measure_Result_Generation:
     def __init__(self, measure_id, main_connector, replace_path, container_name):
         self.measure_id = measure_id
         self.main_connector = main_connector
-        
+        self.container_name = container_name
+
         if rgutils.depth_exists(measure_id, self.main_connector):
             self.dataformat = 'depth'
         else:
@@ -120,29 +121,30 @@ class Measure_Result_Generation:
         
         if len(artifacts) < 15:
             print("not enough data to calculate results measure id {0}".format(self.measure_id[0]))
-            continue
+            return False
         print("enough data to calculate results measure id {0}".format(self.measure_id[0]))
         
         # TODO put it in Dataframe
         self.artifact_list = [list(artifact) for artifact in artifacts]
 
-        self.download_measure()
+        self.download_measure_and_set_calibration()
 
         self.artifact_present = []
-        for artifact in artifact_list:
+        for artifact in self.artifact_list:
             if os.path.isfile(artifact[3]) and 'depth' in artifact[3]:
                 self.artifact_present.append(artifact)
 
         print("no of artifacts present ", len(self.artifact_present))
 
+        return True
 
     def download_measure_and_set_calibration(self):
         '''
         Download a scan measure and sets calibration parameter
         '''
         files = [artifact[3] for artifact in self.artifact_list]
-        block_blob_service = connect_blob_storage(self.ACC_NAME, self.ACC_KEY, self.container_name)
-        blob_access.download_blobs(block_blob_service, container_name, file_list)
+        block_blob_service = blob_access.connect_blob_storage(self.ACC_NAME, self.ACC_KEY, self.container_name)
+        blob_access.download_blobs(block_blob_service, self.container_name, files)
 
         # Not able to understand the code. This does not make sense
         for _file in files:
@@ -180,7 +182,7 @@ class Measure_Result_Generation:
         #pcd_path for pcd_path in pcd_paths if pcd_path.split('/')[-1].split('_')[-2] in ['100','104','200']
         self.artifact_front = []
         for artifact in self.artifact_present:
-            if check_status_code(artifact[3], self.front_status_list, extract_status_code_one, self.front_status_list) or if check_status_code(artifact[3], extract_status_code_two, self.front_status_list):
+            if check_status_code(artifact[3], extract_status_code_one, self.front_status_list) or check_status_code(artifact[3], extract_status_code_two, self.front_status_list):
                 self.artifact_front.append(artifact)
 
         self.artifact_front_pcd_paths = [artifact[3] for artifact in self.artifact_front]
@@ -188,14 +190,14 @@ class Measure_Result_Generation:
         #pcd_path for pcd_path in pcd_paths if pcd_path.split('/')[-1].split('_')[-2] in ['102','110','202']
         self.artifact_back = []
         for artifact in self.artifact_present:
-            if check_status_code(artifact[3], self.front_status_list, extract_status_code_one, self.back_status_list) or if check_status_code(artifact[3], extract_status_code_two, self.back_status_list):
+            if check_status_code(artifact[3], extract_status_code_one, self.back_status_list) or check_status_code(artifact[3], extract_status_code_two, self.back_status_list):
                 self.artifact_back.append(artifact)
         self.artifact_back_pcd_paths = [artifact[3] for artifact in self.artifact_back]
 
         #pcd_path for pcd_path in pcd_paths if pcd_path.split('/')[-1].split('_')[-2] in ['101','107','201']
         self.artifact_threesixty = []
         for artifact in self.artifact_present:
-            if check_status_code(artifact[3], self.front_status_list, extract_status_code_one, self.threesixty_status_list) or if check_status_code(artifact[3], extract_status_code_two, self.threesixty_status_list):
+            if check_status_code(artifact[3], extract_status_code_one, self.threesixty_status_list) or check_status_code(artifact[3], extract_status_code_two, self.threesixty_status_list):
                 self.artifact_threesixty.append(artifact)
         self.artifact_threesixty_pcd_paths = [artifact[3] for artifact in self.artifact_threesixty]
 
@@ -208,8 +210,11 @@ class Measure_Result_Generation:
         '''
         if len(self.artifact_front)<MIN_ARTIFACT_REQUIRED or len(self.artifact_back)<MIN_ARTIFACT_REQUIRED or len(self.artifact_threesixty)<MIN_ARTIFACT_REQUIRED:
             print("not enough scan data for each scan step")
-            continue
+            return False
+
         print("enough scan data for each scan step")
+
+        return True
 
 
     def preprocess_artifact(self, model_id):
@@ -220,30 +225,30 @@ class Measure_Result_Generation:
         json_metadata = self.main_connector.execute(get_json_metadata,fetch_all=True)
 
         if model_id == 'GAPNet_height_s1':
-            if dataformat == 'depth':
-                front_pcd_numpy = depthmap_to_pcd(self.artifact_front_pcd_paths, self.calibration, 'gapnet')
-                back_pcd_numpy = depthmap_to_pcd(self.artifact_back_pcd_paths, self.calibration, 'gapnet')
-                threesixty_pcd_numpy = depthmap_to_pcd(self.artifact_threesixty_pcd_paths, self.calibration, 'gapnet')
+            if self.dataformat == 'depth':
+                front_pcd_numpy = preprocessing.depthmap_to_pcd(self.artifact_front_pcd_paths, self.calibration, 'gapnet')
+                back_pcd_numpy = preprocessing.depthmap_to_pcd(self.artifact_back_pcd_paths, self.calibration, 'gapnet')
+                threesixty_pcd_numpy = preprocessing.depthmap_to_pcd(self.artifact_threesixty_pcd_paths, self.calibration, 'gapnet')
             else:
                 front_pcd_numpy = preprocessing.pcd_processing_gapnet(self.artifact_front_pcd_paths)
                 back_pcd_numpy = preprocessing.pcd_processing_gapnet(self.artifact_back_pcd_paths)
                 threesixty_pcd_numpy = preprocessing.pcd_processing_gapnet(self.artifact_threesixty_pcd_paths)
         #TODO check which file is used depth/pcd
         elif 'depthmap' in model_id:
-            if dataformat == 'depth':
-                front_pcd_numpy = get_depthmaps(self.artifact_front_pcd_paths)
-                back_pcd_numpy = get_depthmaps(self.artifact_back_pcd_paths)
-                threesixty_pcd_numpy = get_depthmaps(self.artifact_threesixty_pcd_paths)
+            if self.dataformat == 'depth':
+                front_pcd_numpy = preprocessing.get_depthmaps(self.artifact_front_pcd_paths)
+                back_pcd_numpy = preprocessing.get_depthmaps(self.artifact_back_pcd_paths)
+                threesixty_pcd_numpy = preprocessing.get_depthmaps(self.artifact_threesixty_pcd_paths)
             else:
-                front_pcd_numpy = pcd_to_depthmap(self.artifact_front_pcd_paths, self.calibration)
-                back_pcd_numpy = pcd_to_depthmap(self.artifact_back_pcd_paths, self.calibration)
-                threesixty_pcd_numpy = pcd_to_depthmap(self.artifact_threesixty_pcd_paths, self.calibration)
+                front_pcd_numpy = preprocessing.pcd_to_depthmap(self.artifact_front_pcd_paths, self.calibration)
+                back_pcd_numpy = preprocessing.pcd_to_depthmap(self.artifact_back_pcd_paths, self.calibration)
+                threesixty_pcd_numpy = preprocessing.pcd_to_depthmap(self.artifact_threesixty_pcd_paths, self.calibration)
         else:
             input_shape = json_metadata[0][0]['input_shape']
-            if dataformat == 'depth':
-                front_pcd_numpy = depthmap_to_pcd(self.artifact_front_pcd_paths, self.calibration, 'pointnet', input_shape)
-                back_pcd_numpy = depthmap_to_pcd(self.artifact_back_pcd_paths, self.calibration, 'pointnet', input_shape)
-                threesixty_pcd_numpy = depthmap_to_pcd(self.artifact_threesixty_pcd_paths, self.calibration, 'pointnet', input_shape)
+            if self.dataformat == 'depth':
+                front_pcd_numpy = preprocessing.depthmap_to_pcd(self.artifact_front_pcd_paths, self.calibration, 'pointnet', input_shape)
+                back_pcd_numpy = preprocessing.depthmap_to_pcd(self.artifact_back_pcd_paths, self.calibration, 'pointnet', input_shape)
+                threesixty_pcd_numpy = preprocessing.depthmap_to_pcd(self.artifact_threesixty_pcd_paths, self.calibration, 'pointnet', input_shape)
             else:
                 front_pcd_numpy = preprocessing.pcd_to_ndarray(self.artifact_front_pcd_paths, input_shape)
                 back_pcd_numpy = preprocessing.pcd_to_ndarray(self.artifact_back_pcd_paths, input_shape)
@@ -275,11 +280,11 @@ class Measure_Result_Generation:
         '''
         #TODO alert when this happens
         # May need to different function
-        if isinstance(front_predictions, str) or isinstance(back_predictions, str) or isinstance(threesixty_predictions, str):
+        if isinstance(self.front_predictions, str) or isinstance(self.back_predictions, str) or isinstance(self.threesixty_predictions, str):
             # Is this modification correct
             print("Result is type string. Skipping it")
             print(id)
-            continue
+            return False
 
         if len(self.front_predictions)<2 or len(self.back_predictions)<2 or len(self.threesixty_predictions)<2:
             print("not enough predictions")
@@ -291,7 +296,8 @@ class Measure_Result_Generation:
             if len(self.threesixty_predictions) < 2:
                 self.threesixty_predictions = [[0], [10]]
             #continue
-
+    
+        return True
 
     def get_height_per_measure(self):
         '''
@@ -352,7 +358,7 @@ class Measure_Result_Generation:
         results.model_result.artifact_results = Bunch()
         results.model_result.artifact_results.front_scan = get_artifact_result(self.artifact_front, self.front_predictions)
         results.model_result.artifact_results.back_scan = get_artifact_result(self.artifact_back, self.back_predictions)
-        results.model_result.artifact_results.threesixty_scan = get_artifact_result(self.artifact_360, self.threesixty_predictions)
+        results.model_result.artifact_results.threesixty_scan = get_artifact_result(self.artifact_threesixty, self.threesixty_predictions)
 
         results_json_string = json.dumps(results)
         self.results_json_object = json.loads(results_json_string)
@@ -376,11 +382,14 @@ class Measure_Result_Generation:
         result_file = '{0}{1}'.format(folder, filename)
 
         #TODO update results to database
-        flag = rgutils.upload_result(result_file, measure_id[0], self.main_connector)
+        flag = rgutils.upload_result(result_file, self.measure_id[0], self.main_connector)
 
         if flag == 0:
             print("could not update to database")
-            continue
+            return False
+        
+        return True
+            
         #TODO send results to storage queue
 
         #flag = rgutils.upload_to_queue(storage_account_name, result_file, main_connector)
@@ -447,17 +456,25 @@ def main():
 
     for measure_id in measure_ids:
         measure_rg = Measure_Result_Generation(measure_id, main_connector, replace_path, container_name)
-        measure_rg.get_artifact_list_per_measure()
-        measure_rg.download_measure_and_set_calibration()
+        flag = measure_rg.get_artifact_list_per_measure()
+        if not flag:
+            continue
+        #measure_rg.download_measure_and_set_calibration() called in other function so commented
         measure_rg.get_qrcodes_per_measure()
         measure_rg.get_timestamp_per_measure()
         measure_rg.get_artifact_paths()
-        measure_rg.check_enough_artifact()
+        flag = measure_rg.check_enough_artifact()
+        if not flag:
+            continue
         measure_rg.preprocess_artifact(model_id)
         measure_rg.get_height_per_artifact(model_id, service)
-        measure_rg.check_enough_height_prediction()
-        measure_rg.create_result_in_json_format(model_id)
-        measure_rg.update_measure_table_and_blob(self, model_id, destination_folder)
+        flag = measure_rg.check_enough_height_prediction()
+        if not flag:
+            continue
+        flag = measure_rg.create_result_in_json_format(model_id)
+        if not flag:
+            continue
+        measure_rg.update_measure_table_and_blob(model_id, destination_folder)
 
     main_connector.cursor.close()
     main_connector.connection.close()

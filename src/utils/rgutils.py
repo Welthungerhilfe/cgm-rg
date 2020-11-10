@@ -260,6 +260,6 @@ def upload_to_queue(storage_account_name, json_path, db_connector):
 
 def depth_exists(id, connector):
     
-    check_dataformat = "SELECT EXISTS (SELECT id FROM artifact WHERE measure_id='{}'".format(id) + " and dataformat = 'depth');"
+    check_dataformat = "SELECT EXISTS (SELECT id FROM artifact WHERE measure_id='{}'".format(id[0]) + " and dataformat = 'depth');"
     exists = connector.execute(check_dataformat, fetch_all=True)
     return exists[0][0]
