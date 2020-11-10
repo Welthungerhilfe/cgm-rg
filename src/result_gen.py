@@ -389,6 +389,20 @@ class MeasureResultGeneration:
     def get_blur_result(self):
         pass
 
+    def get_pose_results(self, model_id, service):
+        '''
+        Generate pose results from rgb images in a scan
+        '''
+        PART_NAMES=["nose","rightShoulder","rightElbow","rightWrist","leftShoulder",
+           "leftElbow","leftWrist","rightHip","rightKnee","rightAnkle",
+           "leftHip","leftKnee","leftAnkle","rightEye","leftEye","rightEar","leftEar"]
+        for artifact in self.rgb_artifact_present:
+            image = preprocessing.posenet_processing(artifact[3])
+
+            results = inference.get_pose_prediction(image, service)
+            pose_prediction = json.loads(results)
+            rgutils.process_posenet_result(pose_prediction, model_id, artifact[0], self.main_connector)
+
     def create_result_in_json_format(self, model_id):
         '''
         Prepare results in Json format
