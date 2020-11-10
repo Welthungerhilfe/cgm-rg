@@ -3,6 +3,7 @@ import sys
 import json
 import shutil
 import random
+import argparse
 import numpy as np
 from bunch import Bunch
 
@@ -462,17 +463,32 @@ class MeasureResultGeneration:
 
 
 def main():
-    if len(sys.argv) != 3:
-        print("Please provide model_id and endpoint name.")
-        exit(1)
+
+    parser = argparse.ArgumentParser(
+        description='Please provide model_id and endpoint name.')
+    
+    parser.add_argument('--model_id', required=True,
+        type=str,
+        help='Model Id of the prediction service')
+
+    parser.add_argument('--service', required=True,
+        type=str,
+        help='Endpoint name of the ML Service')
+
+    args = parser.parse_args()
+
+    model_id = args.model_id
+    service = args.service
+
 
     # destination_folder = str(sys.argv[1])
     # db_connection_file = str(sys.argv[2])
     # storage_account_name = str(sys.argv[3])
-    model_id = str(sys.argv[1])
-    service = str(sys.argv[2])
+    # model_id = str(sys.argv[1])
+    # service = str(sys.argv[2])
     # calibration_file = str(sys.argv[6])
     # container_name = str(sys.argv[7])
+
 
     container_name = "scans"
     destination_folder = '~'
