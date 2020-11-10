@@ -1,6 +1,7 @@
 import sys
 sys.path.append("../src")
-import utils.preprocessing as preprocessing
+
+import utils.preprocessing as preprocessing # noqa E402
 
 
 def test_that_get_height_works():

@@ -17,6 +17,7 @@
 #
 
 
+import config  # noqa402
 import os
 import sys
 import json
@@ -31,7 +32,6 @@ sys.path.append(
             os.path.realpath(__file__)),
         os.pardir))
 
-import config # noqa402
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 

@@ -1,8 +1,8 @@
 import os
-import sys
 import json
 import shutil
 import random
+import argparse
 import numpy as np
 from bunch import Bunch
 
@@ -12,6 +12,8 @@ import utils.dbutils as dbutils
 import utils.blob_access as blob_access
 import utils.rgutils as rgutils
 import utils.preprocessing as preprocessing
+
+BASE_PATH = '/storage/emulated/0/Child Growth Monitor Scanner App/'
 
 
 def get_stats(predictions):
@@ -109,8 +111,9 @@ class MeasureResultGeneration:
         '''
         get_artifacts = "SELECT id, qr_code, create_timestamp, replace('{}'".format(
             self.replace_path)
-        get_artifacts += " || split_part(storage_path,'/storage/emulated/0/Child Growth Monitor Scanner App/', 2), 'measurements', 'measure')"
         # where dataformat = '{}'".format(dataformat)
+        get_artifacts += " || split_part(storage_path, '{}', 2), 'measurements', 'measure')".format(
+            BASE_PATH)
         get_artifacts += "from artifact"
         get_artifacts += " where measure_id = '{}';".format(self.measure_id[0])
         artifacts = self.main_connector.execute(get_artifacts, fetch_all=True)
@@ -461,15 +464,27 @@ class MeasureResultGeneration:
 
 
 def main():
-    if len(sys.argv) != 3:
-        print("Please provide model_id and endpoint name.")
-        exit(1)
+    parser = argparse.ArgumentParser(
+        description='Please provide model_id and endpoint name.')
+
+    parser.add_argument('--model_id', required=True,
+                        type=str,
+                        help='Model Id of the prediction service')
+
+    parser.add_argument('--service', required=True,
+                        type=str,
+                        help='Endpoint name of the ML Service')
+
+    args = parser.parse_args()
+
+    model_id = args.model_id
+    service = args.service
 
     # destination_folder = str(sys.argv[1])
     # db_connection_file = str(sys.argv[2])
     # storage_account_name = str(sys.argv[3])
-    model_id = str(sys.argv[1])
-    service = str(sys.argv[2])
+    # model_id = str(sys.argv[1])
+    # service = str(sys.argv[2])
     # calibration_file = str(sys.argv[6])
     # container_name = str(sys.argv[7])
 
@@ -516,8 +531,8 @@ def main():
                 main_connector.execute(query_delete_measure_result)
             except Exception as error:
                 print(error)
-            query_delete_artifact_result = "delete from artifact_result where model_id = '{}'".format(
-                model_id) + " and artifact_id like '{}';".format(id_split[0] + "%" + id_split[2][:-1] + "%")
+            tmp_str = id_split[0] + "%" + id_split[2][:-1] + "%"
+            query_delete_artifact_result = f"delete from artifact_result where model_id = '{model_id}' and artifact_id like '{tmp_str}';"
             try:
                 main_connector.execute(query_delete_artifact_result)
             except Exception as error:
