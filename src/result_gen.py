@@ -173,7 +173,7 @@ class MeasureResultGeneration:
         '''
         Get the list of qrcodes from the list of artifact of a measure
         '''
-        qr_codes = [artifact[1] for artifact in self.artifact_present]
+        qr_codes = [artifact[1] for artifact in self.depth_artifact_present]
         qr_code = set(qr_codes)
         self.qr_code = list(qr_code)
 
@@ -181,7 +181,7 @@ class MeasureResultGeneration:
         '''
         Get the list of timestamp from the list of artifact of a measure
         '''
-        timestamp = [artifact[2] for artifact in self.artifact_present]
+        timestamp = [artifact[2] for artifact in self.depth_artifact_present]
         timestamp = set(timestamp)
         self.timestamp = list(timestamp)
 
@@ -192,7 +192,7 @@ class MeasureResultGeneration:
         # pcd_path for pcd_path in pcd_paths if
         # pcd_path.split('/')[-1].split('_')[-2] in ['100','104','200']
         self.artifact_front = []
-        for artifact in self.artifact_present:
+        for artifact in self.depth_artifact_present:
             if check_status_code(
                     artifact[3],
                     extract_status_code_one,
@@ -208,7 +208,7 @@ class MeasureResultGeneration:
         # pcd_path for pcd_path in pcd_paths if
         # pcd_path.split('/')[-1].split('_')[-2] in ['102','110','202']
         self.artifact_back = []
-        for artifact in self.artifact_present:
+        for artifact in self.depth_artifact_present:
             if check_status_code(
                     artifact[3],
                     extract_status_code_one,
@@ -223,7 +223,7 @@ class MeasureResultGeneration:
         # pcd_path for pcd_path in pcd_paths if
         # pcd_path.split('/')[-1].split('_')[-2] in ['101','107','201']
         self.artifact_threesixty = []
-        for artifact in self.artifact_present:
+        for artifact in self.depth_artifact_present:
             if check_status_code(
                     artifact[3],
                     extract_status_code_one,
@@ -538,7 +538,8 @@ def main():
         model_id) + r" and dataformat in ('pcd', 'depth') group by measure_id having count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('100', '104', '200') then 1 end) > 4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('102', '110', '202') then 1 end) >4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('101', '107', '201') then 1 end) > 4;"
     measure_ids = main_connector.execute(select_measures, fetch_all=True)
 
-    replace_path = "~/" + config.ACC_NAME + '/qrcode/'
+    #replace_path = "~/" + config.ACC_NAME + '/qrcode/'
+    replace_path = 'qrcode/'
 
     if config.ENV == "dev":
         measure_id = [
