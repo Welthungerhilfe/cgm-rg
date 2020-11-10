@@ -59,11 +59,11 @@ def connect_to_main_database():
     """
 
     dbname = config.DB_NAME
-    user = confdbname = config.DB_USER
-    host = confdbname = config.DB_HOST
-    password = confdbname = config.DB_PASSWD
-    port = confdbname = config.DB_PORT
-    sslmode = confdbname = config.DB_SSL_MODE
+    user = config.DB_USER
+    host = config.DB_HOST
+    password = config.DB_PASSWD
+    port = config.DB_PORT
+    sslmode = config.DB_SSL_MODE
     return DatabaseInterface(
         dbname=dbname,
         user=user,
@@ -198,7 +198,7 @@ class DatabaseInterface:
         return tables
 
     def clear_table(self, table):
-        result = self.cursor.execute("TRUNCATE TABLE {};".format(table))
+        _ = self.cursor.execute("TRUNCATE TABLE {};".format(table))
         self.connection.commit()
 
     def get_number_of_rows(self, table):
