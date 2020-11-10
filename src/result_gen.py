@@ -103,6 +103,8 @@ class Measure_Result_Generation:
         self.front_status_list = ['100','104','200']
         self.back_status_list = ['100','104','200']
         self.threesixty_status_list = ['100','104','200']
+        self.ACC_NAME = config.ACC_NAME 
+        self.ACC_KEY = config.ACC_KEY
 
 
     def get_artifact_list_per_measure(self):
@@ -139,7 +141,8 @@ class Measure_Result_Generation:
         Download a scan measure and sets calibration parameter
         '''
         files = [artifact[3] for artifact in self.artifact_list]
-        blob_access.download_blobs(files, self.container_name)
+        block_blob_service = connect_blob_storage(self.ACC_NAME, self.ACC_KEY, self.container_name)
+        blob_access.download_blobs(block_blob_service, container_name, file_list)
 
         # Not able to understand the code. This does not make sense
         for _file in files:
