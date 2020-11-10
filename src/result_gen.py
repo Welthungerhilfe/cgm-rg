@@ -133,12 +133,19 @@ class MeasureResultGeneration:
 
         self.download_measure_and_set_calibration()
 
-        self.artifact_present = []
+        self.depth_artifact_present = []
         for artifact in self.artifact_list:
             if os.path.isfile(artifact[3]) and 'depth' in artifact[3]:
-                self.artifact_present.append(artifact)
+                self.depth_artifact_present.append(artifact)
 
-        print("no of artifacts present ", len(self.artifact_present))
+        print("no of depth map present ", len(self.depth_artifact_present))
+
+        self.rgb_artifact_present = []
+        for artifact in self.artifact_list:
+            if os.path.isfile(artifact[3]) and '.jpg' in artifact[3]:
+                self.rgb_artifact_present.append(artifact)
+
+        print("no of rgb images present ", len(self.rgb_artifact_present))
 
         return True
 
