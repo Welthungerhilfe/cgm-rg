@@ -1,6 +1,6 @@
+import utils.preprocessing as preprocessing
 import sys
 sys.path.append("../src")
-import utils.preprocessing as preprocessing
 
 
 def test_that_get_height_works():

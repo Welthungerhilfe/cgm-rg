@@ -1,5 +1,4 @@
 import os
-import sys
 import json
 import shutil
 import random
@@ -15,6 +14,7 @@ import utils.rgutils as rgutils
 import utils.preprocessing as preprocessing
 
 BASE_PATH = '/storage/emulated/0/Child Growth Monitor Scanner App/'
+
 
 def get_stats(predictions):
     res = Bunch()
@@ -111,7 +111,8 @@ class MeasureResultGeneration:
         '''
         get_artifacts = "SELECT id, qr_code, create_timestamp, replace('{}'".format(
             self.replace_path)
-        get_artifacts += " || split_part(storage_path, '{}', 2), 'measurements', 'measure')".format(BASE_PATH)
+        get_artifacts += " || split_part(storage_path, '{}', 2), 'measurements', 'measure')".format(
+            BASE_PATH)
         # where dataformat = '{}'".format(dataformat)
         get_artifacts += "from artifact"
         get_artifacts += " where measure_id = '{}';".format(self.measure_id[0])
@@ -466,20 +467,19 @@ def main():
 
     parser = argparse.ArgumentParser(
         description='Please provide model_id and endpoint name.')
-    
+
     parser.add_argument('--model_id', required=True,
-        type=str,
-        help='Model Id of the prediction service')
+                        type=str,
+                        help='Model Id of the prediction service')
 
     parser.add_argument('--service', required=True,
-        type=str,
-        help='Endpoint name of the ML Service')
+                        type=str,
+                        help='Endpoint name of the ML Service')
 
     args = parser.parse_args()
 
     model_id = args.model_id
     service = args.service
-
 
     # destination_folder = str(sys.argv[1])
     # db_connection_file = str(sys.argv[2])
@@ -488,7 +488,6 @@ def main():
     # service = str(sys.argv[2])
     # calibration_file = str(sys.argv[6])
     # container_name = str(sys.argv[7])
-
 
     container_name = "scans"
     destination_folder = '~'
@@ -533,7 +532,7 @@ def main():
                 main_connector.execute(query_delete_measure_result)
             except Exception as error:
                 print(error)
-            
+
             tmp_str = id_split[0] + "%" + id_split[2][:-1] + "%"
             query_delete_artifact_result = f"delete from artifact_result where model_id = '{model_id}' and artifact_id like '{tmp_str}';"
             try:
