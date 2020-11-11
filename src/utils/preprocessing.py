@@ -7,6 +7,14 @@ import cv2
 image_target_height = 240
 image_target_width = 180
 
+scan_type = {
+    'Standing_front': '_100_',
+    'Standing_360': '_101',
+    'Standing_back': '_102_',
+    'Laying_front': '_200_',
+    'Laying_360': '_201',
+    'Laying_back': '_202_'
+}
 
 def load_depth(filename):
     with zipfile.ZipFile(filename) as z:
@@ -399,9 +407,9 @@ def pcd_processing_gapnet(pcd_paths):
 
 def posenet_processing(filename):
     image = cv2.imread(filename)
-    if '_100_' in filename or '_101_' in filename or '_102_' in filename:
+    if scan_type['Standing_front'] in filename or scan_type['Standing_back'] in filename or scan_type['Standing_360'] in filename:
         image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
-    elif '_200_' in filename or '_201_' in filename or '_202_' in filename:
+    elif scan_type['Laying_front'] in filename or scan_type['Laying_back'] in filename or scan_type['Laying_360'] in filename:
         image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
     image = cv2.resize(image, (401, 401))
