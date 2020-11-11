@@ -391,7 +391,7 @@ class MeasureResultGeneration:
         '''
         Face blurs rgb images
         '''
-        
+
         for artifact in self.rgb_artifact_present:
             preprocessing.blur_faces_in_file(artifact[3], artifact[3])
 
