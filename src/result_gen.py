@@ -503,7 +503,7 @@ def main():
     parser.add_argument('--height_service', required=True,
                         type=str,
                         help='Endpoint name of the height generating ML Service')
-    
+
     parser.add_argument('--pose_model_id', required=True,
                         type=str,
                         help='Model Id of the pose generation model')
@@ -537,11 +537,11 @@ def main():
     main_connector = dbutils.connect_to_main_database()
 
     # TODO check if model_id is in active state
-    check_model = "select (json_metadata->>'active')::BOOLEAN from model where id = '{}';".format(model_id)
+    check_model = "select (json_metadata->>'active')::BOOLEAN from model where id = '{}';".format(height_model_id)
     active = main_connector.execute(check_model, fetch_all=True)
 
     if not active[0][0]:
-        print("model {0} is not active.... exiting".format(model_id))
+        print("model {0} is not active.... exiting".format(height_model_id))
         exit(1)
 
     select_measures = "select measure_id from artifact where not exists (SELECT measure_id from measure_result WHERE measure_id=artifact.measure_id and model_id = '{}')".format(

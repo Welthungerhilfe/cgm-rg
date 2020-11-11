@@ -16,6 +16,7 @@ scan_type = {
     'Laying_back': '_202_'
 }
 
+
 def load_depth(filename):
     with zipfile.ZipFile(filename) as z:
         with z.open('data') as f:
