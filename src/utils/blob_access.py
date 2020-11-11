@@ -71,10 +71,10 @@ def upload_blobs(block_blob_service, container_name, file_list):
     """
     Uploads the artifacts specified in file_list to blob storage
     """
-    for (local_file_name, blob_file_name) in file_list:
+    for file in file_list:
         try:
             block_blob_service.create_blob_from_path(
-                container_name, blob_file_name, local_file_name)
+                container_name, file, file)
         except Exception as error:
             print(error)
 
