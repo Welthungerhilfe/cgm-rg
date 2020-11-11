@@ -5,7 +5,6 @@ import random
 import argparse
 import numpy as np
 from bunch import Bunch
-import cv2
 import config
 import utils.inference as inference
 import utils.dbutils as dbutils
@@ -474,11 +473,13 @@ class MeasureResultGeneration:
 
     def delete_downloaded_artifacts(self):
         '''
-        Delete all the artifacts downloaded for the scan 
+        Delete all the artifacts downloaded for the scan
         '''
         files = [artifact[3] for artifact in self.artifact_list]
         for file in files:
             os.remove(file)
+
+        print("successfully deleted the artifacts")
 
         # TODO send results to storage queue
 
@@ -540,7 +541,7 @@ def main():
     replace_path = 'qrcode/'
 
     if config.ENV == "dev":
-        measure_id = [
+        measure_ids = [
             ("c66050300c1ab684_measure_1601356048051_vj7fOLrU2dYwWDOT",
              ),
             ("c66050300c1ab684_measure_1601356093034_CFIfgb2SFufC7Pe9",
@@ -551,7 +552,7 @@ def main():
              ),
             ("601db192d38c0816_measure_1601379417732_PRBsdWChgw8Qkoe1",
              )]
-        for id in measure_id:
+        for id in measure_ids:
             id_split = id[0].split('_')
             query_delete_measure_result = "delete from measure_result where measure_id = '{}'".format(
                 id[0]) + " and model_id = '{}';".format(model_id)
@@ -589,9 +590,7 @@ def main():
         flag = measure_rg.check_enough_height_prediction()
         if not flag:
             continue
-        flag = measure_rg.create_result_in_json_format(model_id)
-        if not flag:
-            continue
+        measure_rg.create_result_in_json_format(model_id)
         measure_rg.update_measure_table_and_blob(model_id, destination_folder)
         measure_rg.get_pose_results("posenet_1.0", "aci-posenet-ind")
         measure_rg.delete_downloaded_artifacts()
