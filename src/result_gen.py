@@ -393,9 +393,7 @@ class MeasureResultGeneration:
         '''
         Generate pose results from rgb images in a scan
         '''
-        PART_NAMES=["nose","rightShoulder","rightElbow","rightWrist","leftShoulder",
-           "leftElbow","leftWrist","rightHip","rightKnee","rightAnkle",
-           "leftHip","leftKnee","leftAnkle","rightEye","leftEye","rightEar","leftEar"]
+        
         for artifact in self.rgb_artifact_present:
             image = preprocessing.posenet_processing(artifact[3])
 
@@ -595,7 +593,7 @@ def main():
         if not flag:
             continue
         measure_rg.update_measure_table_and_blob(model_id, destination_folder)
-        measure_rg.get_pose_results(model_id, service)
+        measure_rg.get_pose_results("posenet_1.0", "aci-posenet-ind")
         measure_rg.delete_downloaded_artifacts()
 
     main_connector.cursor.close()

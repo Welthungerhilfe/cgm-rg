@@ -208,7 +208,9 @@ def depth_exists(id, connector):
 
 def process_posenet_result(pose_prediction, model_id, artifact_id, db_connector):
     table = "artifact_result"
-    
+    PART_NAMES=["nose","rightShoulder","rightElbow","rightWrist","leftShoulder",
+           "leftElbow","leftWrist","rightHip","rightKnee","rightAnkle",
+           "leftHip","leftKnee","leftAnkle","rightEye","leftEye","rightEar","leftEar"]
     pose_scores = np.array(pose_prediction['pose_scores'])
     keypoint_scores = np.array(pose_prediction['keypoint_scores'])
     keypoint_coords = np.array(pose_prediction['keypoint_coords'])
