@@ -403,7 +403,7 @@ def posenet_processing(filename):
         image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
     elif '_200_' in filename or '_201_' in filename or '_202_' in filename:
         image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
-    
-    image=cv2.resize(image,(401,401))
+
+    image = cv2.resize(image, (401, 401))
 
     return image

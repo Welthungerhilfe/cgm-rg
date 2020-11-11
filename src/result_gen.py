@@ -392,13 +392,14 @@ class MeasureResultGeneration:
         '''
         Generate pose results from rgb images in a scan
         '''
-        
+
         for artifact in self.rgb_artifact_present:
             image = preprocessing.posenet_processing(artifact[3])
 
             results = inference.get_pose_prediction(image, service)
             pose_prediction = json.loads(results)
-            rgutils.process_posenet_result(pose_prediction, model_id, artifact[0], self.main_connector)
+            rgutils.process_posenet_result(
+                pose_prediction, model_id, artifact[0], self.main_connector)
 
     def create_result_in_json_format(self, model_id):
         '''
