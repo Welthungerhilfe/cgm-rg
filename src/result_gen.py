@@ -86,10 +86,12 @@ class MeasureResultGeneration:
             measure_id,
             main_connector,
             replace_path,
-            container_name):
+            container_name,
+            destination_container_name):
         self.measure_id = measure_id
         self.main_connector = main_connector
         self.container_name = container_name
+        self.destination_container_name = destination_container_name
 
         if rgutils.depth_exists(measure_id, self.main_connector):
             self.dataformat = 'depth'
@@ -386,7 +388,24 @@ class MeasureResultGeneration:
         pass
 
     def get_blur_result(self):
-        pass
+        '''
+        Face blurs rgb images
+        '''
+
+        for artifact in self.rgb_artifact_present:
+            preprocessing.blur_faces_in_file(artifact[3], artifact[3])
+
+        self.upload_blur_images()
+
+    def upload_blur_images(self):
+        '''
+        Uploads blurred images to separate container
+        '''
+
+        blurred_rgb_files = [artifact[3] for artifact in self.rgb_artifact_present]
+        block_blob_service = blob_access.connect_blob_storage(
+            self.acc_name, self.acc_key, self.destination_container_name)
+        blob_access.upload_blobs(block_blob_service, self.destination_container_name, blurred_rgb_files)
 
     def get_pose_results(self, model_id, service):
         '''
@@ -477,8 +496,8 @@ class MeasureResultGeneration:
         Delete all the artifacts downloaded for the scan
         '''
         files = [artifact[3] for artifact in self.artifact_list]
-        for file in files:
-            os.remove(file)
+        for file_name in files:
+            os.remove(file_name)
 
         print("successfully deleted the artifacts")
 
@@ -528,6 +547,7 @@ def main():
     # container_name = str(sys.argv[7])
 
     container_name = "scans"
+    destination_container_name = "processed-images"
     destination_folder = '~'
 
     # calibration = preprocessing.parseCalibration(calibration_file)
@@ -572,7 +592,7 @@ def main():
             except Exception as error:
                 print(error)
             tmp_str = id_split[0] + "%" + id_split[2][:-1] + "%"
-            query_delete_artifact_result = f"delete from artifact_result where model_id in '({height_model_id}, {pose_model_id})' and artifact_id like '{tmp_str}';"
+            query_delete_artifact_result = f"delete from artifact_result where model_id in ('{height_model_id}', '{pose_model_id}') and artifact_id like '{tmp_str}';"
             try:
                 main_connector.execute(query_delete_artifact_result)
             except Exception as error:
@@ -584,7 +604,7 @@ def main():
 
     for measure_id in measure_ids:
         measure_rg = MeasureResultGeneration(
-            measure_id, main_connector, replace_path, container_name)
+            measure_id, main_connector, replace_path, container_name, destination_container_name)
         flag = measure_rg.get_artifact_list_per_measure()
         if not flag:
             continue
@@ -604,6 +624,7 @@ def main():
         measure_rg.create_result_in_json_format(height_model_id)
         measure_rg.update_measure_table_and_blob(height_model_id, destination_folder)
         measure_rg.get_pose_results(pose_model_id, pose_service)
+        measure_rg.get_blur_result()
         measure_rg.delete_downloaded_artifacts()
 
     main_connector.cursor.close()
