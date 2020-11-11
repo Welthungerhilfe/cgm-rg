@@ -538,7 +538,7 @@ def main():
         model_id) + r" and dataformat in ('pcd', 'depth') group by measure_id having count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('100', '104', '200') then 1 end) > 4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('102', '110', '202') then 1 end) >4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('101', '107', '201') then 1 end) > 4;"
     measure_ids = main_connector.execute(select_measures, fetch_all=True)
 
-    #replace_path = "~/" + config.ACC_NAME + '/qrcode/'
+    # replace_path = "~/" + config.ACC_NAME + '/qrcode/'
     replace_path = 'qrcode/'
 
     if config.ENV == "dev":

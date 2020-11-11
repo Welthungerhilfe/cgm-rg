@@ -245,7 +245,7 @@ def process_posenet_result(
         float_value += 1
         confidence_value = pose_scores[pi]
         print('Pose #%d, score = %f' % (pi, pose_scores[pi]))
-        #pose_dict['pose_number'] = pi
+        # pose_dict['pose_number'] = pi
         pose_dict = {}
         for ki, (s, c) in enumerate(
                 zip(keypoint_scores[pi, :], keypoint_coords[pi, :, :])):
@@ -253,7 +253,7 @@ def process_posenet_result(
             pose_result['score'] = s.tolist()
             pose_result['coordinates'] = c.tolist()
             pose_dict[PART_NAMES[ki]] = pose_result
-            #print('Keypoint %s, score = %f, coord = %s' % (PART_NAMES[ki], s, c))
+            # print('Keypoint %s, score = %f, coord = %s' % (PART_NAMES[ki], s, c))
         pose_list.append(pose_dict)
 
     pose_dict = {}
