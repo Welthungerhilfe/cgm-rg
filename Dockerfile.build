@@ -7,4 +7,4 @@ RUN pip install -r requirements.txt
 
 ADD . /app
 
-ENTRYPOINT ["pytest", "--cov=src"]
+ENTRYPOINT ["pytest", "--cov=tests"]
