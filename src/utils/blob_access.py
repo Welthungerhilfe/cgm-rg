@@ -57,12 +57,12 @@ def download_blobs(block_blob_service, container_name, file_list):
     """
     Downloads the artifacts specified in file_list from blob storage
     """
-    for file in file_list:
-        file_directory = os.path.dirname(file)
+    for file_name in file_list:
+        file_directory = os.path.dirname(file_name)
         if not os.path.isdir(file_directory):
             os.makedirs(file_directory)
         try:
-            block_blob_service.get_blob_to_path(container_name, file, file)
+            block_blob_service.get_blob_to_path(container_name, file_name, file_name)
         except Exception as error:
             print(error)
 
@@ -71,10 +71,10 @@ def upload_blobs(block_blob_service, container_name, file_list):
     """
     Uploads the artifacts specified in file_list to blob storage
     """
-    for file in file_list:
+    for file_name in file_list:
         try:
             block_blob_service.create_blob_from_path(
-                container_name, file, file)
+                container_name, file_name, file_name)
         except Exception as error:
             print(error)
 

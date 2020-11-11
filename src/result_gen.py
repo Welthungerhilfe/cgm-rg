@@ -496,8 +496,8 @@ class MeasureResultGeneration:
         Delete all the artifacts downloaded for the scan
         '''
         files = [artifact[3] for artifact in self.artifact_list]
-        for file in files:
-            os.remove(file)
+        for file_name in files:
+            os.remove(file_name)
 
         print("successfully deleted the artifacts")
 
