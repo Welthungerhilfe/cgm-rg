@@ -1,6 +1,7 @@
 import json
 import dbutils
 from datetime import datetime
+import numpy as np
 
 
 def get_measure_insert(
@@ -204,3 +205,83 @@ def depth_exists(id, connector):
         id[0]) + " and dataformat = 'depth');"
     exists = connector.execute(check_dataformat, fetch_all=True)
     return exists[0][0]
+
+
+def process_posenet_result(
+        pose_prediction,
+        model_id,
+        artifact_id,
+        db_connector):
+    table = "artifact_result"
+    PART_NAMES = [
+        "nose",
+        "rightShoulder",
+        "rightElbow",
+        "rightWrist",
+        "leftShoulder",
+        "leftElbow",
+        "leftWrist",
+        "rightHip",
+        "rightKnee",
+        "rightAnkle",
+        "leftHip",
+        "leftKnee",
+        "leftAnkle",
+        "rightEye",
+        "leftEye",
+        "rightEar",
+        "leftEar"]
+    pose_scores = np.array(pose_prediction['pose_scores'])
+    keypoint_scores = np.array(pose_prediction['keypoint_scores'])
+    keypoint_coords = np.array(pose_prediction['keypoint_coords'])
+
+    float_value = 0.0
+    confidence_value = 0.0
+    pose_list = []
+
+    for pi in range(len(pose_scores)):
+        if pose_scores[pi] == 0.:
+            break
+        float_value += 1
+        confidence_value = pose_scores[pi]
+        print('Pose #%d, score = %f' % (pi, pose_scores[pi]))
+        # pose_dict['pose_number'] = pi
+        pose_dict = {}
+        for ki, (s, c) in enumerate(
+                zip(keypoint_scores[pi, :], keypoint_coords[pi, :, :])):
+            pose_result = {}
+            pose_result['score'] = s.tolist()
+            pose_result['coordinates'] = c.tolist()
+            pose_dict[PART_NAMES[ki]] = pose_result
+            # print('Keypoint %s, score = %f, coord = %s' % (PART_NAMES[ki], s, c))
+        pose_list.append(pose_dict)
+
+    pose_dict = {}
+    for num, pose in enumerate(pose_list, start=1):
+        key = 'pose_' + str(num)
+        pose_dict[key] = pose
+
+    pose_json = json.dumps(pose_dict)
+
+    artifact_mapping = {}
+    artifact_mapping['model_id'] = model_id
+    artifact_mapping['artifact_id'] = artifact_id
+    artifact_mapping['key'] = 'pose_prediction'
+    artifact_mapping['float_value'] = float_value
+    artifact_mapping['confidence_value'] = confidence_value
+    artifact_mapping['json_value'] = pose_json
+
+    keys = []
+    values = []
+    for key in artifact_mapping.keys():
+        keys.append(key)
+        values.append(artifact_mapping[key])
+    insert_statement = dbutils.create_insert_statement(
+        table, keys, values, True, True)
+    try:
+        db_connector.execute(insert_statement)
+        print(
+            'successfully inserted data to {0} table for artifact_id {1}'.format(
+                table, artifact_id))
+    except Exception as error:
+        print(error)

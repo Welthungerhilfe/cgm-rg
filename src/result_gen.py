@@ -5,7 +5,6 @@ import random
 import argparse
 import numpy as np
 from bunch import Bunch
-
 import config
 import utils.inference as inference
 import utils.dbutils as dbutils
@@ -133,12 +132,19 @@ class MeasureResultGeneration:
 
         self.download_measure_and_set_calibration()
 
-        self.artifact_present = []
+        self.depth_artifact_present = []
         for artifact in self.artifact_list:
             if os.path.isfile(artifact[3]) and 'depth' in artifact[3]:
-                self.artifact_present.append(artifact)
+                self.depth_artifact_present.append(artifact)
 
-        print("no of artifacts present ", len(self.artifact_present))
+        print("no of depth map present ", len(self.depth_artifact_present))
+
+        self.rgb_artifact_present = []
+        for artifact in self.artifact_list:
+            if os.path.isfile(artifact[3]) and '.jpg' in artifact[3]:
+                self.rgb_artifact_present.append(artifact)
+
+        print("no of rgb images present ", len(self.rgb_artifact_present))
 
         return True
 
@@ -166,7 +172,7 @@ class MeasureResultGeneration:
         '''
         Get the list of qrcodes from the list of artifact of a measure
         '''
-        qr_codes = [artifact[1] for artifact in self.artifact_present]
+        qr_codes = [artifact[1] for artifact in self.depth_artifact_present]
         qr_code = set(qr_codes)
         self.qr_code = list(qr_code)
 
@@ -174,7 +180,7 @@ class MeasureResultGeneration:
         '''
         Get the list of timestamp from the list of artifact of a measure
         '''
-        timestamp = [artifact[2] for artifact in self.artifact_present]
+        timestamp = [artifact[2] for artifact in self.depth_artifact_present]
         timestamp = set(timestamp)
         self.timestamp = list(timestamp)
 
@@ -185,7 +191,7 @@ class MeasureResultGeneration:
         # pcd_path for pcd_path in pcd_paths if
         # pcd_path.split('/')[-1].split('_')[-2] in ['100','104','200']
         self.artifact_front = []
-        for artifact in self.artifact_present:
+        for artifact in self.depth_artifact_present:
             if check_status_code(
                     artifact[3],
                     extract_status_code_one,
@@ -201,7 +207,7 @@ class MeasureResultGeneration:
         # pcd_path for pcd_path in pcd_paths if
         # pcd_path.split('/')[-1].split('_')[-2] in ['102','110','202']
         self.artifact_back = []
-        for artifact in self.artifact_present:
+        for artifact in self.depth_artifact_present:
             if check_status_code(
                     artifact[3],
                     extract_status_code_one,
@@ -216,7 +222,7 @@ class MeasureResultGeneration:
         # pcd_path for pcd_path in pcd_paths if
         # pcd_path.split('/')[-1].split('_')[-2] in ['101','107','201']
         self.artifact_threesixty = []
-        for artifact in self.artifact_present:
+        for artifact in self.depth_artifact_present:
             if check_status_code(
                     artifact[3],
                     extract_status_code_one,
@@ -382,6 +388,19 @@ class MeasureResultGeneration:
     def get_blur_result(self):
         pass
 
+    def get_pose_results(self, model_id, service):
+        '''
+        Generate pose results from rgb images in a scan
+        '''
+
+        for artifact in self.rgb_artifact_present:
+            image = preprocessing.posenet_processing(artifact[3])
+
+            results = inference.get_pose_prediction(image, service)
+            pose_prediction = json.loads(results)
+            rgutils.process_posenet_result(
+                pose_prediction, model_id, artifact[0], self.main_connector)
+
     def create_result_in_json_format(self, model_id):
         '''
         Prepare results in Json format
@@ -453,6 +472,16 @@ class MeasureResultGeneration:
 
         return True
 
+    def delete_downloaded_artifacts(self):
+        '''
+        Delete all the artifacts downloaded for the scan
+        '''
+        files = [artifact[3] for artifact in self.artifact_list]
+        for file in files:
+            os.remove(file)
+
+        print("successfully deleted the artifacts")
+
         # TODO send results to storage queue
 
         # flag = rgutils.upload_to_queue(storage_account_name, result_file, main_connector)
@@ -467,18 +496,28 @@ def main():
     parser = argparse.ArgumentParser(
         description='Please provide model_id and endpoint name.')
 
-    parser.add_argument('--model_id', required=True,
+    parser.add_argument('--height_model_id', required=True,
                         type=str,
-                        help='Model Id of the prediction service')
+                        help='Model Id of the height model')
 
-    parser.add_argument('--service', required=True,
+    parser.add_argument('--height_service', required=True,
                         type=str,
-                        help='Endpoint name of the ML Service')
+                        help='Endpoint name of the height generating ML Service')
+
+    parser.add_argument('--pose_model_id', required=True,
+                        type=str,
+                        help='Model Id of the pose generation model')
+
+    parser.add_argument('--pose_service', required=True,
+                        type=str,
+                        help='Endpoint name of the pose generating ML Service')
 
     args = parser.parse_args()
 
-    model_id = args.model_id
-    service = args.service
+    height_model_id = args.height_model_id
+    height_service = args.height_service
+    pose_model_id = args.pose_model_id
+    pose_service = args.pose_service
 
     # destination_folder = str(sys.argv[1])
     # db_connection_file = str(sys.argv[2])
@@ -498,21 +537,22 @@ def main():
     main_connector = dbutils.connect_to_main_database()
 
     # TODO check if model_id is in active state
-    check_model = "select (json_metadata->>'active')::BOOLEAN from model where id = '{}';".format(model_id)
+    check_model = "select (json_metadata->>'active')::BOOLEAN from model where id = '{}';".format(height_model_id)
     active = main_connector.execute(check_model, fetch_all=True)
 
     if not active[0][0]:
-        print("model {0} is not active.... exiting".format(model_id))
+        print("model {0} is not active.... exiting".format(height_model_id))
         exit(1)
 
     select_measures = "select measure_id from artifact where not exists (SELECT measure_id from measure_result WHERE measure_id=artifact.measure_id and model_id = '{}')".format(
-        model_id) + r" and dataformat in ('pcd', 'depth') group by measure_id having count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('100', '104', '200') then 1 end) > 4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('102', '110', '202') then 1 end) >4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('101', '107', '201') then 1 end) > 4;"
+        height_model_id) + r" and dataformat in ('pcd', 'depth') group by measure_id having count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('100', '104', '200') then 1 end) > 4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('102', '110', '202') then 1 end) >4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('101', '107', '201') then 1 end) > 4;"
     measure_ids = main_connector.execute(select_measures, fetch_all=True)
 
-    replace_path = "~/" + config.ACC_NAME + '/qrcode/'
+    # replace_path = "~/" + config.ACC_NAME + '/qrcode/'
+    replace_path = 'qrcode/'
 
     if config.ENV == "dev":
-        measure_id = [
+        measure_ids = [
             ("c66050300c1ab684_measure_1601356048051_vj7fOLrU2dYwWDOT",
              ),
             ("c66050300c1ab684_measure_1601356093034_CFIfgb2SFufC7Pe9",
@@ -523,16 +563,16 @@ def main():
              ),
             ("601db192d38c0816_measure_1601379417732_PRBsdWChgw8Qkoe1",
              )]
-        for id in measure_id:
+        for id in measure_ids:
             id_split = id[0].split('_')
             query_delete_measure_result = "delete from measure_result where measure_id = '{}'".format(
-                id[0]) + " and model_id = '{}';".format(model_id)
+                id[0]) + " and model_id = '{}';".format(height_model_id)
             try:
                 main_connector.execute(query_delete_measure_result)
             except Exception as error:
                 print(error)
             tmp_str = id_split[0] + "%" + id_split[2][:-1] + "%"
-            query_delete_artifact_result = f"delete from artifact_result where model_id = '{model_id}' and artifact_id like '{tmp_str}';"
+            query_delete_artifact_result = f"delete from artifact_result where model_id in '({height_model_id}, {pose_model_id})' and artifact_id like '{tmp_str}';"
             try:
                 main_connector.execute(query_delete_artifact_result)
             except Exception as error:
@@ -556,15 +596,15 @@ def main():
         flag = measure_rg.check_enough_artifact()
         if not flag:
             continue
-        measure_rg.preprocess_artifact(model_id)
-        measure_rg.get_height_per_artifact(model_id, service)
+        measure_rg.preprocess_artifact(height_model_id)
+        measure_rg.get_height_per_artifact(height_model_id, height_service)
         flag = measure_rg.check_enough_height_prediction()
         if not flag:
             continue
-        flag = measure_rg.create_result_in_json_format(model_id)
-        if not flag:
-            continue
-        measure_rg.update_measure_table_and_blob(model_id, destination_folder)
+        measure_rg.create_result_in_json_format(height_model_id)
+        measure_rg.update_measure_table_and_blob(height_model_id, destination_folder)
+        measure_rg.get_pose_results(pose_model_id, pose_service)
+        measure_rg.delete_downloaded_artifacts()
 
     main_connector.cursor.close()
     main_connector.connection.close()

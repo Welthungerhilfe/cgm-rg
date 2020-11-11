@@ -2,9 +2,19 @@ import zipfile
 import numpy as np
 from pyntcloud import PyntCloud
 from skimage.transform import resize
+import cv2
 
 image_target_height = 240
 image_target_width = 180
+
+scan_type = {
+    'Standing_front': '_100_',
+    'Standing_360': '_101',
+    'Standing_back': '_102_',
+    'Laying_front': '_200_',
+    'Laying_360': '_201',
+    'Laying_back': '_202_'
+}
 
 
 def load_depth(filename):
@@ -394,3 +404,15 @@ def pcd_processing_gapnet(pcd_paths):
     pointclouds = pointclouds.reshape((-1, 1024, 3))
 
     return pointclouds
+
+
+def posenet_processing(filename):
+    image = cv2.imread(filename)
+    if scan_type['Standing_front'] in filename or scan_type['Standing_back'] in filename or scan_type['Standing_360'] in filename:
+        image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+    elif scan_type['Laying_front'] in filename or scan_type['Laying_back'] in filename or scan_type['Laying_360'] in filename:
+        image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+    image = cv2.resize(image, (401, 401))
+
+    return image
