@@ -496,18 +496,28 @@ def main():
     parser = argparse.ArgumentParser(
         description='Please provide model_id and endpoint name.')
 
-    parser.add_argument('--model_id', required=True,
+    parser.add_argument('--height_model_id', required=True,
                         type=str,
-                        help='Model Id of the prediction service')
+                        help='Model Id of the height model')
 
-    parser.add_argument('--service', required=True,
+    parser.add_argument('--height_service', required=True,
                         type=str,
-                        help='Endpoint name of the ML Service')
+                        help='Endpoint name of the height generating ML Service')
+    
+    parser.add_argument('--pose_model_id', required=True,
+                        type=str,
+                        help='Model Id of the pose generation model')
+
+    parser.add_argument('--pose_service', required=True,
+                        type=str,
+                        help='Endpoint name of the pose generating ML Service')
 
     args = parser.parse_args()
 
-    model_id = args.model_id
-    service = args.service
+    height_model_id = args.height_model_id
+    height_service = args.height_service
+    pose_model_id = args.pose_model_id
+    pose_service = args.pose_service
 
     # destination_folder = str(sys.argv[1])
     # db_connection_file = str(sys.argv[2])
@@ -535,7 +545,7 @@ def main():
         exit(1)
 
     select_measures = "select measure_id from artifact where not exists (SELECT measure_id from measure_result WHERE measure_id=artifact.measure_id and model_id = '{}')".format(
-        model_id) + r" and dataformat in ('pcd', 'depth') group by measure_id having count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('100', '104', '200') then 1 end) > 4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('102', '110', '202') then 1 end) >4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('101', '107', '201') then 1 end) > 4;"
+        height_model_id) + r" and dataformat in ('pcd', 'depth') group by measure_id having count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('100', '104', '200') then 1 end) > 4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('102', '110', '202') then 1 end) >4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('101', '107', '201') then 1 end) > 4;"
     measure_ids = main_connector.execute(select_measures, fetch_all=True)
 
     # replace_path = "~/" + config.ACC_NAME + '/qrcode/'
@@ -556,13 +566,13 @@ def main():
         for id in measure_ids:
             id_split = id[0].split('_')
             query_delete_measure_result = "delete from measure_result where measure_id = '{}'".format(
-                id[0]) + " and model_id = '{}';".format(model_id)
+                id[0]) + " and model_id = '{}';".format(height_model_id)
             try:
                 main_connector.execute(query_delete_measure_result)
             except Exception as error:
                 print(error)
             tmp_str = id_split[0] + "%" + id_split[2][:-1] + "%"
-            query_delete_artifact_result = f"delete from artifact_result where model_id = '{model_id}' and artifact_id like '{tmp_str}';"
+            query_delete_artifact_result = f"delete from artifact_result where model_id in '({height_model_id}, {pose_model_id})' and artifact_id like '{tmp_str}';"
             try:
                 main_connector.execute(query_delete_artifact_result)
             except Exception as error:
@@ -586,14 +596,14 @@ def main():
         flag = measure_rg.check_enough_artifact()
         if not flag:
             continue
-        measure_rg.preprocess_artifact(model_id)
-        measure_rg.get_height_per_artifact(model_id, service)
+        measure_rg.preprocess_artifact(height_model_id)
+        measure_rg.get_height_per_artifact(height_model_id, height_service)
         flag = measure_rg.check_enough_height_prediction()
         if not flag:
             continue
-        measure_rg.create_result_in_json_format(model_id)
-        measure_rg.update_measure_table_and_blob(model_id, destination_folder)
-        measure_rg.get_pose_results("posenet_1.0", "aci-posenet-ind")
+        measure_rg.create_result_in_json_format(height_model_id)
+        measure_rg.update_measure_table_and_blob(height_model_id, destination_folder)
+        measure_rg.get_pose_results(pose_model_id, pose_service)
         measure_rg.delete_downloaded_artifacts()
 
     main_connector.cursor.close()
