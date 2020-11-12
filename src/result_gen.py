@@ -392,22 +392,35 @@ class MeasureResultGeneration:
         '''
         Face blurs rgb images
         '''
-
+        self.blurred_images_path = []
         for artifact in self.rgb_artifact_present:
-            preprocessing.blur_faces_in_file(artifact[3], artifact[3])
+            source_path = artifact[3]
+            target_path = os.path.join(model_id, artifact[0])
+            self.blurred_images_path.append(target_path)
+            preprocessing.blur_faces_in_file(source_path, target_path)
             rgutils.process_face_blur_results(model_id, artifact[0], self.main_connector)
 
         self.upload_blur_images()
+        self.delete_blur_images()
+
 
     def upload_blur_images(self):
         '''
         Uploads blurred images to separate container
         '''
 
-        blurred_rgb_files = [artifact[3] for artifact in self.rgb_artifact_present]
+        # blurred_rgb_files = [artifact[3] for artifact in self.rgb_artifact_present]
         block_blob_service = blob_access.connect_blob_storage(
             self.acc_name, self.acc_key, self.destination_container_name)
-        blob_access.upload_blobs(block_blob_service, self.destination_container_name, blurred_rgb_files)
+        blob_access.upload_blobs(block_blob_service, self.destination_container_name, self.blurred_images_path)
+
+    def delete_blur_images(self):
+        '''
+        Delete the blurred images from machine
+        '''
+        for file_name in self.blurred_images_path:
+            os.remove(file_name)
+
 
     def get_pose_results(self, model_id, service):
         '''
