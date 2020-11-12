@@ -1,25 +1,20 @@
-import json
 import os
+import json
 
-connection_file = os.path.expanduser("~/src/dbconnection.json")
+ACC_NAME = os.environ['ACC_NAME']
+ACC_KEY = os.environ['ACC_KEY']
 
-with open(connection_file) as json_file:
-    json_data = json.load(json_file)
+ENV = os.environ["ENV"]
 
+DB_NAME = "cgm"
+DB_USER = os.environ["DB_USER"]
+DB_HOST = os.environ["DB_HOST"]
 
-ACC_NAME = "cgminbmzci" + json_data["Environment"] + "sa"
-ACC_KEY = json_data["account_key"]
-ENV = json_data["Environment"]
+DB_PASSWD = os.environ["DB_PASS"]
+DB_PORT = 5432
+DB_SSL_MODE = "require"
 
-DB_NAME = json_data["dbname"]
-DB_USER = json_data["user"]
-DB_HOST = json_data["host"]
-DB_PASSWD = json_data["password"]
-DB_PORT = json_data["port"]
-DB_SSL_MODE = json_data["sslmode"]
-
-
-TENANT_ID = json_data["tenant_id"]
-SP_ID = json_data["sp_id"]
-SP_PASSWD = json_data["sp_password"]
-SUB_ID = json_data["sub_id"]
+TENANT_ID = os.environ["TENANT_ID"]
+SP_ID = os.environ["SP_ID"]
+SP_PASSWD = os.environ["SP_PASS"]
+SUB_ID = os.environ["SUB_ID"]
