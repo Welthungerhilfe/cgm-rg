@@ -6,5 +6,6 @@ ADD requirements.txt /app/requirements.txt
 RUN pip install -r requirements.txt
 
 ADD . /app
+RUN chmod +x deployment/*.sh
 
-CMD ["python", "src/result_gen.py"]
+ENTRYPOINT ["crontab", "deployment/crontab"]
