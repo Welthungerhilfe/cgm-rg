@@ -454,6 +454,10 @@ def blur_faces_in_file(source_path: str, target_path: str) -> bool:
         print(f"{len(face_locations)} face locations found and not blurred for path: {source_path}")
         return False
 
+    file_directory = os.path.dirname(target_path)
+    if not os.path.isdir(file_directory):
+        os.makedirs(file_directory)
+
     # Blur the image.
     for top, right, bottom, left in face_locations:
         # Scale back up face locations since the frame we detected in was scaled to 1/4 size
