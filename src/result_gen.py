@@ -396,9 +396,11 @@ class MeasureResultGeneration:
         for artifact in self.rgb_artifact_present:
             source_path = artifact[3]
             target_path = os.path.join(model_id, artifact[0])
-            self.blurred_images_path.append(target_path)
-            preprocessing.blur_faces_in_file(source_path, target_path)
-            rgutils.process_face_blur_results(model_id, artifact[0], self.main_connector)
+            target_path = target_path + '.jpg'
+            blurred = preprocessing.blur_faces_in_file(source_path, target_path)
+            if blurred:
+                self.blurred_images_path.append(target_path)
+                rgutils.process_face_blur_results(model_id, artifact[0], self.main_connector)
 
         self.upload_blur_images()
         self.delete_blur_images()
@@ -612,7 +614,7 @@ def main():
             except Exception as error:
                 print(error)
             tmp_str = id_split[0] + "%" + id_split[2][:-1] + "%"
-            query_delete_artifact_result = f"delete from artifact_result where model_id in ('{height_model_id}', '{pose_model_id}') and artifact_id like '{tmp_str}';"
+            query_delete_artifact_result = f"delete from artifact_result where model_id in ('{height_model_id}', '{pose_model_id}', '{face_blur_model_id}') and artifact_id like '{tmp_str}';"
             try:
                 main_connector.execute(query_delete_artifact_result)
             except Exception as error:
