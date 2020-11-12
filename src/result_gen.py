@@ -387,13 +387,14 @@ class MeasureResultGeneration:
     def get_weight_result(self):
         pass
 
-    def get_blur_result(self):
+    def get_blur_result(self, model_id):
         '''
         Face blurs rgb images
         '''
 
         for artifact in self.rgb_artifact_present:
             preprocessing.blur_faces_in_file(artifact[3], artifact[3])
+            rgutils.process_face_blur_results(model_id, artifact[0], self.main_connector)
 
         self.upload_blur_images()
 
@@ -531,13 +532,18 @@ def main():
                         type=str,
                         help='Endpoint name of the pose generating ML Service')
 
+    parser.add_argument('--face_blur_model_id', required=True,
+                        type=str,
+                        help='Model Id of the face blurring model')
+
+
     args = parser.parse_args()
 
     height_model_id = args.height_model_id
     height_service = args.height_service
     pose_model_id = args.pose_model_id
     pose_service = args.pose_service
-
+    face_blur_model_id = args.face_blur_model_id
     # destination_folder = str(sys.argv[1])
     # db_connection_file = str(sys.argv[2])
     # storage_account_name = str(sys.argv[3])
@@ -624,7 +630,7 @@ def main():
         measure_rg.create_result_in_json_format(height_model_id)
         measure_rg.update_measure_table_and_blob(height_model_id, destination_folder)
         measure_rg.get_pose_results(pose_model_id, pose_service)
-        measure_rg.get_blur_result()
+        measure_rg.get_blur_result(face_blur_model_id)
         measure_rg.delete_downloaded_artifacts()
 
     main_connector.cursor.close()

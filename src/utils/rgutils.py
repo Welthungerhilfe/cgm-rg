@@ -285,3 +285,27 @@ def process_posenet_result(
                 table, artifact_id))
     except Exception as error:
         print(error)
+
+
+def process_face_blur_results(model_id, artifact_id, db_connector):
+    '''
+    Makes entry for artifact which are face blurred in db
+    '''
+
+    table = "artifact_result"
+
+    artifact_mapping = {}
+    artifact_mapping['model_id'] = model_id
+    artifact_mapping['artifact_id'] = artifact_id
+    artifact_mapping['key'] = 'face_blur'
+
+    insert_statement = dbutils.create_insert_statement(
+        table, list(artifact_mapping.keys()), list(artifact_mapping.values()), True, True)
+
+    try:
+        db_connector.execute(insert_statement)
+        print(
+            'successfully inserted data to {0} table for artifact_id {1}'.format(
+                table, artifact_id))
+    except Exception as error:
+        print(error)
