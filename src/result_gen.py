@@ -101,8 +101,8 @@ class MeasureResultGeneration:
         self.replace_path = replace_path
         self.container_name = container_name
         self.front_status_list = ['100', '104', '200']
-        self.back_status_list = ['100', '104', '200']
-        self.threesixty_status_list = ['100', '104', '200']
+        self.back_status_list = ['102', '110', '202']
+        self.threesixty_status_list = ['101', '107', '201']
         self.acc_name = config.ACC_NAME
         self.acc_key = config.ACC_KEY
 
@@ -233,6 +233,7 @@ class MeasureResultGeneration:
                     extract_status_code_two,
                     self.threesixty_status_list):
                 self.artifact_threesixty.append(artifact)
+                
         self.artifact_threesixty_pcd_paths = [
             artifact[3] for artifact in self.artifact_threesixty]
 
