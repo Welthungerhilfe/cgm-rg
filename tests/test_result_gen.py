@@ -40,6 +40,7 @@ except Exception as error:
 test_measure_rg = result_gen.MeasureResultGeneration(
         measure_id, main_connector, replace_path, container_name, destination_container_name)
 
+
 def test_get_artifact_list_per_measure():
     
     result = test_measure_rg.get_artifact_list_per_measure()
@@ -104,6 +105,55 @@ def test_check_enough_height_prediction():
     result = test_measure_rg.check_enough_height_prediction()
 
     assert result == True
+
+
+def test_measure_result_deleted():
+
+    check_exists = f"select exists(select 1 from measure_result where measure_id='{measure_id[0]}' and model_id = '{height_model_id}');"
+    result = main_connector.execute(check_exists, fetch_all=True)
+    result = result[0][0]
+
+    assert result != True
+
+
+def test_artifact_result_deleted():
+
+    random_depth_artifact = random.choice(test_measure_rg.depth_artifact_present)
+    artifact_id = random_depth_artifact[0]
+
+    check_exists = f"select exists(select 1 from artifact_result where artifact_id='{artifact_id}' and model_id = '{height_model_id}');"
+    result = main_connector.execute(check_exists, fetch_all=True)
+    result = result[0][0]
+
+    assert result != True
+
+
+def test_pose_results_deleted():
+
+    test_measure_rg.get_pose_results(pose_model_id, pose_service)
+    random_rgb_artifact = random.choice(test_measure_rg.rgb_artifact_present)
+
+    artifact_id = random_rgb_artifact[0]
+
+    check_exists = f"select exists(select 1 from artifact_result where artifact_id='{artifact_id}' and model_id = '{pose_model_id}');"
+    result = main_connector.execute(check_exists, fetch_all=True)
+    result = result[0][0]
+
+    assert result != True
+
+
+def test_blur_result_deleted():
+
+    test_measure_rg.get_blur_result(face_blur_model_id)
+    random_rgb_artifact = random.choice(test_measure_rg.rgb_artifact_present)
+
+    artifact_id = random_rgb_artifact[0]
+
+    check_exists = f"select exists(select 1 from artifact_result where artifact_id='{artifact_id}' and model_id = '{face_blur_model_id}');"
+    result = main_connector.execute(check_exists, fetch_all=True)
+    result = result[0][0]
+
+    assert result != True
 
 
 def test_create_result_in_json_format():
@@ -176,6 +226,6 @@ def test_delete_downloaded_artifacts():
 
     artifact_path = random_artifact[3]
 
-    result = os.isfile(artifact_path)
+    result = os.path.isfile(artifact_path)
 
     assert result != True
