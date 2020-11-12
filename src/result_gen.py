@@ -233,7 +233,7 @@ class MeasureResultGeneration:
                     extract_status_code_two,
                     self.threesixty_status_list):
                 self.artifact_threesixty.append(artifact)
-                
+
         self.artifact_threesixty_pcd_paths = [
             artifact[3] for artifact in self.artifact_threesixty]
 
@@ -405,7 +405,6 @@ class MeasureResultGeneration:
         self.upload_blur_images()
         self.delete_blur_images()
 
-
     def upload_blur_images(self):
         '''
         Uploads blurred images to separate container
@@ -422,7 +421,6 @@ class MeasureResultGeneration:
         '''
         for file_name in self.blurred_images_path:
             os.remove(file_name)
-
 
     def get_pose_results(self, model_id, service):
         '''
@@ -551,7 +549,6 @@ def main():
     parser.add_argument('--face_blur_model_id', required=True,
                         type=str,
                         help='Model Id of the face blurring model')
-
 
     args = parser.parse_args()
 

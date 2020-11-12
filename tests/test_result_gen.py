@@ -1,7 +1,8 @@
 import os
 import sys
-sys.path.append("../src")
+
 sys.path.append("./src")
+
 import result_gen
 import utils.dbutils as dbutils
 import utils.preprocessing as preprocessing
@@ -38,11 +39,11 @@ except Exception as error:
     print(error)
 
 test_measure_rg = result_gen.MeasureResultGeneration(
-        measure_id, main_connector, replace_path, container_name, destination_container_name)
+    measure_id, main_connector, replace_path, container_name, destination_container_name)
 
 
 def test_get_artifact_list_per_measure():
-    
+
     result = test_measure_rg.get_artifact_list_per_measure()
 
     assert result == True
@@ -94,7 +95,7 @@ def test_preprocess_artifact():
 
 
 def test_get_height_per_artifact():
-    
+
     test_measure_rg.get_height_per_artifact(height_model_id, height_service)
 
     assert len(test_measure_rg.front_predictions) > 0 and len(test_measure_rg.back_predictions) > 0 and len(test_measure_rg.threesixty_predictions) > 0
