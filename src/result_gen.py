@@ -101,8 +101,8 @@ class MeasureResultGeneration:
         self.replace_path = replace_path
         self.container_name = container_name
         self.front_status_list = ['100', '104', '200']
-        self.back_status_list = ['100', '104', '200']
-        self.threesixty_status_list = ['100', '104', '200']
+        self.back_status_list = ['102', '110', '202']
+        self.threesixty_status_list = ['101', '107', '201']
         self.acc_name = config.ACC_NAME
         self.acc_key = config.ACC_KEY
 
@@ -233,6 +233,7 @@ class MeasureResultGeneration:
                     extract_status_code_two,
                     self.threesixty_status_list):
                 self.artifact_threesixty.append(artifact)
+
         self.artifact_threesixty_pcd_paths = [
             artifact[3] for artifact in self.artifact_threesixty]
 
@@ -387,25 +388,39 @@ class MeasureResultGeneration:
     def get_weight_result(self):
         pass
 
-    def get_blur_result(self):
+    def get_blur_result(self, model_id):
         '''
         Face blurs rgb images
         '''
-
+        self.blurred_images_path = []
         for artifact in self.rgb_artifact_present:
-            preprocessing.blur_faces_in_file(artifact[3], artifact[3])
+            source_path = artifact[3]
+            target_path = os.path.join(model_id, artifact[0])
+            target_path = target_path + '.jpg'
+            blurred = preprocessing.blur_faces_in_file(source_path, target_path)
+            if blurred:
+                self.blurred_images_path.append(target_path)
+                rgutils.process_face_blur_results(model_id, artifact[0], self.main_connector)
 
         self.upload_blur_images()
+        self.delete_blur_images()
 
     def upload_blur_images(self):
         '''
         Uploads blurred images to separate container
         '''
 
-        blurred_rgb_files = [artifact[3] for artifact in self.rgb_artifact_present]
+        # blurred_rgb_files = [artifact[3] for artifact in self.rgb_artifact_present]
         block_blob_service = blob_access.connect_blob_storage(
             self.acc_name, self.acc_key, self.destination_container_name)
-        blob_access.upload_blobs(block_blob_service, self.destination_container_name, blurred_rgb_files)
+        blob_access.upload_blobs(block_blob_service, self.destination_container_name, self.blurred_images_path)
+
+    def delete_blur_images(self):
+        '''
+        Delete the blurred images from machine
+        '''
+        for file_name in self.blurred_images_path:
+            os.remove(file_name)
 
     def get_pose_results(self, model_id, service):
         '''
@@ -531,13 +546,17 @@ def main():
                         type=str,
                         help='Endpoint name of the pose generating ML Service')
 
+    parser.add_argument('--face_blur_model_id', required=True,
+                        type=str,
+                        help='Model Id of the face blurring model')
+
     args = parser.parse_args()
 
     height_model_id = args.height_model_id
     height_service = args.height_service
     pose_model_id = args.pose_model_id
     pose_service = args.pose_service
-
+    face_blur_model_id = args.face_blur_model_id
     # destination_folder = str(sys.argv[1])
     # db_connection_file = str(sys.argv[2])
     # storage_account_name = str(sys.argv[3])
@@ -592,7 +611,7 @@ def main():
             except Exception as error:
                 print(error)
             tmp_str = id_split[0] + "%" + id_split[2][:-1] + "%"
-            query_delete_artifact_result = f"delete from artifact_result where model_id in ('{height_model_id}', '{pose_model_id}') and artifact_id like '{tmp_str}';"
+            query_delete_artifact_result = f"delete from artifact_result where model_id in ('{height_model_id}', '{pose_model_id}', '{face_blur_model_id}') and artifact_id like '{tmp_str}';"
             try:
                 main_connector.execute(query_delete_artifact_result)
             except Exception as error:
@@ -624,7 +643,7 @@ def main():
         measure_rg.create_result_in_json_format(height_model_id)
         measure_rg.update_measure_table_and_blob(height_model_id, destination_folder)
         measure_rg.get_pose_results(pose_model_id, pose_service)
-        measure_rg.get_blur_result()
+        measure_rg.get_blur_result(face_blur_model_id)
         measure_rg.delete_downloaded_artifacts()
 
     main_connector.cursor.close()
