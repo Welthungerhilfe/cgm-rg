@@ -1,5 +1,9 @@
+from pathlib import Path
 import sys
-sys.path.append("../src")
+
+REPO_DIR = Path(__file__).parents[1].absolute()
+SRC_DIR = str(REPO_DIR / "src")
+sys.path.append(SRC_DIR)
 
 import utils.preprocessing as preprocessing # noqa E402
 

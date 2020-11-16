@@ -1,7 +1,10 @@
+from pathlib import Path
 import os
 import sys
 
-sys.path.append("./src")
+REPO_DIR = Path(__file__).parents[1].absolute()
+SRC_DIR = str(REPO_DIR / "src")
+sys.path.append(SRC_DIR)
 
 import result_gen
 import utils.dbutils as dbutils
@@ -131,7 +134,6 @@ def test_artifact_result_deleted():
 
 def test_pose_results_deleted():
 
-    test_measure_rg.get_pose_results(pose_model_id, pose_service)
     random_rgb_artifact = random.choice(test_measure_rg.rgb_artifact_present)
 
     artifact_id = random_rgb_artifact[0]
@@ -145,7 +147,6 @@ def test_pose_results_deleted():
 
 def test_blur_result_deleted():
 
-    test_measure_rg.get_blur_result(face_blur_model_id)
     random_rgb_artifact = random.choice(test_measure_rg.rgb_artifact_present)
 
     artifact_id = random_rgb_artifact[0]

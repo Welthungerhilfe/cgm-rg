@@ -1,3 +1,5 @@
+import sys
+
 import os
 import json
 import shutil
@@ -11,6 +13,7 @@ import utils.dbutils as dbutils
 import utils.blob_access as blob_access
 import utils.rgutils as rgutils
 import utils.preprocessing as preprocessing
+
 
 BASE_PATH = '/storage/emulated/0/Child Growth Monitor Scanner App/'
 
