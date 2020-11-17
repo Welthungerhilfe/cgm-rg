@@ -1,7 +1,6 @@
 import os
 import datetime
-import blob_access
-
+import utils.blob_access as blob_access
 
 def test_blob_access():
     '''

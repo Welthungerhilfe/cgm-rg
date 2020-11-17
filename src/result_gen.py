@@ -613,7 +613,7 @@ def main():
     # replace_path = "~/" + config.ACC_NAME + '/qrcode/'
     replace_path = 'qrcode/'
 
-    if config.ENV == "dev":
+    if config.RUN_ENV == "local":
         measure_ids_dev = [
             ("c66050300c1ab684_measure_1601356048051_vj7fOLrU2dYwWDOT",
              ),
@@ -640,13 +640,12 @@ def main():
                 main_connector.execute(query_delete_artifact_result)
             except Exception as error:
                 print(error)
+        
+        measure_ids_ += measure_ids_dev
             
 
     # measure_ids = [('c66050300c1ab684_measure_1601356048051_vj7fOLrU2dYwWDOT',), ('c66050300c1ab684_measure_1601356093034_CFIfgb2SFufC7Pe9',)]
-
-
-    # Handle if measure_ids is empty
-    measure_ids_ += measure_ids_dev
+    
 
     print("Performing Result Generation of Final Measure id : ", measure_ids_)    
     print("Length of Final Measure ID: ", len(measure_ids_))
