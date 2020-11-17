@@ -649,6 +649,7 @@ def main():
             measure_id, main_connector, replace_path, container_name, destination_container_name)
         flag = measure_rg.get_artifact_list_per_measure()
         if not flag:
+            print("enough artifacts are not present")
             continue
         # measure_rg.download_measure_and_set_calibration() called in other
         # function so commented
