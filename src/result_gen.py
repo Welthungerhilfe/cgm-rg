@@ -151,6 +151,9 @@ class MeasureResultGeneration:
 
         print("no of rgb images present ", len(self.rgb_artifact_present))
 
+        if len(self.rgb_artifact_present) == 0 and len(self.depth_artifact_present) == 0:
+            return False
+
         return True
 
     def download_measure_and_set_calibration(self):
