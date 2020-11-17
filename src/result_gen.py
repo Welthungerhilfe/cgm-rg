@@ -12,6 +12,7 @@ import utils.blob_access as blob_access
 import utils.rgutils as rgutils
 import utils.preprocessing as preprocessing
 
+
 BASE_PATH = '/storage/emulated/0/Child Growth Monitor Scanner App/'
 
 
@@ -132,7 +133,8 @@ class MeasureResultGeneration:
         # TODO put it in Dataframe
         self.artifact_list = [list(artifact) for artifact in artifacts]
 
-        self.download_measure_and_set_calibration()
+        if not self.download_measure_and_set_calibration():
+            return False
 
         self.depth_artifact_present = []
         for artifact in self.artifact_list:
@@ -148,6 +150,11 @@ class MeasureResultGeneration:
 
         print("no of rgb images present ", len(self.rgb_artifact_present))
 
+        if len(
+                self.rgb_artifact_present) == 0 and len(
+                self.depth_artifact_present) == 0:
+            return False
+
         return True
 
     def download_measure_and_set_calibration(self):
@@ -157,8 +164,11 @@ class MeasureResultGeneration:
         files = [artifact[3] for artifact in self.artifact_list]
         block_blob_service = blob_access.connect_blob_storage(
             self.acc_name, self.acc_key, self.container_name)
-        blob_access.download_blobs(
+        downloaded = blob_access.download_blobs(
             block_blob_service, self.container_name, files)
+
+        if not downloaded:
+            return downloaded
 
         # Not able to understand the code. This does not make sense
         for _file in files:
@@ -169,6 +179,8 @@ class MeasureResultGeneration:
             self.calibration = preprocessing.parseCalibration(calibration_file)
         except Exception as error:
             print(error)
+
+        return True
 
     def get_qrcodes_per_measure(self):
         '''
@@ -397,10 +409,12 @@ class MeasureResultGeneration:
             source_path = artifact[3]
             target_path = os.path.join(model_id, artifact[0])
             target_path = target_path + '.jpg'
-            blurred = preprocessing.blur_faces_in_file(source_path, target_path)
+            blurred = preprocessing.blur_faces_in_file(
+                source_path, target_path)
             if blurred:
                 self.blurred_images_path.append(target_path)
-                rgutils.process_face_blur_results(model_id, artifact[0], self.main_connector)
+                rgutils.process_face_blur_results(
+                    model_id, artifact[0], self.main_connector)
 
         self.upload_blur_images()
         self.delete_blur_images()
@@ -413,7 +427,10 @@ class MeasureResultGeneration:
         # blurred_rgb_files = [artifact[3] for artifact in self.rgb_artifact_present]
         block_blob_service = blob_access.connect_blob_storage(
             self.acc_name, self.acc_key, self.destination_container_name)
-        blob_access.upload_blobs(block_blob_service, self.destination_container_name, self.blurred_images_path)
+        blob_access.upload_blobs(
+            block_blob_service,
+            self.destination_container_name,
+            self.blurred_images_path)
 
     def delete_blur_images(self):
         '''
@@ -534,9 +551,11 @@ def main():
                         type=str,
                         help='Model Id of the height model')
 
-    parser.add_argument('--height_service', required=True,
-                        type=str,
-                        help='Endpoint name of the height generating ML Service')
+    parser.add_argument(
+        '--height_service',
+        required=True,
+        type=str,
+        help='Endpoint name of the height generating ML Service')
 
     parser.add_argument('--pose_model_id', required=True,
                         type=str,
@@ -557,6 +576,13 @@ def main():
     pose_model_id = args.pose_model_id
     pose_service = args.pose_service
     face_blur_model_id = args.face_blur_model_id
+
+    print("height_model_id: ", height_model_id)
+    print("height_service: ", height_service)
+    print("pose_model_id: ", pose_model_id)
+    print("pose_service: ", pose_service)
+    print("face_blur_model_id: ", face_blur_model_id)
+
     # destination_folder = str(sys.argv[1])
     # db_connection_file = str(sys.argv[2])
     # storage_account_name = str(sys.argv[3])
@@ -584,14 +610,17 @@ def main():
         exit(1)
 
     select_measures = "select measure_id from artifact where not exists (SELECT measure_id from measure_result WHERE measure_id=artifact.measure_id and model_id = '{}')".format(
-        height_model_id) + r" and dataformat in ('pcd', 'depth') group by measure_id having count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('100', '104', '200') then 1 end) > 4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('102', '110', '202') then 1 end) >4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('101', '107', '201') then 1 end) > 4;"
-    measure_ids = main_connector.execute(select_measures, fetch_all=True)
+        height_model_id) + r" and create_timestamp > 1602115200000 and dataformat in ('pcd', 'depth') group by measure_id having count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('100', '104', '200') then 1 end) > 4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('102', '110', '202') then 1 end) >4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('101', '107', '201') then 1 end) > 4;"
+    measure_ids_ = main_connector.execute(select_measures, fetch_all=True)
+
+    print("Measure id selected from DB :", measure_ids_)
+    print("Length of selected Measure ID from DB: ", len(measure_ids_))
 
     # replace_path = "~/" + config.ACC_NAME + '/qrcode/'
     replace_path = 'qrcode/'
 
-    if config.ENV == "dev":
-        measure_ids = [
+    if config.RUN_ENV == "local":
+        measure_ids_dev = [
             ("c66050300c1ab684_measure_1601356048051_vj7fOLrU2dYwWDOT",
              ),
             ("c66050300c1ab684_measure_1601356093034_CFIfgb2SFufC7Pe9",
@@ -602,7 +631,8 @@ def main():
              ),
             ("601db192d38c0816_measure_1601379417732_PRBsdWChgw8Qkoe1",
              )]
-        for id in measure_ids:
+
+        for id in measure_ids_dev:
             id_split = id[0].split('_')
             query_delete_measure_result = "delete from measure_result where measure_id = '{}'".format(
                 id[0]) + " and model_id = '{}';".format(height_model_id)
@@ -617,15 +647,23 @@ def main():
             except Exception as error:
                 print(error)
 
+        measure_ids_ += measure_ids_dev
+
     # measure_ids = [('c66050300c1ab684_measure_1601356048051_vj7fOLrU2dYwWDOT',), ('c66050300c1ab684_measure_1601356093034_CFIfgb2SFufC7Pe9',)]
 
-    print(len(measure_ids))
+    print("Performing Result Generation of Final Measure id : ", measure_ids_)
+    print("Length of Final Measure ID: ", len(measure_ids_))
 
-    for measure_id in measure_ids:
+    for measure_id in measure_ids_:
         measure_rg = MeasureResultGeneration(
-            measure_id, main_connector, replace_path, container_name, destination_container_name)
+            measure_id,
+            main_connector,
+            replace_path,
+            container_name,
+            destination_container_name)
         flag = measure_rg.get_artifact_list_per_measure()
         if not flag:
+            print("enough artifacts are not present")
             continue
         # measure_rg.download_measure_and_set_calibration() called in other
         # function so commented
@@ -641,7 +679,8 @@ def main():
         if not flag:
             continue
         measure_rg.create_result_in_json_format(height_model_id)
-        measure_rg.update_measure_table_and_blob(height_model_id, destination_folder)
+        measure_rg.update_measure_table_and_blob(
+            height_model_id, destination_folder)
         measure_rg.get_pose_results(pose_model_id, pose_service)
         measure_rg.get_blur_result(face_blur_model_id)
         measure_rg.delete_downloaded_artifacts()

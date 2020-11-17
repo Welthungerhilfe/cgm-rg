@@ -1,5 +1,5 @@
 import json
-import dbutils
+from utils import dbutils
 from datetime import datetime
 import numpy as np
 
@@ -300,7 +300,9 @@ def process_face_blur_results(model_id, artifact_id, db_connector):
     artifact_mapping['key'] = 'face_blur'
 
     insert_statement = dbutils.create_insert_statement(
-        table, list(artifact_mapping.keys()), list(artifact_mapping.values()), True, True)
+        table, list(
+            artifact_mapping.keys()), list(
+            artifact_mapping.values()), True, True)
 
     try:
         db_connector.execute(insert_statement)

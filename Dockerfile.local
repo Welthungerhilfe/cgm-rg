@@ -1,4 +1,3 @@
-# base docker file
 FROM python:3.6-slim-stretch
 
 RUN apt-get -y update
@@ -41,19 +40,10 @@ RUN pip install -r requirements.txt
 ADD . /app
 RUN chmod +x deployment/*.sh
 
-#Environment name of the RG
 ENV RUN_ENV local
 
 RUN mkdir log
 
 RUN crontab deployment/crontab
 
-
-#Working
-#ENTRYPOINT ["python", "src/result_gen.py", "--height_model_id", "q3_depthmap_height_run_01", "--height_service", "q3-depthmap-height-run-01-ci", "--pose_model_id", "posenet_1.0", "--pose_service", "aci-posenet-ind", "--face_blur_model_id", "face_recogntion"]
-
-#Working
-#ENTRYPOINT ["pytest", "tests/"]
-
-#Working
 ENTRYPOINT ["cron", "-f"]
