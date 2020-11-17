@@ -181,6 +181,8 @@ class MeasureResultGeneration:
         except Exception as error:
             print(error)
 
+        return True
+
     def get_qrcodes_per_measure(self):
         '''
         Get the list of qrcodes from the list of artifact of a measure
