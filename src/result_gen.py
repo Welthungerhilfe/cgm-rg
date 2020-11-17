@@ -1,5 +1,3 @@
-import sys
-
 import os
 import json
 import shutil
@@ -138,7 +136,6 @@ class MeasureResultGeneration:
         if not self.download_measure_and_set_calibration():
             return False
 
-
         self.depth_artifact_present = []
         for artifact in self.artifact_list:
             if os.path.isfile(artifact[3]) and 'depth' in artifact[3]:
@@ -153,7 +150,9 @@ class MeasureResultGeneration:
 
         print("no of rgb images present ", len(self.rgb_artifact_present))
 
-        if len(self.rgb_artifact_present) == 0 and len(self.depth_artifact_present) == 0:
+        if len(
+                self.rgb_artifact_present) == 0 and len(
+                self.depth_artifact_present) == 0:
             return False
 
         return True
@@ -410,10 +409,12 @@ class MeasureResultGeneration:
             source_path = artifact[3]
             target_path = os.path.join(model_id, artifact[0])
             target_path = target_path + '.jpg'
-            blurred = preprocessing.blur_faces_in_file(source_path, target_path)
+            blurred = preprocessing.blur_faces_in_file(
+                source_path, target_path)
             if blurred:
                 self.blurred_images_path.append(target_path)
-                rgutils.process_face_blur_results(model_id, artifact[0], self.main_connector)
+                rgutils.process_face_blur_results(
+                    model_id, artifact[0], self.main_connector)
 
         self.upload_blur_images()
         self.delete_blur_images()
@@ -426,7 +427,10 @@ class MeasureResultGeneration:
         # blurred_rgb_files = [artifact[3] for artifact in self.rgb_artifact_present]
         block_blob_service = blob_access.connect_blob_storage(
             self.acc_name, self.acc_key, self.destination_container_name)
-        blob_access.upload_blobs(block_blob_service, self.destination_container_name, self.blurred_images_path)
+        blob_access.upload_blobs(
+            block_blob_service,
+            self.destination_container_name,
+            self.blurred_images_path)
 
     def delete_blur_images(self):
         '''
@@ -547,9 +551,11 @@ def main():
                         type=str,
                         help='Model Id of the height model')
 
-    parser.add_argument('--height_service', required=True,
-                        type=str,
-                        help='Endpoint name of the height generating ML Service')
+    parser.add_argument(
+        '--height_service',
+        required=True,
+        type=str,
+        help='Endpoint name of the height generating ML Service')
 
     parser.add_argument('--pose_model_id', required=True,
                         type=str,
@@ -571,12 +577,12 @@ def main():
     pose_service = args.pose_service
     face_blur_model_id = args.face_blur_model_id
 
-    print("height_model_id: ",  height_model_id)
-    print("height_service: ",  height_service)
-    print("pose_model_id: ",  pose_model_id)
-    print("pose_service: ",  pose_service)
-    print("face_blur_model_id: ",  face_blur_model_id)
-    
+    print("height_model_id: ", height_model_id)
+    print("height_service: ", height_service)
+    print("pose_model_id: ", pose_model_id)
+    print("pose_service: ", pose_service)
+    print("face_blur_model_id: ", face_blur_model_id)
+
     # destination_folder = str(sys.argv[1])
     # db_connection_file = str(sys.argv[2])
     # storage_account_name = str(sys.argv[3])
@@ -640,19 +646,21 @@ def main():
                 main_connector.execute(query_delete_artifact_result)
             except Exception as error:
                 print(error)
-        
+
         measure_ids_ += measure_ids_dev
-            
 
     # measure_ids = [('c66050300c1ab684_measure_1601356048051_vj7fOLrU2dYwWDOT',), ('c66050300c1ab684_measure_1601356093034_CFIfgb2SFufC7Pe9',)]
-    
 
-    print("Performing Result Generation of Final Measure id : ", measure_ids_)    
+    print("Performing Result Generation of Final Measure id : ", measure_ids_)
     print("Length of Final Measure ID: ", len(measure_ids_))
 
     for measure_id in measure_ids_:
         measure_rg = MeasureResultGeneration(
-            measure_id, main_connector, replace_path, container_name, destination_container_name)
+            measure_id,
+            main_connector,
+            replace_path,
+            container_name,
+            destination_container_name)
         flag = measure_rg.get_artifact_list_per_measure()
         if not flag:
             print("enough artifacts are not present")
@@ -671,7 +679,8 @@ def main():
         if not flag:
             continue
         measure_rg.create_result_in_json_format(height_model_id)
-        measure_rg.update_measure_table_and_blob(height_model_id, destination_folder)
+        measure_rg.update_measure_table_and_blob(
+            height_model_id, destination_folder)
         measure_rg.get_pose_results(pose_model_id, pose_service)
         measure_rg.get_blur_result(face_blur_model_id)
         measure_rg.delete_downloaded_artifacts()

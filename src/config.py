@@ -9,7 +9,7 @@ print("Result Generation running in ", RUN_ENV)
 if RUN_ENV == 'local':
     dir_path = os.path.dirname(os.path.realpath(__file__))
     connection_file = "dbconnection.json"
-    db_connection_full_path = os.path.join(dir_path , connection_file)
+    db_connection_full_path = os.path.join(dir_path, connection_file)
     print(db_connection_full_path)
 
     with open(db_connection_full_path) as json_file:
@@ -17,7 +17,7 @@ if RUN_ENV == 'local':
 
     ACC_NAME = "cgminbmzci" + json_data["Environment"] + "sa"
     ACC_KEY = json_data["account_key"]
-    #ENV = json_data["Environment"]
+    # ENV = json_data["Environment"]
 
     DB_NAME = json_data["dbname"]
     DB_USER = json_data["user"]

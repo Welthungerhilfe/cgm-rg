@@ -62,12 +62,13 @@ def download_blobs(block_blob_service, container_name, file_list):
         if not os.path.isdir(file_directory):
             os.makedirs(file_directory)
         try:
-            block_blob_service.get_blob_to_path(container_name, file_name, file_name)
+            block_blob_service.get_blob_to_path(
+                container_name, file_name, file_name)
         except Exception as error:
-            #print(error)
-            print('cannot download ', file_name)
+            # print(error)
+            print('Cannot download ', file_name)
             return False
-    
+
     return True
 
 

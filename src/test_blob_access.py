@@ -2,6 +2,7 @@ import os
 import datetime
 import utils.blob_access as blob_access
 
+
 def test_blob_access():
     '''
     Test case to check the blob access
