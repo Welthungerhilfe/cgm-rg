@@ -560,6 +560,13 @@ def main():
     pose_model_id = args.pose_model_id
     pose_service = args.pose_service
     face_blur_model_id = args.face_blur_model_id
+
+    print("height_model_id: ",  height_model_id)
+    print("height_service: ",  height_service)
+    print("pose_model_id: ",  pose_model_id)
+    print("pose_service: ",  pose_service)
+    print("face_blur_model_id: ",  face_blur_model_id)
+    
     # destination_folder = str(sys.argv[1])
     # db_connection_file = str(sys.argv[2])
     # storage_account_name = str(sys.argv[3])
@@ -587,14 +594,17 @@ def main():
         exit(1)
 
     select_measures = "select measure_id from artifact where not exists (SELECT measure_id from measure_result WHERE measure_id=artifact.measure_id and model_id = '{}')".format(
-        height_model_id) + r" and dataformat in ('pcd', 'depth') group by measure_id having count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('100', '104', '200') then 1 end) > 4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('102', '110', '202') then 1 end) >4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('101', '107', '201') then 1 end) > 4;"
-    measure_ids = main_connector.execute(select_measures, fetch_all=True)
+        height_model_id) + r" and create_timestamp > 1602115200000 and dataformat in ('pcd', 'depth') group by measure_id having count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('100', '104', '200') then 1 end) > 4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('102', '110', '202') then 1 end) >4 and count(case when substring(substring(storage_path from '_[0-9]\d\d_') from '[0-9]\d\d') in ('101', '107', '201') then 1 end) > 4;"
+    measure_ids_ = main_connector.execute(select_measures, fetch_all=True)
+
+    print("Measure id selected from DB :", measure_ids_)
+    print("Length of selected Measure ID from DB: ", len(measure_ids_))
 
     # replace_path = "~/" + config.ACC_NAME + '/qrcode/'
     replace_path = 'qrcode/'
 
     if config.ENV == "dev":
-        measure_ids = [
+        measure_ids_dev = [
             ("c66050300c1ab684_measure_1601356048051_vj7fOLrU2dYwWDOT",
              ),
             ("c66050300c1ab684_measure_1601356093034_CFIfgb2SFufC7Pe9",
@@ -605,7 +615,8 @@ def main():
              ),
             ("601db192d38c0816_measure_1601379417732_PRBsdWChgw8Qkoe1",
              )]
-        for id in measure_ids:
+
+        for id in measure_ids_dev:
             id_split = id[0].split('_')
             query_delete_measure_result = "delete from measure_result where measure_id = '{}'".format(
                 id[0]) + " and model_id = '{}';".format(height_model_id)
@@ -619,12 +630,18 @@ def main():
                 main_connector.execute(query_delete_artifact_result)
             except Exception as error:
                 print(error)
+            
 
     # measure_ids = [('c66050300c1ab684_measure_1601356048051_vj7fOLrU2dYwWDOT',), ('c66050300c1ab684_measure_1601356093034_CFIfgb2SFufC7Pe9',)]
 
-    print(len(measure_ids))
 
-    for measure_id in measure_ids:
+    # Handle if measure_ids is empty
+    measure_ids_ += measure_ids_dev
+
+    print("Performing Result Generation of Final Measure id : ", measure_ids_)    
+    print("Length of Final Measure ID: ", len(measure_ids_))
+
+    for measure_id in measure_ids_:
         measure_rg = MeasureResultGeneration(
             measure_id, main_connector, replace_path, container_name, destination_container_name)
         flag = measure_rg.get_artifact_list_per_measure()
