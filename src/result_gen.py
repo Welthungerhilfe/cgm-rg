@@ -135,7 +135,9 @@ class MeasureResultGeneration:
         # TODO put it in Dataframe
         self.artifact_list = [list(artifact) for artifact in artifacts]
 
-        self.download_measure_and_set_calibration()
+        if not self.download_measure_and_set_calibration():
+            return False
+
 
         self.depth_artifact_present = []
         for artifact in self.artifact_list:
@@ -163,8 +165,11 @@ class MeasureResultGeneration:
         files = [artifact[3] for artifact in self.artifact_list]
         block_blob_service = blob_access.connect_blob_storage(
             self.acc_name, self.acc_key, self.container_name)
-        blob_access.download_blobs(
+        downloaded = blob_access.download_blobs(
             block_blob_service, self.container_name, files)
+
+        if not downloaded:
+            return downloaded
 
         # Not able to understand the code. This does not make sense
         for _file in files:
