@@ -45,7 +45,6 @@ RUN chmod +x entrypoint.sh
 
 RUN echo "RUN_ENV='dev'" > src/run_env.py
 
-#RUN env >> /etc/environment
 
 RUN mkdir log
 
