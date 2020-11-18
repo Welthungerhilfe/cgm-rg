@@ -46,7 +46,6 @@ RUN chmod +x deployment/*.sh
 
 RUN echo "RUN_ENV='local'" > src/run_env.py
 
-
 RUN mkdir log
 
 RUN crontab deployment/crontab

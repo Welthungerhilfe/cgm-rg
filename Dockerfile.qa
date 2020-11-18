@@ -44,7 +44,6 @@ RUN chmod +x deployment/*.sh
 
 RUN echo "RUN_ENV='qa'" > src/run_env.py
 
-
 RUN mkdir log
 
 RUN crontab deployment/crontab

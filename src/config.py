@@ -2,7 +2,7 @@ import json
 import os
 import run_env
 
-#RUN_ENV = os.environ['RUN_ENV']
+# RUN_ENV = os.environ['RUN_ENV']
 
 RUN_ENV = run_env.RUN_ENV
 
@@ -23,7 +23,6 @@ if RUN_ENV == 'local':
     ACC_NAME = "cgminbmzci" + json_data["Environment"] + "sa"
     ACC_KEY = json_data["account_key"]
     # ENV = json_data["Environment"]
-
 
     DB_NAME = json_data["dbname"]
     DB_USER = json_data["user"]
