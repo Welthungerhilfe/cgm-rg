@@ -40,7 +40,10 @@ RUN pip install -r requirements.txt
 ADD . /app
 RUN chmod +x deployment/*.sh
 
-ENV RUN_ENV qa
+#ENV RUN_ENV qa
+
+RUN echo "RUN_ENV='qa'" > src/run_env.py
+
 
 RUN mkdir log
 
