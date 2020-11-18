@@ -1,10 +1,15 @@
 import json
 import os
+import run_env
 
+#RUN_ENV = os.environ['RUN_ENV']
 
-RUN_ENV = os.environ["ENV"]
+RUN_ENV = run_env.RUN_ENV
 
-print("Result Generation running in ", RUN_ENV)
+print("Result Generation running in", RUN_ENV)
+print(RUN_ENV)
+print(len(RUN_ENV))
+
 
 if RUN_ENV == 'local':
     dir_path = os.path.dirname(os.path.realpath(__file__))

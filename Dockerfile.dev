@@ -40,7 +40,9 @@ RUN pip install -r requirements.txt
 ADD . /app
 RUN chmod +x deployment/*.sh
 
-ENV RUN_ENV dev
+#ENV RUN_ENV dev
+
+RUN echo "RUN_ENV='dev'" > src/run_env.py
 
 RUN mkdir log
 
