@@ -24,6 +24,7 @@ if RUN_ENV == 'local':
     ACC_KEY = json_data["account_key"]
     # ENV = json_data["Environment"]
 
+
     DB_NAME = json_data["dbname"]
     DB_USER = json_data["user"]
     DB_HOST = json_data["host"]
