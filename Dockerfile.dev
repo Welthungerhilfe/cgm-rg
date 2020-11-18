@@ -39,13 +39,16 @@ RUN pip install -r requirements.txt
 
 ADD . /app
 RUN chmod +x deployment/*.sh
+RUN chmod +x entrypoint.sh
 
 #ENV RUN_ENV dev
 
 RUN echo "RUN_ENV='dev'" > src/run_env.py
 
+#RUN env >> /etc/environment
+
 RUN mkdir log
 
 RUN crontab deployment/crontab
 
-ENTRYPOINT ["cron", "-f"]
+ENTRYPOINT ["/app/entrypoint.sh"]
