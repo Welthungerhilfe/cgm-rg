@@ -1,0 +1,47 @@
+# TODO copyright information
+# this is the file to install the cron jobs to regularily write
+# messages from the Azure Storage Queues into the local filesystem
+#
+#
+#
+# Edit this file to introduce tasks to be run by cron.
+#
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+#
+# For more information see the manual pages of crontab(5) and cron(8)
+#
+
+# m h  dom mon dow   command
+
+### qa environment
+# TODO write with environment variable
+
+* * * * * echo "Started RG" > /proc/1/fd/1 2>/proc/1/fd/2
+
+* * * * * /usr/bin/flock -n /app/result-gen.lock /usr/local/bin/python3 /app/src/result_gen.py --height_model_id q3_depthmap_height_run_01 --height_service q3-depthmap-height-run-01-ci --pose_model_id posenet_1.0 --pose_service aci-posenet-ind --face_blur_model_id face_recogntion > /proc/1/fd/1 2>/proc/1/fd/2
+
+* * * * * echo "Finished RG" > /proc/1/fd/1 2>/proc/1/fd/2
+
+#* * * * * /usr/bin/flock -n /app/result-gen.lock /app/deployment/run_result_gen.sh > /proc/1/fd/1 2>/proc/1/fd/2
+
+# * * * * * /usr/bin/flock -n /app/result-gen.lock bash /usr/local/bin/python3 /app/src/result_gen.py --height_model_id q3_depthmap_height_run_01 --height_service q3-depthmap-height-run-01-ci --pose_model_id posenet_1.0 --pose_service aci-posenet-ind --face_blur_model_id face_recogntion > /proc/1/fd/1 2>/proc/1/fd/2
+
+# * * * * * run-one /usr/local/bin/python3 /app/src/result_gen.py --height_model_id q3_depthmap_height_run_01 --height_service q3-depthmap-height-run-01-ci --pose_model_id posenet_1.0 --pose_service aci-posenet-ind --face_blur_model_id face_recogntion > /proc/1/fd/1 2>/proc/1/fd/2
+
+# * * * * * /app/deployment/run_result_gen.sh > /proc/1/fd/1 2>/proc/1/fd/2
+
+# * * * * * run-one deployment/run_result_gen.sh > /proc/1/fd/1 2>/proc/1/fd/2
+
+# * * * * * run-one deployment/debug_log.sh#
+
+# * * * * * run-one deployment/run_result_gen_gapnet_height.sh
+
+# * * * * * run-one deployment/run_result_gen_20190723_weight.sh
+
+# * * * * * run-one deployment/run_result_gen_q3_depthmap_plaincnn_height_run_01.sh
+
+# * * * * * run-one deployment/run_result_gen_q3_depthmap_plaincnn_height_run_02.sh
+
+
