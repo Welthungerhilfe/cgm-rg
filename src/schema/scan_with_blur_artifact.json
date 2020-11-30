@@ -1,0 +1,28 @@
+{
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "person": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "version": "string",
+    "location": {
+      "lat": 0,
+      "lng": 0
+    },
+    "type": 0,
+    "scan_start": "2020-11-25T11:41:49.504Z",
+    "scan_end": "2020-11-25T11:41:49.504Z",
+    "artifacts": [
+      {
+        "id": "3fa85f64-5717-4562-b3fc-2c963f66abcd",
+        "timestamp": "2020-11-25T11:41:49.504Z",
+        "order": 0,
+        "file": "3fa85f64-5717-4562-b3fc-2c963fmayank",
+        "format": "img"
+      },
+      {
+        "id": "3fa85f64-5717-4562-b3fc-2c963f66abce",
+        "timestamp": "2020-11-25T11:41:49.504Z",
+        "order": 1,
+        "file": "3fa85f64-5717-4562-b3fc-2c963f6shradul",
+        "format": "img"
+      }
+    ]
+  }

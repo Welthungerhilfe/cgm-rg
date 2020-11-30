@@ -1,0 +1,6 @@
+{
+    "name": "face_recogntion",
+    "version": "1.0.0",
+    "result_format": "img",
+    "result_binding": "artifact"
+}
