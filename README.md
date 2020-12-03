@@ -9,32 +9,22 @@ Result Generation is performed when the Scanner App take an scan and upload it t
 
 ## Steps to start RG
 
-### Below envinronment variable needed to run the Result Generation
-```
-ACC_NAME (Storage Account Name)
-ACC_KEY (Storage Account Key)
-DB_USER
-DB_HOST
-DB_PASSWD
-TENANT_ID
-SP_ID (Service Principal Id)
-SP_PASSWD (Service Principal Password)
-SUB_ID (Subscription Id)
-```
+
 
 ### Below are the command to run using the azure vm
+# get the ip address of the local machine
 
 ```sh
-docker build --tag rgservice:latest --file ./Dockerfile.release .
+docker build --tag rgservice:1.0 --file ./Dockerfile .
 
-docker run -d -e ACC_NAME=$(ACC_NAME) -e ACC_KEY=$(ACC_KEY) -e DB_USER=$(DB_USER) -e DB_HOST=$(DB_HOST) -e DB_PASSWD=$(DB_PASSWD) -e TENANT_ID=$(TENANT_ID) -e SP_ID=$(SP_ID) -e SP_PASSWD=$(SP_PASSWD) -e SUB_ID=$(SUB_ID) --name rg_service rgservice:latest
+docker run -it --add-host="localhost:'YOUR IP ADDRESS'" --name rgservice_1_0 rgservice:1.0
 ```
 
 ### Steps to run RG in the container instance in Azure.
 
 ```
 Step 1: Build and push the RG image with latest code in azure container registry. Use the existing 'cgm-rg-release' pipeline which is already setup in the Azure Devops Releases for build and push the RG image
-Step 2: Use the latest image in azure container registry cgmrgtest.azurecr.io/welthungerhilfe and run a container instance with the above environment variables.
+Step 2: Use the latest image in azure container registry cgmrgtest.azurecr.io/welthungerhilfe and run a container instance.
 ```
 
 
