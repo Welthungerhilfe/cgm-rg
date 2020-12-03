@@ -22,7 +22,6 @@ def blur_face(source_path: str):
     Returns:
         bool: True if blurred otherwise False
     """
-
     # Read the image.
     assert os.path.exists(source_path), f"{source_path} does not exist"
     rgb_image = cv2.imread(source_path)
@@ -79,11 +78,11 @@ class ScanResults:
         self.scan_metadata = scan_metadata
         self.blur_workflow = blur_workflow
         self.format_wise_artifact = {}
-        self.blur_input_format = self.blur_workflow["meta"]["input_format"]
+        if self.blur_workflow["meta"]["input_format"] == 'image/jpeg':
+            self.blur_input_format = 'img'
         self.scan_parent_dir = scan_parent_dir
         self.scan_dir = os.path.join(self.scan_parent_dir, self.scan_metadata['id'])
         self.api = api
-
         self.blur_workflow_artifact_dir = os.path.join(self.scan_dir, self.blur_input_format)
 
     
@@ -98,13 +97,16 @@ class ScanResults:
         for artifact in artifact_list:
             mod_artifact = copy.deepcopy(artifact)
             mod_artifact['download_status'] = False
+            # Change the format from image/jpeg to img
+            if artifact['format'] == 'image/jpeg':
+                mod_artifact['format'] =  'img'
             
             if mod_artifact['format'] in self.format_wise_artifact:
                 self.format_wise_artifact[mod_artifact['format']].append(mod_artifact)
             else:
                 self.format_wise_artifact[mod_artifact['format']] = [mod_artifact]
 
-        print("Prepared format wise Artifact")
+        print("\nPrepared format wise Artifact:\n")
         pprint.pprint(self.format_wise_artifact)
 
 

@@ -101,12 +101,13 @@ class ApiEndpoints:
         response = requests.get(self.url + self.scan_endpoint)
         if response.status_code == 200:
             content = response.json()
+            print("\nScan Details : \n")
             pprint.pprint(content)
 
             with open(scan_path, 'w') as f:
                 json.dump(content, f, indent=4)
 
-            print("Written scan successfully to ", scan_path)
+            print("\n Written scan successfully to ", scan_path)
         else:
             print("Response code : ", response.status_code)
         
