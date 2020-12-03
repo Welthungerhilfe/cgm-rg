@@ -87,9 +87,9 @@ class ApiEndpoints:
 
         return response.status_code
     
-    def post_workflow(self, worflow_path):
+    def post_workflow(self, workflow_path):
         '''
-        Post the worflows using POST /files
+        Post the workflows using POST /files
         '''
         return str(uuid.uuid4()), 200
 
@@ -107,7 +107,7 @@ class ApiEndpoints:
             with open(scan_path, 'w') as f:
                 json.dump(content, f, indent=4)
 
-            print("\n Written scan successfully to ", scan_path)
+            print("\n Written scan metadata successfully to ", scan_path)
         else:
             print("Response code : ", response.status_code)
         
