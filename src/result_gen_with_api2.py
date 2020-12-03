@@ -234,12 +234,12 @@ def main():
                         help='API endpoint URL')
 
     parser.add_argument('--scan_parent_dir',
-                        default = "/home/nikhil/cgm-all/cgm-rg/data/scans/",
+                        default = "data/scans/",
                         type=str,
                         help='Parent directory in which scans will be stored')
 
     parser.add_argument('--blur_workflow_path',
-                        default = "./schema/blur-worflow-post.json",
+                        default = "src/schema/blur-worflow-post.json",
                         type=str,
                         help='Blur Workflow path')
 
@@ -264,24 +264,29 @@ def main():
     cgm_api.get_scan(scan_metadata_path)
 
     #scan_metadata_path = './schema/scan_with_blur_artifact.json'
-    
     with open(scan_metadata_path, 'r') as f:
         scan_metadata = f.read()
     scan_metadata_obj = json.loads(scan_metadata)
 
-    # Taking a single scan at a time
-    scan_metadata_obj = scan_metadata_obj['scans'][0]
+    if len(scan_metadata_obj['scans'])>0:
 
-    with open(blur_workflow_path, 'r') as f:
-        blur_workflow = f.read()
-    blur_workflow_obj = json.loads(blur_workflow)
+        print(" Starting Result Generation Workflow on a scan")
+        # Taking a single scan at a time
+        scan_metadata_obj = scan_metadata_obj['scans'][0]
 
-    scan_results = ScanResults(scan_metadata_obj, blur_workflow_obj, scan_parent_dir, cgm_api)
+        with open(blur_workflow_path, 'r') as f:
+            blur_workflow = f.read()
+        blur_workflow_obj = json.loads(blur_workflow)
 
-    scan_results.process_scan_metadata()
-    scan_results.create_scan_and_artifact_dir()
-    scan_results.download_blur_flow_artifact()
-    scan_results.run_blur_flow()
+        scan_results = ScanResults(scan_metadata_obj, blur_workflow_obj, scan_parent_dir, cgm_api)
+
+        scan_results.process_scan_metadata()
+        scan_results.create_scan_and_artifact_dir()
+        scan_results.download_blur_flow_artifact()
+        scan_results.run_blur_flow()
+
+    else:
+        print("No Scan found without Results")
 
 
 if __name__ == "__main__":
