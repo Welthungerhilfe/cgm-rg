@@ -10,14 +10,18 @@ type_ = 'image/jpeg'
 files = {}
 files['file'] = (open(path, 'rb'), type_)
 files['filename'] = path
-#files['content_type'] ='multipart/form-data'
+# files['content_type'] ='multipart/form-data'
 print('\nFile name to post : ', files['filename'])
 
-#print(files)
-response = requests.post(url + file_endpoint, files=files, headers={'content_type':'multipart/form-data'})
-#response = requests.post(url + file_endpoint, data=files)
+# print(files)
+response = requests.post(
+    url + file_endpoint,
+    files=files,
+    headers={
+        'content_type': 'multipart/form-data'})
+# response = requests.post(url + file_endpoint, data=files)
 
 print("\nResponse status code: ", response.status_code)
 
-file_id  = response.content.decode('utf-8')
+file_id = response.content.decode('utf-8')
 print("\nFile Id from post of test.jpg: ", file_id, '\n')

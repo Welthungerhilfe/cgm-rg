@@ -38,28 +38,31 @@ def blur_face(source_path: str):
     rgb_image = cv2.imread(source_path)
     image = rgb_image[:, :, ::-1]  # RGB -> BGR for OpenCV
 
-    # The images are provided in 90degrees turned. Here we rotate 90degress to the right.
+    # The images are provided in 90degrees turned. Here we rotate 90degress to
+    # the right.
     image = np.swapaxes(image, 0, 1)
 
     # Scale image down for faster prediction.
-    small_image = cv2.resize(image, (0, 0), fx=1. / RESIZE_FACTOR, fy=1. / RESIZE_FACTOR)
+    small_image = cv2.resize(image, (0, 0), fx=1. /
+                             RESIZE_FACTOR, fy=1. / RESIZE_FACTOR)
 
     # Find face locations.
     face_locations = face_recognition.face_locations(small_image, model="cnn")
 
     # Check if image should be used.
-    #if not should_image_be_used(source_path, number_of_faces=len(face_locations)):
+    # if not should_image_be_used(source_path, number_of_faces=len(face_locations)):
     #    # logging.warn(f"{len(face_locations)} face locations found and not blurred for path: {source_path}")
     #    print(f"{len(face_locations)} face locations found and not blurred for path: {source_path}")
     #    return _, False
 
-    #file_directory = os.path.dirname(target_path)
-    #if not os.path.isdir(file_directory):
+    # file_directory = os.path.dirname(target_path)
+    # if not os.path.isdir(file_directory):
     #    os.makedirs(file_directory)
 
     # Blur the image.
     for top, right, bottom, left in face_locations:
-        # Scale back up face locations since the frame we detected in was scaled to 1/4 size
+        # Scale back up face locations since the frame we detected in was
+        # scaled to 1/4 size
         top *= RESIZE_FACTOR
         right *= RESIZE_FACTOR
         bottom *= RESIZE_FACTOR
@@ -83,7 +86,6 @@ def blur_face(source_path: str):
     # logging.info(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
     print(f"{len(face_locations)} face locations found and blurred for path: {source_path}\n")
     return rgb_image, True
-
 
 
 def load_depth(filename):
@@ -498,19 +500,23 @@ def blur_faces_in_file(source_path: str, target_path: str) -> bool:
     rgb_image = cv2.imread(source_path)
     image = rgb_image[:, :, ::-1]  # RGB -> BGR for OpenCV
 
-    # The images are provided in 90degrees turned. Here we rotate 90degress to the right.
+    # The images are provided in 90degrees turned. Here we rotate 90degress to
+    # the right.
     image = np.swapaxes(image, 0, 1)
 
     # Scale image down for faster prediction.
-    small_image = cv2.resize(image, (0, 0), fx=1. / RESIZE_FACTOR, fy=1. / RESIZE_FACTOR)
+    small_image = cv2.resize(image, (0, 0), fx=1. /
+                             RESIZE_FACTOR, fy=1. / RESIZE_FACTOR)
 
     # Find face locations.
     face_locations = face_recognition.face_locations(small_image, model="cnn")
 
     # Check if image should be used.
-    if not should_image_be_used(source_path, number_of_faces=len(face_locations)):
+    if not should_image_be_used(source_path,
+                                number_of_faces=len(face_locations)):
         # logging.warn(f"{len(face_locations)} face locations found and not blurred for path: {source_path}")
-        print(f"{len(face_locations)} face locations found and not blurred for path: {source_path}")
+        print(
+            f"{len(face_locations)} face locations found and not blurred for path: {source_path}")
         return False
 
     file_directory = os.path.dirname(target_path)
@@ -519,7 +525,8 @@ def blur_faces_in_file(source_path: str, target_path: str) -> bool:
 
     # Blur the image.
     for top, right, bottom, left in face_locations:
-        # Scale back up face locations since the frame we detected in was scaled to 1/4 size
+        # Scale back up face locations since the frame we detected in was
+        # scaled to 1/4 size
         top *= RESIZE_FACTOR
         right *= RESIZE_FACTOR
         bottom *= RESIZE_FACTOR
