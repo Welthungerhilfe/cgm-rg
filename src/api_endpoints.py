@@ -1,14 +1,18 @@
 import os
 import cv2
+import json
+import pprint
 import requests
 
 class ApiEndpoints:
-    def __init__(self, url, get_file_endpoint, post_file_endpoint, result_endpoint, workflow_endpoint):
+    def __init__(self, url, scan_endpoint, get_file_endpoint, post_file_endpoint, result_endpoint, workflow_endpoint):
         self.url = url
+        self.scan_endpoint = scan_endpoint
         self.get_file_endpoint = get_file_endpoint
         self.post_file_endpoint = post_file_endpoint
         self.result_endpoint = result_endpoint
         self.workflow_endpoint = workflow_endpoint
+        
 
     def get_files(self, file_id, save_dir):
         '''
@@ -83,8 +87,31 @@ class ApiEndpoints:
 
         return response.status_code
     
-    def post_workflow(worflow_path):
+    def post_workflow(self, worflow_path):
         '''
         Post the worflows using POST /files
         '''
         return str(uuid.uuid4()), 200
+
+
+    def get_scan(self, scan_path):
+        '''
+        Get the scan metadata
+        '''
+        response = requests.get(self.url + self.scan_endpoint)
+        if response.status_code == 200:
+            content = response.json()
+            pprint.pprint(content)
+
+            with open(scan_path, 'w') as f:
+                json.dump(content, f, indent=4)
+
+            print("Written scan successfully to ", scan_path)
+        else:
+            print("Response code : ", response.status_code)
+        
+
+if __name__ == "__main__":
+    url = "http://localhost:5001"
+    scan_endpoint = '/api/scan/scans/unprocessed?limit=1'
+

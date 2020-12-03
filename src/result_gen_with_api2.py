@@ -222,7 +222,6 @@ class ScanResults:
                         print("\nResult posted successfully for Blur Result No. : ", i)
 
 
-
 def main():
     parser = argparse.ArgumentParser(
         description='Please provide model_id and endpoint name.')
@@ -245,20 +244,31 @@ def main():
     args = parser.parse_args()
 
     url = args.url
+    scan_endpoint = '/api/scan/scans/unprocessed?limit=1'
     get_file_endpoint = '/api/scan/files/'
     post_file_endpoint = '/api/scan/files'
     result_endpoint = '/api/scan/results'
     workflow_endpoint = '/api/scan/workflows'
 
-    cgm_api = ApiEndpoints(url, get_file_endpoint, post_file_endpoint, result_endpoint, workflow_endpoint)
-
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
 
-    scan_json_path = './schema/scan_with_blur_artifact.json'
-    with open(scan_json_path, 'r') as f:
+    scan_metadata_name = 'scan_meta_'+str(uuid.uuid4())+'.json'
+    scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
+
+    cgm_api = ApiEndpoints(url, scan_endpoint, get_file_endpoint, post_file_endpoint, 
+                            result_endpoint, workflow_endpoint)
+
+    cgm_api.get_scan(scan_metadata_path)
+
+    #scan_metadata_path = './schema/scan_with_blur_artifact.json'
+    
+    with open(scan_metadata_path, 'r') as f:
         scan_metadata = f.read()
     scan_metadata_obj = json.loads(scan_metadata)
+
+    # Taking a single scan at a time
+    scan_metadata_obj = scan_metadata_obj['scans'][0]
 
     with open(blur_workflow_path, 'r') as f:
         blur_workflow = f.read()
