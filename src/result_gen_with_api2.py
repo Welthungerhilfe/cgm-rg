@@ -126,11 +126,11 @@ class ScanResults:
                     └── 5850e04c-33e1-11eb-af63-4f5622046249_blur.jpg
         '''
         if not os.path.isdir(self.scan_dir):
-            os.mkdir(self.scan_dir)
+            os.makedirs(self.scan_dir)
 
         for artifact_format in self.format_wise_artifact:
             if not os.path.exists(os.path.join(self.scan_dir, artifact_format)):
-                os.mkdir(os.path.join(self.scan_dir, artifact_format))
+                os.makedirs(os.path.join(self.scan_dir, artifact_format))
     
 
     def download_blur_flow_artifact(self):
