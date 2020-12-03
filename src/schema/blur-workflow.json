@@ -1,6 +1,9 @@
 {
-    "name": "face_recogntion",
+    "name": "face_recognition",
     "version": "1.0.0",
     "result_format": "img",
-    "result_binding": "artifact"
+    "result_binding": "artifact",
+    "meta":{
+        "input_format":"img"
+    }
 }

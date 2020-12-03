@@ -27,6 +27,65 @@ CODES_360 = ("101", "201")
 RESIZE_FACTOR = 4
 
 
+def blur_face(source_path: str):
+    """Blur image
+    Returns:
+        bool: True if blurred otherwise False
+    """
+
+    # Read the image.
+    assert os.path.exists(source_path), f"{source_path} does not exist"
+    rgb_image = cv2.imread(source_path)
+    image = rgb_image[:, :, ::-1]  # RGB -> BGR for OpenCV
+
+    # The images are provided in 90degrees turned. Here we rotate 90degress to the right.
+    image = np.swapaxes(image, 0, 1)
+
+    # Scale image down for faster prediction.
+    small_image = cv2.resize(image, (0, 0), fx=1. / RESIZE_FACTOR, fy=1. / RESIZE_FACTOR)
+
+    # Find face locations.
+    face_locations = face_recognition.face_locations(small_image, model="cnn")
+
+    # Check if image should be used.
+    #if not should_image_be_used(source_path, number_of_faces=len(face_locations)):
+    #    # logging.warn(f"{len(face_locations)} face locations found and not blurred for path: {source_path}")
+    #    print(f"{len(face_locations)} face locations found and not blurred for path: {source_path}")
+    #    return _, False
+
+    #file_directory = os.path.dirname(target_path)
+    #if not os.path.isdir(file_directory):
+    #    os.makedirs(file_directory)
+
+    # Blur the image.
+    for top, right, bottom, left in face_locations:
+        # Scale back up face locations since the frame we detected in was scaled to 1/4 size
+        top *= RESIZE_FACTOR
+        right *= RESIZE_FACTOR
+        bottom *= RESIZE_FACTOR
+        left *= RESIZE_FACTOR
+
+        # Extract the region of the image that contains the face.
+        face_image = image[top:bottom, left:right]
+
+        # Blur the face image.
+        face_image = cv2.GaussianBlur(face_image, ksize=(99, 99), sigmaX=30)
+
+        # Put the blurred face region back into the frame image.
+        image[top:bottom, left:right] = face_image
+
+    # Rotate image back.
+    image = np.swapaxes(image, 0, 1)
+
+    # Write image to hard drive.
+    rgb_image = image[:, :, ::-1]  # BGR -> RGB for OpenCV
+
+    # logging.info(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
+    print(f"{len(face_locations)} face locations found and blurred for path: {source_path}\n")
+    return rgb_image, True
+
+
+
 def load_depth(filename):
     with zipfile.ZipFile(filename) as z:
         with z.open('data') as f:

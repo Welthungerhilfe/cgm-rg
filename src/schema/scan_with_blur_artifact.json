@@ -1,6 +1,6 @@
 {
-    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    "person": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "id": "1e2a49c0-34b9-11eb-9913-67c853d62115",
+    "person": "1dbfbeb6-34b9-11eb-9913-f769d21d91ef",
     "version": "string",
     "location": {
       "lat": 0,
@@ -11,18 +11,11 @@
     "scan_end": "2020-11-25T11:41:49.504Z",
     "artifacts": [
       {
-        "id": "3fa85f64-5717-4562-b3fc-2c963f66abcd",
+        "id": "1e2ae772-34b9-11eb-9913-3321a690c623",
         "timestamp": "2020-11-25T11:41:49.504Z",
         "order": 0,
-        "file": "3fa85f64-5717-4562-b3fc-2c963fmayank",
-        "format": "img"
-      },
-      {
-        "id": "3fa85f64-5717-4562-b3fc-2c963f66abce",
-        "timestamp": "2020-11-25T11:41:49.504Z",
-        "order": 1,
-        "file": "3fa85f64-5717-4562-b3fc-2c963f6shradul",
+        "file": "1dd223a8-34b9-11eb-9913-4b06875f87c3",
         "format": "img"
       }
     ]
-  }
+}
