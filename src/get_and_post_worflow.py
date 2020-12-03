@@ -1,4 +1,5 @@
 import json
+import uuid
 import pprint
 import requests
 
@@ -17,12 +18,16 @@ def post_workflow_and_save_response(endpoint, workflow_path, response_path):
         workflow = f.read()
     
     workflow_obj = json.loads(workflow)
+    # Creating unique name everytime of blur_workflow since storing in db solution 
+    # not implemented. Need to implement storage of worflows in DB and remove this part
+    workflow_obj['name'] = workflow_obj['name'] + '_' + str(uuid.uuid4())
+
     print("Workflow Post Object: ")
     pprint.pprint(workflow_obj)
     
     response = requests.post(endpoint, json=workflow_obj)
     
-    print("Worflow Post response")
+    print("Workflow Post response")
     print("Status code: ", response.status_code)
     
     if response.status_code == 201:
@@ -46,12 +51,12 @@ if __name__ == "__main__":
     #print("Content : ", r.content)
     #sample_post_request(url, file_path)
 
-    blur_workflow_path = './schema/blur-workflow.json'
-    blur_workflow_response_path = './schema/blur-worflow-post.json'
+    blur_workflow_path = 'src/schema/blur-workflow.json'
+    blur_workflow_response_path = 'src/schema/blur-workflow-post.json'
 
     status_code = post_workflow_and_save_response(url + workflow_endpoint, 
                     blur_workflow_path, blur_workflow_response_path)
 
 
     if status_code == 201:
-        print("Blur Worflow Registration sucessfull")
+        print("Blur Workflow Registration successfull")

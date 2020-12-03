@@ -4,6 +4,6 @@
     "result_format": "img",
     "result_binding": "artifact",
     "meta":{
-        "input_format":"img"
+        "input_format":"image/jpeg"
     }
 }
