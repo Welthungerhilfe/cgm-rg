@@ -15,7 +15,7 @@ Result Generation is performed when the Scanner App take an scan and upload it t
 # get the ip address of the local machine
 
 ```sh
-docker build --tag etlservice:1.0 --file ./Dockerfile .
+docker build --tag rgservice:1.0 --file ./Dockerfile .
 
 docker run -it --add-host="localhost:'YOUR IP ADDRESS'" --name rgservice_1_0 rgservice:1.0
 ```
