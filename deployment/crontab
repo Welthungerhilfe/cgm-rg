@@ -20,7 +20,7 @@
 
 * * * * * echo "Started RG" > /proc/1/fd/1 2>/proc/1/fd/2
 
-* * * * * /usr/bin/flock -n /app/result-gen.lock /usr/local/bin/python3 /app/src/result_gen_with_api.py --url http://localhost:5001 --scan_parent_dir /app/data/scans/ --blur_workflow_path /app/src/schema/blur-workflow-post.json > /proc/1/fd/1 2>/proc/1/fd/2
+* * * * * /usr/bin/flock -n /app/result-gen.lock /usr/local/bin/python3 /app/src/result_gen_with_api.py --scan_parent_dir /app/data/scans/ --blur_workflow_path /app/src/schema/blur-workflow-post.json > /proc/1/fd/1 2>/proc/1/fd/2
 
 * * * * * echo "Finished RG" > /proc/1/fd/1 2>/proc/1/fd/2
 

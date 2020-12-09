@@ -39,10 +39,13 @@ ADD requirements.txt /app/requirements.txt
 RUN pip install -r requirements.txt
 
 ADD . /app
-RUN chmod +x deployment/*.sh
+#RUN chmod +x deployment/*.sh
+
+ARG APP_ENV=LOCAL
+ENV APP_ENV ${APP_ENV}
 
 #Environment name of the RG
-ENV RUN_ENV local
+#ENV RUN_ENV LOCAL
 
 RUN mkdir log
 

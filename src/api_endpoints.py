@@ -1,5 +1,7 @@
 import os
 import cv2
+import copy
+import uuid
 import json
 import pprint
 import requests
@@ -20,13 +22,70 @@ class ApiEndpoints:
         self.post_file_endpoint = post_file_endpoint
         self.result_endpoint = result_endpoint
         self.workflow_endpoint = workflow_endpoint
+        self.headers = {}
+        self.auth_token = None
+
+    def set_auth_token(self):
+        auth_token = None
+
+        resource = "https%3A%2F%2Fcgmb2csandbox.onmicrosoft.com%2F98e9e1be-53fb-47f4-b53a-5842aeb869d5"
+        
+        headers = {
+            'Metadata': 'true',
+        }
+        
+        response_one = requests.get('http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource='+resource, headers=headers)
+        
+        print("\nresponse_one status code: ", response_one.status_code)
+
+        if response_one.status_code == 200:
+            token = response_one.json()
+            print("\ntoken : ", token)
+
+            access_token = token['access_token']
+            print("\naccess_token: ", access_token)
+            
+            data = {"access_token": access_token}
+
+            response_two = requests.post('https://cgm-be-ci-dev-scanner-api.azurewebsites.net/.auth/login/aad', json=data)
+            print("\response_two status code: ", response_two.status_code)
+
+            if response_two.status_code == 200:
+                auth_token_json = response_two.json()
+                print("\nauth_token_json : ", auth_token_json)
+
+                auth_token = auth_token_json['authenticationToken']
+                print("\nauth_token: ", auth_token)
+            else:
+                print("\response_two Get request failed\n")
+        else:
+            print("\nresponse_one Get request failed\n")
+
+        return auth_token
+
+    def prepare_header(self):
+        headers = copy.deepcopy(self.headers)
+
+        if os.environ['APP_ENV'] == 'SANDBOX':
+            auth_token = self.set_auth_token()
+
+            if auth_token is not None:
+                headers['X-ZUMO-AUTH'] = auth_token
+            else:
+                print("Auth token is None")
+                # TODO handle null values of auth_token
+                pass
+
+        return headers
 
     def get_files(self, file_id, save_dir):
         '''
         Get the files from api using file id
         '''
         endpoint = self.url + self.get_file_endpoint
-        response = requests.get(endpoint + file_id)
+
+        headers = self.prepare_header()
+        response = requests.get(endpoint + file_id, headers = headers)
         print("\nStatus code: ", response.status_code)
 
         file_path = os.path.join(save_dir, file_id)
@@ -40,6 +99,11 @@ class ApiEndpoints:
         '''
         Post the files using the path of the file
         '''
+        headers = self.prepare_header()
+        headers['content_type'] = 'multipart/form-data'  # status_code 201
+        #headers['content-type'] = 'multipart/form-data'  # status_code 400
+        #headers['Content-Type'] = 'multipart/form-data'   # status_code 400
+        
         endpoint = self.url + self.post_file_endpoint
 
         files = {}
@@ -48,7 +112,6 @@ class ApiEndpoints:
 
         print('\nFile name to post : ', files['filename'])
 
-        headers = {'content_type': 'multipart/form-data'}
         response = requests.post(endpoint, files=files, headers=headers)
         file_id = response.content.decode('utf-8')
 
@@ -61,6 +124,11 @@ class ApiEndpoints:
         Post the file result produced such as blur directly
         without saving it to a location to avoid I/O overhead
         '''
+        headers = self.prepare_header()
+        headers['content_type'] = 'multipart/form-data'    # status_code 201
+        #headers['content-type'] = 'multipart/form-data'     # status_code 400
+        #headers['Content-Type'] = 'multipart/form-data'     # status_code 400
+
         endpoint = self.url + self.post_file_endpoint
 
         _, bin_file = cv2.imencode('.JPEG', bin_file)
@@ -70,7 +138,6 @@ class ApiEndpoints:
             'file': bin_file,
             'filename': 'test.jpg'
         }
-        headers = {'content_type': 'multipart/form-data'}
 
         response = requests.post(endpoint, files=files, headers=headers)
         file_id = response.content.decode('utf-8')
@@ -84,17 +151,52 @@ class ApiEndpoints:
         Post the result object produced while Result Generation
         using POST /results
         '''
+        headers = self.prepare_header()
         endpoint = self.url + self.result_endpoint
 
-        response = requests.post(endpoint, json=result_json_obj)
+        response = requests.post(endpoint, json=result_json_obj, headers=headers)
 
         print("Status of post result response: ", response.status_code, '\n')
 
         return response.status_code
 
+    def post_workflow_and_save_response(self, workflow_path, response_path):
+        '''
+        Post the workflow and saves the response
+        '''
+        # Read the workflow json
+        with open(workflow_path, 'r') as f:
+            workflow = f.read()
+        workflow_obj = json.loads(workflow)
+        
+        # Creating unique name everytime of blur_workflow since storing in db solution
+        # not implemented. 
+        # TODO Need to implement storage of worflows in DB and remove this part
+        workflow_obj['name'] = workflow_obj['name'] + '_' + str(uuid.uuid4())
+
+        print("Workflow Post Object: ")
+        pprint.pprint(workflow_obj)
+
+        headers = self.prepare_header()
+        endpoint = self.url + self.workflow_endpoint
+        response = requests.post(endpoint, json=workflow_obj, headers=headers)
+        print("Workflow Post response")
+        print("Status code: ", response.status_code)
+
+        if response.status_code == 201:
+            content = response.json()
+
+            content['meta'] = workflow_obj["meta"]
+            pprint.pprint(content)
+
+            with open(response_path, 'w') as f:
+                json.dump(content, f)
+
+        return response.status_code
+
     def post_workflow(self, workflow_path):
         '''
-        Post the workflows using POST /files
+        Mockup of Post the workflows using POST /files
         '''
         return str(uuid.uuid4()), 200
 
@@ -102,7 +204,9 @@ class ApiEndpoints:
         '''
         Get the scan metadata
         '''
-        response = requests.get(self.url + self.scan_endpoint)
+        headers = self.prepare_header()
+        response = requests.get(self.url + self.scan_endpoint, headers=headers)
+        
         if response.status_code == 200:
             content = response.json()
             print("\nScan Details : \n")
@@ -117,5 +221,9 @@ class ApiEndpoints:
 
 
 if __name__ == "__main__":
-    url = "http://localhost:5001"
+    if os.environ['APP_ENV']=='LOCAL':
+        url = "http://localhost:5001"
+    elif os.environ['APP_ENV']=='SANDBOX':
+        url = "https://cgm-be-ci-dev-scanner-api.azurewebsites.net"    
+    
     scan_endpoint = '/api/scan/scans/unprocessed?limit=1'

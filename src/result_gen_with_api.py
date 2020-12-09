@@ -201,7 +201,7 @@ class ScanResults:
 
             print("input_path of image to perform blur: ", input_path, '\n')
 
-            # blur_status = blur_faces_in_file(input_path, target_path)
+            #blur_status = blur_faces_in_file(input_path, target_path)
             blur_img_binary, blur_status = blur_face(input_path)
 
             if blur_status:
@@ -243,10 +243,12 @@ def main():
     parser = argparse.ArgumentParser(
         description='Please provide model_id and endpoint name.')
 
+    '''
     parser.add_argument('--url',
                         default="http://localhost:5001",
                         type=str,
                         help='API endpoint URL')
+    '''
 
     parser.add_argument('--scan_parent_dir',
                         default="data/scans/",
@@ -260,7 +262,15 @@ def main():
 
     args = parser.parse_args()
 
-    url = args.url
+    # url = args.url
+
+    print("\nApp Environment : ", os.environ['APP_ENV'])
+
+    if os.environ['APP_ENV']=='LOCAL':
+        url = "http://localhost:5001"
+    elif os.environ['APP_ENV']=='SANDBOX':
+        url = "https://cgm-be-ci-dev-scanner-api.azurewebsites.net"    
+    
     scan_endpoint = '/api/scan/scans/unprocessed?limit=1'
     get_file_endpoint = '/api/scan/files/'
     post_file_endpoint = '/api/scan/files'
