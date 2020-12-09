@@ -47,7 +47,7 @@ files['filename'] = path.split('/')[-1]
 
 print('\nFile name to post : ', files['filename'])
 
-#headers['content_type'] = 'multipart/form-data'
+headers['content_type'] = 'multipart/form-data'
 #headers['content-type'] = 'multipart/form-data'
 #headers['Content-Type'] = 'multipart/form-data'
 
@@ -56,11 +56,11 @@ print('\nFile name to post : ', files['filename'])
 #file_endpoint = '/api/scan/files'
 
 
-content_type = 'multipart/form-data'
+#content_type = 'multipart/form-data'
 
-#post_file_response = requests.post('https://cgm-be-ci-dev-scanner-api.azurewebsites.net/api/scan/files', files=files, headers=headers)
+post_file_response = requests.post('https://cgm-be-ci-dev-scanner-api.azurewebsites.net/api/scan/files', files=files, headers=headers)
 #post_file_response = requests.post('https://cgm-be-ci-dev-scanner-api.azurewebsites.net/api/scan/files', data=files, headers=headers)
-post_file_response = requests.post('https://cgm-be-ci-dev-scanner-api.azurewebsites.net/api/scan/files', content_type=content_type, files=files, headers=headers)
+#post_file_response = requests.post('https://cgm-be-ci-dev-scanner-api.azurewebsites.net/api/scan/files', content_type=content_type, files=files, headers=headers)
 
 
 print("\post_file_response status code: ", post_file_response.status_code)
