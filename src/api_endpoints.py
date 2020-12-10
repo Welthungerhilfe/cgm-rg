@@ -29,13 +29,16 @@ class ApiEndpoints:
         auth_token = None
 
         resource = "https%3A%2F%2Fcgmb2csandbox.onmicrosoft.com%2F98e9e1be-53fb-47f4-b53a-5842aeb869d5"
-        
+
         headers = {
             'Metadata': 'true',
         }
-        
-        response_one = requests.get('http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource='+resource, headers=headers)
-        
+
+        response_one = requests.get(
+            'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=' +
+            resource,
+            headers=headers)
+
         print("\nresponse_one status code: ", response_one.status_code)
 
         if response_one.status_code == 200:
@@ -44,10 +47,12 @@ class ApiEndpoints:
 
             access_token = token['access_token']
             print("\naccess_token: ", access_token)
-            
+
             data = {"access_token": access_token}
 
-            response_two = requests.post('https://cgm-be-ci-dev-scanner-api.azurewebsites.net/.auth/login/aad', json=data)
+            response_two = requests.post(
+                'https://cgm-be-ci-dev-scanner-api.azurewebsites.net/.auth/login/aad',
+                json=data)
             print("\response_two status code: ", response_two.status_code)
 
             if response_two.status_code == 200:
@@ -85,7 +90,7 @@ class ApiEndpoints:
         endpoint = self.url + self.get_file_endpoint
 
         headers = self.prepare_header()
-        response = requests.get(endpoint + file_id, headers = headers)
+        response = requests.get(endpoint + file_id, headers=headers)
         print("\nStatus code: ", response.status_code)
 
         file_path = os.path.join(save_dir, file_id)
@@ -101,9 +106,9 @@ class ApiEndpoints:
         '''
         headers = self.prepare_header()
         headers['content_type'] = 'multipart/form-data'  # status_code 201
-        #headers['content-type'] = 'multipart/form-data'  # status_code 400
-        #headers['Content-Type'] = 'multipart/form-data'   # status_code 400
-        
+        # headers['content-type'] = 'multipart/form-data'  # status_code 400
+        # headers['Content-Type'] = 'multipart/form-data'   # status_code 400
+
         endpoint = self.url + self.post_file_endpoint
 
         files = {}
@@ -126,8 +131,8 @@ class ApiEndpoints:
         '''
         headers = self.prepare_header()
         headers['content_type'] = 'multipart/form-data'    # status_code 201
-        #headers['content-type'] = 'multipart/form-data'     # status_code 400
-        #headers['Content-Type'] = 'multipart/form-data'     # status_code 400
+        # headers['content-type'] = 'multipart/form-data'     # status_code 400
+        # headers['Content-Type'] = 'multipart/form-data'     # status_code 400
 
         endpoint = self.url + self.post_file_endpoint
 
@@ -154,7 +159,10 @@ class ApiEndpoints:
         headers = self.prepare_header()
         endpoint = self.url + self.result_endpoint
 
-        response = requests.post(endpoint, json=result_json_obj, headers=headers)
+        response = requests.post(
+            endpoint,
+            json=result_json_obj,
+            headers=headers)
 
         print("Status of post result response: ", response.status_code, '\n')
 
@@ -168,9 +176,9 @@ class ApiEndpoints:
         with open(workflow_path, 'r') as f:
             workflow = f.read()
         workflow_obj = json.loads(workflow)
-        
+
         # Creating unique name everytime of blur_workflow since storing in db solution
-        # not implemented. 
+        # not implemented.
         # TODO Need to implement storage of worflows in DB and remove this part
         workflow_obj['name'] = workflow_obj['name'] + '_' + str(uuid.uuid4())
 
@@ -206,7 +214,7 @@ class ApiEndpoints:
         '''
         headers = self.prepare_header()
         response = requests.get(self.url + self.scan_endpoint, headers=headers)
-        
+
         if response.status_code == 200:
             content = response.json()
             print("\nScan Details : \n")
@@ -221,9 +229,9 @@ class ApiEndpoints:
 
 
 if __name__ == "__main__":
-    if os.environ['APP_ENV']=='LOCAL':
+    if os.environ['APP_ENV'] == 'LOCAL':
         url = "http://localhost:5001"
-    elif os.environ['APP_ENV']=='SANDBOX':
-        url = "https://cgm-be-ci-dev-scanner-api.azurewebsites.net"    
-    
+    elif os.environ['APP_ENV'] == 'SANDBOX':
+        url = "https://cgm-be-ci-dev-scanner-api.azurewebsites.net"
+
     scan_endpoint = '/api/scan/scans/unprocessed?limit=1'

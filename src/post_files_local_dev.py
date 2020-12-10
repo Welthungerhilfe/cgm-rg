@@ -1,4 +1,3 @@
-import os
 import requests
 
 headers = {}
@@ -13,8 +12,8 @@ files['filename'] = path.split('/')[-1]
 
 print('\nFile name to post : ', files['filename'])
 headers['content_type'] = 'multipart/form-data'
-#headers['content-type'] = 'multipart/form-data'
-#headers['Content-Type'] = 'multipart/form-data'
+# headers['content-type'] = 'multipart/form-data'
+# headers['Content-Type'] = 'multipart/form-data'
 
 print(headers)
 
@@ -26,7 +25,7 @@ file_endpoint = '/api/scan/files'
 response = requests.post(url + file_endpoint, files=files, headers=headers)
 
 
-#response = requests.post(url + file_endpoint, data=files, headers=headers)
+# response = requests.post(url + file_endpoint, data=files, headers=headers)
 
 print("\nResponse status code: ", response.status_code)
 

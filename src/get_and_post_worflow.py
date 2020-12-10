@@ -1,19 +1,14 @@
 import os
-import json
-import uuid
-import pprint
-import requests
 from api_endpoints import ApiEndpoints
 
 if __name__ == "__main__":
 
     print("\nApp Environment : ", os.environ['APP_ENV'])
 
-    if os.environ['APP_ENV']=='LOCAL':
+    if os.environ['APP_ENV'] == 'LOCAL':
         url = "http://localhost:5001"
-    elif os.environ['APP_ENV']=='SANDBOX':
-        url = "https://cgm-be-ci-dev-scanner-api.azurewebsites.net"    
-
+    elif os.environ['APP_ENV'] == 'SANDBOX':
+        url = "https://cgm-be-ci-dev-scanner-api.azurewebsites.net"
 
     scan_endpoint = '/api/scan/scans/unprocessed?limit=1'
     get_file_endpoint = '/api/scan/files/'
@@ -28,7 +23,6 @@ if __name__ == "__main__":
         post_file_endpoint,
         result_endpoint,
         workflow_endpoint)
-
 
     blur_workflow_path = 'src/schema/blur-workflow.json'
     blur_workflow_response_path = 'src/schema/blur-workflow-post.json'
