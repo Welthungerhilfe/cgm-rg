@@ -24,7 +24,7 @@ class ApiEndpoints:
         self.workflow_endpoint = workflow_endpoint
         self.headers = {}
         self.auth_token = None
-        if os.environ['APP_ENV'] != 'LOCAL':
+        if os.environ['APP_ENV'] == 'SANDBOX' or os.environ['APP_ENV'] == 'DEMO' :
             self.resource = os.environ['APP_RESOURCE']
             self.token_endpoint = os.environ['TOKEN_ENDPOINT']
             self.app_endpoint = os.environ['APP_ENDPOINT']
@@ -86,7 +86,7 @@ class ApiEndpoints:
     def prepare_header(self):
         headers = copy.deepcopy(self.headers)
 
-        if os.environ['APP_ENV'] == 'SANDBOX':
+        if os.environ['APP_ENV'] == 'SANDBOX' or os.environ['APP_ENV'] == 'DEMO':
             auth_token = self.set_auth_token()
 
             if auth_token is not None:
