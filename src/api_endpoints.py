@@ -28,7 +28,6 @@ class ApiEndpoints:
         self.token_endpoint = os.environ['TOKEN_ENDPOINT']
         self.app_endpoint = os.environ['APP_ENDPOINT']
 
-
     def set_auth_token(self):
         auth_token = None
 
@@ -65,10 +64,9 @@ class ApiEndpoints:
                 'https://cgm-be-ci-dev-scanner-api.azurewebsites.net/.auth/login/aad',
                 json=data)
             '''
-            
-            response_two = requests.post(self.app_endpoint + '/.auth/login/aad', 
-                json=data)
-            
+
+            response_two = requests.post(self.app_endpoint + '/.auth/login/aad', json=data)
+
             print("\response_two status code: ", response_two.status_code)
 
             if response_two.status_code == 200:
