@@ -20,17 +20,7 @@
 
 * * * * * echo "Started RG" > /proc/1/fd/1 2>/proc/1/fd/2
 
-* * * * * /usr/bin/flock -n /app/result-gen.lock /usr/local/bin/python3 /app/src/result_gen_with_api2.py --url http://localhost:5001 --scan_parent_dir /app/data/scans/ --blur_workflow_path /app/src/schema/blur-workflow-post.json > /proc/1/fd/1 2>/proc/1/fd/2
+* * * * * /usr/bin/flock -n /app/result-gen.lock /usr/local/bin/python3 /app/src/result_gen_with_api.py --scan_parent_dir /app/data/scans/ --blur_workflow_path /app/src/schema/blur-workflow-post.json > /proc/1/fd/1 2>/proc/1/fd/2
 
 * * * * * echo "Finished RG" > /proc/1/fd/1 2>/proc/1/fd/2
-
-#* * * * * /usr/bin/flock -n /app/result-gen.lock /usr/local/bin/python3 /app/src/result_gen_with_api2.py --url http://localhost:5001 --scan_parent_dir /home/nikhil/cgm-all/cgm-rg/data/scans/ --blur_workflow_path ./schema/blur-worflow-post.json > /proc/1/fd/1 2>/proc/1/fd/2
-
-#* * * * * /usr/bin/flock -n /app/result-gen.lock /usr/local/bin/python3 /app/src/result_gen.py --height_model_id q3_depthmap_height_run_01 --height_service q3-depthmap-height-run-01-ci --pose_model_id posenet_1.0 --pose_service aci-posenet-ind --face_blur_model_id face_recogntion > /proc/1/fd/1 2>/proc/1/fd/2
-
-#* * * * * /usr/bin/flock -n /app/result-gen.lock /app/deployment/run_result_gen.sh > /proc/1/fd/1 2>/proc/1/fd/2
-
-# * * * * * /usr/bin/flock -n /app/result-gen.lock bash /usr/local/bin/python3 /app/src/result_gen.py --height_model_id q3_depthmap_height_run_01 --height_service q3-depthmap-height-run-01-ci --pose_model_id posenet_1.0 --pose_service aci-posenet-ind --face_blur_model_id face_recogntion > /proc/1/fd/1 2>/proc/1/fd/2
-
-# * * * * * run-one /usr/local/bin/python3 /app/src/result_gen.py --height_model_id q3_depthmap_height_run_01 --height_service q3-depthmap-height-run-01-ci --pose_model_id posenet_1.0 --pose_service aci-posenet-ind --face_blur_model_id face_recogntion > /proc/1/fd/1 2>/proc/1/fd/2
 
