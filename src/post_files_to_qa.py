@@ -55,13 +55,10 @@ print('\nFile name to post : ', files['filename'])
 
 headers['content_type'] = 'multipart/form-data'
 
-
-
 post_file_response = requests.post(
     url + '/api/scan/files',
     files=files,
     headers=headers)
-
 
 print("\npost_file_response status code: ", post_file_response.status_code)
 print("\nPost File response\n")
