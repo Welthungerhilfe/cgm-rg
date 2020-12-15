@@ -24,9 +24,10 @@ class ApiEndpoints:
         self.workflow_endpoint = workflow_endpoint
         self.headers = {}
         self.auth_token = None
-        self.resource = os.environ['APP_RESOURCE']
-        self.token_endpoint = os.environ['TOKEN_ENDPOINT']
-        self.app_endpoint = os.environ['APP_ENDPOINT']
+        if os.environ['APP_ENV'] != 'LOCAL':
+            self.resource = os.environ['APP_RESOURCE']
+            self.token_endpoint = os.environ['TOKEN_ENDPOINT']
+            self.app_endpoint = os.environ['APP_ENDPOINT']
 
     def set_auth_token(self):
         auth_token = None
@@ -188,8 +189,9 @@ class ApiEndpoints:
         '''
         # Read the workflow json
         with open(workflow_path, 'r') as f:
-            workflow = f.read()
-        workflow_obj = json.loads(workflow)
+            workflow_obj = json.load(f)
+            # workflow = f.read()
+        # workflow_obj = json.loads(workflow)
 
         # Creating unique name everytime of blur_workflow since storing in db solution
         # not implemented.
