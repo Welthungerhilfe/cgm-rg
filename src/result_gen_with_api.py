@@ -101,7 +101,7 @@ class ScanResults:
             mod_artifact = copy.deepcopy(artifact)
             mod_artifact['download_status'] = False
             # Change the format from image/jpeg to img
-            if artifact['format'] == 'image/jpeg':
+            if artifact['format'] == 'image/jpeg' or artifact['format'] == 'rgb':
                 mod_artifact['format'] = 'img'
 
             if mod_artifact['format'] in self.format_wise_artifact:
