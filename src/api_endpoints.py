@@ -24,19 +24,29 @@ class ApiEndpoints:
         self.workflow_endpoint = workflow_endpoint
         self.headers = {}
         self.auth_token = None
+        self.resource = os.environ['APP_RESOURCE']
+        self.token_endpoint = os.environ['TOKEN_ENDPOINT']
+        self.app_endpoint = os.environ['APP_ENDPOINT']
+
 
     def set_auth_token(self):
         auth_token = None
 
-        resource = "https%3A%2F%2Fcgmb2csandbox.onmicrosoft.com%2F98e9e1be-53fb-47f4-b53a-5842aeb869d5"
+        # resource = "https%3A%2F%2Fcgmb2csandbox.onmicrosoft.com%2F98e9e1be-53fb-47f4-b53a-5842aeb869d5"
 
         headers = {
             'Metadata': 'true',
         }
 
+        '''
         response_one = requests.get(
             'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=' +
-            resource,
+            self.resource,
+            headers=headers)
+        '''
+
+        response_one = requests.get(
+            self.token_endpoint + '&resource=' + self.resource,
             headers=headers)
 
         print("\nresponse_one status code: ", response_one.status_code)
@@ -50,9 +60,15 @@ class ApiEndpoints:
 
             data = {"access_token": access_token}
 
+            '''
             response_two = requests.post(
                 'https://cgm-be-ci-dev-scanner-api.azurewebsites.net/.auth/login/aad',
                 json=data)
+            '''
+            
+            response_two = requests.post(self.app_endpoint + '/.auth/login/aad', 
+                json=data)
+            
             print("\response_two status code: ", response_two.status_code)
 
             if response_two.status_code == 200:
