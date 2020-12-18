@@ -9,6 +9,8 @@ from datetime import datetime
 import numpy as np
 import face_recognition
 from bunch import Bunch
+import pymongo
+from pymongo import MongoClient
 from api_endpoints import ApiEndpoints
 
 RESIZE_FACTOR = 4
@@ -260,6 +262,16 @@ def main():
                         type=str,
                         help='Blur Workflow path')
 
+    parser.add_argument('--face_recognition_name',
+                        default="face_recognition",
+                        type=str,
+                        help='name of the face recogniton model')
+    
+    parser.add_argument('--face_recognition_version',
+                        default="1.0.0",
+                        type=str,
+                        help='version of the face recogniton model')
+
     args = parser.parse_args()
 
     # url = args.url
@@ -281,6 +293,12 @@ def main():
 
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
+    face_recognition_name = args.face_recognition_name
+    face_recognition_version = args.face_recognition_version
+
+    cluster = client = pymongo.MongoClient("mongodb+srv://nikhil:bxQnvPpBDKI5VAnu@cluster0.y7zec.mongodb.net/<dbname>?retryWrites=true&w=majority")
+    db = cluster['cgm-rg']
+    collection = db['test']
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
@@ -296,9 +314,11 @@ def main():
     cgm_api.get_scan(scan_metadata_path)
 
     # scan_metadata_path = './schema/scan_with_blur_artifact.json'
+    
     with open(scan_metadata_path, 'r') as f:
         scan_metadata = f.read()
     scan_metadata_obj = json.loads(scan_metadata)
+
 
     if len(scan_metadata_obj['scans']) > 0:
 
@@ -306,9 +326,11 @@ def main():
         # Taking a single scan at a time
         scan_metadata_obj = scan_metadata_obj['scans'][0]
 
-        with open(blur_workflow_path, 'r') as f:
-            blur_workflow = f.read()
-        blur_workflow_obj = json.loads(blur_workflow)
+        #with open(blur_workflow_path, 'r') as f:
+        #    blur_workflow = f.read()
+        #blur_workflow_obj = json.loads(blur_workflow)
+
+        blur_workflow_obj = collection.find_one({"name":face_recognition_name, "version":face_recognition_version})
 
         scan_results = ScanResults(
             scan_metadata_obj,
