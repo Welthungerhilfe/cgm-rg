@@ -48,7 +48,7 @@ if __name__ == "__main__":
         result_endpoint,
         workflow_endpoint)
 
-    cluster = client = pymongo.MongoClient("mongodb+srv://nikhil:bxQnvPpBDKI5VAnu@cluster0.y7zec.mongodb.net/<dbname>?retryWrites=true&w=majority")
+    cluster = client = pymongo.MongoClient("mongodb+srv://<user>:<password>@cluster0.y7zec.mongodb.net/<dbname>?retryWrites=true&w=majority")
     db = cluster['cgm-rg']
     collection = db['test']
 
