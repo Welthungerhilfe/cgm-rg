@@ -1,15 +1,15 @@
 import os
 import json
 import pymongo
-from pymongo import MongoClient
 
 from api_endpoints import ApiEndpoints
+
 
 def check_workflow_exists(workflow_path, collection):
     with open(workflow_path) as f:
         workflow_json = json.load(f)
 
-    results = collection.count_documents({"name": workflow_json["name"],"version": workflow_json["version"]})
+    results = collection.count_documents({"name": workflow_json["name"], "version": workflow_json["version"]})
     print("no of existing document ", results)
     return results
 
@@ -67,4 +67,3 @@ if __name__ == "__main__":
         if status_code == 201:
             print("Blur Workflow Registration Successful, adding to db")
             insert_workflow_document(blur_workflow_response_path, collection)
-            
