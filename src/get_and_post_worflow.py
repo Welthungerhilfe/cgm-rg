@@ -55,7 +55,7 @@ if __name__ == "__main__":
         workflow_endpoint)
 
     db = cluster['cgm-rg']
-    collection = db['test']
+    collection = db[collection_name]
 
     current_dir = os.path.dirname(os.path.realpath(__file__))
     print(current_dir)

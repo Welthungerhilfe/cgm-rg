@@ -302,7 +302,7 @@ def main():
     face_recognition_version = args.face_recognition_version
 
     db = cluster['cgm-rg']
-    collection = db['test']
+    collection = db[collection_name]
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
