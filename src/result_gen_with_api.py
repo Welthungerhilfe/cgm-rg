@@ -280,12 +280,15 @@ def main():
     if os.environ['APP_ENV'] == 'LOCAL':
         url = "http://localhost:5001"
         collection_name = "local"
+        cluster = pymongo.MongoClient("mongodb://localhost:27017/")
     elif os.environ['APP_ENV'] == 'SANDBOX':
         url = "https://cgm-be-ci-dev-scanner-api.azurewebsites.net"
         collection_name = "sandbox"
+        cluster = client = pymongo.MongoClient("mongodb+srv://<user>:<password>@cluster0.y7zec.mongodb.net/<dbname>?retryWrites=true&w=majority")
     elif os.environ['APP_ENV'] == 'DEMO':
         url = "https://cgm-be-ci-qa-scanner-api.azurewebsites.net"
         collection_name = "demo"
+        cluster = client = pymongo.MongoClient("mongodb+srv://<user>:<password>@cluster0.y7zec.mongodb.net/<dbname>?retryWrites=true&w=majority")
 
     scan_endpoint = '/api/scan/scans/unprocessed?limit=1'
     get_file_endpoint = '/api/scan/files/'
@@ -298,7 +301,6 @@ def main():
     face_recognition_name = args.face_recognition_name
     face_recognition_version = args.face_recognition_version
 
-    cluster = pymongo.MongoClient("mongodb+srv://<uset>:<password>@cluster0.y7zec.mongodb.net/<dbname>?retryWrites=true&w=majority")
     db = cluster['cgm-rg']
     collection = db['test']
 
