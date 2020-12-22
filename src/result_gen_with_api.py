@@ -279,10 +279,13 @@ def main():
 
     if os.environ['APP_ENV'] == 'LOCAL':
         url = "http://localhost:5001"
+        collection_name = "local"
     elif os.environ['APP_ENV'] == 'SANDBOX':
         url = "https://cgm-be-ci-dev-scanner-api.azurewebsites.net"
+        collection_name = "sandbox"
     elif os.environ['APP_ENV'] == 'DEMO':
         url = "https://cgm-be-ci-qa-scanner-api.azurewebsites.net"
+        collection_name = "demo"
 
     scan_endpoint = '/api/scan/scans/unprocessed?limit=1'
     get_file_endpoint = '/api/scan/files/'
