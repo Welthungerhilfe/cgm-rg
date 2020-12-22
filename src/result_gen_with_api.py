@@ -298,7 +298,7 @@ def main():
     face_recognition_name = args.face_recognition_name
     face_recognition_version = args.face_recognition_version
 
-    cluster = pymongo.MongoClient("mongodb+srv://nikhil:bxQnvPpBDKI5VAnu@cluster0.y7zec.mongodb.net/<dbname>?retryWrites=true&w=majority")
+    cluster = pymongo.MongoClient("mongodb+srv://<uset>:<password>@cluster0.y7zec.mongodb.net/<dbname>?retryWrites=true&w=majority")
     db = cluster['cgm-rg']
     collection = db['test']
 
