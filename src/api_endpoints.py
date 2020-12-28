@@ -128,7 +128,7 @@ class ApiEndpoints:
 
         files = {}
         files['file'] = (open(file_path, 'rb'), type_)
-        files['filename'] = path.split('/')[-1]
+        files['filename'] = file_path.split('/')[-1]
 
         print('\nFile name to post : ', files['filename'])
 
@@ -183,20 +183,10 @@ class ApiEndpoints:
 
         return response.status_code
 
-    def post_workflow_and_save_response(self, workflow_path, response_path):
+    def post_workflow_and_save_response(self, workflow_obj):
         '''
         Post the workflow and saves the response
         '''
-        # Read the workflow json
-        with open(workflow_path, 'r') as f:
-            workflow_obj = json.load(f)
-            # workflow = f.read()
-        # workflow_obj = json.loads(workflow)
-
-        # Creating unique name everytime of blur_workflow since storing in db solution
-        # not implemented.
-        # TODO Need to implement storage of worflows in DB and remove this part
-        workflow_obj['name'] = workflow_obj['name'] + '_' + str(uuid.uuid4())
 
         print("Workflow Post Object: ")
         pprint.pprint(workflow_obj)
@@ -213,8 +203,8 @@ class ApiEndpoints:
             content['meta'] = workflow_obj["meta"]
             pprint.pprint(content)
 
-            with open(response_path, 'w') as f:
-                json.dump(content, f)
+            # with open(response_path, 'w') as f:
+            #     json.dump(content, f)
 
         return response.status_code
 
@@ -242,6 +232,15 @@ class ApiEndpoints:
             print("\n Written scan metadata successfully to ", scan_path)
         else:
             print("Response code : ", response.status_code)
+
+    def get_workflows(self):
+        '''
+        Get all registerd workflows
+        '''
+        headers = self.prepare_header()
+        response = requests.get(self.url + self.workflow_endpoint, headers=headers)
+
+        return response.json()
 
 
 if __name__ == "__main__":
