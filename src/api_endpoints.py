@@ -128,7 +128,7 @@ class ApiEndpoints:
 
         files = {}
         files['file'] = (open(file_path, 'rb'), type_)
-        files['filename'] = path.split('/')[-1]
+        files['filename'] = file_path.split('/')[-1]
 
         print('\nFile name to post : ', files['filename'])
 
@@ -187,7 +187,7 @@ class ApiEndpoints:
         '''
         Post the workflow and saves the response
         '''
-        
+
         print("Workflow Post Object: ")
         pprint.pprint(workflow_obj)
 

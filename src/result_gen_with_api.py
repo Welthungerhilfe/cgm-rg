@@ -203,7 +203,7 @@ class ScanResults:
             input_path = os.path.join(
                 self.blur_workflow_artifact_dir,
                 artifact['file'])
-            target_path = input_path + '_blur.jpg'
+            # target_path = input_path + '_blur.jpg'
 
             print("input_path of image to perform blur: ", input_path, '\n')
 
@@ -261,7 +261,6 @@ def main():
                         type=str,
                         help='Parent directory in which scans will be stored')
 
-
     parser.add_argument('--blur_workflow_path',
                         default="src/schema/blur-worflow-post.json",
                         type=str,
@@ -288,7 +287,7 @@ def main():
 
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
-    
+
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
 

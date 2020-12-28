@@ -3,6 +3,7 @@ from api_endpoints import ApiEndpoints
 import glob
 import json
 
+
 def get_list_of_files(source_folder):
     '''
     Get list of json files in a folder
@@ -18,7 +19,7 @@ def check_workflow_exists(json_obj, workflows):
 
 
 def check_workflows(json_paths, workflows, cgm_api):
-    
+
     for path in json_paths:
         with open(path, 'r') as f:
             workflow_obj = json.load(f)
