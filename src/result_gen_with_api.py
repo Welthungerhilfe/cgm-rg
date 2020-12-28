@@ -74,6 +74,12 @@ def blur_face(source_path: str):
     return rgb_image, True
 
 
+def get_workflow_id(workflow_name, workflow_version, workflows):
+    blur_workflow_obj_with_id = list(filter(lambda workflow: (workflow['name'] == workflow_name and workflow['version'] == workflow_version), workflows['workflows']))[0]
+
+    return blur_workflow_obj_with_id['id']
+
+
 class ScanResults:
     def __init__(self, scan_metadata, blur_workflow, scan_parent_dir, api):
         self.scan_metadata = scan_metadata
@@ -255,6 +261,7 @@ def main():
                         type=str,
                         help='Parent directory in which scans will be stored')
 
+
     parser.add_argument('--blur_workflow_path',
                         default="src/schema/blur-worflow-post.json",
                         type=str,
@@ -281,7 +288,7 @@ def main():
 
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
-
+    
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
 
@@ -293,6 +300,7 @@ def main():
         result_endpoint,
         workflow_endpoint)
 
+    workflows = cgm_api.get_workflows()
     cgm_api.get_scan(scan_metadata_path)
 
     # scan_metadata_path = './schema/scan_with_blur_artifact.json'
@@ -307,8 +315,9 @@ def main():
         scan_metadata_obj = scan_metadata_obj['scans'][0]
 
         with open(blur_workflow_path, 'r') as f:
-            blur_workflow = f.read()
-        blur_workflow_obj = json.loads(blur_workflow)
+            blur_workflow_obj = json.load(f)
+
+        blur_workflow_obj['id'] = get_workflow_id(blur_workflow_obj['name'], blur_workflow_obj['version'], workflows)
 
         scan_results = ScanResults(
             scan_metadata_obj,
