@@ -309,7 +309,7 @@ class ScanResults:
                 artifact['file'])
 
             data, width, height, depthScale, maxConfidence = preprocessing.load_depth(input_path)
-            depthmap,height, width = preprocessing.prepare_depthmap(data, width, height, depthScale)
+            depthmap, height, width = preprocessing.prepare_depthmap(data, width, height, depthScale)
             depthmap = preprocessing.preprocess(depthmap)
             depthmaps.append(depthmap)
 
@@ -342,12 +342,12 @@ def main():
                         help='Parent directory in which scans will be stored')
 
     parser.add_argument('--blur_workflow_path',
-                        default="src/schema/blur-worflow-post.json",
+                        default="src/workflows/blur-worflow-post.json",
                         type=str,
                         help='Blur Workflow path')
 
     parser.add_argument('--height_workflow_path',
-                        default="src/schema/height-worflow.json",
+                        default="src/workflows/height-worflow.json",
                         type=str,
                         help='Height Workflow path')
 
