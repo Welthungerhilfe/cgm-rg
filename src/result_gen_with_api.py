@@ -322,7 +322,7 @@ class ScanResults:
                         height_result, indent=2, separators=(',', ':'))
         height_result_object = json.loads(height_result_string)
         if self.api.post_results(height_result_object) == 201:
-            print("successfully post height results")
+            print("successfully post height results: ", height_result_object)
 
 
 def main():
