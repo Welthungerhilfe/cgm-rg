@@ -277,28 +277,25 @@ class ScanResults:
 
     def prepare_height_result_object(
             self,
-            source_artifacts_list,
-            blur_id_from_post_request,
+            predictions,
             generated_timestamp):
         '''
         Prepare the result object in the results format
         '''
-        blur_result = Bunch()
-        # Need to clarify
-        # blur_result.id = str(uuid.uuid4())
-        blur_result.id = f"{uuid.uuid4()}"
-        blur_result.scan = self.scan_metadata['id']
-        blur_result.workflow = self.blur_workflow["id"]
-        blur_result.source_artifacts = source_artifacts_list
-        blur_result.source_results = []
-        # blur_result.data = Bunch()
-        blur_result.file = blur_id_from_post_request
-        blur_result.generated = generated_timestamp
-        blur_result.meta = []
-
         res = Bunch()
         res.results = []
-        res.results.append(blur_result)
+        for artifact, prediction in zip(self.height_format_wise_artifact, predictions):
+            height_result = Bunch()
+            height_result.id = f"{uuid.uuid4()}"
+            height_result.scan = self.scan_metadata['id']
+            height_result.workflow = self.height_workflow["id"]
+            height_result.source_artifacts = []
+            height_result.source_results = []
+            height_result.generated = generated_timestamp
+            result = {'height': prediction}
+            height_result.data = result
+            res.results.append(height_result)
+
         return res
 
     def run_height_flow(self):
@@ -317,8 +314,15 @@ class ScanResults:
             depthmaps.append(depthmap)
 
         depthmaps = np.array(depthmaps)
-
+        generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         height_predictions = inference.get_predictions(depthmaps, self.height_service_name)
+
+        height_result = self.prepare_height_result_object(height_predictions, generated_timestamp)
+        height_result_string = json.dumps(
+                        height_result, indent=2, separators=(',', ':'))
+        height_result_object = json.loads(height_result_string)
+        if self.api.post_results(height_result_object) == 201:
+            print("successfully post height results")
 
 
 def main():
