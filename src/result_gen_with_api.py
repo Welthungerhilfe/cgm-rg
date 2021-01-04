@@ -289,7 +289,7 @@ class ScanResults:
             height_result.id = f"{uuid.uuid4()}"
             height_result.scan = self.scan_metadata['id']
             height_result.workflow = self.height_workflow["id"]
-            height_result.source_artifacts = []
+            height_result.source_artifacts = [artifact['id']]
             height_result.source_results = []
             height_result.generated = generated_timestamp
             result = {'height': prediction[0]}
