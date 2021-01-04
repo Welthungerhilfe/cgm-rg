@@ -315,7 +315,7 @@ class ScanResults:
 
         depthmaps = np.array(depthmaps)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-        height_predictions = inference.get_predictions_local(depthmaps, self.height_service_name)
+        height_predictions = inference.get_predictions_local(depthmaps)
         print("height predictions are: ", height_predictions)
 
         height_result = self.prepare_height_result_object(height_predictions, generated_timestamp)
