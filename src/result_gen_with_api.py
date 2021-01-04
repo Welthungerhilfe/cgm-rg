@@ -292,7 +292,7 @@ class ScanResults:
             height_result.source_artifacts = []
             height_result.source_results = []
             height_result.generated = generated_timestamp
-            result = {'height': prediction}
+            result = {'height': prediction[0]}
             height_result.data = result
             res.results.append(height_result)
 
@@ -318,7 +318,7 @@ class ScanResults:
         height_predictions = inference.get_predictions_local(depthmaps)
         print("height predictions are: ", height_predictions)
 
-        height_result = self.prepare_height_result_object(height_predictions, generated_timestamp)
+        height_result = self.prepare_height_result_object(height_predictions.tolist(), generated_timestamp)
         height_result_string = json.dumps(
                         height_result, indent=2, separators=(',', ':'))
         height_result_object = json.loads(height_result_string)
