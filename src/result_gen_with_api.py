@@ -271,7 +271,7 @@ class ScanResults:
                 mod_artifact['download_status'] = True
                 self.height_format_wise_artifact.append(mod_artifact)
 
-        print("\nBelow Artifacts for blur workflow\n")
+        print("\nBelow Artifacts for height workflow\n")
         print(self.height_format_wise_artifact)
         print("\nDownload Artifact for completed\n")
 
