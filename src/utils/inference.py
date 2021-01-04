@@ -4,6 +4,8 @@ import json
 
 from azureml.core import Workspace
 from azureml.core.authentication import ServicePrincipalAuthentication
+import tensorflow as tf
+from tensorflow.keras.models import load_model
 
 # To include the config file
 sys.path.append(
@@ -21,6 +23,11 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 # TODO load the weights of passed model and generate results for passed
 # pointclouds
 
+model = load_model('/app/models/best_model.h5')
+
+
+def get_prediction_local(numpy_array):
+    return model.predict(numpy_array)
 
 def get_predictions(numpy_array, service_name):
 
