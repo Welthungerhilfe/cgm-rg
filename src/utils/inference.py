@@ -26,7 +26,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 model = load_model('/app/models/best_model.h5')
 
 
-def get_prediction_local(numpy_array):
+def get_predictions_local(numpy_array):
     return model.predict(numpy_array)
 
 def get_predictions(numpy_array, service_name):
