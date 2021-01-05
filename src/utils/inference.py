@@ -4,7 +4,6 @@ import json
 
 from azureml.core import Workspace
 from azureml.core.authentication import ServicePrincipalAuthentication
-import tensorflow as tf
 from tensorflow.keras.models import load_model
 
 # To include the config file
@@ -29,9 +28,8 @@ model = load_model('/app/models/best_model.h5')
 def get_predictions_local(numpy_array):
     return model.predict(numpy_array)
 
-def get_predictions(numpy_array, service_name):
 
-    # ws = Workspace.from_config('~/PythonCode/prod_ws_config.json')
+def get_predictions(numpy_array, service_name):
 
     sp = ServicePrincipalAuthentication(
         tenant_id=os.environ['TENANT_ID'],
