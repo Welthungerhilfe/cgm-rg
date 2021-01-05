@@ -319,8 +319,7 @@ class ScanResults:
         print("height predictions are: ", height_predictions)
 
         height_result = self.prepare_height_result_object(height_predictions.tolist(), generated_timestamp)
-        height_result_string = json.dumps(
-                        height_result, indent=2, separators=(',', ':'))
+        height_result_string = json.dumps(height_result, indent=2, separators=(',', ':'))
         height_result_object = json.loads(height_result_string)
         if self.api.post_results(height_result_object) == 201:
             print("successfully post height results: ", height_result_object)
