@@ -254,6 +254,9 @@ class ScanResults:
                         print(
                             "\nResult posted successfully for Blur Result No. : ", i)
 
+    def get_mean_scan_height_results(self, predictions):
+        return np.mean(predictions)
+
     def download_height_flow_artifact(self):
         print("\nDownload Artifacts for height Worflow Started")
 
@@ -298,6 +301,30 @@ class ScanResults:
 
         return res
 
+    def prepare_scan_height_result_object(
+            self,
+            predictions,
+            generated_timestamp):
+        '''
+        Prepare the scan result object in the results format
+        '''
+        res = Bunch()
+        res.results = []
+        height_result = Bunch()
+        height_result.id = f"{uuid.uuid4()}"
+        height_result.scan = self.scan_metadata['id']
+        height_result.workflow = self.height_workflow["id"]
+        height_result.source_artifacts = [artifact['id'] for artifact in self.height_format_wise_artifact]
+        height_result.source_results = []
+        height_result.generated = generated_timestamp
+        mean_prediction = self.get_mean_scan_height_results(predictions)
+        result = {'mean_height': mean_prediction}
+        height_result.data = result
+
+        res.results.append(height_result)
+
+        return res
+
     def run_height_flow(self):
         '''
         Run the height Workflow on the downloaded artifacts
@@ -322,7 +349,13 @@ class ScanResults:
         height_result_string = json.dumps(height_result, indent=2, separators=(',', ':'))
         height_result_object = json.loads(height_result_string)
         if self.api.post_results(height_result_object) == 201:
-            print("successfully post height results: ", height_result_object)
+            print("successfully post artifact level height results: ", height_result_object)
+
+        scan_height_result = self.prepare_scan_height_result_object(height_predictions.tolist(), generated_timestamp)
+        scan_height_result_string = json.dumps(scan_height_result, indent=2, separators=(',', ':'))
+        scan_height_result_object = json.loads(scan_height_result_string)
+        if self.api.post_results(scan_height_result_object) == 201:
+            print("successfully post scan level height results: ", scan_height_result_object)
 
 
 def main():
