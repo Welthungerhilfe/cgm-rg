@@ -18,3 +18,5 @@ dlib
 face-recognition==1.3.0
 jsonschema==2.6.0
 requests==2.19.1
+tensorflow==2.0.0
+h5py==2.10.0

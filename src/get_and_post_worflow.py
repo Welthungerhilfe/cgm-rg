@@ -28,6 +28,8 @@ def check_workflows(json_paths, workflows, cgm_api):
             status_code = cgm_api.post_workflow_and_save_response(workflow_obj)
             if status_code == 201:
                 print("successfully registered workflow for name ", workflow_obj['name'], " and version ", workflow_obj['version'])
+        else:
+            print("workflow for name ", workflow_obj['name'], " and version ", workflow_obj['version'], "already exists")
 
 
 if __name__ == "__main__":
