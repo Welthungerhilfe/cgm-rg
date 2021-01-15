@@ -2,8 +2,8 @@ import os
 import sys
 import json
 
-from azureml.core import Workspace
-from azureml.core.authentication import ServicePrincipalAuthentication
+# from azureml.core import Workspace
+# from azureml.core.authentication import ServicePrincipalAuthentication
 from tensorflow.keras.models import load_model
 
 # To include the config file
