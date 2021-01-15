@@ -468,7 +468,7 @@ def main():
                         help='Height Workflow path')
 
     parser.add_argument('--weight_workflow_path',
-                        default="src/workflows/weight-worflow.json",
+                        default="/app/src/workflows/weight-worflow.json",
                         type=str,
                         help='Weight Workflow path')
 
@@ -547,7 +547,7 @@ def main():
         scan_results.create_scan_and_artifact_dir()
         scan_results.download_blur_flow_artifact()
         scan_results.run_blur_flow()
-        scan_results.download_height_flow_artifact()
+        scan_results.download_depth_artifact()
         scan_results.run_height_flow()
         scan_results.run_weight_flow()
 
