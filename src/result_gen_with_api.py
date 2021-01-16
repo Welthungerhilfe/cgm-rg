@@ -398,11 +398,11 @@ def main():
     elif os.environ['APP_ENV'] == 'DEMO':
         url = "https://cgm-be-ci-qa-scanner-api.azurewebsites.net"
 
-    scan_endpoint = '/api/scan/scans/unprocessed?limit=1'
-    get_file_endpoint = '/api/scan/files/'
-    post_file_endpoint = '/api/scan/files'
-    result_endpoint = '/api/scan/results'
-    workflow_endpoint = '/api/scan/workflows'
+    scan_endpoint = '/api/scans/unprocessed?limit=1'
+    get_file_endpoint = '/api/files/'
+    post_file_endpoint = '/api/files'
+    result_endpoint = '/api/results'
+    workflow_endpoint = '/api/workflows'
 
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
