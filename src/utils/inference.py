@@ -1,6 +1,5 @@
 import os
 import sys
-import json
 
 # from azureml.core import Workspace
 # from azureml.core.authentication import ServicePrincipalAuthentication
@@ -34,6 +33,7 @@ def get_weight_predictions_local(numpy_array):
     return weight_model.predict(numpy_array)
 
 
+'''
 def get_predictions(numpy_array, service_name):
 
     sp = ServicePrincipalAuthentication(
@@ -57,3 +57,4 @@ def get_predictions(numpy_array, service_name):
         predictions += prediction
 
     return predictions
+'''
