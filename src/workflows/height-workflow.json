@@ -1,7 +1,7 @@
 {
     "name": "q3-depthmap-height",
     "version": "run-01",
-    "result_format": "img",
+    "result_format": "dict",
     "result_binding": "artifact",
     "service_name":"q3-depthmap-height-run-01-ci",
     "meta":{
