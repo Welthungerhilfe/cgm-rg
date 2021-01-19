@@ -1,0 +1,10 @@
+{
+    "name": "q4-depthmap-plaincnn-weight-95k",
+    "version": "run-12_01",
+    "result_format": "dict",
+    "result_binding": "artifact",
+    "service_name":"q4-depthmap-plaincnn-weight-95k-run-12-ci",
+    "meta":{
+        "input_format":"application/zip"
+    }
+}

@@ -1,9 +1,8 @@
 import os
 import sys
-import json
 
-from azureml.core import Workspace
-from azureml.core.authentication import ServicePrincipalAuthentication
+# from azureml.core import Workspace
+# from azureml.core.authentication import ServicePrincipalAuthentication
 from tensorflow.keras.models import load_model
 
 # To include the config file
@@ -22,13 +21,19 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 # TODO load the weights of passed model and generate results for passed
 # pointclouds
 
-model = load_model('/app/models/best_model.h5')
+height_model = load_model('/app/models/best_model.h5')
+weight_model = load_model('/app/models/q4-depthmap-plaincnn-weight-95k-run-12/best_model.ckpt/', compile=False)
 
 
-def get_predictions_local(numpy_array):
-    return model.predict(numpy_array)
+def get_height_predictions_local(numpy_array):
+    return height_model.predict(numpy_array)
 
 
+def get_weight_predictions_local(numpy_array):
+    return weight_model.predict(numpy_array)
+
+
+'''
 def get_predictions(numpy_array, service_name):
 
     sp = ServicePrincipalAuthentication(
@@ -52,3 +57,4 @@ def get_predictions(numpy_array, service_name):
         predictions += prediction
 
     return predictions
+'''
