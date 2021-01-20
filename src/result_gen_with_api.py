@@ -474,8 +474,8 @@ def main():
 
     args = parser.parse_args()
 
-    preprocessing.setWidth(int(240 * 0.75))
-    preprocessing.setHeight(int(180 * 0.75))
+    preprocessing.set_width(int(240 * 0.75))
+    preprocessing.set_height(int(180 * 0.75))
 
     print("\nApp Environment : ", os.environ['APP_ENV'])
 
