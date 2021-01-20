@@ -3,8 +3,8 @@ import numpy as np
 from pyntcloud import PyntCloud
 from skimage.transform import resize
 
-image_target_height = 240
-image_target_width = 180
+IMAGE_TARGET_HEIGHT = 240
+IMAGE_TARGET_WIDTH = 180
 
 
 def load_depth(filename):
@@ -25,8 +25,8 @@ def load_depth(filename):
 
 
 def parseDepth(tx, ty, data, depthScale):
-    depth = data[(int(ty) * width + int(tx)) * 3 + 0] << 8
-    depth += data[(int(ty) * width + int(tx)) * 3 + 1]
+    depth = data[(int(ty) * WIDTH + int(tx)) * 3 + 0] << 8
+    depth += data[(int(ty) * WIDTH + int(tx)) * 3 + 1]
     depth *= depthScale
     return depth
 
@@ -56,8 +56,8 @@ def getPCD(filename, calibration, data, maxConfidence, depthScale):
     pcd = []
     # count = str(getCount(calibration, data, depthScale))
     # print(count)
-    for x in range(2, width - 2):
-        for y in range(2, height - 2):
+    for x in range(2, WIDTH - 2):
+        for y in range(2, HEIGHT - 2):
             depth = parseDepth(x, y, data, depthScale)
             if depth:
                 res = convert2Dto3D(calibration[1], x, y, depth)
@@ -79,7 +79,7 @@ def preprocess(depthmap):
     depthmap = preprocess_depthmap(depthmap)
     # depthmap = depthmap/depthmap.max()
     depthmap = depthmap / 7.5
-    depthmap = resize(depthmap, (image_target_height, image_target_width))
+    depthmap = resize(depthmap, (IMAGE_TARGET_HEIGHT, IMAGE_TARGET_WIDTH))
     depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
     # depthmap = depthmap[None, :]
     return depthmap
@@ -145,10 +145,10 @@ def parseCalibration(filepath):
 
 def convert2Dto3D(intrisics, x, y, z):
     # print(intrisics)
-    fx = intrisics[0] * float(width)
-    fy = intrisics[1] * float(height)
-    cx = intrisics[2] * float(width)
-    cy = intrisics[3] * float(height)
+    fx = intrisics[0] * float(WIDTH)
+    fy = intrisics[1] * float(HEIGHT)
+    cx = intrisics[2] * float(WIDTH)
+    cy = intrisics[3] * float(HEIGHT)
     tx = (x - cx) * z / fx
     ty = (y - cy) * z / fy
     output = []
@@ -162,10 +162,10 @@ def convert2Dto3D(intrisics, x, y, z):
 
 def convert3Dto2D(intrisics, x, y, z):
     # print(intrisics)
-    fx = intrisics[0] * float(width)
-    fy = intrisics[1] * float(height)
-    cx = intrisics[2] * float(width)
-    cy = intrisics[3] * float(height)
+    fx = intrisics[0] * float(WIDTH)
+    fy = intrisics[1] * float(HEIGHT)
+    cx = intrisics[2] * float(WIDTH)
+    cy = intrisics[3] * float(HEIGHT)
     tx = x * fx / z + cx
     ty = y * fy / z + cy
     output = []
@@ -176,33 +176,33 @@ def convert3Dto2D(intrisics, x, y, z):
 
 
 def parseConfidence(tx, ty, data, maxConfidence):
-    return (data[(int(ty) * width + int(tx)) * 3 + 2]) / maxConfidence
+    return (data[(int(ty) * WIDTH + int(tx)) * 3 + 2]) / maxConfidence
 
 # getter
 
 
 def getWidth():
-    return width
+    return WIDTH
 
 # getter
 
 
 def getHeight():
-    return height
+    return HEIGHT
 
 # setter
 
 
 def setWidth(value):
-    global width
-    width = value
+    global WIDTH
+    WIDTH = value
 
 # setter
 
 
 def setHeight(value):
-    global height
-    height = value
+    global HEIGHT
+    HEIGHT = value
 
     # parse PCD
 
@@ -228,8 +228,8 @@ def parsePCD(filepath):
 # get valid points in depthmaps
 def getCount(calibration, data, depthScale):
     count = 0
-    for x in range(2, width - 2):
-        for y in range(2, height - 2):
+    for x in range(2, WIDTH - 2):
+        for y in range(2, HEIGHT - 2):
             depth = parseDepth(x, y, data, depthScale)
             if depth:
                 res = convert2Dto3D(calibration[1], x, y, depth)
@@ -340,7 +340,7 @@ def get_depthmaps(paths):
     for path in paths:
         data, width, height, depthScale, maxConfidence = load_depth(path)
         depthmap, height, width = prepare_depthmap(
-            data, width, height, depthScale)
+            data, WIDTH, HEIGHT, depthScale)
         # print(height, width)
         depthmap = preprocess(depthmap)
         # print(depthmap.shape)
