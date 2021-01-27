@@ -190,8 +190,7 @@ class ApiEndpoints:
 
         if response.status_code == 201:
             content = response.json()
-
-            content['meta'] = workflow_obj["meta"]
+            #content['data'] = workflow_obj["data"]
             pprint.pprint(content)
 
             # with open(response_path, 'w') as f:
