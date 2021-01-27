@@ -3,8 +3,8 @@
     "version": "run-01_01",
     "result_format": "dict",
     "result_binding": "artifact",
-    "service_name":"q3-depthmap-height-run-01-ci",
-    "meta":{
-        "input_format":"application/zip"
+    "data":{
+        "input_format":"application/zip",
+        "model":"q3-depthmap-height"
     }
 }
