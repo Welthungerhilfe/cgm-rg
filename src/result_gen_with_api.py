@@ -92,11 +92,11 @@ class ScanResults:
         self.weight_workflow_scan = weight_workflow_scan
 
         self.format_wise_artifact = {}
-        if self.blur_workflow["meta"]["input_format"] == 'image/jpeg':
+        if self.blur_workflow["data"]["input_format"] == 'image/jpeg':
             self.blur_input_format = 'img'
-        if self.height_workflow_artifact["meta"]["input_format"] == 'application/zip':
+        if self.height_workflow_artifact["data"]["input_format"] == 'application/zip':
             self.height_input_format = 'depth'
-        if self.weight_workflow_artifact["meta"]["input_format"] == 'application/zip':
+        if self.weight_workflow_artifact["data"]["input_format"] == 'application/zip':
             self.weight_input_format = 'depth'
         self.depth_input_format = 'depth'
         self.scan_parent_dir = scan_parent_dir
