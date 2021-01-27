@@ -5,7 +5,6 @@
     "result_binding": "scan",
     "data":{
         "input_format":"application/zip",
-        "model":"q4-depthmap-plaincnn-weight-95k",
-        "service_name":"q4-depthmap-plaincnn-weight-95k-run-12-ci"
+        "model":"q4-depthmap-plaincnn-weight-95k"
     }
 }

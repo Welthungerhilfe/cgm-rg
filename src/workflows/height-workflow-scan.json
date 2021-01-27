@@ -5,7 +5,6 @@
     "result_binding": "scan",
     "data":{
         "input_format":"application/zip",
-        "model":"q3-depthmap-height",
-        "service_name":"q3-depthmap-height-run-01-ci"
+        "model":"q3-depthmap-height"
     }
 }
