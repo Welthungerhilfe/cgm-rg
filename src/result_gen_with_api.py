@@ -17,17 +17,17 @@ RESIZE_FACTOR = 4
 
 
 class BlurFlow:
-    def __init__(self, api, workflows, process_data, workflow_obj, blur_format_wise_artifact):
+    def __init__(self, api, workflows, workflow_obj, artifacts, scan_parent_dir, scan_metadata):
         self.api = api
         self.workflows = workflows
-        self.process_data = process_data
+        self.artifacts = artifacts
         self.workflow_obj = workflow_obj
-        self.workflow_obj['id'] = workflows.get_workflow_id(workflow_obj['name'], workflow_obj['version'])
-        if self.workflow_obj["meta"]["input_format"] == 'image/jpeg':
+        self.scan_metadata = scan_metadata
+        self.scan_parent_dir = scan_parent_dir
+        if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.blur_input_format = 'img'
-        self.blur_workflow_artifact_dir = os.path.join(self.process_data.scan_dir, self.blur_input_format)
-        # self.blur_format_wise_artifact = blur_format_wise_artifact
-        # self.blur_workflow_artifact_dir = self.process_data.
+        self.scan_directory = os.path.join(self.scan_parent_dir, self.scan_metadata['id'], self.blur_input_format)
+        self.workflow_obj['id'] = workflows.get_workflow_id(workflow_obj['name'], workflow_obj['version'])
 
     def get_input_path(self, directory, file_name):
         return os.path.join(directory, file_name)
@@ -36,10 +36,10 @@ class BlurFlow:
         '''
         Run the blur Workflow on the downloaded artifacts
         '''
-        for i, artifact in enumerate(self.blur_format_wise_artifact):
+        for i, artifact in enumerate(self.artifacts):
 
             input_path = self.get_input_path(
-                self.blur_workflow_artifact_dir,
+                self.scan_directory,
                 artifact['file'])
             # target_path = input_path + '_blur.jpg'
 
@@ -100,10 +100,53 @@ class BlurFlow:
         print(f"{len(face_locations)} face locations found and blurred for path: {source_path}\n")
         return rgb_image, True
 
+    def post_blur_files(self):
+        for artifact in self.artifacts:
+            blur_id_from_post_request, post_status = self.api.post_files(
+                    artifact['blurred_image'])
+            if post_status == 201:
+                artifact['blur_id_from_post_request'] = blur_id_from_post_request
+                artifact['generated_timestamp'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+
+    def prepare_result_object(self):
+        res = Bunch()
+        res.results = []
+        for artifact in self.artifacts:
+            blur_result = Bunch()
+            blur_result.id = f"{uuid.uuid4()}"
+            blur_result.scan = self.scan_metadata['id']
+            blur_result.workflow = self.workflow_obj["id"]
+            blur_result.source_artifacts = [artifact['file']]
+            blur_result.source_results = []
+            blur_result.file = artifact['blur_id_from_post_request']
+            blur_result.generated = artifact['generated_timestamp']
+            res.results.append(blur_result)
+        
+        return res
+
+    def post_result_object(self):
+        blur_result = self.prepare_result_object()
+        blur_result_string = json.dumps(blur_result, indent=2, separators=(',', ':'))
+        blur_result_object = json.loads(blur_result_string)
+        if self.api.post_results(blur_result_object) == 201:
+            print("successfully post blur results: ", blur_result_object)
+
 
 class HeightFlow:
-    pass
-
+    def __init__(self, api, workflows, artifact_workflow_obj, scan_workflow_obj, artifacts, scan_parent_dir, scan_metadata):
+        self.api = api
+        self.workflows = workflows
+        self.artifacts = artifacts
+        self.artifact_workflow_obj = artifact_workflow_obj
+        self.scan_workflow_obj = scan_workflow_obj
+        self.scan_metadata = scan_metadata
+        self.scan_parent_dir = scan_parent_dir
+        if self.workflow_obj["meta"]["input_format"] == 'image/jpeg':
+            self.blur_input_format = 'img'
+        self.scan_directory = os.path.join(self.scan_parent_dir, self.scan_metadata['id'], self.blur_input_format)
+        self.artifact_workflow_obj['id'] = workflows.get_workflow_id(artifact_workflow_obj['name'], artifact_workflow_obj['version'])
+        self.scan_workflow_obj['id'] = workflows.get_workflow_id(scan_workflow_obj['name'], scan_workflow_obj['version'])
+    
 
 class WeightFlow:
     pass
@@ -123,7 +166,7 @@ class ProcessWorkflows:
         return blur_workflow_obj_with_id['id']
 
 
-class GetAndPostDataToApi:
+class GetScanMetadata:
     def __init__(self, api, scan_metadata_path):
         self.api = api
         self.scan_metadata_path = scan_metadata_path
@@ -139,42 +182,37 @@ class GetAndPostDataToApi:
 
         return self.scan_metadata
 
-    def download_artifacts(self, input_format, format_wise_artifact, destination_directory):
-        print("\nDownload Artifacts for ", input_format, " format")
 
-        self.artifacts = []
-
-        for i, artifact in enumerate(
-                format_wise_artifact[input_format]):
-            mod_artifact = copy.deepcopy(artifact)
-
-            print("\nDownloading Artifact Name: ", mod_artifact["file"], '\n')
-            status_code = self.api.get_files(
-                mod_artifact["file"], destination_directory)
-            # status_code = get_files_mockup(mod_artifact["file"], format_dir)
-            if status_code == 200:
-                mod_artifact['download_status'] = True
-                self.artifacts.append(mod_artifact)
-
-        print("\nBelow Artifacts for blur workflow\n")
-        print(self.artifacts)
-        print("\nDownload Artifact for completed\n")
-
-        return self.artifacts
-
-
-class GenerateResults:
-    pass
-
-
-class ProcessData:
-    def __init__(self, scan_metadata, scan_parent_dir):
+class DataProcessing:
+    def __init__(self, api, scan_metadata, scan_parent_dir):
+        self.api = api
         self.scan_metadata = scan_metadata
         self.format_wise_artifact = {}
         self.scan_parent_dir = scan_parent_dir
         self.scan_dir = os.path.join(
             self.scan_parent_dir,
             self.scan_metadata['id'])
+    
+    def download_artifacts(self, input_format):
+        print(f"\nDownloading Artifacts for { input_format } format")
+
+        for i, artifact in enumerate(
+                self.format_wise_artifact[input_format]):
+            mod_artifact = copy.deepcopy(artifact)
+
+            print("\nDownloading Artifact Name: ", mod_artifact["file"], '\n')
+            status_code = self.api.get_files(
+                mod_artifact["file"], os.path.join(self.scan_dir, input_format))
+            # status_code = get_files_mockup(mod_artifact["file"], format_dir)
+            if status_code == 200:
+                mod_artifact['download_status'] = True
+                self.artifacts.append(mod_artifact)
+
+        print(f"\nBelow Artifacts for { input_format } workflow\n")
+        print(self.artifacts)
+        print("\nDownload Artifact for completed\n")
+
+        return self.artifacts
 
     def check_artifact_format(self, format):
         if format == 'image/jpeg' or format == 'rgb':
@@ -236,6 +274,24 @@ class ProcessData:
                     self.scan_dir,
                     artifact_format)):
                 os.makedirs(os.path.join(self.scan_dir, artifact_format))
+
+    def get_processed_depthmaps(self):
+        self.depthmaps = []
+        for i, artifact in enumerate(self.depth_artifact):
+            input_path = self.get_input_path(
+                self.depth_artifact_dir,
+                artifact['file'])
+
+            data, width, height, depthScale, maxConfidence = preprocessing.load_depth(input_path)
+            depthmap, height, width = preprocessing.prepare_depthmap(data, width, height, depthScale)
+            depthmap = preprocessing.preprocess(depthmap)
+            depthmaps.append(depthmap)
+
+        self.depthmaps = np.array(depthmaps)
+
+
+class GenerateResults:
+    pass
 
 
 class MakeResultObjects:
