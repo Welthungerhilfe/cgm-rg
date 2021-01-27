@@ -83,17 +83,20 @@ def get_workflow_id(workflow_name, workflow_version, workflows):
 
 
 class ScanResults:
-    def __init__(self, scan_metadata, blur_workflow, height_workflow, weight_workflow, scan_parent_dir, api):
+    def __init__(self, scan_metadata, blur_workflow, height_workflow_artifact, weight_workflow_artifact, height_workflow_scan, weight_workflow_scan, scan_parent_dir, api):
         self.scan_metadata = scan_metadata
         self.blur_workflow = blur_workflow
-        self.height_workflow = height_workflow
-        self.weight_workflow = weight_workflow
+        self.height_workflow_artifact = height_workflow_artifact
+        self.weight_workflow_artifact = weight_workflow_artifact
+        self.height_workflow_scan = height_workflow_scan
+        self.weight_workflow_scan = weight_workflow_scan
+
         self.format_wise_artifact = {}
         if self.blur_workflow["meta"]["input_format"] == 'image/jpeg':
             self.blur_input_format = 'img'
-        if self.height_workflow["meta"]["input_format"] == 'application/zip':
+        if self.height_workflow_artifact["meta"]["input_format"] == 'application/zip':
             self.height_input_format = 'depth'
-        if self.weight_workflow["meta"]["input_format"] == 'application/zip':
+        if self.weight_workflow_artifact["meta"]["input_format"] == 'application/zip':
             self.weight_input_format = 'depth'
         self.depth_input_format = 'depth'
         self.scan_parent_dir = scan_parent_dir
@@ -295,7 +298,7 @@ class ScanResults:
             height_result = Bunch()
             height_result.id = f"{uuid.uuid4()}"
             height_result.scan = self.scan_metadata['id']
-            height_result.workflow = self.height_workflow["id"]
+            height_result.workflow = self.height_workflow_artifact["id"]
             height_result.source_artifacts = [artifact['id']]
             height_result.source_results = []
             height_result.generated = generated_timestamp
@@ -317,7 +320,7 @@ class ScanResults:
         height_result = Bunch()
         height_result.id = f"{uuid.uuid4()}"
         height_result.scan = self.scan_metadata['id']
-        height_result.workflow = self.height_workflow["id"]
+        height_result.workflow = self.height_workflow_scan["id"]
         height_result.source_artifacts = [artifact['id'] for artifact in self.depth_artifact]
         height_result.source_results = []
         height_result.generated = generated_timestamp
@@ -374,7 +377,7 @@ class ScanResults:
             weight_result = Bunch()
             weight_result.id = f"{uuid.uuid4()}"
             weight_result.scan = self.scan_metadata['id']
-            weight_result.workflow = self.weight_workflow["id"]
+            weight_result.workflow = self.weight_workflow_artifact["id"]
             weight_result.source_artifacts = [artifact['id']]
             weight_result.source_results = []
             weight_result.generated = generated_timestamp
@@ -396,7 +399,7 @@ class ScanResults:
         weight_result = Bunch()
         weight_result.id = f"{uuid.uuid4()}"
         weight_result.scan = self.scan_metadata['id']
-        weight_result.workflow = self.weight_workflow["id"]
+        weight_result.workflow = self.weight_workflow_scan["id"]
         weight_result.source_artifacts = [artifact['id'] for artifact in self.depth_artifact]
         weight_result.source_results = []
         weight_result.generated = generated_timestamp
@@ -462,15 +465,23 @@ def main():
                         type=str,
                         help='Blur Workflow path')
 
-    parser.add_argument('--height_workflow_path',
-                        default="src/workflows/height-worflow.json",
+    parser.add_argument('--height_workflow_artifact_path',
+                        default="src/workflows/height-worflow-artifact.json",
                         type=str,
-                        help='Height Workflow path')
+                        help='Height Workflow Artifact path')
+    parser.add_argument('--height_workflow_scan_path',
+                        default="src/workflows/height-worflow-scan.json",
+                        type=str,
+                        help='Height Workflow Scan path')
 
-    parser.add_argument('--weight_workflow_path',
-                        default="/app/src/workflows/weight-worflow.json",
+    parser.add_argument('--weight_workflow_artifact_path',
+                        default="/app/src/workflows/weight-worflow-artifact.json",
                         type=str,
-                        help='Weight Workflow path')
+                        help='Weight Workflow Artifact path')
+    parser.add_argument('--weight_workflow_scan_path',
+                        default="/app/src/workflows/weight-worflow-scan.json",
+                        type=str,
+                        help='Weight Workflow Scan path')
 
     args = parser.parse_args()
 
@@ -494,8 +505,10 @@ def main():
 
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
-    height_workflow_path = args.height_workflow_path
-    weight_workflow_path = args.weight_workflow_path
+    height_workflow_artifact_path = args.height_workflow_artifact_path
+    height_workflow_scan_path = args.height_workflow_scan_path
+    weight_workflow_artifact_path = args.weight_workflow_artifact_path
+    weight_workflow_scan_path = args.weight_workflow_scan_path
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
@@ -525,21 +538,32 @@ def main():
         with open(blur_workflow_path, 'r') as f:
             blur_workflow_obj = json.load(f)
 
-        with open(height_workflow_path, 'r') as f:
-            height_workflow_obj = json.load(f)
+        with open(height_workflow_artifact_path, 'r') as f:
+            height_workflow_artifact_obj = json.load(f)
 
-        with open(weight_workflow_path, 'r') as f:
-            weight_workflow_obj = json.load(f)
+        with open(height_workflow_scan_path, 'r') as f:
+            height_workflow_scan_obj = json.load(f)
+
+        with open(weight_workflow_artifact_path, 'r') as f:
+            weight_workflow_artifact_obj = json.load(f)
+
+        with open(weight_workflow_scan_path, 'r') as f:
+            weight_workflow_scan_obj = json.load(f)
 
         blur_workflow_obj['id'] = get_workflow_id(blur_workflow_obj['name'], blur_workflow_obj['version'], workflows)
-        height_workflow_obj['id'] = get_workflow_id(height_workflow_obj['name'], height_workflow_obj['version'], workflows)
-        weight_workflow_obj['id'] = get_workflow_id(weight_workflow_obj['name'], weight_workflow_obj['version'], workflows)
+        height_workflow_artifact_obj['id'] = get_workflow_id(height_workflow_artifact_obj['name'], height_workflow_artifact_obj['version'], workflows)
+        weight_workflow_artifact_obj['id'] = get_workflow_id(weight_workflow_artifact_obj['name'], weight_workflow_artifact_obj['version'], workflows)
+
+        height_workflow_scan_obj['id'] = get_workflow_id(height_workflow_scan_obj['name'], height_workflow_scan_obj['version'], workflows)
+        weight_workflow_scan_obj['id'] = get_workflow_id(weight_workflow_scan_obj['name'], weight_workflow_scan_obj['version'], workflows)
 
         scan_results = ScanResults(
             scan_metadata_obj,
             blur_workflow_obj,
-            height_workflow_obj,
-            weight_workflow_obj,
+            height_workflow_artifact_obj,
+            weight_workflow_artifact_obj,
+            height_workflow_scan_obj,
+            weight_workflow_scan_obj,
             scan_parent_dir,
             cgm_api)
 
