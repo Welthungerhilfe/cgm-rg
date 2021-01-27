@@ -29,6 +29,12 @@ class BlurFlow:
         self.scan_directory = os.path.join(self.scan_parent_dir, self.scan_metadata['id'], self.blur_input_format)
         self.workflow_obj['id'] = workflows.get_workflow_id(workflow_obj['name'], workflow_obj['version'])
 
+    def bunch_object_to_json_object(self, bunch_object):
+        json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
+        json_object = json.loads(json_string)
+
+        return json_object
+
     def get_input_path(self, directory, file_name):
         return os.path.join(directory, file_name)
 
@@ -126,8 +132,7 @@ class BlurFlow:
 
     def post_result_object(self):
         blur_result = self.prepare_result_object()
-        blur_result_string = json.dumps(blur_result, indent=2, separators=(',', ':'))
-        blur_result_object = json.loads(blur_result_string)
+        blur_result_object = self.bunch_object_to_json_object(blur_result)
         if self.api.post_results(blur_result_object) == 201:
             print("successfully post blur results: ", blur_result_object)
 
@@ -141,12 +146,92 @@ class HeightFlow:
         self.scan_workflow_obj = scan_workflow_obj
         self.scan_metadata = scan_metadata
         self.scan_parent_dir = scan_parent_dir
-        if self.workflow_obj["meta"]["input_format"] == 'image/jpeg':
-            self.blur_input_format = 'img'
-        self.scan_directory = os.path.join(self.scan_parent_dir, self.scan_metadata['id'], self.blur_input_format)
+        if self.workflow_obj["data"]["input_format"] == 'application/zip':
+            self.depth_input_format = 'depth'
+        self.scan_directory = os.path.join(self.scan_parent_dir, self.scan_metadata['id'], self.depth_input_format)
         self.artifact_workflow_obj['id'] = workflows.get_workflow_id(artifact_workflow_obj['name'], artifact_workflow_obj['version'])
         self.scan_workflow_obj['id'] = workflows.get_workflow_id(scan_workflow_obj['name'], scan_workflow_obj['version'])
-    
+
+    def bunch_object_to_json_object(self, bunch_object):
+        json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
+        json_object = json.loads(json_string)
+
+        return json_object
+
+    def get_input_path(self, directory, file_name):
+        return os.path.join(directory, file_name)
+
+    def get_mean_scan_results(self, predictions):
+        return np.mean(predictions)
+
+    def process_depthmaps(self):
+        depthmaps = []
+        for artifact in self.artifacts:
+            input_path = self.get_input_path(
+                self.scan_directory,
+                artifact['file'])
+
+            data, width, height, depthScale, maxConfidence = preprocessing.load_depth(input_path)
+            depthmap, height, width = preprocessing.prepare_depthmap(data, width, height, depthScale)
+            depthmap = preprocessing.preprocess(depthmap)
+            depthmaps.append(depthmap)
+
+        depthmaps = np.array(depthmaps)
+
+        return depthmaps
+
+    def run_height_flow(self):
+        depthmaps = self.process_depthmaps()
+        height_predictions = inference.get_height_predictions_local(depthmaps)
+        generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        self.post_height_results(height_predictions, generated_timestamp)
+        
+    def artifact_level_height_result_object(self, predictions, generated_timestamp):
+        res = Bunch()
+        res.results = []
+        for artifact, prediction in zip(self.artifacts, predictions):
+            height_result = Bunch()
+            height_result.id = f"{uuid.uuid4()}"
+            height_result.scan = self.scan_metadata['id']
+            height_result.workflow = self.artifact_workflow_obj["id"]
+            height_result.source_artifacts = [artifact['id']]
+            height_result.source_results = []
+            height_result.generated = generated_timestamp
+            result = {'height': prediction[0]}
+            height_result.data = result
+            res.results.append(height_result)
+
+        return res
+
+    def scan_level_height_result_object(self, predictions, generated_timestamp):
+        res = Bunch()
+        res.results = []
+        height_result = Bunch()
+        height_result.id = f"{uuid.uuid4()}"
+        height_result.scan = self.scan_metadata['id']
+        height_result.workflow = self.scan_workflow_obj["id"]
+        height_result.source_artifacts = [artifact['id'] for artifact in self.artifacts]
+        height_result.source_results = []
+        height_result.generated = generated_timestamp
+        mean_prediction = self.get_mean_scan_results(predictions)
+        result = {'mean_height': mean_prediction}
+        height_result.data = result
+
+        res.results.append(height_result)
+
+        return res
+
+    def post_height_results(self, predictions, generated_timestamp):
+        artifact_level_height_result_bunch = self.artifact_level_height_result_object(predictions, generated_timestamp)
+        artifact_level_height_result_json = self.bunch_object_to_json_object(artifact_level_height_result_bunch)
+        if self.api.post_results(artifact_level_height_result_json) == 201:
+            print("successfully post artifact level height results: ", artifact_level_height_result_json)
+
+        scan_level_height_result_bunch = self.artifact_level_height_result_object(predictions, generated_timestamp)
+        scan_level_height_result_json = self.bunch_object_to_json_object(scan_level_height_result_bunch)
+        if self.api.post_results(scan_level_height_result_json) == 201:
+            print("successfully post scan level height results: ", scan_level_height_result_json)
+
 
 class WeightFlow:
     pass
