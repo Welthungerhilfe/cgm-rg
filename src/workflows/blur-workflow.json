@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "result_format": "img",
     "result_binding": "artifact",
-    "meta":{
+    "data":{
         "input_format":"image/jpeg"
     }
 }
