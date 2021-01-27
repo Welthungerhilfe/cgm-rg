@@ -221,6 +221,9 @@ class ApiEndpoints:
                 json.dump(content, f, indent=4)
 
             print("\n Written scan metadata successfully to ", scan_path)
+
+            return len(content['scans'])
+
         else:
             print("Response code : ", response.status_code)
 

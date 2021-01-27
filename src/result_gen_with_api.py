@@ -16,70 +16,230 @@ import utils.preprocessing as preprocessing
 RESIZE_FACTOR = 4
 
 
-def blur_face(source_path: str):
-    """Blur image
-    Returns:
-        bool: True if blurred otherwise False
-    """
-    # Read the image.
-    assert os.path.exists(source_path), f"{source_path} does not exist"
-    rgb_image = cv2.imread(source_path)
-    image = rgb_image[:, :, ::-1]  # RGB -> BGR for OpenCV
+class BlurFlow:
+    def __init__(self, api, workflows, process_data, workflow_obj, blur_format_wise_artifact):
+        self.api = api
+        self.workflows = workflows
+        self.process_data = process_data
+        self.workflow_obj = workflow_obj
+        self.workflow_obj['id'] = workflows.get_workflow_id(workflow_obj['name'], workflow_obj['version'])
+        if self.workflow_obj["meta"]["input_format"] == 'image/jpeg':
+            self.blur_input_format = 'img'
+        self.blur_workflow_artifact_dir = os.path.join(self.process_data.scan_dir, self.blur_input_format)
+        # self.blur_format_wise_artifact = blur_format_wise_artifact
+        # self.blur_workflow_artifact_dir = self.process_data.
 
-    # The images are provided in 90degrees turned. Here we rotate 90degress to
-    # the right.
-    image = np.swapaxes(image, 0, 1)
+    def get_input_path(self, directory, file_name):
+        return os.path.join(directory, file_name)
 
-    # Scale image down for faster prediction.
-    small_image = cv2.resize(image, (0, 0), fx=1.0 /
-                             RESIZE_FACTOR, fy=1.0 / RESIZE_FACTOR)
+    def run_blur_flow(self):
+        '''
+        Run the blur Workflow on the downloaded artifacts
+        '''
+        for i, artifact in enumerate(self.blur_format_wise_artifact):
 
-    # Find face locations.
-    face_locations = face_recognition.face_locations(small_image, model="cnn")
+            input_path = self.get_input_path(
+                self.blur_workflow_artifact_dir,
+                artifact['file'])
+            # target_path = input_path + '_blur.jpg'
 
-    # Check if image should be used.
-    # if not should_image_be_used(source_path, number_of_faces=len(face_locations)):
-    #    # logging.warn(f"{len(face_locations)} face locations found and not blurred for path: {source_path}")
-    #    print(f"{len(face_locations)} face locations found and not blurred for path: {source_path}")
-    #    return _, False
+            print("input_path of image to perform blur: ", input_path, '\n')
 
-    # file_directory = os.path.dirname(target_path)
-    # if not os.path.isdir(file_directory):
-    #    os.makedirs(file_directory)
+            # blur_status = blur_faces_in_file(input_path, target_path)
+            blur_img_binary, blur_status = self.blur_face(input_path)
 
-    # Blur the image.
-    for top, right, bottom, left in face_locations:
-        # Scale back up face locations since the frame we detected in was
-        # scaled to 1/4 size
-        top *= RESIZE_FACTOR
-        right *= RESIZE_FACTOR
-        bottom *= RESIZE_FACTOR
-        left *= RESIZE_FACTOR
+            if blur_status:
+                artifact['blurred_image'] = blur_img_binary
 
-        # Extract the region of the image that contains the face.
-        face_image = image[top:bottom, left:right]
+    def blur_face(self, source_path: str):
+        """Blur image
+        Returns:
+            bool: True if blurred otherwise False
+        """
+        # Read the image.
+        assert os.path.exists(source_path), f"{source_path} does not exist"
+        rgb_image = cv2.imread(source_path)
+        image = rgb_image[:, :, ::-1]  # RGB -> BGR for OpenCV
 
-        # Blur the face image.
-        face_image = cv2.GaussianBlur(face_image, ksize=(99, 99), sigmaX=30)
+        # The images are provided in 90degrees turned. Here we rotate 90degress to
+        # the right.
+        image = np.swapaxes(image, 0, 1)
 
-        # Put the blurred face region back into the frame image.
-        image[top:bottom, left:right] = face_image
+        # Scale image down for faster prediction.
+        small_image = cv2.resize(image, (0, 0), fx=1.0 /
+                                RESIZE_FACTOR, fy=1.0 / RESIZE_FACTOR)
 
-    # Rotate image back.
-    image = np.swapaxes(image, 0, 1)
+        # Find face locations.
+        face_locations = face_recognition.face_locations(small_image, model="cnn")
 
-    # Write image to hard drive.
-    rgb_image = image[:, :, ::-1]  # BGR -> RGB for OpenCV
+        # Blur the image.
+        for top, right, bottom, left in face_locations:
+            # Scale back up face locations since the frame we detected in was
+            # scaled to 1/4 size
+            top *= RESIZE_FACTOR
+            right *= RESIZE_FACTOR
+            bottom *= RESIZE_FACTOR
+            left *= RESIZE_FACTOR
 
-    # logging.info(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
-    print(f"{len(face_locations)} face locations found and blurred for path: {source_path}\n")
-    return rgb_image, True
+            # Extract the region of the image that contains the face.
+            face_image = image[top:bottom, left:right]
+
+            # Blur the face image.
+            face_image = cv2.GaussianBlur(face_image, ksize=(99, 99), sigmaX=30)
+
+            # Put the blurred face region back into the frame image.
+            image[top:bottom, left:right] = face_image
+
+        # Rotate image back.
+        image = np.swapaxes(image, 0, 1)
+
+        # Write image to hard drive.
+        rgb_image = image[:, :, ::-1]  # BGR -> RGB for OpenCV
+
+        # logging.info(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
+        print(f"{len(face_locations)} face locations found and blurred for path: {source_path}\n")
+        return rgb_image, True
 
 
-def get_workflow_id(workflow_name, workflow_version, workflows):
-    blur_workflow_obj_with_id = list(filter(lambda workflow: (workflow['name'] == workflow_name and workflow['version'] == workflow_version), workflows['workflows']))[0]
+class HeightFlow:
+    pass
 
-    return blur_workflow_obj_with_id['id']
+
+class WeightFlow:
+    pass
+
+
+class ProcessWorkflows:
+    def __init__(self, api):
+        # self.workflow_object = workflow_object
+        self.api = api
+
+    def get_list_of_worflows(self):
+        self.workflows = self.api.get_workflows()
+
+    def get_workflow_id(self, workflow_name, workflow_version):
+        blur_workflow_obj_with_id = list(filter(lambda workflow: (workflow['name'] == workflow_name and workflow['version'] == workflow_version), self.workflows['workflows']))[0]
+
+        return blur_workflow_obj_with_id['id']
+
+
+class GetAndPostDataToApi:
+    def __init__(self, api, scan_metadata_path):
+        self.api = api
+        self.scan_metadata_path = scan_metadata_path
+    
+    def get_unprocessed_scans(self):
+        
+        return self.api.get_scan(self.scan_metadata_path)
+
+    def get_scan_metadata(self):
+        with open(self.scan_metadata_path, 'r') as f:
+            scan_metadata_obj  = json.load(f)
+        self.scan_metadata = scan_metadata_obj['scans'][0]
+
+        return self.scan_metadata
+
+    def download_artifacts(self, input_format, format_wise_artifact, destination_directory):
+        print("\nDownload Artifacts for ", input_format, " format")
+
+        self.artifacts = []
+
+        for i, artifact in enumerate(
+                format_wise_artifact[input_format]):
+            mod_artifact = copy.deepcopy(artifact)
+
+            print("\nDownloading Artifact Name: ", mod_artifact["file"], '\n')
+            status_code = self.api.get_files(
+                mod_artifact["file"], destination_directory)
+            # status_code = get_files_mockup(mod_artifact["file"], format_dir)
+            if status_code == 200:
+                mod_artifact['download_status'] = True
+                self.artifacts.append(mod_artifact)
+
+        print("\nBelow Artifacts for blur workflow\n")
+        print(self.artifacts)
+        print("\nDownload Artifact for completed\n")
+
+        return self.artifacts
+
+
+class GenerateResults:
+    pass
+
+
+class ProcessData:
+    def __init__(self, scan_metadata, scan_parent_dir):
+        self.scan_metadata = scan_metadata
+        self.format_wise_artifact = {}
+        self.scan_parent_dir = scan_parent_dir
+        self.scan_dir = os.path.join(
+            self.scan_parent_dir,
+            self.scan_metadata['id'])
+
+    def check_artifact_format(self, format):
+        if format == 'image/jpeg' or format == 'rgb':
+            return 'img'
+        elif format == 'application/zip':
+            return 'depth'
+
+    def add_artifacts_to_format_dictionary(self, format, artifact):
+        if format in self.format_wise_artifact:
+            self.format_wise_artifact[format].append(
+                artifact)
+        else:
+            self.format_wise_artifact[format] = [
+                artifact]
+
+    def process_scan_metadata(self):
+        '''
+        Process the scan object to get the list of jpeg id
+        and artifact id return a dict of format as key and
+        list of file id as values
+        '''
+        artifact_list = self.scan_metadata['artifacts']
+
+        for artifact in artifact_list:
+            mod_artifact = copy.deepcopy(artifact)
+            mod_artifact['download_status'] = False
+
+            mod_artifact['format'] = self.check_artifact_format(artifact['format'])
+
+            self.add_artifacts_to_format_dictionary(mod_artifact['format'], mod_artifact)
+
+        print("\nPrepared format wise Artifact:\n")
+        pprint.pprint(self.format_wise_artifact)
+
+    def create_scan_dir(self):
+        '''
+        Create a scan dir and format wise dir inside scan dir
+        in which all the artifacts will be downloaded
+        .
+        └── scans
+            ├── 3fa85f64-5717-4562-b3fc-2c963f66afa6
+            │   └── img
+            │       ├── 3fa85f64-5717-4562-b3fc-2c963f6shradul
+            │       ├── 3fa85f64-5717-4562-b3fc-2c963fmayank
+            │       ├── 69869078-33e1-11eb-af63-cf4006664c92
+            │       └── 699b71dc-33e1-11eb-af63-e32a5809de47
+            └── 59560ba2-33e1-11eb-af63-4b01606d9610
+                └── img
+                    ├── 5850e04c-33e1-11eb-af63-4f5622046249
+                    └── 5850e04c-33e1-11eb-af63-4f5622046249_blur.jpg
+        '''
+        if not os.path.isdir(self.scan_dir):
+            os.makedirs(self.scan_dir)
+
+    def create_artifact_dir(self):
+        for artifact_format in self.format_wise_artifact:
+            if not os.path.exists(
+                os.path.join(
+                    self.scan_dir,
+                    artifact_format)):
+                os.makedirs(os.path.join(self.scan_dir, artifact_format))
+
+
+class MakeResultObjects:
+    pass
 
 
 class ScanResults:
