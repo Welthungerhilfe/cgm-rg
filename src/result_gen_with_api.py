@@ -147,8 +147,8 @@ class HeightFlow:
         self.artifacts = artifacts
         self.artifact_workflow_path = artifact_workflow_path
         self.scan_workflow_path = scan_workflow_path
-        self.artifact_workflow_obj = self.workflows.get_workflows(self.artifact_workflow_path)
-        self.scan_workflow_obj = self.workflows.get_workflows(self.scan_workflow_path)
+        self.artifact_workflow_obj = self.workflows.load_workflows(self.artifact_workflow_path)
+        self.scan_workflow_obj = self.workflows.load_workflows(self.scan_workflow_path)
         self.scan_metadata = scan_metadata
         self.scan_parent_dir = scan_parent_dir
         if self.workflow_obj["data"]["input_format"] == 'application/zip':
@@ -245,8 +245,8 @@ class WeightFlow:
         self.artifacts = artifacts
         self.artifact_workflow_path = artifact_workflow_path
         self.scan_workflow_path = scan_workflow_path
-        self.artifact_workflow_obj = self.workflows.get_workflows(self.artifact_workflow_path)
-        self.scan_workflow_obj = self.workflows.get_workflows(self.scan_workflow_path)
+        self.artifact_workflow_obj = self.workflows.load_workflows(self.artifact_workflow_path)
+        self.scan_workflow_obj = self.workflows.load_workflows(self.scan_workflow_path)
         self.scan_metadata = scan_metadata
         self.scan_parent_dir = scan_parent_dir
         if self.workflow_obj["data"]["input_format"] == 'application/zip':
