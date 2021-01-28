@@ -220,11 +220,10 @@ class ApiEndpoints:
                 json.dump(content, f, indent=4)
 
             print("\n Written scan metadata successfully to ", scan_path)
-
             return len(content['scans'])
-
         else:
             print("Response code : ", response.status_code)
+            return 0
 
     def get_workflows(self):
         '''
@@ -244,4 +243,4 @@ if __name__ == "__main__":
     elif os.environ['APP_ENV'] == 'DEMO':
         url = "https://cgm-be-ci-qa-scanner-api.azurewebsites.net"
 
-    scan_endpoint = '/api/scan/scans/unprocessed?limit=1'
+    scan_endpoint = '/api/scans/unprocessed?limit=1'

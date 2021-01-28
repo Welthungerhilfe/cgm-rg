@@ -17,11 +17,12 @@ RESIZE_FACTOR = 4
 
 
 class BlurFlow:
-    def __init__(self, api, workflows, workflow_obj, artifacts, scan_parent_dir, scan_metadata):
+    def __init__(self, api, workflows, workflow_path, artifacts, scan_parent_dir, scan_metadata):
         self.api = api
         self.workflows = workflows
         self.artifacts = artifacts
-        self.workflow_obj = workflow_obj
+        self.workflow_path = workflow_path
+        self.workflow_obj = self.workflow.load_workflows(self.workflow_path)
         self.scan_metadata = scan_metadata
         self.scan_parent_dir = scan_parent_dir
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
@@ -39,9 +40,11 @@ class BlurFlow:
         return os.path.join(directory, file_name)
 
     def run_blur_flow(self):
-        '''
-        Run the blur Workflow on the downloaded artifacts
-        '''
+        self.blur_artifacts()
+        self.post_blur_files()
+        self.post_result_object()        
+
+    def blur_artifacts(self):
         for i, artifact in enumerate(self.artifacts):
 
             input_path = self.get_input_path(
@@ -138,12 +141,14 @@ class BlurFlow:
 
 
 class HeightFlow:
-    def __init__(self, api, workflows, artifact_workflow_obj, scan_workflow_obj, artifacts, scan_parent_dir, scan_metadata):
+    def __init__(self, api, workflows, artifact_workflow_path, scan_workflow_path, artifacts, scan_parent_dir, scan_metadata):
         self.api = api
         self.workflows = workflows
         self.artifacts = artifacts
-        self.artifact_workflow_obj = artifact_workflow_obj
-        self.scan_workflow_obj = scan_workflow_obj
+        self.artifact_workflow_path = artifact_workflow_path
+        self.scan_workflow_path = scan_workflow_path
+        self.artifact_workflow_obj = self.workflows.get_workflows(self.artifact_workflow_path)
+        self.scan_workflow_obj = self.workflows.get_workflows(self.scan_workflow_path)
         self.scan_metadata = scan_metadata
         self.scan_parent_dir = scan_parent_dir
         if self.workflow_obj["data"]["input_format"] == 'application/zip':
@@ -234,12 +239,14 @@ class HeightFlow:
 
 
 class WeightFlow:
-    def __init__(self, api, workflows, artifact_workflow_obj, scan_workflow_obj, artifacts, scan_parent_dir, scan_metadata):
+    def __init__(self, api, workflows, artifact_workflow_path, scan_workflow_path, artifacts, scan_parent_dir, scan_metadata):
         self.api = api
         self.workflows = workflows
         self.artifacts = artifacts
-        self.artifact_workflow_obj = artifact_workflow_obj
-        self.scan_workflow_obj = scan_workflow_obj
+        self.artifact_workflow_path = artifact_workflow_path
+        self.scan_workflow_path = scan_workflow_path
+        self.artifact_workflow_obj = self.workflows.get_workflows(self.artifact_workflow_path)
+        self.scan_workflow_obj = self.workflows.get_workflows(self.scan_workflow_path)
         self.scan_metadata = scan_metadata
         self.scan_parent_dir = scan_parent_dir
         if self.workflow_obj["data"]["input_format"] == 'application/zip':
@@ -342,6 +349,12 @@ class ProcessWorkflows:
 
         return blur_workflow_obj_with_id['id']
 
+    def load_workflows(self, workflow_path):
+        with open(workflow_path, 'r') as f:
+            workflow_obj = json.load(f)
+        
+        return workflow_obj
+
 
 class GetScanMetadata:
     def __init__(self, api, scan_metadata_path):
@@ -355,9 +368,9 @@ class GetScanMetadata:
     def get_scan_metadata(self):
         with open(self.scan_metadata_path, 'r') as f:
             scan_metadata_obj  = json.load(f)
-        self.scan_metadata = scan_metadata_obj['scans'][0]
+        scan_metadata = scan_metadata_obj['scans'][0]
 
-        return self.scan_metadata
+        return scan_metadata
 
 
 class DataProcessing:
@@ -914,62 +927,27 @@ def main():
         result_endpoint,
         workflow_endpoint)
 
-    workflows = cgm_api.get_workflows()
-    cgm_api.get_scan(scan_metadata_path)
+    workflow = ProcessWorkflows(cgm_api)
+    
+    get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
 
-    # scan_metadata_path = './schema/scan_with_blur_artifact.json'
-    with open(scan_metadata_path, 'r') as f:
-        scan_metadata = f.read()
-    scan_metadata_obj = json.loads(scan_metadata)
+    if get_scan_metadata.get_unprocessed_scans() > 0:
+        scan_metadata = get_scan_metadata.get_scan_metadata()
 
-    if len(scan_metadata_obj['scans']) > 0:
+        data_processing = DataProcessing(cgm_api, scan_metadata, scan_metadata_path)
+        data_processing.process_scan_metadata()
+        data_processing.create_scan_dir()
+        data_processing.create_artifact_dir()
+        rgb_artifacts = data_processing.download_artifacts('img')
+        depth_artifacts = data_processing.download_artifacts('depth')
 
-        print(" Starting Result Generation Workflow on a scan")
-        # Taking a single scan at a time
-        scan_metadata_obj = scan_metadata_obj['scans'][0]
+        blurflow = BlurFlow(cgm_api, workflow, blur_workflow_path, rgb_artifacts, scan_metadata_path, scan_metadata)
+        heightflow = HeightFlow(cgm_api, workflow, height_workflow_artifact_path, height_workflow_scan_path, depth_artifacts, scan_metadata_path, scan_metadata)
+        weightflow = WeightFlow(cgm_api, workflow, weight_workflow_artifact_path, weight_workflow_scan_path, depth_artifacts, scan_metadata_path, scan_metadata)
 
-        with open(blur_workflow_path, 'r') as f:
-            blur_workflow_obj = json.load(f)
-
-        with open(height_workflow_artifact_path, 'r') as f:
-            height_workflow_artifact_obj = json.load(f)
-
-        with open(height_workflow_scan_path, 'r') as f:
-            height_workflow_scan_obj = json.load(f)
-
-        with open(weight_workflow_artifact_path, 'r') as f:
-            weight_workflow_artifact_obj = json.load(f)
-
-        with open(weight_workflow_scan_path, 'r') as f:
-            weight_workflow_scan_obj = json.load(f)
-
-        blur_workflow_obj['id'] = get_workflow_id(blur_workflow_obj['name'], blur_workflow_obj['version'], workflows)
-        height_workflow_artifact_obj['id'] = get_workflow_id(height_workflow_artifact_obj['name'], height_workflow_artifact_obj['version'], workflows)
-        weight_workflow_artifact_obj['id'] = get_workflow_id(weight_workflow_artifact_obj['name'], weight_workflow_artifact_obj['version'], workflows)
-
-        height_workflow_scan_obj['id'] = get_workflow_id(height_workflow_scan_obj['name'], height_workflow_scan_obj['version'], workflows)
-        weight_workflow_scan_obj['id'] = get_workflow_id(weight_workflow_scan_obj['name'], weight_workflow_scan_obj['version'], workflows)
-
-        scan_results = ScanResults(
-            scan_metadata_obj,
-            blur_workflow_obj,
-            height_workflow_artifact_obj,
-            weight_workflow_artifact_obj,
-            height_workflow_scan_obj,
-            weight_workflow_scan_obj,
-            scan_parent_dir,
-            cgm_api)
-
-        scan_results.process_scan_metadata()
-        scan_results.create_scan_and_artifact_dir()
-        scan_results.download_blur_flow_artifact()
-        scan_results.run_blur_flow()
-        scan_results.download_depth_artifact()
-        scan_results.run_height_flow()
-        scan_results.run_weight_flow()
-
-    else:
-        print("No Scan found without Results")
+        blurflow.run_blur_flow()
+        heightflow.run_height_flow()
+        weightflow.run_weight_flow()
 
 
 if __name__ == "__main__":
