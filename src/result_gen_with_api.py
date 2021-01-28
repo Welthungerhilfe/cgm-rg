@@ -22,13 +22,13 @@ class BlurFlow:
         self.workflows = workflows
         self.artifacts = artifacts
         self.workflow_path = workflow_path
-        self.workflow_obj = self.workflow.load_workflows(self.workflow_path)
+        self.workflow_obj = self.workflows.load_workflows(self.workflow_path)
         self.scan_metadata = scan_metadata
         self.scan_parent_dir = scan_parent_dir
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.blur_input_format = 'img'
         self.scan_directory = os.path.join(self.scan_parent_dir, self.scan_metadata['id'], self.blur_input_format)
-        self.workflow_obj['id'] = workflows.get_workflow_id(workflow_obj['name'], workflow_obj['version'])
+        self.workflow_obj['id'] = self.workflows.get_workflow_id(self.workflow_obj['name'], self.workflow_obj['version'])
 
     def bunch_object_to_json_object(self, bunch_object):
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
@@ -154,8 +154,8 @@ class HeightFlow:
         if self.workflow_obj["data"]["input_format"] == 'application/zip':
             self.depth_input_format = 'depth'
         self.scan_directory = os.path.join(self.scan_parent_dir, self.scan_metadata['id'], self.depth_input_format)
-        self.artifact_workflow_obj['id'] = workflows.get_workflow_id(artifact_workflow_obj['name'], artifact_workflow_obj['version'])
-        self.scan_workflow_obj['id'] = workflows.get_workflow_id(scan_workflow_obj['name'], scan_workflow_obj['version'])
+        self.artifact_workflow_obj['id'] = self.workflows.get_workflow_id(self.artifact_workflow_obj['name'], self.artifact_workflow_obj['version'])
+        self.scan_workflow_obj['id'] = self.workflows.get_workflow_id(self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
 
     def bunch_object_to_json_object(self, bunch_object):
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
@@ -252,8 +252,8 @@ class WeightFlow:
         if self.workflow_obj["data"]["input_format"] == 'application/zip':
             self.depth_input_format = 'depth'
         self.scan_directory = os.path.join(self.scan_parent_dir, self.scan_metadata['id'], self.depth_input_format)
-        self.artifact_workflow_obj['id'] = workflows.get_workflow_id(artifact_workflow_obj['name'], artifact_workflow_obj['version'])
-        self.scan_workflow_obj['id'] = workflows.get_workflow_id(scan_workflow_obj['name'], scan_workflow_obj['version'])
+        self.artifact_workflow_obj['id'] = self.workflows.get_workflow_id(self.artifact_workflow_obj['name'], self.artifact_workflow_obj['version'])
+        self.scan_workflow_obj['id'] = self.workflows.get_workflow_id(self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
 
     def bunch_object_to_json_object(self, bunch_object):
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
@@ -385,6 +385,7 @@ class DataProcessing:
     
     def download_artifacts(self, input_format):
         print(f"\nDownloading Artifacts for { input_format } format")
+        self.artifacts = []
 
         for i, artifact in enumerate(
                 self.format_wise_artifact[input_format]):
@@ -934,7 +935,7 @@ def main():
     if get_scan_metadata.get_unprocessed_scans() > 0:
         scan_metadata = get_scan_metadata.get_scan_metadata()
 
-        data_processing = DataProcessing(cgm_api, scan_metadata, scan_metadata_path)
+        data_processing = DataProcessing(cgm_api, scan_metadata, scan_parent_dir)
         data_processing.process_scan_metadata()
         data_processing.create_scan_dir()
         data_processing.create_artifact_dir()
