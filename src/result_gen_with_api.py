@@ -345,7 +345,7 @@ class ProcessWorkflows:
         self.workflows = self.api.get_workflows()
 
     def get_workflow_id(self, workflow_name, workflow_version):
-        workflow_obj_with_id = list(filter(lambda workflow: (self.workflows['name'] == workflow_name and self.workflows['version'] == workflow_version), self.workflows['workflows']))[0]
+        workflow_obj_with_id = list(filter(lambda workflow: (workflow['name'] == workflow_name and workflow['version'] == workflow_version), self.workflows['workflows']))[0]
 
         return workflow_obj_with_id['id']
 
@@ -934,7 +934,7 @@ def main():
 
     if get_scan_metadata.get_unprocessed_scans() > 0:
         scan_metadata = get_scan_metadata.get_scan_metadata()
-
+        workflow.get_list_of_worflows()
         data_processing = DataProcessing(cgm_api, scan_metadata, scan_parent_dir)
         data_processing.process_scan_metadata()
         data_processing.create_scan_dir()
