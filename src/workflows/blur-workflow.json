@@ -1,13 +1,9 @@
 {
-    "workflows": [
-        {
-            "name": "face_recognition",
-            "version": "1.0.0",
-            "result_format": "img",
-            "result_binding": "artifact",
-            "data":{
-                "input_format":"image/jpeg"
-            }
-        }
-    ]
+    "name": "face_recognition",
+    "version": "1.0.0",
+    "result_format": "img",
+    "result_binding": "artifact",
+    "data":{
+        "input_format":"image/jpeg"
+    }
 }
