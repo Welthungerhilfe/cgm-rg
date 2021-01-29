@@ -151,7 +151,7 @@ class HeightFlow:
         self.scan_workflow_obj = self.workflows.load_workflows(self.scan_workflow_path)
         self.scan_metadata = scan_metadata
         self.scan_parent_dir = scan_parent_dir
-        if self.workflow_obj["data"]["input_format"] == 'application/zip':
+        if self.artifact_workflow_obj["data"]["input_format"] == 'application/zip':
             self.depth_input_format = 'depth'
         self.scan_directory = os.path.join(self.scan_parent_dir, self.scan_metadata['id'], self.depth_input_format)
         self.artifact_workflow_obj['id'] = self.workflows.get_workflow_id(self.artifact_workflow_obj['name'], self.artifact_workflow_obj['version'])
@@ -249,7 +249,7 @@ class WeightFlow:
         self.scan_workflow_obj = self.workflows.load_workflows(self.scan_workflow_path)
         self.scan_metadata = scan_metadata
         self.scan_parent_dir = scan_parent_dir
-        if self.workflow_obj["data"]["input_format"] == 'application/zip':
+        if self.artifact_workflow_obj["data"]["input_format"] == 'application/zip':
             self.depth_input_format = 'depth'
         self.scan_directory = os.path.join(self.scan_parent_dir, self.scan_metadata['id'], self.depth_input_format)
         self.artifact_workflow_obj['id'] = self.workflows.get_workflow_id(self.artifact_workflow_obj['name'], self.artifact_workflow_obj['version'])
