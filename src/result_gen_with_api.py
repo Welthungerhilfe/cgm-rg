@@ -942,9 +942,9 @@ def main():
         rgb_artifacts = data_processing.download_artifacts('img')
         depth_artifacts = data_processing.download_artifacts('depth')
 
-        blurflow = BlurFlow(cgm_api, workflow, blur_workflow_path, rgb_artifacts, scan_metadata_path, scan_metadata)
-        heightflow = HeightFlow(cgm_api, workflow, height_workflow_artifact_path, height_workflow_scan_path, depth_artifacts, scan_metadata_path, scan_metadata)
-        weightflow = WeightFlow(cgm_api, workflow, weight_workflow_artifact_path, weight_workflow_scan_path, depth_artifacts, scan_metadata_path, scan_metadata)
+        blurflow = BlurFlow(cgm_api, workflow, blur_workflow_path, rgb_artifacts, scan_parent_dir, scan_metadata)
+        heightflow = HeightFlow(cgm_api, workflow, height_workflow_artifact_path, height_workflow_scan_path, depth_artifacts, scan_parent_dir, scan_metadata)
+        weightflow = WeightFlow(cgm_api, workflow, weight_workflow_artifact_path, weight_workflow_scan_path, depth_artifacts, scan_parent_dir, scan_metadata)
 
         blurflow.run_blur_flow()
         heightflow.run_height_flow()
