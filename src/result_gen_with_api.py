@@ -125,7 +125,7 @@ class BlurFlow:
             blur_result.id = f"{uuid.uuid4()}"
             blur_result.scan = self.scan_metadata['id']
             blur_result.workflow = self.workflow_obj["id"]
-            blur_result.source_artifacts = [artifact['file']]
+            blur_result.source_artifacts = [artifact['id']]
             blur_result.source_results = []
             blur_result.file = artifact['blur_id_from_post_request']
             blur_result.generated = artifact['generated_timestamp']
@@ -167,7 +167,7 @@ class HeightFlow:
         return os.path.join(directory, file_name)
 
     def get_mean_scan_results(self, predictions):
-        return np.mean(predictions)
+        return str(np.mean(predictions))
 
     def process_depthmaps(self):
         depthmaps = []
@@ -202,7 +202,7 @@ class HeightFlow:
             height_result.source_artifacts = [artifact['id']]
             height_result.source_results = []
             height_result.generated = generated_timestamp
-            result = {'height': prediction[0]}
+            result = {'height': str(prediction[0])}
             height_result.data = result
             res.results.append(height_result)
 
@@ -265,7 +265,7 @@ class WeightFlow:
         return os.path.join(directory, file_name)
 
     def get_mean_scan_results(self, predictions):
-        return np.mean(predictions)
+        return str(np.mean(predictions))
 
     def process_depthmaps(self):
         depthmaps = []
@@ -300,7 +300,7 @@ class WeightFlow:
             weight_result.source_artifacts = [artifact['id']]
             weight_result.source_results = []
             weight_result.generated = generated_timestamp
-            result = {'weight': prediction[0]}
+            result = {'weight': str(prediction[0])}
             weight_result.data = result
             res.results.append(weight_result)
 
