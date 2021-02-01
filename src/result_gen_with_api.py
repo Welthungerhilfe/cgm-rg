@@ -17,6 +17,45 @@ RESIZE_FACTOR = 4
 
 
 class BlurFlow:
+    """
+    A class to handle face blur results generation.
+
+    ...
+
+    Attributes
+    ----------
+    api : object
+        object of api_endpoints class
+    workflows : list
+        list of registered workflows
+    workflow_path : str
+        path of the workflow file for face blurring
+    artifacts : list
+        list of artifacts to run blur flow on
+    scan_parent_dir : str
+        directory where scans are stored
+    scan_metadata : json
+        metadata of the scan to run blur flow on
+
+    Methods
+    -------
+    bunch_object_to_json_object(bunch_object):
+        Converts given bunch object to json object.
+    get_input_path(directory, file_name):
+        Returns input path for given directory name and file name.
+    run_blur_flow():
+        Driver method for blur flow.
+    blur_artifacts():
+        Blurs the list of artifacts.
+    blur_face(source_path):
+        Runs face blur on given source_path.
+    post_blur_files():
+        Posts the blurred file to api.
+    prepare_result_object():
+        Prepares result object for results generated.
+    post_result_object():
+        Posts the result object to api.
+    """
     def __init__(self, api, workflows, workflow_path, artifacts, scan_parent_dir, scan_metadata):
         self.api = api
         self.workflows = workflows
@@ -141,6 +180,47 @@ class BlurFlow:
 
 
 class HeightFlow:
+    """
+    A class to handle height results generation.
+
+    ...
+
+    Attributes
+    ----------
+    api : object
+        object of api_endpoints class
+    workflows : list
+        list of registered workflows
+    artifact_workflow_path : str
+        path of the workflow file for artifact level height results
+    scan_workflow_path : json
+        path of the workflow file for scan level height results
+    artifacts : list
+        list of artifacts to run heigth flow on
+    scan_parent_dir : str
+        directory where scans are stored
+    scan_metadata : json
+        metadata of the scan to run height flow on
+
+    Methods
+    -------
+    bunch_object_to_json_object(bunch_object):
+        Converts given bunch object to json object.
+    get_input_path(directory, file_name):
+        Returns input path for given directory name and file name.
+    get_mean_scan_results(predictions):
+        Returns the average prediction from given list of predictions.
+    process_depthmaps():
+        Loads the list of depthmaps in scan as numpy array.
+    run_height_flow():
+        Driver method for height flow.
+    artifact_level_height_result_object(predictions, generated_timestamp):
+        Prepares artifact level height result object.
+    scan_level_height_result_object(predictions, generated_timestamp):
+        Prepares scan level height result object.
+    post_height_results(predictions, generated_timestamp):
+        Posts the artifact and scan level height results to api.
+    """
     def __init__(self, api, workflows, artifact_workflow_path, scan_workflow_path, artifacts, scan_parent_dir, scan_metadata):
         self.api = api
         self.workflows = workflows
@@ -239,6 +319,47 @@ class HeightFlow:
 
 
 class WeightFlow:
+    """
+    A class to handle weight results generation.
+
+    ...
+
+    Attributes
+    ----------
+    api : object
+        object of api_endpoints class
+    workflows : list
+        list of registered workflows
+    artifact_workflow_path : str
+        path of the workflow file for artifact level weight results
+    scan_workflow_path : json
+        path of the workflow file for scan level weight results
+    artifacts : list
+        list of artifacts to run weigth flow on
+    scan_parent_dir : str
+        directory where scans are stored
+    scan_metadata : json
+        metadata of the scan to run weight flow on
+
+    Methods
+    -------
+    bunch_object_to_json_object(bunch_object):
+        Converts given bunch object to json object.
+    get_input_path(directory, file_name):
+        Returns input path for given directory name and file name.
+    get_mean_scan_results(predictions):
+        Returns the average prediction from given list of predictions.
+    process_depthmaps():
+        Loads the list of depthmaps in scan as numpy array.
+    run_weight_flow():
+        Driver method for weight flow.
+    artifact_level_weight_result_object(predictions, generated_timestamp):
+        Prepares artifact level weight result object.
+    scan_level_weight_result_object(predictions, generated_timestamp):
+        Prepares scan level weight result object.
+    post_weight_results(predictions, generated_timestamp):
+        Posts the artifact and scan level weight results to api.
+    """
     def __init__(self, api, workflows, artifact_workflow_path, scan_workflow_path, artifacts, scan_parent_dir, scan_metadata):
         self.api = api
         self.workflows = workflows
@@ -337,6 +458,28 @@ class WeightFlow:
 
 
 class ProcessWorkflows:
+    """
+    A class to process all the workflows.
+
+    ...
+
+    Attributes
+    ----------
+    api : object
+        object of api_endpoints class
+
+    Methods
+    -------
+    get_list_of_worflows():
+        Gets the list of workflows from api
+
+    get_workflow_id(workflow_name, workflow_version):
+        Gets the id of the workflow for given workflow name and version
+
+    load_workflows(workflow_path):
+        Loads the workflow from given path
+    """
+
     def __init__(self, api):
         # self.workflow_object = workflow_object
         self.api = api
@@ -357,11 +500,52 @@ class ProcessWorkflows:
 
 
 class GetScanMetadata:
+    """
+    A class to get and process scan metadata.
+
+    ...
+
+    Attributes
+    ----------
+    api : object
+        object of api_endpoints class
+    scan_metadata_path : str
+        path to store scan metadata
+
+    Methods
+    -------
+    get_unprocessed_scans():
+        Returns the no of scans in scan metadata.
+    
+    get_scan_metadata():
+        Returns the scan metadata
+    """
     def __init__(self, api, scan_metadata_path):
+        """
+        Constructs all the necessary attributes for the GetScanMetadata object.
+
+        Parameters
+        ----------
+            api : objects
+                object of api_endpoints class
+            scan_metadata_path : str
+                path to store scan metadata
+        """
         self.api = api
         self.scan_metadata_path = scan_metadata_path
     
     def get_unprocessed_scans(self):
+        """
+        Gets unprocessed_scans from api and returns the no of scans
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
         
         return self.api.get_scan(self.scan_metadata_path)
 
@@ -373,7 +557,36 @@ class GetScanMetadata:
         return scan_metadata
 
 
-class DataProcessing:
+class PrepareArtifacts:
+    """
+    A class to prepare artifacts for result generation.
+
+    ...
+
+    Attributes
+    ----------
+    api : object
+        object of api_endpoints class
+    scan_metadata : json
+        metadata of the scan to run weight flow on
+    scan_parent_dir : str
+        directory where scans are stored
+
+    Methods
+    -------
+    download_artifacts(input_format):
+        Download artifacts for the scan
+    check_artifact_format():
+        Checks the format of the artifact
+    add_artifacts_to_format_dictionary():
+        Sort artifacts according to input format
+    process_scan_metadata():
+        Process artifacts in a scan.
+    create_scan_dir():
+        Create directory to store artifacts in scan.
+    create_artifact_dir():
+        Create directory to store downloaded artifacts.
+    """
     def __init__(self, api, scan_metadata, scan_parent_dir):
         self.api = api
         self.scan_metadata = scan_metadata
@@ -466,20 +679,6 @@ class DataProcessing:
                     artifact_format)):
                 os.makedirs(os.path.join(self.scan_dir, artifact_format))
 
-    def get_processed_depthmaps(self):
-        self.depthmaps = []
-        for i, artifact in enumerate(self.depth_artifact):
-            input_path = self.get_input_path(
-                self.depth_artifact_dir,
-                artifact['file'])
-
-            data, width, height, depthScale, maxConfidence = preprocessing.load_depth(input_path)
-            depthmap, height, width = preprocessing.prepare_depthmap(data, width, height, depthScale)
-            depthmap = preprocessing.preprocess(depthmap)
-            depthmaps.append(depthmap)
-
-        self.depthmaps = np.array(depthmaps)
-
 
 class GenerateResults:
     pass
@@ -487,368 +686,6 @@ class GenerateResults:
 
 class MakeResultObjects:
     pass
-
-
-class ScanResults:
-    def __init__(self, scan_metadata, blur_workflow, height_workflow_artifact, weight_workflow_artifact, height_workflow_scan, weight_workflow_scan, scan_parent_dir, api):
-        self.scan_metadata = scan_metadata
-        self.blur_workflow = blur_workflow
-        self.height_workflow_artifact = height_workflow_artifact
-        self.weight_workflow_artifact = weight_workflow_artifact
-        self.height_workflow_scan = height_workflow_scan
-        self.weight_workflow_scan = weight_workflow_scan
-
-        self.format_wise_artifact = {}
-        if self.blur_workflow["data"]["input_format"] == 'image/jpeg':
-            self.blur_input_format = 'img'
-        if self.height_workflow_artifact["data"]["input_format"] == 'application/zip':
-            self.height_input_format = 'depth'
-        if self.weight_workflow_artifact["data"]["input_format"] == 'application/zip':
-            self.weight_input_format = 'depth'
-        self.depth_input_format = 'depth'
-        self.scan_parent_dir = scan_parent_dir
-        self.scan_dir = os.path.join(
-            self.scan_parent_dir,
-            self.scan_metadata['id'])
-        self.api = api
-        self.blur_workflow_artifact_dir = os.path.join(
-            self.scan_dir, self.blur_input_format)
-        self.depth_artifact_dir = os.path.join(
-            self.scan_dir, 'depth')
-        # self.height_service_name = height_workflow["service_name"]
-
-    def process_scan_metadata(self):
-        '''
-        Process the scan object to get the list of jpeg id
-        and artifact id return a dict of format as key and
-        list of file id as values
-        '''
-        artifact_list = self.scan_metadata['artifacts']
-
-        for artifact in artifact_list:
-            mod_artifact = copy.deepcopy(artifact)
-            mod_artifact['download_status'] = False
-            # Change the format from image/jpeg to img
-            if artifact['format'] == 'image/jpeg' or artifact['format'] == 'rgb':
-                mod_artifact['format'] = 'img'
-            elif artifact['format'] == 'application/zip':
-                mod_artifact['format'] = 'depth'
-
-            if mod_artifact['format'] in self.format_wise_artifact:
-                self.format_wise_artifact[mod_artifact['format']].append(
-                    mod_artifact)
-            else:
-                self.format_wise_artifact[mod_artifact['format']] = [
-                    mod_artifact]
-
-        print("\nPrepared format wise Artifact:\n")
-        pprint.pprint(self.format_wise_artifact)
-
-    def create_scan_and_artifact_dir(self):
-        '''
-        Create a scan dir and format wise dir inside scan dir
-        in which all the artifacts will be downloaded
-        .
-        └── scans
-            ├── 3fa85f64-5717-4562-b3fc-2c963f66afa6
-            │   └── img
-            │       ├── 3fa85f64-5717-4562-b3fc-2c963f6shradul
-            │       ├── 3fa85f64-5717-4562-b3fc-2c963fmayank
-            │       ├── 69869078-33e1-11eb-af63-cf4006664c92
-            │       └── 699b71dc-33e1-11eb-af63-e32a5809de47
-            └── 59560ba2-33e1-11eb-af63-4b01606d9610
-                └── img
-                    ├── 5850e04c-33e1-11eb-af63-4f5622046249
-                    └── 5850e04c-33e1-11eb-af63-4f5622046249_blur.jpg
-        '''
-        if not os.path.isdir(self.scan_dir):
-            os.makedirs(self.scan_dir)
-
-        for artifact_format in self.format_wise_artifact:
-            if not os.path.exists(
-                os.path.join(
-                    self.scan_dir,
-                    artifact_format)):
-                os.makedirs(os.path.join(self.scan_dir, artifact_format))
-
-    def download_blur_flow_artifact(self):
-        print("\nDownload Artifacts for Blur Worflow Started")
-
-        self.blur_format_wise_artifact = []
-
-        for i, artifact in enumerate(
-                self.format_wise_artifact[self.blur_input_format]):
-            mod_artifact = copy.deepcopy(artifact)
-
-            print("\nDownloading Artifact Name: ", mod_artifact["file"], '\n')
-            status_code = self.api.get_files(
-                mod_artifact["file"], self.blur_workflow_artifact_dir)
-            # status_code = get_files_mockup(mod_artifact["file"], format_dir)
-            if status_code == 200:
-                mod_artifact['download_status'] = True
-                self.blur_format_wise_artifact.append(mod_artifact)
-
-        print("\nBelow Artifacts for blur workflow\n")
-        print(self.blur_format_wise_artifact)
-        print("\nDownload Artifact for completed\n")
-
-    def prepare_blur_result_object(
-            self,
-            source_artifacts_list,
-            blur_id_from_post_request,
-            generated_timestamp):
-        '''
-        Prepare the result object in the results format
-        '''
-        blur_result = Bunch()
-        # Need to clarify
-        # blur_result.id = str(uuid.uuid4())
-        blur_result.id = f"{uuid.uuid4()}"
-        blur_result.scan = self.scan_metadata['id']
-        blur_result.workflow = self.blur_workflow["id"]
-        blur_result.source_artifacts = source_artifacts_list
-        blur_result.source_results = []
-        # blur_result.data = Bunch()
-        blur_result.file = blur_id_from_post_request
-        blur_result.generated = generated_timestamp
-        blur_result.meta = []
-
-        res = Bunch()
-        res.results = []
-        res.results.append(blur_result)
-        return res
-
-    def run_blur_flow(self):
-        '''
-        Run the blur Workflow on the downloaded artifacts
-        '''
-        for i, artifact in enumerate(self.blur_format_wise_artifact):
-
-            input_path = os.path.join(
-                self.blur_workflow_artifact_dir,
-                artifact['file'])
-            # target_path = input_path + '_blur.jpg'
-
-            print("input_path of image to perform blur: ", input_path, '\n')
-
-            # blur_status = blur_faces_in_file(input_path, target_path)
-            blur_img_binary, blur_status = blur_face(input_path)
-
-            if blur_status:
-                # Post the blur files
-                blur_id_from_post_request, post_status = self.api.post_files(
-                    blur_img_binary)
-                # blur_id_from_post_request, post_status = self.api.post_files_using_path(target_path)
-                # blur_id_from_post_request, post_status = '5850e04c-33e1-11eb-af63-4f5622046249' ,True
-
-                print("Post status of uploading the blur file: ", post_status)
-
-                if post_status == 201:
-                    print("\nStarting to post the blur result Json\n")
-
-                    # prepare results
-                    source_artifacts_list = [artifact['id']]
-                    generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-
-                    blur_result = self.prepare_blur_result_object(
-                        source_artifacts_list, blur_id_from_post_request, generated_timestamp)
-
-                    print("----------------------------------------------")
-                    print("Blur Result Json :")
-
-                    blur_result_string = json.dumps(
-                        blur_result, indent=2, separators=(',', ':'))
-                    blur_result_object = json.loads(blur_result_string)
-                    pprint.pprint(blur_result_object)
-
-                    print("----------------------------------------------")
-
-                    # post the blur results using /results
-                    if self.api.post_results(blur_result_object) == 201:
-                        print(
-                            "\nResult posted successfully for Blur Result No. : ", i)
-
-    def get_mean_scan_results(self, predictions):
-        return np.mean(predictions)
-
-    def download_depth_artifact(self):
-        print("\nDownload Artifacts for height Worflow Started")
-
-        self.depth_artifact = []
-
-        for i, artifact in enumerate(
-                self.format_wise_artifact[self.depth_input_format]):
-            mod_artifact = copy.deepcopy(artifact)
-
-            print("\nDownloading Artifact Name: ", mod_artifact["file"], '\n')
-            status_code = self.api.get_files(
-                mod_artifact["file"], self.depth_artifact_dir)
-            # status_code = get_files_mockup(mod_artifact["file"], format_dir)
-            if status_code == 200:
-                mod_artifact['download_status'] = True
-                self.depth_artifact.append(mod_artifact)
-
-        print("\nBelow are depth Artifacts\n")
-        print(self.depth_artifact)
-        print("\nDownload depth Artifact for completed\n")
-
-    def prepare_height_result_object(
-            self,
-            predictions,
-            generated_timestamp):
-        '''
-        Prepare the result object in the results format
-        '''
-        res = Bunch()
-        res.results = []
-        for artifact, prediction in zip(self.depth_artifact, predictions):
-            height_result = Bunch()
-            height_result.id = f"{uuid.uuid4()}"
-            height_result.scan = self.scan_metadata['id']
-            height_result.workflow = self.height_workflow_artifact["id"]
-            height_result.source_artifacts = [artifact['id']]
-            height_result.source_results = []
-            height_result.generated = generated_timestamp
-            result = {'height': prediction[0]}
-            height_result.data = result
-            res.results.append(height_result)
-
-        return res
-
-    def prepare_scan_height_result_object(
-            self,
-            predictions,
-            generated_timestamp):
-        '''
-        Prepare the scan result object in the results format
-        '''
-        res = Bunch()
-        res.results = []
-        height_result = Bunch()
-        height_result.id = f"{uuid.uuid4()}"
-        height_result.scan = self.scan_metadata['id']
-        height_result.workflow = self.height_workflow_scan["id"]
-        height_result.source_artifacts = [artifact['id'] for artifact in self.depth_artifact]
-        height_result.source_results = []
-        height_result.generated = generated_timestamp
-        mean_prediction = self.get_mean_scan_results(predictions)
-        result = {'mean_height': mean_prediction}
-        height_result.data = result
-
-        res.results.append(height_result)
-
-        return res
-
-    def run_height_flow(self):
-        '''
-        Run the height Workflow on the downloaded artifacts
-        '''
-        depthmaps = []
-        for i, artifact in enumerate(self.depth_artifact):
-            input_path = os.path.join(
-                self.depth_artifact_dir,
-                artifact['file'])
-
-            data, width, height, depthScale, maxConfidence = preprocessing.load_depth(input_path)
-            depthmap, height, width = preprocessing.prepare_depthmap(data, width, height, depthScale)
-            depthmap = preprocessing.preprocess(depthmap)
-            depthmaps.append(depthmap)
-
-        depthmaps = np.array(depthmaps)
-        generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-        height_predictions = inference.get_height_predictions_local(depthmaps)
-        print("height predictions are: ", height_predictions)
-
-        height_result = self.prepare_height_result_object(height_predictions.tolist(), generated_timestamp)
-        height_result_string = json.dumps(height_result, indent=2, separators=(',', ':'))
-        height_result_object = json.loads(height_result_string)
-        if self.api.post_results(height_result_object) == 201:
-            print("successfully post artifact level height results: ", height_result_object)
-
-        scan_height_result = self.prepare_scan_height_result_object(height_predictions.tolist(), generated_timestamp)
-        scan_height_result_string = json.dumps(scan_height_result, indent=2, separators=(',', ':'))
-        scan_height_result_object = json.loads(scan_height_result_string)
-        if self.api.post_results(scan_height_result_object) == 201:
-            print("successfully post scan level height results: ", scan_height_result_object)
-
-    def prepare_weight_result_object(
-            self,
-            predictions,
-            generated_timestamp):
-        '''
-        Prepare the result object in the results format
-        '''
-        res = Bunch()
-        res.results = []
-        for artifact, prediction in zip(self.depth_artifact, predictions):
-            weight_result = Bunch()
-            weight_result.id = f"{uuid.uuid4()}"
-            weight_result.scan = self.scan_metadata['id']
-            weight_result.workflow = self.weight_workflow_artifact["id"]
-            weight_result.source_artifacts = [artifact['id']]
-            weight_result.source_results = []
-            weight_result.generated = generated_timestamp
-            result = {'weight': prediction[0]}
-            weight_result.data = result
-            res.results.append(weight_result)
-
-        return res
-
-    def prepare_scan_weight_result_object(
-            self,
-            predictions,
-            generated_timestamp):
-        '''
-        Prepare the scan result object in the results format
-        '''
-        res = Bunch()
-        res.results = []
-        weight_result = Bunch()
-        weight_result.id = f"{uuid.uuid4()}"
-        weight_result.scan = self.scan_metadata['id']
-        weight_result.workflow = self.weight_workflow_scan["id"]
-        weight_result.source_artifacts = [artifact['id'] for artifact in self.depth_artifact]
-        weight_result.source_results = []
-        weight_result.generated = generated_timestamp
-        mean_prediction = self.get_mean_scan_results(predictions)
-        result = {'mean_weight': mean_prediction}
-        weight_result.data = result
-
-        res.results.append(weight_result)
-
-        return res
-
-    def run_weight_flow(self):
-        '''
-        Run the weight Workflow on the downloaded artifacts
-        '''
-        depthmaps = []
-        for i, artifact in enumerate(self.depth_artifact):
-            input_path = os.path.join(
-                self.depth_artifact_dir,
-                artifact['file'])
-
-            data, width, height, depthScale, maxConfidence = preprocessing.load_depth(input_path)
-            depthmap, height, width = preprocessing.prepare_depthmap(data, width, height, depthScale)
-            depthmap = preprocessing.preprocess(depthmap)
-            depthmaps.append(depthmap)
-
-        depthmaps = np.array(depthmaps)
-        generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-        weight_predictions = inference.get_weight_predictions_local(depthmaps)
-        print("weight predictions are: ", weight_predictions)
-
-        weight_result = self.prepare_weight_result_object(weight_predictions.tolist(), generated_timestamp)
-        weight_result_string = json.dumps(weight_result, indent=2, separators=(',', ':'))
-        weight_result_object = json.loads(weight_result_string)
-        if self.api.post_results(weight_result_object) == 201:
-            print("successfully post artifact level weight results: ", weight_result_object)
-
-        scan_weight_result = self.prepare_scan_weight_result_object(weight_predictions.tolist(), generated_timestamp)
-        scan_weight_result_string = json.dumps(scan_weight_result, indent=2, separators=(',', ':'))
-        scan_weight_result_object = json.loads(scan_weight_result_string)
-        if self.api.post_results(scan_weight_result_object) == 201:
-            print("successfully post scan level weight results: ", scan_weight_result_object)
 
 
 def main():
@@ -935,7 +772,7 @@ def main():
     if get_scan_metadata.get_unprocessed_scans() > 0:
         scan_metadata = get_scan_metadata.get_scan_metadata()
         workflow.get_list_of_worflows()
-        data_processing = DataProcessing(cgm_api, scan_metadata, scan_parent_dir)
+        data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
         data_processing.process_scan_metadata()
         data_processing.create_scan_dir()
         data_processing.create_artifact_dir()
