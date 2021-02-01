@@ -81,7 +81,7 @@ class BlurFlow:
     def run_blur_flow(self):
         self.blur_artifacts()
         self.post_blur_files()
-        self.post_result_object()        
+        self.post_result_object()
 
     def blur_artifacts(self):
         for i, artifact in enumerate(self.artifacts):
@@ -169,7 +169,7 @@ class BlurFlow:
             blur_result.file = artifact['blur_id_from_post_request']
             blur_result.generated = artifact['generated_timestamp']
             res.results.append(blur_result)
-        
+
         return res
 
     def post_result_object(self):
@@ -270,7 +270,7 @@ class HeightFlow:
         height_predictions = inference.get_height_predictions_local(depthmaps)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         self.post_height_results(height_predictions, generated_timestamp)
-        
+
     def artifact_level_height_result_object(self, predictions, generated_timestamp):
         res = Bunch()
         res.results = []
@@ -409,7 +409,7 @@ class WeightFlow:
         weight_predictions = inference.get_weight_predictions_local(depthmaps)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         self.post_weight_results(weight_predictions, generated_timestamp)
-        
+
     def artifact_level_weight_result_object(self, predictions, generated_timestamp):
         res = Bunch()
         res.results = []
@@ -495,7 +495,7 @@ class ProcessWorkflows:
     def load_workflows(self, workflow_path):
         with open(workflow_path, 'r') as f:
             workflow_obj = json.load(f)
-        
+
         return workflow_obj
 
 
@@ -516,7 +516,7 @@ class GetScanMetadata:
     -------
     get_unprocessed_scans():
         Returns the no of scans in scan metadata.
-    
+
     get_scan_metadata():
         Returns the scan metadata
     """
@@ -533,7 +533,7 @@ class GetScanMetadata:
         """
         self.api = api
         self.scan_metadata_path = scan_metadata_path
-    
+
     def get_unprocessed_scans(self):
         """
         Gets unprocessed_scans from api and returns the no of scans
@@ -546,12 +546,12 @@ class GetScanMetadata:
         -------
         None
         """
-        
+
         return self.api.get_scan(self.scan_metadata_path)
 
     def get_scan_metadata(self):
         with open(self.scan_metadata_path, 'r') as f:
-            scan_metadata_obj  = json.load(f)
+            scan_metadata_obj = json.load(f)
         scan_metadata = scan_metadata_obj['scans'][0]
 
         return scan_metadata
@@ -595,7 +595,7 @@ class PrepareArtifacts:
         self.scan_dir = os.path.join(
             self.scan_parent_dir,
             self.scan_metadata['id'])
-    
+
     def download_artifacts(self, input_format):
         print(f"\nDownloading Artifacts for { input_format } format")
         self.artifacts = []
@@ -766,7 +766,7 @@ def main():
         workflow_endpoint)
 
     workflow = ProcessWorkflows(cgm_api)
-    
+
     get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
 
     if get_scan_metadata.get_unprocessed_scans() > 0:

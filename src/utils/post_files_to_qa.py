@@ -8,8 +8,7 @@ headers = {
 }
 
 response_one = requests.get(
-    'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=' +
-    resource,
+    'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=' + resource,
     headers=headers)
 
 print("\nresponse_one status code: ", response_one.status_code)
