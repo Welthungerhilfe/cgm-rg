@@ -114,8 +114,7 @@ class BlurFlow:
         image = np.swapaxes(image, 0, 1)
 
         # Scale image down for faster prediction.
-        small_image = cv2.resize(image, (0, 0), fx=1.0 /
-                                RESIZE_FACTOR, fy=1.0 / RESIZE_FACTOR)
+        small_image = cv2.resize(image, (0, 0), fx=1.0 / RESIZE_FACTOR, fy=1.0 / RESIZE_FACTOR)
 
         # Find face locations.
         face_locations = face_recognition.face_locations(small_image, model="cnn")
@@ -150,8 +149,7 @@ class BlurFlow:
 
     def post_blur_files(self):
         for artifact in self.artifacts:
-            blur_id_from_post_request, post_status = self.api.post_files(
-                    artifact['blurred_image'])
+            blur_id_from_post_request, post_status = self.api.post_files(artifact['blurred_image'])
             if post_status == 201:
                 artifact['blur_id_from_post_request'] = blur_id_from_post_request
                 artifact['generated_timestamp'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
