@@ -599,7 +599,7 @@ class PrepareArtifacts:
     def check_artifact_format(self, format):
         if format in ['image/jpeg', 'rgb']:
             return 'img'
-        elif format == 'application/zip':
+        elif format in ['application/zip', 'depth']:
             return 'depth'
 
     def add_artifacts_to_format_dictionary(self, format, artifact):
