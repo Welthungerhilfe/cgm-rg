@@ -17,11 +17,11 @@ def load_depth(filename):
             width = int(res[0])
             height = int(res[1])
             depthScale = float(header[1])
-            maxConfidence = float(header[2])
+            max_confidence = float(header[2])
             data = f.read()
             f.close()
         z.close()
-    return data, width, height, depthScale, maxConfidence
+    return data, width, height, depthScale, max_confidence
 
 
 def parse_depth(tx, ty, data, depthScale):
