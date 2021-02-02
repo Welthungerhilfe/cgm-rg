@@ -75,9 +75,9 @@ class ApiEndpoints:
                 auth_token = auth_token_json['authenticationToken']
                 print("\nauth_token: ", auth_token)
             else:
-                print("\response_two Get request failed\n")
+                print("\response_two Get request failed")
         else:
-            print("\nresponse_one Get request failed\n")
+            print("\nresponse_one Get request failed")
 
         return auth_token
 
@@ -126,7 +126,7 @@ class ApiEndpoints:
         response = requests.post(endpoint, files=files, headers=headers)
         file_id = response.content.decode('utf-8')
 
-        print("\nFile Id from post of test.jpg: ", file_id, '\n')
+        print("\nFile Id from post of test.jpg: ", file_id)
 
         return file_id, response.status_code
 
@@ -153,7 +153,7 @@ class ApiEndpoints:
         response = requests.post(endpoint, files=files, headers=headers)
         file_id = response.content.decode('utf-8')
 
-        print("File Id from post of test.jpg: ", file_id, '\n')
+        print("File Id from post of test.jpg: ", file_id)
 
         return file_id, response.status_code
 
@@ -170,7 +170,7 @@ class ApiEndpoints:
             json=result_json_obj,
             headers=headers)
 
-        print("Status of post result response: ", response.status_code, '\n')
+        print("Status of post result response: ", response.status_code)
 
         return response.status_code
 
@@ -213,13 +213,13 @@ class ApiEndpoints:
 
         if response.status_code == 200:
             content = response.json()
-            print("\nScan Details : \n")
+            print("\nScan Details :")
             pprint.pprint(content)
 
             with open(scan_path, 'w') as f:
                 json.dump(content, f, indent=4)
 
-            print("\n Written scan metadata successfully to ", scan_path)
+            print("Written scan metadata successfully to ", scan_path)
             return len(content['scans'])
         else:
             print("Response code : ", response.status_code)

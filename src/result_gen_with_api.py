@@ -91,7 +91,7 @@ class BlurFlow:
                 artifact['file'])
             # target_path = input_path + '_blur.jpg'
 
-            print("input_path of image to perform blur: ", input_path, '\n')
+            print("input_path of image to perform blur: ", input_path)
 
             # blur_status = blur_faces_in_file(input_path, target_path)
             blur_img_binary, blur_status = self.blur_face(input_path)
@@ -144,7 +144,7 @@ class BlurFlow:
         rgb_image = image[:, :, ::-1]  # BGR -> RGB for OpenCV
 
         # logging.info(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
-        print(f"{len(face_locations)} face locations found and blurred for path: {source_path}\n")
+        print(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
         return rgb_image, True
 
     def post_blur_files(self):
@@ -602,7 +602,7 @@ class PrepareArtifacts:
                 self.format_wise_artifact[input_format]):
             mod_artifact = copy.deepcopy(artifact)
 
-            print("\nDownloading Artifact Name: ", mod_artifact["file"], '\n')
+            print("\nDownloading Artifact Name: ", mod_artifact["file"])
             status_code = self.api.get_files(
                 mod_artifact["file"], os.path.join(self.scan_dir, input_format))
             # status_code = get_files_mockup(mod_artifact["file"], format_dir)
@@ -610,9 +610,9 @@ class PrepareArtifacts:
                 mod_artifact['download_status'] = True
                 self.artifacts.append(mod_artifact)
 
-        print(f"\nBelow Artifacts for { input_format } workflow\n")
+        print(f"\nBelow Artifacts for { input_format } workflow")
         print(self.artifacts)
-        print("\nDownload Artifact for completed\n")
+        print("\nDownload Artifact for completed")
 
         return self.artifacts
 
@@ -646,7 +646,7 @@ class PrepareArtifacts:
 
             self.add_artifacts_to_format_dictionary(mod_artifact['format'], mod_artifact)
 
-        print("\nPrepared format wise Artifact:\n")
+        print("\nPrepared format wise Artifact:")
         pprint.pprint(self.format_wise_artifact)
 
     def create_scan_dir(self):
