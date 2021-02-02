@@ -5,10 +5,13 @@ import uuid
 import copy
 import pprint
 import argparse
-from datetime import datetime
 import numpy as np
 import face_recognition
 from bunch import Bunch
+from datetime import datetime
+from skimage.io import imsave
+from skimage.io import imread
+from skimage.transform import resize
 from api_endpoints import ApiEndpoints
 import utils.inference as inference
 import utils.preprocessing as preprocessing
@@ -175,6 +178,91 @@ class BlurFlow:
         blur_result_object = self.bunch_object_to_json_object(blur_result)
         if self.api.post_results(blur_result_object) == 201:
             print("successfully post blur results: ", blur_result_object)
+
+class DepthMapImgFlow:
+    """
+    A class to visualise depthmap image in result generation
+    """
+
+    def __init__(self, api, workflows, workflow_path, artifacts, scan_parent_dir, scan_metadata):
+        self.api = api
+        self.workflows = workflows
+        self.artifacts = artifacts
+        self.workflow_path = workflow_path
+        self.workflow_obj = self.workflows.load_workflows(self.workflow_path)
+        self.scan_metadata = scan_metadata
+        self.scan_parent_dir = scan_parent_dir
+        if self.workflow_obj["data"]["input_format"] == 'application/zip':
+            self.depth_input_format = 'depth'
+        self.scan_directory = os.path.join(self.scan_parent_dir, self.scan_metadata['id'], self.depth_input_format)
+        self.workflow_obj['id'] = self.workflows.get_workflow_id(self.workflow_obj['name'], self.workflow_obj['version'])
+
+    def get_input_path(self, directory, file_name):
+        return os.path.join(directory, file_name)
+
+    def bunch_object_to_json_object(self, bunch_object):
+        json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
+        json_object = json.loads(json_string)
+
+        return json_object
+    
+    def preprocess_depthmap(self, input_path):
+        data, width, height, depthScale, maxConfidence = preprocessing.load_depth(input_path)
+        depthmap, height, width = preprocessing.prepare_depthmap(data, width, height, depthScale)
+        depthmap = preprocessing.preprocess(depthmap)
+        depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
+        
+        cv2.imwrite('/app/data/depthmap_cv2.png', depthmap)
+        imsave('/app/data/depthmap_skimage.png', depthmap)
+        
+        return depthmap, True
+
+    def depthmap_img_artifacts(self):
+        for artifact in self.artifacts:
+            input_path = self.get_input_path(
+                self.scan_directory,
+                artifact['file'])
+
+            depthmap, depthmap_status = self.preprocess_depthmap(input_path)
+            # TODO convert depthmap to depthmap image
+
+            if depthmap_status:
+                artifact['depthmap_img'] = depthmap
+
+    def run_depthmap_img_flow(self):
+        self.depthmap_img_artifacts()
+        self.post_depthmap_image_files()
+        self.post_result_object()
+
+    def post_depthmap_image_files(self):
+        for artifact in self.artifacts:
+            depthmap_img_id_from_post_request, post_status = self.api.post_files(artifact['depthmap_img'])
+            if post_status == 201:
+                artifact['depthmap_img_id_from_post_request'] = depthmap_img_id_from_post_request
+                artifact['generated_timestamp'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+
+    def prepare_result_object(self):
+        res = Bunch()
+        res.results = []
+        for artifact in self.artifacts:
+            depthmap_img_result = Bunch()
+            depthmap_img_result.id = f"{uuid.uuid4()}"
+            depthmap_img_result.scan = self.scan_metadata['id']
+            depthmap_img_result.workflow = self.workflow_obj["id"]
+            depthmap_img_result.source_artifacts = [artifact['id']]
+            depthmap_img_result.source_results = []
+            depthmap_img_result.file = artifact['depthmap_img_id_from_post_request']
+            depthmap_img_result.generated = artifact['generated_timestamp']
+            res.results.append(depthmap_img_result)
+
+        return res
+
+    def post_result_object(self):
+        depthmap_img_result = self.prepare_result_object()
+        depthmap_img_result_object = self.bunch_object_to_json_object(depthmap_img_result)
+        if self.api.post_results(depthmap_img_result_object) == 201:
+            print("successfully post Depthmap Image results: ", depthmap_img_result_object)
+
 
 
 class HeightFlow:
@@ -703,25 +791,30 @@ def main():
                         help='Parent directory in which scans will be stored')
 
     parser.add_argument('--blur_workflow_path',
-                        default="src/workflows/blur-worflow-post.json",
+                        default="src/workflows/blur-workflow.json",
                         type=str,
                         help='Blur Workflow path')
 
+    parser.add_argument('--depthmap_img_workflow_path',
+                        default="src/workflows/depthmap-img-workflow.json",
+                        type=str,
+                        help='Depthmap Image Workflow path')
+
     parser.add_argument('--height_workflow_artifact_path',
-                        default="src/workflows/height-worflow-artifact.json",
+                        default="src/workflows/height-workflow-artifact.json",
                         type=str,
                         help='Height Workflow Artifact path')
     parser.add_argument('--height_workflow_scan_path',
-                        default="src/workflows/height-worflow-scan.json",
+                        default="src/workflows/height-workflow-scan.json",
                         type=str,
                         help='Height Workflow Scan path')
 
     parser.add_argument('--weight_workflow_artifact_path',
-                        default="/app/src/workflows/weight-worflow-artifact.json",
+                        default="/app/src/workflows/weight-workflow-artifact.json",
                         type=str,
                         help='Weight Workflow Artifact path')
     parser.add_argument('--weight_workflow_scan_path',
-                        default="/app/src/workflows/weight-worflow-scan.json",
+                        default="/app/src/workflows/weight-workflow-scan.json",
                         type=str,
                         help='Weight Workflow Scan path')
 
@@ -747,6 +840,7 @@ def main():
 
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
+    depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
@@ -778,12 +872,14 @@ def main():
         depth_artifacts = data_processing.download_artifacts('depth')
 
         blurflow = BlurFlow(cgm_api, workflow, blur_workflow_path, rgb_artifacts, scan_parent_dir, scan_metadata)
+        depthmap_img_flow = DepthMapImgFlow(cgm_api, workflow, depthmap_img_workflow_path, depth_artifacts, scan_parent_dir, scan_metadata)
         heightflow = HeightFlow(cgm_api, workflow, height_workflow_artifact_path, height_workflow_scan_path, depth_artifacts, scan_parent_dir, scan_metadata)
         weightflow = WeightFlow(cgm_api, workflow, weight_workflow_artifact_path, weight_workflow_scan_path, depth_artifacts, scan_parent_dir, scan_metadata)
 
-        blurflow.run_blur_flow()
+        #blurflow.run_blur_flow()
+        depthmap_img_flow.run_depthmap_img_flow()
         heightflow.run_height_flow()
-        weightflow.run_weight_flow()
+        #weightflow.run_weight_flow()
 
 
 if __name__ == "__main__":
