@@ -98,7 +98,7 @@ class BlurFlow:
     def blur_face(self, source_path: str):
         """Blur image
         Returns:
-            bool: True if blurred otherwise False
+            tuple: (blurred_rgb_image, boolean: True if blurred otherwise False)
         """
         # Read the image.
         assert os.path.exists(source_path), f"{source_path} does not exist"
