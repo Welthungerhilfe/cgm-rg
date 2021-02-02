@@ -9,9 +9,7 @@ import numpy as np
 import face_recognition
 from bunch import Bunch
 from datetime import datetime
-from skimage.io import imsave
-from skimage.io import imread
-from skimage.transform import resize
+import matplotlib.pyplot as plt
 from api_endpoints import ApiEndpoints
 import utils.inference as inference
 import utils.preprocessing as preprocessing
@@ -194,6 +192,7 @@ class DepthMapImgFlow:
             self.depth_input_format = 'depth'
         self.scan_directory = os.path.join(self.scan_parent_dir, self.scan_metadata['id'], self.depth_input_format)
         self.workflow_obj['id'] = self.workflows.get_workflow_id(self.workflow_obj['name'], self.workflow_obj['version'])
+        self.colormap = plt.get_cmap('inferno')
 
     def get_input_path(self, directory, file_name):
         return os.path.join(directory, file_name)
@@ -209,10 +208,7 @@ class DepthMapImgFlow:
         depthmap, height, width = preprocessing.prepare_depthmap(data, width, height, depthScale)
         depthmap = preprocessing.preprocess(depthmap)
         depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
-        
-        cv2.imwrite('/app/data/depthmap_cv2.png', depthmap)
-        imsave('/app/data/depthmap_skimage.png', depthmap)
-        
+                
         return depthmap, True
 
     def depthmap_img_artifacts(self):
@@ -222,10 +218,11 @@ class DepthMapImgFlow:
                 artifact['file'])
 
             depthmap, depthmap_status = self.preprocess_depthmap(input_path)
-            # TODO convert depthmap to depthmap image
-
+            
+            heatmap = (self.colormap(depthmap) * 2**16).astype(np.uint16)[:,:,:3]
+            heatmap = cv2.cvtColor(heatmap, cv2.COLOR_RGB2BGR)
             if depthmap_status:
-                artifact['depthmap_img'] = depthmap
+                artifact['depthmap_img'] = heatmap
 
     def run_depthmap_img_flow(self):
         self.depthmap_img_artifacts()
