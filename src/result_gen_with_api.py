@@ -617,7 +617,7 @@ class PrepareArtifacts:
         return self.artifacts
 
     def check_artifact_format(self, format):
-        if format == 'image/jpeg' or format == 'rgb':
+        if format in ['image/jpeg', 'rgb']:
             return 'img'
         elif format == 'application/zip':
             return 'depth'
