@@ -20,7 +20,6 @@ class BlurFlow:
     """
     A class to handle face blur results generation.
 
-
     Attributes
     ----------
     api : object
@@ -180,8 +179,6 @@ class HeightFlow:
     """
     A class to handle height results generation.
 
-    ...
-
     Attributes
     ----------
     api : object
@@ -318,8 +315,6 @@ class HeightFlow:
 class WeightFlow:
     """
     A class to handle weight results generation.
-
-    ...
 
     Attributes
     ----------
@@ -458,8 +453,6 @@ class ProcessWorkflows:
     """
     A class to process all the workflows.
 
-    ...
-
     Attributes
     ----------
     api : object
@@ -499,8 +492,6 @@ class ProcessWorkflows:
 class GetScanMetadata:
     """
     A class to get and process scan metadata.
-
-    ...
 
     Attributes
     ----------
@@ -557,8 +548,6 @@ class GetScanMetadata:
 class PrepareArtifacts:
     """
     A class to prepare artifacts for result generation.
-
-    ...
 
     Attributes
     ----------
@@ -623,11 +612,9 @@ class PrepareArtifacts:
 
     def add_artifacts_to_format_dictionary(self, format, artifact):
         if format in self.format_wise_artifact:
-            self.format_wise_artifact[format].append(
-                artifact)
+            self.format_wise_artifact[format].append(artifact)
         else:
-            self.format_wise_artifact[format] = [
-                artifact]
+            self.format_wise_artifact[format] = [artifact]
 
     def process_scan_metadata(self):
         '''
@@ -665,24 +652,11 @@ class PrepareArtifacts:
                     ├── 5850e04c-33e1-11eb-af63-4f5622046249
                     └── 5850e04c-33e1-11eb-af63-4f5622046249_blur.jpg
         '''
-        if not os.path.isdir(self.scan_dir):
-            os.makedirs(self.scan_dir)
+        os.makedirs(self.scan_dir, exist_ok=False)
 
     def create_artifact_dir(self):
         for artifact_format in self.format_wise_artifact:
-            if not os.path.exists(
-                os.path.join(
-                    self.scan_dir,
-                    artifact_format)):
-                os.makedirs(os.path.join(self.scan_dir, artifact_format))
-
-
-class GenerateResults:
-    pass
-
-
-class MakeResultObjects:
-    pass
+            os.makedirs(os.path.join(self.scan_dir, artifact_format), exist_ok=False)
 
 
 def main():
