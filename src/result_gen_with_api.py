@@ -20,7 +20,6 @@ class BlurFlow:
     """
     A class to handle face blur results generation.
 
-    ...
 
     Attributes
     ----------
