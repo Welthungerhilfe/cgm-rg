@@ -23,7 +23,7 @@ class BlurFlow:
     Attributes
     ----------
     api : object
-        object of api_endpoints class
+        object of ApiEndpoints class
     workflows : list
         list of registered workflows
     workflow_path : str
@@ -84,9 +84,7 @@ class BlurFlow:
     def blur_artifacts(self):
         for i, artifact in enumerate(self.artifacts):
 
-            input_path = self.get_input_path(
-                self.scan_directory,
-                artifact['file'])
+            input_path = self.get_input_path(self.scan_directory, artifact['file'])
             # target_path = input_path + '_blur.jpg'
 
             print("input_path of image to perform blur: ", input_path)
@@ -182,7 +180,7 @@ class HeightFlow:
     Attributes
     ----------
     api : object
-        object of api_endpoints class
+        object of ApiEndpoints class
     workflows : list
         list of registered workflows
     artifact_workflow_path : str
@@ -246,9 +244,7 @@ class HeightFlow:
     def process_depthmaps(self):
         depthmaps = []
         for artifact in self.artifacts:
-            input_path = self.get_input_path(
-                self.scan_directory,
-                artifact['file'])
+            input_path = self.get_input_path(self.scan_directory, artifact['file'])
 
             data, width, height, depthScale, maxConfidence = preprocessing.load_depth(input_path)
             depthmap, height, width = preprocessing.prepare_depthmap(data, width, height, depthScale)
@@ -319,7 +315,7 @@ class WeightFlow:
     Attributes
     ----------
     api : object
-        object of api_endpoints class
+        object of ApiEndpoints class
     workflows : list
         list of registered workflows
     artifact_workflow_path : str
@@ -383,9 +379,7 @@ class WeightFlow:
     def process_depthmaps(self):
         depthmaps = []
         for artifact in self.artifacts:
-            input_path = self.get_input_path(
-                self.scan_directory,
-                artifact['file'])
+            input_path = self.get_input_path(self.scan_directory, artifact['file'])
 
             data, width, height, depthScale, maxConfidence = preprocessing.load_depth(input_path)
             depthmap, height, width = preprocessing.prepare_depthmap(data, width, height, depthScale)
@@ -456,7 +450,7 @@ class ProcessWorkflows:
     Attributes
     ----------
     api : object
-        object of api_endpoints class
+        object of ApiEndpoints class
 
     Methods
     -------
@@ -496,7 +490,7 @@ class GetScanMetadata:
     Attributes
     ----------
     api : object
-        object of api_endpoints class
+        object of ApiEndpoints class
     scan_metadata_path : str
         path to store scan metadata
 
@@ -552,7 +546,7 @@ class PrepareArtifacts:
     Attributes
     ----------
     api : object
-        object of api_endpoints class
+        object of ApiEndpoints class
     scan_metadata : json
         metadata of the scan to run weight flow on
     scan_parent_dir : str
@@ -586,13 +580,11 @@ class PrepareArtifacts:
         print(f"\nDownloading Artifacts for { input_format } format")
         self.artifacts = []
 
-        for i, artifact in enumerate(
-                self.format_wise_artifact[input_format]):
+        for i, artifact in enumerate(self.format_wise_artifact[input_format]):
             mod_artifact = copy.deepcopy(artifact)
 
             print("\nDownloading Artifact Name: ", mod_artifact["file"])
-            status_code = self.api.get_files(
-                mod_artifact["file"], os.path.join(self.scan_dir, input_format))
+            status_code = self.api.get_files(mod_artifact["file"], os.path.join(self.scan_dir, input_format))
             # status_code = get_files_mockup(mod_artifact["file"], format_dir)
             if status_code == 200:
                 mod_artifact['download_status'] = True
