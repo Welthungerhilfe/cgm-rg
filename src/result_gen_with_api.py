@@ -246,7 +246,7 @@ class HeightFlow:
         for artifact in self.artifacts:
             input_path = self.get_input_path(self.scan_directory, artifact['file'])
 
-            data, width, height, depthScale, maxConfidence = preprocessing.load_depth(input_path)
+            data, width, height, depthScale, max_confidence = preprocessing.load_depth(input_path)
             depthmap, height, width = preprocessing.prepare_depthmap(data, width, height, depthScale)
             depthmap = preprocessing.preprocess(depthmap)
             depthmaps.append(depthmap)
@@ -381,7 +381,7 @@ class WeightFlow:
         for artifact in self.artifacts:
             input_path = self.get_input_path(self.scan_directory, artifact['file'])
 
-            data, width, height, depthScale, maxConfidence = preprocessing.load_depth(input_path)
+            data, width, height, depthScale, max_confidence = preprocessing.load_depth(input_path)
             depthmap, height, width = preprocessing.prepare_depthmap(data, width, height, depthScale)
             depthmap = preprocessing.preprocess(depthmap)
             depthmaps.append(depthmap)
