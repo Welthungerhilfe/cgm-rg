@@ -3,8 +3,8 @@ import numpy as np
 from pyntcloud import PyntCloud
 from skimage.transform import resize
 
-image_target_height = 240
-image_target_width = 180
+IMAGE_TARGET_HEIGHT = 240
+IMAGE_TARGET_WIDTH = 180
 
 
 def load_depth(filename):
@@ -24,9 +24,9 @@ def load_depth(filename):
     return data, width, height, depthScale, maxConfidence
 
 
-def parseDepth(tx, ty, data, depthScale):
-    depth = data[(int(ty) * width + int(tx)) * 3 + 0] << 8
-    depth += data[(int(ty) * width + int(tx)) * 3 + 1]
+def parse_depth(tx, ty, data, depthScale):
+    depth = data[(int(ty) * WIDTH + int(tx)) * 3 + 0] << 8
+    depth += data[(int(ty) * WIDTH + int(tx)) * 3 + 1]
     depth *= depthScale
     return depth
 
@@ -36,11 +36,11 @@ def prepare_depthmap(data, width, height, depthScale):
     output = np.zeros((width, height, 1))
     for cx in range(width):
         for cy in range(height):
-            #             output[cx][height - cy - 1][0] = parseConfidence(cx, cy)
+            #             output[cx][height - cy - 1][0] = parse_confidence(cx, cy)
             #             output[cx][height - cy - 1][1] = im_array[cy][cx][1] / 255.0 #test matching on RGB data
-            #             output[cx][height - cy - 1][2] = 1.0 - min(parseDepth(cx, cy) / 2.0, 1.0) #depth data scaled to be visible
+            #             output[cx][height - cy - 1][2] = 1.0 - min(parse_depth(cx, cy) / 2.0, 1.0) #depth data scaled to be visible
             # depth data scaled to be visible
-            output[cx][height - cy - 1] = parseDepth(cx, cy, data, depthScale)
+            output[cx][height - cy - 1] = parse_depth(cx, cy, data, depthScale)
     return (
         np.array(
             output,
@@ -52,19 +52,19 @@ def prepare_depthmap(data, width, height, depthScale):
 
 
 # write obj
-def getPCD(filename, calibration, data, maxConfidence, depthScale):
+def get_pcd(filename, calibration, data, maxConfidence, depthScale):
     pcd = []
-    # count = str(getCount(calibration, data, depthScale))
+    # count = str(get_count(calibration, data, depthScale))
     # print(count)
-    for x in range(2, width - 2):
-        for y in range(2, height - 2):
-            depth = parseDepth(x, y, data, depthScale)
+    for x in range(2, WIDTH - 2):
+        for y in range(2, HEIGHT - 2):
+            depth = parse_depth(x, y, data, depthScale)
             if depth:
-                res = convert2Dto3D(calibration[1], x, y, depth)
+                res = convert_2d_to_3d(calibration[1], x, y, depth)
                 if res:
-                    # file.write(str(-res[0]) + ' ' + str(res[1]) + ' ' + str(res[2]) + ' ' + str(parseConfidence(x, y)) + '\n')
+                    # file.write(str(-res[0]) + ' ' + str(res[1]) + ' ' + str(res[2]) + ' ' + str(parse_confidence(x, y)) + '\n')
                     pcd.append([-res[0], res[1], res[2],
-                                parseConfidence(x, y, data, maxConfidence)])
+                                parse_confidence(x, y, data, maxConfidence)])
 
     return np.array(pcd)
 
@@ -79,26 +79,26 @@ def preprocess(depthmap):
     depthmap = preprocess_depthmap(depthmap)
     # depthmap = depthmap/depthmap.max()
     depthmap = depthmap / 7.5
-    depthmap = resize(depthmap, (image_target_height, image_target_width))
+    depthmap = resize(depthmap, (IMAGE_TARGET_HEIGHT, IMAGE_TARGET_WIDTH))
     depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
     # depthmap = depthmap[None, :]
     return depthmap
 
 
-def lenovo_pcd2depth(pcd, calibration):
+def lenovo_pcd_to_depth(pcd, calibration):
     try:
-        points = parsePCD(pcd)
+        points = parse_pcd(pcd)
     except Exception as error:
         print(error)
         return None
-    width = getWidth()
-    height = getHeight()
+    width = get_width()
+    height = get_height()
     # print(height, width)
     output = np.zeros((width, height, 1))
     # print(calibration)
     for p in points:
         try:
-            v = convert3Dto2D(calibration[1], p[0], p[1], p[2])
+            v = convert_3d_to_2d(calibration[1], p[0], p[1], p[2])
         except Exception as error:
             print(pcd, error)
         x = round(width - v[0] - 1)
@@ -111,7 +111,7 @@ def lenovo_pcd2depth(pcd, calibration):
 # parse line of numbers
 
 
-def parseNumbers(line):
+def parse_numbers(line):
     output = []
     values = line.split(" ")
     for value in values:
@@ -121,20 +121,20 @@ def parseNumbers(line):
 # parse calibration file
 
 
-def parseCalibration(filepath):
+def parse_calibration(filepath):
     # global calibration
     with open(filepath, 'r') as file:
         calibration = []
         file.readline()[:-1]
-        calibration.append(parseNumbers(file.readline()))
+        calibration.append(parse_numbers(file.readline()))
         # print(str(calibration[0]) + '\n') #color camera intrinsics - fx, fy,
         # cx, cy
         file.readline()[:-1]
-        calibration.append(parseNumbers(file.readline()))
+        calibration.append(parse_numbers(file.readline()))
         # print(str(calibration[1]) + '\n') #depth camera intrinsics - fx, fy,
         # cx, cy
         file.readline()[:-1]
-        calibration.append(parseNumbers(file.readline()))
+        calibration.append(parse_numbers(file.readline()))
         # print(str(calibration[2]) + '\n') #depth camera position relativelly
         # to color camera in meters
         calibration[2][1] *= 8.0  # workaround for wrong calibration data
@@ -143,12 +143,12 @@ def parseCalibration(filepath):
 # convert point into 3D
 
 
-def convert2Dto3D(intrisics, x, y, z):
+def convert_2d_to_3d(intrisics, x, y, z):
     # print(intrisics)
-    fx = intrisics[0] * float(width)
-    fy = intrisics[1] * float(height)
-    cx = intrisics[2] * float(width)
-    cy = intrisics[3] * float(height)
+    fx = intrisics[0] * float(WIDTH)
+    fy = intrisics[1] * float(HEIGHT)
+    cx = intrisics[2] * float(WIDTH)
+    cy = intrisics[3] * float(HEIGHT)
     tx = (x - cx) * z / fx
     ty = (y - cy) * z / fy
     output = []
@@ -160,12 +160,12 @@ def convert2Dto3D(intrisics, x, y, z):
 # convert point into 2D
 
 
-def convert3Dto2D(intrisics, x, y, z):
+def convert_3d_to_2d(intrisics, x, y, z):
     # print(intrisics)
-    fx = intrisics[0] * float(width)
-    fy = intrisics[1] * float(height)
-    cx = intrisics[2] * float(width)
-    cy = intrisics[3] * float(height)
+    fx = intrisics[0] * float(WIDTH)
+    fy = intrisics[1] * float(HEIGHT)
+    cx = intrisics[2] * float(WIDTH)
+    cy = intrisics[3] * float(HEIGHT)
     tx = x * fx / z + cx
     ty = y * fy / z + cy
     output = []
@@ -175,39 +175,39 @@ def convert3Dto2D(intrisics, x, y, z):
     return output
 
 
-def parseConfidence(tx, ty, data, maxConfidence):
-    return (data[(int(ty) * width + int(tx)) * 3 + 2]) / maxConfidence
+def parse_confidence(tx, ty, data, maxConfidence):
+    return (data[(int(ty) * WIDTH + int(tx)) * 3 + 2]) / maxConfidence
 
 # getter
 
 
-def getWidth():
-    return width
+def get_width():
+    return WIDTH
 
 # getter
 
 
-def getHeight():
-    return height
+def get_height():
+    return HEIGHT
 
 # setter
 
 
-def setWidth(value):
-    global width
-    width = value
+def set_width(value):
+    global WIDTH
+    WIDTH = value
 
 # setter
 
 
-def setHeight(value):
-    global height
-    height = value
+def set_height(value):
+    global HEIGHT
+    HEIGHT = value
 
     # parse PCD
 
 
-def parsePCD(filepath):
+def parse_pcd(filepath):
     with open(filepath, 'r') as file:
         data = []
         while True:
@@ -220,19 +220,19 @@ def parsePCD(filepath):
             if not line:
                 break
             else:
-                values = parseNumbers(line)
+                values = parse_numbers(line)
                 data.append(values)
         return data
 
 
 # get valid points in depthmaps
-def getCount(calibration, data, depthScale):
+def get_count(calibration, data, depthScale):
     count = 0
-    for x in range(2, width - 2):
-        for y in range(2, height - 2):
-            depth = parseDepth(x, y, data, depthScale)
+    for x in range(2, WIDTH - 2):
+        for y in range(2, HEIGHT - 2):
+            depth = parse_depth(x, y, data, depthScale)
             if depth:
-                res = convert2Dto3D(calibration[1], x, y, depth)
+                res = convert_2d_to_3d(calibration[1], x, y, depth)
                 if res:
                     count = count + 1
     return count
@@ -299,7 +299,7 @@ def preprocess_pointcloud(pointcloud, subsample_size, channels):
 def pcd_to_depthmap(paths, calibration):
     depthmaps = []
     for path in paths:
-        depthmap = lenovo_pcd2depth(path, calibration)
+        depthmap = lenovo_pcd_to_depth(path, calibration)
         if depthmap is not None:
             depthmap = preprocess(depthmap)
             depthmaps.append(depthmap)
@@ -313,7 +313,7 @@ def depthmap_to_pcd(paths, calibration, preprocessing_type, input_shape=[]):
     pcds = []
     for path in paths:
         data, width, height, depthScale, maxConfidence = load_depth(path)
-        pcd = getPCD(path, calibration, data, maxConfidence, depthScale)
+        pcd = get_pcd(path, calibration, data, maxConfidence, depthScale)
 
         if pcd.shape[0] == 0:
             continue
@@ -340,7 +340,7 @@ def get_depthmaps(paths):
     for path in paths:
         data, width, height, depthScale, maxConfidence = load_depth(path)
         depthmap, height, width = prepare_depthmap(
-            data, width, height, depthScale)
+            data, WIDTH, HEIGHT, depthScale)
         # print(height, width)
         depthmap = preprocess(depthmap)
         # print(depthmap.shape)
