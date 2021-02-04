@@ -188,7 +188,7 @@ class ApiEndpoints:
         print("Workflow Post response")
         print("Status code: ", response.status_code)
 
-        if response.status_code == 201:
+        if response.status_code in [201, 200]:
             content = response.json()
             # content['data'] = workflow_obj["data"]
             pprint.pprint(content)
@@ -196,7 +196,7 @@ class ApiEndpoints:
             # with open(response_path, 'w') as f:
             #     json.dump(content, f)
 
-        return response.status_code
+        return response
 
     def post_workflow(self, workflow_path):
         '''
