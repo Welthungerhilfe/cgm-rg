@@ -1,10 +1,13 @@
 import sys
+sys.path.append('./src')
 import unittest
 sys.path.insert(0, '/opt/api')
 
 
-from api_endpoints import ApiEndpoints
-from result_gen_with_api import ScanResults
+#from src.api_endpoints import ApiEndpoints
+#from src.result_gen_with_api import ScanResults
+import api_endpoints
+import result_gen_with_api
 
 class TestScanResults(unittest.TestCase):
     def setup(self):
