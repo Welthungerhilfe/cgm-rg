@@ -1,17 +1,19 @@
-import os
-import cv2
-import json
-import uuid
-import copy
-import pprint
 import argparse
+import copy
+import json
+import os
+import pprint
+import uuid
 from datetime import datetime
-import numpy as np
+
+import cv2
 import face_recognition
+import numpy as np
 from bunch import Bunch
-from api_endpoints import ApiEndpoints
+
 import utils.inference as inference
 import utils.preprocessing as preprocessing
+from api_endpoints import ApiEndpoints
 
 RESIZE_FACTOR = 4
 
