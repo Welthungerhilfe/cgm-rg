@@ -54,6 +54,7 @@ class BlurFlow:
     post_result_object():
         Posts the result object to api.
     """
+
     def __init__(self, api, workflows, workflow_path, artifacts, scan_parent_dir, scan_metadata):
         self.api = api
         self.workflows = workflows
@@ -64,8 +65,10 @@ class BlurFlow:
         self.scan_parent_dir = scan_parent_dir
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.blur_input_format = 'img'
-        self.scan_directory = os.path.join(self.scan_parent_dir, self.scan_metadata['id'], self.blur_input_format)
-        self.workflow_obj['id'] = self.workflows.get_workflow_id(self.workflow_obj['name'], self.workflow_obj['version'])
+        self.scan_directory = os.path.join(
+            self.scan_parent_dir, self.scan_metadata['id'], self.blur_input_format)
+        self.workflow_obj['id'] = self.workflows.get_workflow_id(
+            self.workflow_obj['name'], self.workflow_obj['version'])
 
     def bunch_object_to_json_object(self, bunch_object):
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
@@ -84,7 +87,8 @@ class BlurFlow:
     def blur_artifacts(self):
         for i, artifact in enumerate(self.artifacts):
 
-            input_path = self.get_input_path(self.scan_directory, artifact['file'])
+            input_path = self.get_input_path(
+                self.scan_directory, artifact['file'])
             # target_path = input_path + '_blur.jpg'
 
             print("input_path of image to perform blur: ", input_path)
@@ -110,10 +114,12 @@ class BlurFlow:
         image = np.swapaxes(image, 0, 1)
 
         # Scale image down for faster prediction.
-        small_image = cv2.resize(image, (0, 0), fx=1.0 / RESIZE_FACTOR, fy=1.0 / RESIZE_FACTOR)
+        small_image = cv2.resize(
+            image, (0, 0), fx=1.0 / RESIZE_FACTOR, fy=1.0 / RESIZE_FACTOR)
 
         # Find face locations.
-        face_locations = face_recognition.face_locations(small_image, model="cnn")
+        face_locations = face_recognition.face_locations(
+            small_image, model="cnn")
 
         # Blur the image.
         for top, right, bottom, left in face_locations:
@@ -128,7 +134,8 @@ class BlurFlow:
             face_image = image[top:bottom, left:right]
 
             # Blur the face image.
-            face_image = cv2.GaussianBlur(face_image, ksize=(99, 99), sigmaX=30)
+            face_image = cv2.GaussianBlur(
+                face_image, ksize=(99, 99), sigmaX=30)
 
             # Put the blurred face region back into the frame image.
             image[top:bottom, left:right] = face_image
@@ -140,15 +147,18 @@ class BlurFlow:
         rgb_image = image[:, :, ::-1]  # BGR -> RGB for OpenCV
 
         # logging.info(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
-        print(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
+        print(
+            f"{len(face_locations)} face locations found and blurred for path: {source_path}")
         return rgb_image, True
 
     def post_blur_files(self):
         for artifact in self.artifacts:
-            blur_id_from_post_request, post_status = self.api.post_files(artifact['blurred_image'])
+            blur_id_from_post_request, post_status = self.api.post_files(
+                artifact['blurred_image'])
             if post_status == 201:
                 artifact['blur_id_from_post_request'] = blur_id_from_post_request
-                artifact['generated_timestamp'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+                artifact['generated_timestamp'] = datetime.now().strftime(
+                    '%Y-%m-%dT%H:%M:%SZ')
 
     def prepare_result_object(self):
         res = Bunch()
@@ -171,6 +181,101 @@ class BlurFlow:
         blur_result_object = self.bunch_object_to_json_object(blur_result)
         if self.api.post_results(blur_result_object) == 201:
             print("successfully post blur results: ", blur_result_object)
+
+
+class Standing_laying:
+    """
+    A class to handle standing/laying results generation.
+
+    Attributes
+    ----------
+    api : object
+        object of ApiEndpoints class
+    workflows : list
+        list of registered workflows
+    workflow_path : str
+        path of the workflow file for standing_laying
+    artifacts : list
+        list of artifacts to run standing_laying flow on
+    scan_parent_dir : str
+        directory where scans are stored
+    scan_metadata : json
+        metadata of the scan to run standing_laying flow on
+
+    Methods
+    -------
+    TODO
+    """
+
+    def __init__(self, api, workflows, workflow_path, artifacts, scan_parent_dir, scan_metadata):
+        self.api = api
+        self.workflows = workflows
+        self.artifacts = artifacts
+        self.workflow_path = workflow_path
+        self.workflow_obj = self.workflows.load_workflows(self.workflow_path)
+        self.scan_metadata = scan_metadata
+        self.scan_parent_dir = scan_parent_dir
+        if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
+            self.standing_laying_input_format = 'img'
+        self.scan_directory = os.path.join(
+            self.scan_parent_dir, self.scan_metadata['id'], self.standing_laying_input_format)
+        self.workflow_obj['id'] = self.workflows.get_workflow_id(
+            self.workflow_obj['name'], self.workflow_obj['version'])
+
+    def bunch_object_to_json_object(self, bunch_object):
+        json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
+        json_object = json.loads(json_string)
+
+        return json_object
+
+    def get_input_path(self, directory, file_name):
+        return os.path.join(directory, file_name)
+
+    def run_standing_laying_flow(self):
+        prediction = self.standing_laying_artifacts()
+        generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        self.post_result_object(prediction, generated_timestamp)
+
+    def standing_laying_artifacts(self):
+        predictions = []
+        for i, artifact in enumerate(self.artifacts):
+
+            input_path = self.get_input_path(
+                self.scan_directory, artifact['file'])
+
+            print("input_path of image to perform standing laying: ", input_path)
+
+            img = preprocessing.standing_laying_data_preprocessing(input_path)
+            prediction = inference.get_standing_laying_prediction_local(img)
+            predictions.append(prediction)
+        predictions = np.array(predictions)
+        return predictions
+
+    def prepare_result_object(self, prediction, generated_timestamp):
+        res = Bunch()
+        res.results = []
+        for artifact, prediction in zip(self.artifacts, prediction):
+            standing_laying_result = Bunch()
+            standing_laying_result.id = f"{uuid.uuid4()}"
+            standing_laying_result.scan = self.scan_metadata['id']
+            standing_laying_result.workflow = self.workflow_obj["id"]
+            standing_laying_result.source_artifacts = [artifact['id']]
+            standing_laying_result.source_results = []
+            standing_laying_result.generated = generated_timestamp
+            result = {'standing': str(prediction[0])}
+            standing_laying_result.data = result
+            res.results.append(standing_laying_result)
+
+        return res
+
+    def post_result_object(self, prediction, generated_timestamp):
+        standing_laying_result = self.prepare_result_object(
+            prediction, generated_timestamp)
+        standing_laying_result_object = self.bunch_object_to_json_object(
+            standing_laying_result)
+        if self.api.post_results(standing_laying_result_object) == 201:
+            print("successfully post Standing laying results: ",
+                  standing_laying_result_object)
 
 
 class HeightFlow:
@@ -668,25 +773,29 @@ def main():
                         help='Parent directory in which scans will be stored')
 
     parser.add_argument('--blur_workflow_path',
-                        default="src/workflows/blur-worflow-post.json",
+                        default="src/workflows/blur-workflow.json",
                         type=str,
                         help='Blur Workflow path')
+    parser.add_argument('--standing_laying_workflow_path',
+                        default="src/workflows/standing_laying-workflow.json",
+                        type=str,
+                        help='Standing laying Workflow path')
 
     parser.add_argument('--height_workflow_artifact_path',
-                        default="src/workflows/height-worflow-artifact.json",
+                        default="src/workflows/height-workflow-artifact.json",
                         type=str,
                         help='Height Workflow Artifact path')
     parser.add_argument('--height_workflow_scan_path',
-                        default="src/workflows/height-worflow-scan.json",
+                        default="src/workflows/height-workflow-scan.json",
                         type=str,
                         help='Height Workflow Scan path')
 
     parser.add_argument('--weight_workflow_artifact_path',
-                        default="/app/src/workflows/weight-worflow-artifact.json",
+                        default="/app/src/workflows/weight-workflow-artifact.json",
                         type=str,
                         help='Weight Workflow Artifact path')
     parser.add_argument('--weight_workflow_scan_path',
-                        default="/app/src/workflows/weight-worflow-scan.json",
+                        default="/app/src/workflows/weight-workflow-scan.json",
                         type=str,
                         help='Weight Workflow Scan path')
 
@@ -712,6 +821,7 @@ def main():
 
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
+    standing_laying_workflow_path=args.standing_laying_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
@@ -743,10 +853,12 @@ def main():
         depth_artifacts = data_processing.download_artifacts('depth')
 
         blurflow = BlurFlow(cgm_api, workflow, blur_workflow_path, rgb_artifacts, scan_parent_dir, scan_metadata)
+        standing_laying = Standing_laying(cgm_api, workflow, standing_laying_workflow_path, rgb_artifacts, scan_parent_dir, scan_metadata)
         heightflow = HeightFlow(cgm_api, workflow, height_workflow_artifact_path, height_workflow_scan_path, depth_artifacts, scan_parent_dir, scan_metadata)
         weightflow = WeightFlow(cgm_api, workflow, weight_workflow_artifact_path, weight_workflow_scan_path, depth_artifacts, scan_parent_dir, scan_metadata)
 
         blurflow.run_blur_flow()
+        standing_laying.run_standing_laying_flow()
         heightflow.run_height_flow()
         weightflow.run_weight_flow()
 
