@@ -14,6 +14,10 @@ from api_endpoints import ApiEndpoints
 import utils.inference as inference
 import utils.preprocessing as preprocessing
 
+from skimage.io import imsave
+from skimage.io import imread
+
+
 RESIZE_FACTOR = 4
 
 
@@ -218,11 +222,11 @@ class DepthMapImgFlow:
                 artifact['file'])
 
             depthmap, depthmap_status = self.preprocess_depthmap(input_path)
-            
-            heatmap = (self.colormap(depthmap) * 2**16).astype(np.uint16)[:,:,:3]
-            heatmap = cv2.cvtColor(heatmap, cv2.COLOR_RGB2BGR)
+            imsave('depthmap_skimage.png', depthmap)
+            skimage_image = imread('depthmap_skimage.png')
+              
             if depthmap_status:
-                artifact['depthmap_img'] = heatmap
+                artifact['depthmap_img'] = skimage_image
 
     def run_depthmap_img_flow(self):
         self.depthmap_img_artifacts()
@@ -231,6 +235,12 @@ class DepthMapImgFlow:
 
     def post_depthmap_image_files(self):
         for artifact in self.artifacts:
+            #heatmap_path = 'heatmap.png'
+            #cv2.imwrite(heatmap_path, artifact['depthmap_img'])
+            #heatmap = cv2.imread(heatmap_path)
+            #type_ = 'image/jpeg'
+            #depthmap_img_id_from_post_request, post_status = self.api.post_files_using_path(heatmap_path, type_)
+            
             depthmap_img_id_from_post_request, post_status = self.api.post_files(artifact['depthmap_img'])
             if post_status == 201:
                 artifact['depthmap_img_id_from_post_request'] = depthmap_img_id_from_post_request
@@ -840,10 +850,10 @@ def main():
         heightflow = HeightFlow(cgm_api, workflow, height_workflow_artifact_path, height_workflow_scan_path, depth_artifacts, scan_parent_dir, scan_metadata)
         weightflow = WeightFlow(cgm_api, workflow, weight_workflow_artifact_path, weight_workflow_scan_path, depth_artifacts, scan_parent_dir, scan_metadata)
 
-        blurflow.run_blur_flow()
+        #blurflow.run_blur_flow()
         depthmap_img_flow.run_depthmap_img_flow()
-        heightflow.run_height_flow()
-        weightflow.run_weight_flow()
+        #heightflow.run_height_flow()
+        #weightflow.run_weight_flow()
 
 
 if __name__ == "__main__":
