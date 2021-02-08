@@ -979,10 +979,10 @@ def main():
             scan_parent_dir,
             scan_metadata)
 
-        # blurflow.run_blur_flow()
+        blurflow.run_blur_flow()
         depthmap_img_flow.run_depthmap_img_flow()
-        # heightflow.run_height_flow()
-        # weightflow.run_weight_flow()
+        heightflow.run_height_flow()
+        weightflow.run_weight_flow()
 
 
 if __name__ == "__main__":
