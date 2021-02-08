@@ -3,10 +3,31 @@ sys.path.append('./src')
 import pytest
 from bunch import Bunch
 import json
+import os
 #from src.result_gen_with_api import BlurFlow
-import result_gen_with_api
+from result_gen_with_api import BlurFlow, ProcessWorkflows
+from api_endpoints import ApiEndpoints
 
-blurflow = BlurFlow(cgm_api, workflow, blur_workflow_path, rgb_artifacts, scan_parent_dir, scan_metadata)
+os.environ['APP_ENV'] = 'LOCAL'
+
+scan_endpoint = '/api/scans/unprocessed?limit=1'
+get_file_endpoint = '/api/files/'
+post_file_endpoint = '/api/files'
+result_endpoint = '/api/results'
+workflow_endpoint = '/api/workflows'
+url = "http://localhost:5001"
+
+cgm_api = ApiEndpoints(
+        url,
+        scan_endpoint,
+        get_file_endpoint,
+        post_file_endpoint,
+        result_endpoint,
+        workflow_endpoint)
+
+workflow = ProcessWorkflows(cgm_api)
+
+blurflow = BlurFlow(cgm_api, workflow, blur_workflow_path, rgb_artifacts={}, scan_parent_dir='', scan_metadata={})
 
 def test_bunch_object_to_json_object():
     """
