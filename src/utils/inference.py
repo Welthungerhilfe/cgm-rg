@@ -23,7 +23,6 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 
 height_model = load_model('/app/models/best_model.h5')
 weight_model = load_model('/app/models/q4-depthmap-plaincnn-weight-95k-run-12/best_model.ckpt/', compile=False)
-standing_laying = load_model('/app/models/Standing_laying/best_model.h5')
 
 
 def get_height_predictions_local(numpy_array):
@@ -32,10 +31,6 @@ def get_height_predictions_local(numpy_array):
 
 def get_weight_predictions_local(numpy_array):
     return weight_model.predict(numpy_array)
-
-
-def get_standing_laying_prediction_local(numpy_array):
-    return standing_laying.predict(numpy_array)
 
 
 '''
