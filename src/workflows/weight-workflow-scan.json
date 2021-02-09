@@ -6,5 +6,6 @@
     "data":{
         "input_format":"application/zip",
         "model":"q4-depthmap-plaincnn-weight-95k"
-    }
+    },
+    "eligible": true
 }
