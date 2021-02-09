@@ -1,6 +1,6 @@
 import os
 import sys
-
+import pathlib
 # from azureml.core import Workspace
 # from azureml.core.authentication import ServicePrincipalAuthentication
 from tensorflow.keras.models import load_model
@@ -12,6 +12,8 @@ sys.path.append(
             os.path.realpath(__file__)),
         os.pardir))
 
+current_working_directory = pathlib.Path.cwd()
+models_path = current_working_directory.joinpath('models')
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 
@@ -21,8 +23,8 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 # TODO load the weights of passed model and generate results for passed
 # pointclouds
 
-height_model = load_model('/app/models/best_model.h5')
-weight_model = load_model('/app/models/q4-depthmap-plaincnn-weight-95k-run-12/best_model.ckpt/', compile=False)
+height_model = load_model(models_path.joinpath('best_model.h5'))
+weight_model = load_model(models_path.joinpath('q4-depthmap-plaincnn-weight-95k-run-12', 'best_model.ckpt'), compile=False)
 
 
 def get_height_predictions_local(numpy_array):
