@@ -1,8 +1,8 @@
-import os
 from pathlib import Path
+# import os
 
 from azureml.core import Workspace
-#from azureml.core.authentication import ServicePrincipalAuthentication
+# from azureml.core.authentication import ServicePrincipalAuthentication
 from azureml.core.model import Model
 
 REPO_DIR = Path(__file__).parents[1].absolute()
