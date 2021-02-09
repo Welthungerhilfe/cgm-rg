@@ -2,11 +2,13 @@ import os
 import json
 import pathlib
 
+
 def load_json(json_path):
     with open(json_path, 'r') as f:
         json_obj = json.load(f)
-    
+
     return json_obj
+
 
 os.environ['APP_ENV'] = 'LOCAL'
 

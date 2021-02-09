@@ -4,10 +4,11 @@ import pytest
 from bunch import Bunch
 import json
 import os
-#from src.result_gen_with_api import BlurFlow
+# from src.result_gen_with_api import BlurFlow
 from result_gen_with_api import BlurFlow, ProcessWorkflows
-from api_endpoints import ApiEndpoints
+# from api_endpoints import ApiEndpoints
 import set_up_dummy_objects
+
 
 def test_bunch_object_to_json_object():
     """
@@ -25,5 +26,3 @@ def test_bunch_object_to_json_object():
     assert isinstance(truth, dict)
 
     # Cleanup - none required
-
-

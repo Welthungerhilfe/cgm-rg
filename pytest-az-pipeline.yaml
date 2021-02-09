@@ -34,9 +34,8 @@ steps:
     pip install numpy==1.18.1 tensorflow==2.3.0 azureml-sdk[notebooks,automl]==1.13.0 glob2==0.7 imgaug==0.4.0 flake8==3.8.4 pytest==5.4.2 pytest-cov==2.10.0 pytest-azurepipelines
   displayName: 'Install dependencies'
 - script: |
-    flake8 --ignore E501,F841,W504,F821 src/
+    flake8 --ignore E501,F841,W504,F821,E402,F401 src/
   displayName: 'flake8'
 - script: |
     pytest
   displayName: 'pytest'
-  

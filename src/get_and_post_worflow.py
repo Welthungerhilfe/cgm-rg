@@ -16,7 +16,7 @@ def get_list_of_files(source_folder):
 
 def upsert_workflows(json_paths, workflows, cgm_api):
 
-    #workflows = {f"{workflow['name']} {workflow['version']}": workflow for workflow in workflows['workflows']}
+    # workflows = {f"{workflow['name']} {workflow['version']}": workflow for workflow in workflows['workflows']}
 
     for path in json_paths:
         with open(path, 'r') as f:
