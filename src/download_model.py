@@ -6,7 +6,7 @@ from azureml.core import Workspace
 from azureml.core.model import Model
 
 REPO_DIR = Path(__file__).parents[1].absolute()
-                                                                                    
+
 '''
 sp = ServicePrincipalAuthentication(
         tenant_id=os.environ['TENANT_ID'],

@@ -65,7 +65,8 @@ class ApiEndpoints:
                 json=data)
             '''
 
-            response_two = requests.post(self.app_endpoint + '/.auth/login/aad', json=data)
+            response_two = requests.post(
+                self.app_endpoint + '/.auth/login/aad', json=data)
 
             print("\response_two status code: ", response_two.status_code)
 
@@ -239,7 +240,8 @@ class ApiEndpoints:
         Get all registerd workflows
         '''
         headers = self.prepare_header()
-        response = requests.get(self.url + self.workflow_endpoint, headers=headers)
+        response = requests.get(
+            self.url + self.workflow_endpoint, headers=headers)
 
         return response.json()
 

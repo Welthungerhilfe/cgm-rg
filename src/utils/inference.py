@@ -22,7 +22,8 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 # pointclouds
 
 height_model = load_model('/app/models/best_model.h5')
-weight_model = load_model('/app/models/q4-depthmap-plaincnn-weight-95k-run-12/best_model.ckpt/', compile=False)
+weight_model = load_model(
+    '/app/models/q4-depthmap-plaincnn-weight-95k-run-12/best_model.ckpt/', compile=False)
 standing_laying = load_model('/app/models/Standing_laying/best_model.h5')
 
 

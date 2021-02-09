@@ -7,22 +7,15 @@ import uuid
 from datetime import datetime
 
 import cv2
-import argparse
-import numpy as np
 import face_recognition
+import matplotlib.pyplot as plt
 import numpy as np
 from bunch import Bunch
+from skimage.io import imread, imsave
 
-from datetime import datetime
-import matplotlib.pyplot as plt
-from api_endpoints import ApiEndpoints
 import utils.inference as inference
 import utils.preprocessing as preprocessing
 from api_endpoints import ApiEndpoints
-
-from skimage.io import imsave
-from skimage.io import imread
-
 
 RESIZE_FACTOR = 4
 
@@ -242,7 +235,7 @@ class Standing_laying:
             self.scan_parent_dir, self.scan_metadata['id'], self.standing_laying_input_format)
         self.workflow_obj['id'] = self.workflows.get_workflow_id(
             self.workflow_obj['name'], self.workflow_obj['version'])
-        
+
     def bunch_object_to_json_object(self, bunch_object):
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
         json_object = json.loads(json_string)
@@ -296,8 +289,8 @@ class Standing_laying:
         if self.api.post_results(standing_laying_result_object) == 201:
             print("successfully post Standing laying results: ",
                   standing_laying_result_object)
-        
-        
+
+
 class DepthMapImgFlow:
     """
     A class to visualise depthmap image in result generation
@@ -1019,7 +1012,7 @@ def main():
 
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
-    standing_laying_workflow_path=args.standing_laying_workflow_path
+    standing_laying_workflow_path = args.standing_laying_workflow_path
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
@@ -1052,7 +1045,6 @@ def main():
         rgb_artifacts = data_processing.download_artifacts('img')
         depth_artifacts = data_processing.download_artifacts('depth')
 
-
         blurflow = BlurFlow(
             cgm_api,
             workflow,
@@ -1061,12 +1053,12 @@ def main():
             scan_parent_dir,
             scan_metadata)
         standing_laying = Standing_laying(
-          cgm_api,
-          workflow,
-          standing_laying_workflow_path,
-          rgb_artifacts,
-          scan_parent_dir,
-          scan_metadata)
+            cgm_api,
+            workflow,
+            standing_laying_workflow_path,
+            rgb_artifacts,
+            scan_parent_dir,
+            scan_metadata)
         depthmap_img_flow = DepthMapImgFlow(
             cgm_api,
             workflow,
