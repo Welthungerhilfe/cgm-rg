@@ -1,0 +1,63 @@
+{
+    "workflows": [
+        {
+            "data": {
+                "input_format": "application/zip",
+                "model": "q3-depthmap-height"
+            },
+            "eligible": false,
+            "id": "44ab2472-69d2-11eb-9498-0f8be936bd29",
+            "name": "q3-depthmap-height",
+            "result_binding": "artifact",
+            "result_format": "dict",
+            "version": "run-01_01"
+        },
+        {
+            "data": {
+                "input_format": "application/zip",
+                "model": "q4-depthmap-plaincnn-weight-95k"
+            },
+            "eligible": false,
+            "id": "44ad427a-69d2-11eb-9498-ef50216ca3d6",
+            "name": "q4-depthmap-plaincnn-weight-95k",
+            "result_binding": "artifact",
+            "result_format": "dict",
+            "version": "run-12_01"
+        },
+        {
+            "data": {
+                "input_format": "image/jpeg"
+            },
+            "eligible": false,
+            "id": "44af5600-69d2-11eb-9498-8ffe0e3b2017",
+            "name": "face_recognition",
+            "result_binding": "artifact",
+            "result_format": "img",
+            "version": "1.0.0"
+        },
+        {
+            "data": {
+                "input_format": "application/zip",
+                "model": "q4-depthmap-plaincnn-weight-95k"
+            },
+            "eligible": false,
+            "id": "44b106da-69d2-11eb-9498-a7452f79bbf3",
+            "name": "q4-depthmap-plaincnn-weight-95k-mean",
+            "result_binding": "scan",
+            "result_format": "dict",
+            "version": "run-12_01"
+        },
+        {
+            "data": {
+                "input_format": "application/zip",
+                "model": "q3-depthmap-height"
+            },
+            "eligible": true,
+            "id": "44b2ec48-69d2-11eb-9498-c3a976d5162b",
+            "name": "q3-depthmap-height-mean",
+            "result_binding": "scan",
+            "result_format": "dict",
+            "version": "run-01_01"
+        }
+    ]
+}
