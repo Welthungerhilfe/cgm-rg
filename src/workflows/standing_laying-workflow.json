@@ -1,0 +1,10 @@
+{
+    "name": "standing_laying",
+    "version": "1.0.0",
+    "result_format": "img",
+    "result_binding": "artifact",
+    "data":{
+        "input_format":"image/jpeg",
+        "model":"standing_laying"
+    }
+}

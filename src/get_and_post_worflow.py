@@ -1,7 +1,8 @@
-import os
-from api_endpoints import ApiEndpoints
 import glob
 import json
+import os
+
+from api_endpoints import ApiEndpoints
 
 
 def get_list_of_files(source_folder):

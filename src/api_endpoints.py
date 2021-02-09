@@ -1,9 +1,10 @@
-import os
-import cv2
 import copy
-import uuid
 import json
+import os
 import pprint
+import uuid
+
+import cv2
 import requests
 
 
