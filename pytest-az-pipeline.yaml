@@ -36,3 +36,7 @@ steps:
 - script: |
     flake8 --ignore E501,F841,W504,F821 src/
   displayName: 'flake8'
+- script: |
+    pytest
+  displayName: 'pytest'
+  
