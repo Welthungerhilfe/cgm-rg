@@ -10,12 +10,10 @@ from bunch import Bunch
 import face_recognition
 from datetime import datetime
 import matplotlib.pyplot as plt
-from skimage.io import imread, imsave
 
 import utils.inference as inference
 import utils.preprocessing as preprocessing
 from api_endpoints import ApiEndpoints
-
 
 
 RESIZE_FACTOR = 4
@@ -222,7 +220,14 @@ class Standing_laying:
     TODO
     """
 
-    def __init__(self, api, workflows, workflow_path, artifacts, scan_parent_dir, scan_metadata):
+    def __init__(
+            self,
+            api,
+            workflows,
+            workflow_path,
+            artifacts,
+            scan_parent_dir,
+            scan_metadata):
         self.api = api
         self.workflows = workflows
         self.artifacts = artifacts
@@ -233,7 +238,9 @@ class Standing_laying:
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.standing_laying_input_format = 'img'
         self.scan_directory = os.path.join(
-            self.scan_parent_dir, self.scan_metadata['id'], self.standing_laying_input_format)
+            self.scan_parent_dir,
+            self.scan_metadata['id'],
+            self.standing_laying_input_format)
         self.workflow_obj['id'] = self.workflows.get_workflow_id(
             self.workflow_obj['name'], self.workflow_obj['version'])
 
@@ -333,15 +340,15 @@ class DepthMapImgFlow:
     def preprocess_depthmap(self, input_path):
         data, width, height, depthScale, maxConfidence = preprocessing.load_depth(
             input_path)
-        
+
         preprocessing.set_width(int(width))
         preprocessing.set_height(int(height))
-        
+
         depthmap, height, width = preprocessing.prepare_depthmap(
             data, width, height, depthScale)
-        
-        #depthmap = preprocessing.preprocess(depthmap)
-        #depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
+
+        # depthmap = preprocessing.preprocess(depthmap)
+        # depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
         return depthmap, True
 
     def depthmap_img_artifacts(self):
@@ -351,11 +358,8 @@ class DepthMapImgFlow:
                 artifact['file'])
 
             depthmap, depthmap_status = self.preprocess_depthmap(input_path)
-            
             scaled_depthmap = depthmap * 255.0
 
-            #imsave('depthmap_skimage.png', depthmap)
-            #skimage_image = imread('depthmap_skimage.png')
             if depthmap_status:
                 artifact['depthmap_img'] = scaled_depthmap
 
@@ -990,10 +994,11 @@ def main():
                         type=str,
                         help='Height Workflow Scan path')
 
-    parser.add_argument('--weight_workflow_artifact_path',
-                        default="/app/src/workflows/weight-workflow-artifact.json",
-                        type=str,
-                        help='Weight Workflow Artifact path')
+    parser.add_argument(
+        '--weight_workflow_artifact_path',
+        default="/app/src/workflows/weight-workflow-artifact.json",
+        type=str,
+        help='Weight Workflow Artifact path')
     parser.add_argument('--weight_workflow_scan_path',
                         default="/app/src/workflows/weight-workflow-scan.json",
                         type=str,
@@ -1001,12 +1006,11 @@ def main():
 
     args = parser.parse_args()
 
-    #preprocessing.set_width(int(240 * 0.75))
-    #preprocessing.set_height(int(180 * 0.75))
+    # preprocessing.set_width(int(240 * 0.75))
+    # preprocessing.set_height(int(180 * 0.75))
 
     preprocessing.set_width(int(240))
     preprocessing.set_height(int(180))
-
 
     print("\nApp Environment : ", os.environ['APP_ENV'])
 
