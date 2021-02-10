@@ -144,11 +144,10 @@ class ApiEndpoints:
 
         endpoint = self.url + self.post_file_endpoint
 
-        # _, bin_file = cv2.imencode('.JPEG', bin_file)
-        _, bin_file = cv2.imencode('.PNG', bin_file)
+        _, bin_file = cv2.imencode('.JPEG', bin_file)
+        # _, bin_file = cv2.imencode('.PNG', bin_file)
         bin_file = bin_file.tostring()
 
-        '''
         files = {
             'file': bin_file,
             'filename': 'test.jpg'
@@ -158,6 +157,7 @@ class ApiEndpoints:
             'file': bin_file,
             'filename': 'test.PNG'
         }
+        '''
 
         response = requests.post(endpoint, files=files, headers=headers)
         file_id = response.content.decode('utf-8')
