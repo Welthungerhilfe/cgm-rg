@@ -932,7 +932,7 @@ class PrepareArtifacts:
                     ├── 5850e04c-33e1-11eb-af63-4f5622046249
                     └── 5850e04c-33e1-11eb-af63-4f5622046249_blur.jpg
         '''
-        os.makedirs(self.scan_dir, exist_ok=False)
+        os.makedirs(self.scan_dir, exist_ok=True)
 
     def create_artifact_dir(self):
         for artifact_format in self.format_wise_artifact:
@@ -940,7 +940,7 @@ class PrepareArtifacts:
                 os.path.join(
                     self.scan_dir,
                     artifact_format),
-                exist_ok=False)
+                exist_ok=True)
 
 
 def main():
