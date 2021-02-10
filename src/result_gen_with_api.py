@@ -333,10 +333,15 @@ class DepthMapImgFlow:
     def preprocess_depthmap(self, input_path):
         data, width, height, depthScale, maxConfidence = preprocessing.load_depth(
             input_path)
+        
+        preprocessing.set_width(int(width))
+        preprocessing.set_height(int(height))
+        
         depthmap, height, width = preprocessing.prepare_depthmap(
             data, width, height, depthScale)
-        depthmap = preprocessing.preprocess(depthmap)
-        depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
+        
+        #depthmap = preprocessing.preprocess(depthmap)
+        #depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
         return depthmap, True
 
     def depthmap_img_artifacts(self):
@@ -346,10 +351,13 @@ class DepthMapImgFlow:
                 artifact['file'])
 
             depthmap, depthmap_status = self.preprocess_depthmap(input_path)
-            imsave('depthmap_skimage.png', depthmap)
-            skimage_image = imread('depthmap_skimage.png')
+            
+            scaled_depthmap = depthmap * 255.0
+
+            #imsave('depthmap_skimage.png', depthmap)
+            #skimage_image = imread('depthmap_skimage.png')
             if depthmap_status:
-                artifact['depthmap_img'] = skimage_image
+                artifact['depthmap_img'] = scaled_depthmap
 
     def run_depthmap_img_flow(self):
         self.depthmap_img_artifacts()
@@ -973,11 +981,6 @@ def main():
                         type=str,
                         help='Depthmap Image Workflow path')
 
-    parser.add_argument('--depthmap_img_workflow_path',
-                        default="src/workflows/depthmap-img-workflow.json",
-                        type=str,
-                        help='Depthmap Image Workflow path')
-
     parser.add_argument('--height_workflow_artifact_path',
                         default="src/workflows/height-workflow-artifact.json",
                         type=str,
@@ -998,8 +1001,12 @@ def main():
 
     args = parser.parse_args()
 
-    preprocessing.set_width(int(240 * 0.75))
-    preprocessing.set_height(int(180 * 0.75))
+    #preprocessing.set_width(int(240 * 0.75))
+    #preprocessing.set_height(int(180 * 0.75))
+
+    preprocessing.set_width(int(240))
+    preprocessing.set_height(int(180))
+
 
     print("\nApp Environment : ", os.environ['APP_ENV'])
 
