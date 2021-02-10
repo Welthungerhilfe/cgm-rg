@@ -1,5 +1,7 @@
 import zipfile
+
 import numpy as np
+import tensorflow as tf
 from pyntcloud import PyntCloud
 from skimage.transform import resize
 
@@ -394,3 +396,13 @@ def pcd_processing_gapnet(pcd_paths):
     pointclouds = pointclouds.reshape((-1, 1024, 3))
 
     return pointclouds
+
+
+def standing_laying_data_preprocessing(source_path):
+    img = tf.io.read_file(source_path)
+    img = tf.image.decode_jpeg(img, channels=3)
+    img = tf.cast(img, tf.float32) * (1. / 256)
+    img = tf.image.rot90(img, k=3)
+    img = tf.image.resize(img, [240, 180])
+    img = tf.expand_dims(img, axis=0)
+    return img
