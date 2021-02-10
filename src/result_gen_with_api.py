@@ -1,35 +1,21 @@
-import argparse
+import os
+import cv2
 import copy
 import json
-import os
+import uuid
 import pprint
-<<<<<<< HEAD
 import argparse
 import numpy as np
-=======
-import uuid
-from datetime import datetime
-
-import cv2
->>>>>>> 70da27df7ed9e124d316728889e9937ec1f5d9ea
-import face_recognition
-import matplotlib.pyplot as plt
-import numpy as np
 from bunch import Bunch
-<<<<<<< HEAD
+import face_recognition
 from datetime import datetime
 import matplotlib.pyplot as plt
-from api_endpoints import ApiEndpoints
-=======
 from skimage.io import imread, imsave
 
->>>>>>> 70da27df7ed9e124d316728889e9937ec1f5d9ea
 import utils.inference as inference
 import utils.preprocessing as preprocessing
 from api_endpoints import ApiEndpoints
 
-from skimage.io import imsave
-from skimage.io import imread
 
 
 RESIZE_FACTOR = 4
@@ -212,8 +198,6 @@ class BlurFlow:
             print("successfully post blur results: ", blur_result_object)
 
 
-<<<<<<< HEAD
-=======
 class Standing_laying:
     """
     A class to handle standing/laying results generation.
@@ -308,7 +292,6 @@ class Standing_laying:
                   standing_laying_result_object)
 
 
->>>>>>> 70da27df7ed9e124d316728889e9937ec1f5d9ea
 class DepthMapImgFlow:
     """
     A class to visualise depthmap image in result generation
@@ -1004,18 +987,10 @@ def main():
                         type=str,
                         help='Height Workflow Scan path')
 
-<<<<<<< HEAD
-    parser.add_argument(
-        '--weight_workflow_artifact_path',
-        default="/app/src/workflows/weight-workflow-artifact.json",
-        type=str,
-        help='Weight Workflow Artifact path')
-=======
     parser.add_argument('--weight_workflow_artifact_path',
                         default="/app/src/workflows/weight-workflow-artifact.json",
                         type=str,
                         help='Weight Workflow Artifact path')
->>>>>>> 70da27df7ed9e124d316728889e9937ec1f5d9ea
     parser.add_argument('--weight_workflow_scan_path',
                         default="/app/src/workflows/weight-workflow-scan.json",
                         type=str,
@@ -1043,10 +1018,7 @@ def main():
 
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
-<<<<<<< HEAD
-=======
     standing_laying_workflow_path = args.standing_laying_workflow_path
->>>>>>> 70da27df7ed9e124d316728889e9937ec1f5d9ea
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
@@ -1086,8 +1058,6 @@ def main():
             rgb_artifacts,
             scan_parent_dir,
             scan_metadata)
-<<<<<<< HEAD
-=======
         standing_laying = Standing_laying(
             cgm_api,
             workflow,
@@ -1095,7 +1065,6 @@ def main():
             rgb_artifacts,
             scan_parent_dir,
             scan_metadata)
->>>>>>> 70da27df7ed9e124d316728889e9937ec1f5d9ea
         depthmap_img_flow = DepthMapImgFlow(
             cgm_api,
             workflow,
@@ -1122,10 +1091,7 @@ def main():
 
         blurflow.run_blur_flow()
         depthmap_img_flow.run_depthmap_img_flow()
-<<<<<<< HEAD
-=======
         standing_laying.run_standing_laying_flow()
->>>>>>> 70da27df7ed9e124d316728889e9937ec1f5d9ea
         heightflow.run_height_flow()
         weightflow.run_weight_flow()
 
