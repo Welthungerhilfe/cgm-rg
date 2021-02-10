@@ -546,7 +546,7 @@ class HeightFlow:
                 "successfully post artifact level height results: ",
                 artifact_level_height_result_json)
 
-        scan_level_height_result_bunch = self.artifact_level_height_result_object(
+        scan_level_height_result_bunch = self.scan_level_height_result_object(
             predictions, generated_timestamp)
         scan_level_height_result_json = self.bunch_object_to_json_object(
             scan_level_height_result_bunch)
@@ -711,7 +711,7 @@ class WeightFlow:
                 "successfully post artifact level weight results: ",
                 artifact_level_weight_result_json)
 
-        scan_level_weight_result_bunch = self.artifact_level_weight_result_object(
+        scan_level_weight_result_bunch = self.scan_level_weight_result_object(
             predictions, generated_timestamp)
         scan_level_weight_result_json = self.bunch_object_to_json_object(
             scan_level_weight_result_bunch)
