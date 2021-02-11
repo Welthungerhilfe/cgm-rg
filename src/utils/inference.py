@@ -47,7 +47,6 @@ except Exception as e:
     print(e)
 
 
-
 def get_height_predictions_local(numpy_array):
     return height_model.predict(numpy_array)
 
