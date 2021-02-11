@@ -7,7 +7,7 @@ from azureml.core.model import Model
 
 REPO_DIR = Path(__file__).parents[1].absolute()
 
-'''
+
 sp = ServicePrincipalAuthentication(
         tenant_id=os.environ['TENANT_ID'],
         service_principal_id=os.environ['SP_ID'],
@@ -16,8 +16,8 @@ sp = ServicePrincipalAuthentication(
 ws = Workspace.get(name="cgm-azureml-prod",
                     auth=sp,
                     subscription_id=os.environ['SUB_ID'])
-'''
-ws = Workspace.from_config()
+
+#ws = Workspace.from_config()
 
 standing_laying = Model(ws, name='standing_laying_classifier')
 print(standing_laying)
