@@ -21,10 +21,31 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 # TODO load the weights of passed model and generate results for passed
 # pointclouds
 
-height_model = load_model('/app/models/best_model.h5')
-weight_model = load_model(
-    '/app/models/q4-depthmap-plaincnn-weight-95k-run-12/best_model.ckpt/', compile=False)
-standing_laying = load_model('/app/models/Standing_laying/best_model.h5')
+try:
+    height_model = load_model('/app/models/best_model.h5')
+except OSError as error:
+    print(error)
+    print("Not able to load the Height model")
+except Exception as e:
+    print(e)
+
+try:
+    weight_model = load_model(
+        '/app/models/q4-depthmap-plaincnn-weight-95k-run-12/best_model.ckpt/', compile=False)
+except OSError as error:
+    print(error)
+    print("Not able to load the Weight model")
+except Exception as e:
+    print(e)
+
+try:
+    standing_laying = load_model('/app/models/Standing_laying/best_model.h5')
+except OSError as error:
+    print(error)
+    print("Not able to load the Standind Laying model")
+except Exception as e:
+    print(e)
+
 
 
 def get_height_predictions_local(numpy_array):

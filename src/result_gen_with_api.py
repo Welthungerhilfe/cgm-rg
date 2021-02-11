@@ -1100,11 +1100,32 @@ def main():
             scan_parent_dir,
             scan_metadata)
 
-        blurflow.run_blur_flow()
-        depthmap_img_flow.run_depthmap_img_flow()
-        standing_laying.run_standing_laying_flow()
-        heightflow.run_height_flow()
-        weightflow.run_weight_flow()
+        try:
+            blurflow.run_blur_flow()
+        except Exception as e:
+            print(e)
+
+        try:
+            depthmap_img_flow.run_depthmap_img_flow()
+        except Exception as e:
+            print(e)
+
+        try:
+            standing_laying.run_standing_laying_flow()
+        except Exception as e:
+            print(e)
+
+        try:
+            heightflow.run_height_flow()
+        except Exception as e:
+            print(e)
+
+        try:
+            weightflow.run_weight_flow()
+        except Exception as e:
+            print(e)
+
+
 
 
 if __name__ == "__main__":
