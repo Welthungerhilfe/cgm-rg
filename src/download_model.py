@@ -23,5 +23,5 @@ ws = Workspace(
 
 standing_laying = Model(ws, name='standing_laying_classifier')
 print(standing_laying)
-standing_laying.download(
-    target_dir=REPO_DIR / 'models', exist_ok=True, exists_ok=None)
+standing_laying.download(target_dir=REPO_DIR / 'models')
+print("Model Succesfully downloaded")
