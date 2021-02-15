@@ -1,21 +1,20 @@
-import argparse
+import os
+import cv2
 import copy
 import json
-import os
-import pprint
 import uuid
-from datetime import datetime
-
-import cv2
-import face_recognition
-import matplotlib.pyplot as plt
+import pprint
+import argparse
 import numpy as np
 from bunch import Bunch
-from skimage.io import imread, imsave
+import face_recognition
+from datetime import datetime
+import matplotlib.pyplot as plt
 
 import utils.inference as inference
 import utils.preprocessing as preprocessing
 from api_endpoints import ApiEndpoints
+
 
 RESIZE_FACTOR = 4
 
@@ -221,7 +220,14 @@ class Standing_laying:
     TODO
     """
 
-    def __init__(self, api, workflows, workflow_path, artifacts, scan_parent_dir, scan_metadata):
+    def __init__(
+            self,
+            api,
+            workflows,
+            workflow_path,
+            artifacts,
+            scan_parent_dir,
+            scan_metadata):
         self.api = api
         self.workflows = workflows
         self.artifacts = artifacts
@@ -232,7 +238,9 @@ class Standing_laying:
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.standing_laying_input_format = 'img'
         self.scan_directory = os.path.join(
-            self.scan_parent_dir, self.scan_metadata['id'], self.standing_laying_input_format)
+            self.scan_parent_dir,
+            self.scan_metadata['id'],
+            self.standing_laying_input_format)
         self.workflow_obj['id'] = self.workflows.get_workflow_id(
             self.workflow_obj['name'], self.workflow_obj['version'])
 
@@ -332,10 +340,15 @@ class DepthMapImgFlow:
     def preprocess_depthmap(self, input_path):
         data, width, height, depthScale, maxConfidence = preprocessing.load_depth(
             input_path)
+
+        preprocessing.set_width(int(width))
+        preprocessing.set_height(int(height))
+
         depthmap, height, width = preprocessing.prepare_depthmap(
             data, width, height, depthScale)
-        depthmap = preprocessing.preprocess(depthmap)
-        depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
+
+        # depthmap = preprocessing.preprocess(depthmap)
+        # depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
         return depthmap, True
 
     def depthmap_img_artifacts(self):
@@ -345,10 +358,10 @@ class DepthMapImgFlow:
                 artifact['file'])
 
             depthmap, depthmap_status = self.preprocess_depthmap(input_path)
-            imsave('depthmap_skimage.png', depthmap)
-            skimage_image = imread('depthmap_skimage.png')
+            scaled_depthmap = depthmap * 255.0
+
             if depthmap_status:
-                artifact['depthmap_img'] = skimage_image
+                artifact['depthmap_img'] = scaled_depthmap
 
     def run_depthmap_img_flow(self):
         self.depthmap_img_artifacts()
@@ -545,7 +558,7 @@ class HeightFlow:
                 "successfully post artifact level height results: ",
                 artifact_level_height_result_json)
 
-        scan_level_height_result_bunch = self.artifact_level_height_result_object(
+        scan_level_height_result_bunch = self.scan_level_height_result_object(
             predictions, generated_timestamp)
         scan_level_height_result_json = self.bunch_object_to_json_object(
             scan_level_height_result_bunch)
@@ -710,7 +723,7 @@ class WeightFlow:
                 "successfully post artifact level weight results: ",
                 artifact_level_weight_result_json)
 
-        scan_level_weight_result_bunch = self.artifact_level_weight_result_object(
+        scan_level_weight_result_bunch = self.scan_level_weight_result_object(
             predictions, generated_timestamp)
         scan_level_weight_result_json = self.bunch_object_to_json_object(
             scan_level_weight_result_bunch)
@@ -931,7 +944,7 @@ class PrepareArtifacts:
                     ├── 5850e04c-33e1-11eb-af63-4f5622046249
                     └── 5850e04c-33e1-11eb-af63-4f5622046249_blur.jpg
         '''
-        os.makedirs(self.scan_dir, exist_ok=False)
+        os.makedirs(self.scan_dir, exist_ok=True)
 
     def create_artifact_dir(self):
         for artifact_format in self.format_wise_artifact:
@@ -939,7 +952,7 @@ class PrepareArtifacts:
                 os.path.join(
                     self.scan_dir,
                     artifact_format),
-                exist_ok=False)
+                exist_ok=True)
 
 
 def main():
@@ -981,10 +994,11 @@ def main():
                         type=str,
                         help='Height Workflow Scan path')
 
-    parser.add_argument('--weight_workflow_artifact_path',
-                        default="/app/src/workflows/weight-workflow-artifact.json",
-                        type=str,
-                        help='Weight Workflow Artifact path')
+    parser.add_argument(
+        '--weight_workflow_artifact_path',
+        default="/app/src/workflows/weight-workflow-artifact.json",
+        type=str,
+        help='Weight Workflow Artifact path')
     parser.add_argument('--weight_workflow_scan_path',
                         default="/app/src/workflows/weight-workflow-scan.json",
                         type=str,
@@ -992,8 +1006,11 @@ def main():
 
     args = parser.parse_args()
 
-    preprocessing.set_width(int(240 * 0.75))
-    preprocessing.set_height(int(180 * 0.75))
+    # preprocessing.set_width(int(240 * 0.75))
+    # preprocessing.set_height(int(180 * 0.75))
+
+    preprocessing.set_width(int(240))
+    preprocessing.set_height(int(180))
 
     print("\nApp Environment : ", os.environ['APP_ENV'])
 
@@ -1083,11 +1100,30 @@ def main():
             scan_parent_dir,
             scan_metadata)
 
-        blurflow.run_blur_flow()
-        depthmap_img_flow.run_depthmap_img_flow()
-        standing_laying.run_standing_laying_flow()
-        heightflow.run_height_flow()
-        weightflow.run_weight_flow()
+        try:
+            blurflow.run_blur_flow()
+        except Exception as e:
+            print(e)
+
+        try:
+            depthmap_img_flow.run_depthmap_img_flow()
+        except Exception as e:
+            print(e)
+
+        try:
+            standing_laying.run_standing_laying_flow()
+        except Exception as e:
+            print(e)
+
+        try:
+            heightflow.run_height_flow()
+        except Exception as e:
+            print(e)
+
+        try:
+            weightflow.run_weight_flow()
+        except Exception as e:
+            print(e)
 
 
 if __name__ == "__main__":
