@@ -1,7 +1,7 @@
-from pathlib import Path
 import os
+from pathlib import Path
 
-from azureml.core import Workspace,Experiment,Run
+from azureml.core import Experiment, Run, Workspace
 from azureml.core.authentication import ServicePrincipalAuthentication
 from azureml.core.model import Model
 
@@ -23,11 +23,13 @@ def download_model(ws, experiment_name, run_id, input_location, output_location)
     if input_location.endswith(".h5"):
         run.download_file(input_location, output_location)
     elif input_location.endswith(".ckpt"):
-        run.download_files(prefix=input_location, output_directory=output_location)
+        run.download_files(prefix=input_location,
+                           output_directory=output_location)
     else:
         raise NameError(f"{input_location}'s path extension not supported")
     print("Successfully downloaded model")
 # ws = Workspace.from_config()
+
 
 def main():
     sp = ServicePrincipalAuthentication(
@@ -47,16 +49,17 @@ def main():
     print("Model Succesfully downloaded")
 
     download_model(ws=ws,
-            experiment_name='q3-depthmap-plaincnn-height-95k',
-            run_id='q3-depthmap-plaincnn-height-95k_1610709896_ef7f755d',
-            input_location=os.path.join('outputs', 'best_model.ckpt'),
-            output_location=REPO_DIR / 'models/height')
-    
+                   experiment_name='q3-depthmap-plaincnn-height-95k',
+                   run_id='q3-depthmap-plaincnn-height-95k_1610709896_ef7f755d',
+                   input_location=os.path.join('outputs', 'best_model.ckpt'),
+                   output_location=REPO_DIR / 'models/height')
+
     download_model(ws=ws,
-            experiment_name='q4-depthmap-plaincnn-weight-95k',
-            run_id='q4-depthmap-plaincnn-weight-95k_1611336518_642a9c58',
-            input_location=os.path.join('outputs', 'best_model.ckpt'),
-            output_location=REPO_DIR / 'models/weight')
+                   experiment_name='q4-depthmap-plaincnn-weight-95k',
+                   run_id='q4-depthmap-plaincnn-weight-95k_1611336518_642a9c58',
+                   input_location=os.path.join('outputs', 'best_model.ckpt'),
+                   output_location=REPO_DIR / 'models/weight')
+
 
 if __name__ == "__main__":
     main()
