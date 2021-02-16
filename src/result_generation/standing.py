@@ -9,8 +9,8 @@ import numpy as np
 from bunch import Bunch
 
 sys.path.append(str(Path(__file__).parents[1]))
-import utils.inference as inference
-import utils.preprocessing as preprocessing
+import utils.inference as inference  # noqa: E402
+import utils.preprocessing as preprocessing  # noqa: E402
 
 
 class Standing_laying:
