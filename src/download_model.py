@@ -7,6 +7,7 @@ from azureml.core.model import Model
 
 REPO_DIR = Path(__file__).parents[1].absolute()
 
+
 def download_model(ws, experiment_name, run_id, input_location, output_location):
     """Download the pretrained model
     Args:
@@ -49,7 +50,7 @@ def main():
     print("Model Succesfully downloaded")
 
     # Downlaod model for height
-    Download_model(ws=ws,
+    download_model(ws=ws,
                    experiment_name='q3-depthmap-plaincnn-height-95k',
                    run_id='q3-depthmap-plaincnn-height-95k_1610709896_ef7f755d',
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
