@@ -7,7 +7,6 @@ from azureml.core.model import Model
 
 REPO_DIR = Path(__file__).parents[1].absolute()
 
-
 def download_model(ws, experiment_name, run_id, input_location, output_location):
     """Download the pretrained model
     Args:
@@ -28,7 +27,6 @@ def download_model(ws, experiment_name, run_id, input_location, output_location)
     else:
         raise NameError(f"{input_location}'s path extension not supported")
     print("Successfully downloaded model")
-# ws = Workspace.from_config()
 
 
 def main():
@@ -44,16 +42,20 @@ def main():
         workspace_name="cgm-ml-prod-we-azml",
         auth=sp
     )
+
+    # Downlaod model for standing/laying
     standing_laying = Model(ws, name='standing_laying_classifier')
     standing_laying.download(target_dir=REPO_DIR / 'models')
     print("Model Succesfully downloaded")
 
-    download_model(ws=ws,
+    # Downlaod model for height
+    Download_model(ws=ws,
                    experiment_name='q3-depthmap-plaincnn-height-95k',
                    run_id='q3-depthmap-plaincnn-height-95k_1610709896_ef7f755d',
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/height')
 
+    # Downlaod model for  weight
     download_model(ws=ws,
                    experiment_name='q4-depthmap-plaincnn-weight-95k',
                    run_id='q4-depthmap-plaincnn-weight-95k_1611336518_642a9c58',
