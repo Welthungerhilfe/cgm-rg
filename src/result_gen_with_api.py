@@ -4,15 +4,7 @@ import json
 import os
 import pprint
 import uuid
-from datetime import datetime
 
-import cv2
-import face_recognition
-import matplotlib.pyplot as plt
-import numpy as np
-from bunch import Bunch
-
-import utils.inference as inference
 import utils.preprocessing as preprocessing
 from api_endpoints import ApiEndpoints
 from result_generation.blur import BlurFlow
