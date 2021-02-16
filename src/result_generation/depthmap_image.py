@@ -5,11 +5,11 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
-import numpy as np
+import matplotlib.pyplot as plt
 from bunch import Bunch
 
 sys.path.append(str(Path(__file__).parents[1]))
-import utils.preprocessing as preprocessing
+import utils.preprocessing as preprocessing  # noqa: E402
 
 
 class DepthMapImgFlow:
