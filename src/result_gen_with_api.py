@@ -1,19 +1,25 @@
-import os
-import cv2
+import argparse
 import copy
 import json
-import uuid
+import os
 import pprint
-import argparse
+import uuid
+from datetime import datetime
+
+import cv2
+import face_recognition
+import matplotlib.pyplot as plt
 import numpy as np
 from bunch import Bunch
-import face_recognition
-from datetime import datetime
-import matplotlib.pyplot as plt
 
 import utils.inference as inference
 import utils.preprocessing as preprocessing
 from api_endpoints import ApiEndpoints
+from result_generation.blur import BlurFlow
+from result_generation.depthmap_image import DepthMapImgFlow
+from result_generation.height import HeightFlow
+from result_generation.standing import Standing_laying
+from result_generation.weight import WeightFlow
 
 
 class ProcessWorkflows:
