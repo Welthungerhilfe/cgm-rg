@@ -34,7 +34,18 @@ class Standing_laying:
 
     Methods
     -------
-    TODO
+    bunch_object_to_json_object(bunch_object):
+        Converts given bunch object to json object.
+    get_input_path(directory, file_name):
+        Returns input path for given directory name and file name.
+    run_standing_laying_flow():
+        Driver method for Standing laying flow.
+    standing_laying_artifacts():
+        Give prediction of standing/laying to the list of artifacts.
+    prepare_result_object(predictions, generated_timestamp):
+        Prepares result object for results generated.
+    post_result_object(predictions, generated_timestamp):
+        Posts the result object to api.
     """
 
     def __init__(
