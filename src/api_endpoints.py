@@ -16,13 +16,15 @@ class ApiEndpoints:
             get_file_endpoint,
             post_file_endpoint,
             result_endpoint,
-            workflow_endpoint):
+            workflow_endpoint,
+            person_detail_endpoint):
         self.url = url
         self.scan_endpoint = scan_endpoint
         self.get_file_endpoint = get_file_endpoint
         self.post_file_endpoint = post_file_endpoint
         self.result_endpoint = result_endpoint
         self.workflow_endpoint = workflow_endpoint
+        self.person_detail_endpoint = person_detail_endpoint
         self.headers = {}
         self.auth_token = None
         if os.environ['APP_ENV'] == 'SANDBOX' or os.environ['APP_ENV'] == 'DEMO':
@@ -234,6 +236,17 @@ class ApiEndpoints:
         else:
             print("Response code : ", response.status_code)
             return 0
+
+    def get_person_details(self, person_id):
+        headers = self.prepare_header()
+        resposne = requests.get(
+            self.url + self.person_detail_endpoint+person_id+'/basic', headers=headers)
+
+        if resposne.status_code == 200:
+            content = resposne.json()
+            print("\n Person Details :")
+            pprint.pprint(content)
+        return content
 
     def get_workflows(self):
         '''
