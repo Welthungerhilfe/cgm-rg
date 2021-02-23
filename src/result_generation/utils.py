@@ -1,11 +1,13 @@
-from datetime import date
+from datetime import datetime
+
+MIN_HEIGHT = 45
+MAX_HEIGHT = 120
+MAX_AGE = 1856.0
 
 
 def age(dob, scan_date):
 
-    f_date = date(2014, 7, 2)
-    l_date = date(2014, 7, 11)
-    delta = l_date - f_date
-    print(delta.days)
-
-age("2020-11-12","f")
+    date_dob = datetime.strptime(dob, "%Y-%m-%d")
+    date_scan = datetime.strptime(scan_date, '%Y-%m-%dT%H:%M:%SZ')
+    delta = date_scan - date_dob
+    return delta.days
