@@ -240,7 +240,7 @@ class ApiEndpoints:
     def get_person_details(self, person_id):
         headers = self.prepare_header()
         resposne = requests.get(
-            self.url + self.person_detail_endpoint+person_id+'/basic', headers=headers)
+            self.url + self.person_detail_endpoint + person_id + '/basic', headers=headers)
 
         if resposne.status_code == 200:
             content = resposne.json()
