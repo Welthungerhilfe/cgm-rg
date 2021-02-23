@@ -17,3 +17,4 @@ face-recognition==1.3.0
 jsonschema
 requests
 pyntcloud==0.0.1
+cgmzscore
