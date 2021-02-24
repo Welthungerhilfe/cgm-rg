@@ -1,4 +1,5 @@
 tensorflow
+azureml-sdk
 opencv-python
 pillow
 numpy
@@ -16,4 +17,5 @@ face-recognition==1.3.0
 jsonschema
 requests
 pyntcloud==0.0.1
+cgmzscore
 mock==4.0.3

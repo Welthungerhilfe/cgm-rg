@@ -1,0 +1,9 @@
+{
+    "name": "depthmap-image",
+    "version": "1.0.0",
+    "result_format": "img",
+    "result_binding": "artifact",
+    "data":{
+        "input_format":"application/zip"
+    }
+}

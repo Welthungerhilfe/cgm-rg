@@ -1,9 +1,10 @@
-import os
-import cv2
 import copy
-import uuid
 import json
+import os
 import pprint
+import uuid
+
+import cv2
 import requests
 
 
@@ -15,13 +16,15 @@ class ApiEndpoints:
             get_file_endpoint,
             post_file_endpoint,
             result_endpoint,
-            workflow_endpoint):
+            workflow_endpoint,
+            person_detail_endpoint):
         self.url = url
         self.scan_endpoint = scan_endpoint
         self.get_file_endpoint = get_file_endpoint
         self.post_file_endpoint = post_file_endpoint
         self.result_endpoint = result_endpoint
         self.workflow_endpoint = workflow_endpoint
+        self.person_detail_endpoint = person_detail_endpoint
         self.headers = {}
         self.auth_token = None
         if os.environ['APP_ENV'] == 'SANDBOX' or os.environ['APP_ENV'] == 'DEMO':
@@ -64,7 +67,8 @@ class ApiEndpoints:
                 json=data)
             '''
 
-            response_two = requests.post(self.app_endpoint + '/.auth/login/aad', json=data)
+            response_two = requests.post(
+                self.app_endpoint + '/.auth/login/aad', json=data)
 
             print("\response_two status code: ", response_two.status_code)
 
@@ -143,17 +147,25 @@ class ApiEndpoints:
         endpoint = self.url + self.post_file_endpoint
 
         _, bin_file = cv2.imencode('.JPEG', bin_file)
+        # _, bin_file = cv2.imencode('.PNG', bin_file)
         bin_file = bin_file.tostring()
 
         files = {
             'file': bin_file,
             'filename': 'test.jpg'
         }
+        '''
+        files = {
+            'file': bin_file,
+            'filename': 'test.PNG'
+        }
+        '''
 
         response = requests.post(endpoint, files=files, headers=headers)
         file_id = response.content.decode('utf-8')
 
-        print("File Id from post of test.jpg: ", file_id)
+        # print("File Id from post of test.jpg: ", file_id)
+        print("File Id from post of test.PNG: ", file_id)
 
         return file_id, response.status_code
 
@@ -225,12 +237,24 @@ class ApiEndpoints:
             print("Response code : ", response.status_code)
             return 0
 
+    def get_person_details(self, person_id):
+        headers = self.prepare_header()
+        resposne = requests.get(
+            self.url + self.person_detail_endpoint + person_id + '/basic', headers=headers)
+
+        if resposne.status_code == 200:
+            content = resposne.json()
+            print("\n Person Details :")
+            pprint.pprint(content)
+        return content
+
     def get_workflows(self):
         '''
         Get all registerd workflows
         '''
         headers = self.prepare_header()
-        response = requests.get(self.url + self.workflow_endpoint, headers=headers)
+        response = requests.get(
+            self.url + self.workflow_endpoint, headers=headers)
 
         return response.json()
 
