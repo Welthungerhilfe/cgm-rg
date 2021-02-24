@@ -22,7 +22,8 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 # pointclouds
 
 try:
-    height_model = load_model('/app/models/best_model.h5')
+    height_model = load_model(
+        '/app/models/height/outputs/best_model.ckpt/', compile=False)
 except OSError as error:
     print(error)
     print("Not able to load the Height model")
@@ -31,7 +32,7 @@ except Exception as e:
 
 try:
     weight_model = load_model(
-        '/app/models/q4-depthmap-plaincnn-weight-95k-run-12/best_model.ckpt/', compile=False)
+        '/app/models/weight/outputs/best_model.ckpt/', compile=False)
 except OSError as error:
     print(error)
     print("Not able to load the Weight model")
