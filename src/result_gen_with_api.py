@@ -388,7 +388,8 @@ def main():
             weight_workflow_scan_path,
             depth_artifacts,
             scan_parent_dir,
-            scan_metadata)
+            scan_metadata,
+            person_details)
 
         try:
             blurflow.run_blur_flow()
