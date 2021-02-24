@@ -7,6 +7,9 @@ from pathlib import Path
 
 import numpy as np
 from bunch import Bunch
+from cgmzscore import Calculator
+
+from result_generation.utils import MAX_AGE, MAX_HEIGHT, MIN_HEIGHT, age
 
 sys.path.append(str(Path(__file__).parents[1]))
 import utils.inference as inference  # noqa: E402
@@ -62,7 +65,8 @@ class HeightFlow:
             scan_workflow_path,
             artifacts,
             scan_parent_dir,
-            scan_metadata):
+            scan_metadata,
+            person_details):
         self.api = api
         self.workflows = workflows
         self.artifacts = artifacts
@@ -73,6 +77,7 @@ class HeightFlow:
         self.scan_workflow_obj = self.workflows.load_workflows(
             self.scan_workflow_path)
         self.scan_metadata = scan_metadata
+        self.person_details = person_details
         self.scan_parent_dir = scan_parent_dir
         if self.artifact_workflow_obj["data"]["input_format"] == 'application/zip':
             self.depth_input_format = 'depth'
@@ -151,12 +156,30 @@ class HeightFlow:
         height_result.source_results = []
         height_result.generated = generated_timestamp
         mean_prediction = self.get_mean_scan_results(predictions)
-        result = {'mean_height': mean_prediction}
+        class_lhfa = self.zscore_lhfa(mean_prediction)
+        result = {'mean_height': mean_prediction,
+                  'Height Diagnosis': class_lhfa}
         height_result.data = result
 
         res.results.append(height_result)
 
         return res
+
+    def zscore_lhfa(self, mean_prediction):
+        sex = 'M' if self.person_details['sex'] == 'male' else 'F'
+        age_in_days = age(
+            self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
+        class_lhfa = 'Not Found'
+        if MIN_HEIGHT < float(mean_prediction) <= MAX_HEIGHT and age_in_days <= MAX_AGE:
+            zscore_lhfa = Calculator().zScore_lhfa(
+                age_in_days=str(age_in_days), sex=sex, height=mean_prediction)
+            if zscore_lhfa < -3:
+                class_lhfa = 'Severly Stunted'
+            elif zscore_lhfa < -2:
+                class_lhfa = 'Moderately Stunted'
+            else:
+                class_lhfa = 'Not Stunted'
+        return class_lhfa
 
     def post_height_results(self, predictions, generated_timestamp):
         artifact_level_height_result_bunch = self.artifact_level_height_result_object(

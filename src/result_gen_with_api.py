@@ -236,6 +236,10 @@ class PrepareArtifacts:
                 exist_ok=True)
 
 
+def person(api, person_id):
+    return api.get_person_details(person_id)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Please provide model_id and workflow paths.')
@@ -277,12 +281,12 @@ def main():
                         help='Height Workflow Scan path')
 
     parser.add_argument('--weight_workflow_artifact_path',
-                        default="/app/src/workflows/weight-workflow-artifact.json",
+                        default="src/workflows/weight-workflow-artifact.json",
                         type=str,
                         help='Weight Workflow Artifact path')
 
     parser.add_argument('--weight_workflow_scan_path',
-                        default="/app/src/workflows/weight-workflow-scan.json",
+                        default="src/workflows/weight-workflow-scan.json",
                         type=str,
                         help='Weight Workflow Scan path')
 
@@ -308,6 +312,7 @@ def main():
     post_file_endpoint = '/api/files'
     result_endpoint = '/api/results'
     workflow_endpoint = '/api/workflows'
+    person_detail_endpoint = '/api/persons/'
 
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
@@ -327,7 +332,8 @@ def main():
         get_file_endpoint,
         post_file_endpoint,
         result_endpoint,
-        workflow_endpoint)
+        workflow_endpoint,
+        person_detail_endpoint)
 
     workflow = ProcessWorkflows(cgm_api)
 
@@ -343,6 +349,7 @@ def main():
         data_processing.create_artifact_dir()
         rgb_artifacts = data_processing.download_artifacts('img')
         depth_artifacts = data_processing.download_artifacts('depth')
+        person_details = person(cgm_api, scan_metadata['person'])
 
         blurflow = BlurFlow(
             cgm_api,
@@ -372,7 +379,8 @@ def main():
             height_workflow_scan_path,
             depth_artifacts,
             scan_parent_dir,
-            scan_metadata)
+            scan_metadata,
+            person_details)
         weightflow = WeightFlow(
             cgm_api,
             workflow,
@@ -380,7 +388,8 @@ def main():
             weight_workflow_scan_path,
             depth_artifacts,
             scan_parent_dir,
-            scan_metadata)
+            scan_metadata,
+            person_details)
 
         try:
             blurflow.run_blur_flow()

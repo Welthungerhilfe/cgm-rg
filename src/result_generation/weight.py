@@ -7,6 +7,9 @@ from pathlib import Path
 
 import numpy as np
 from bunch import Bunch
+from cgmzscore import Calculator
+
+from result_generation.utils import MAX_AGE, age
 
 sys.path.append(str(Path(__file__).parents[1]))
 import utils.inference as inference  # noqa: E402
@@ -62,7 +65,8 @@ class WeightFlow:
             scan_workflow_path,
             artifacts,
             scan_parent_dir,
-            scan_metadata):
+            scan_metadata,
+            person_details):
         self.api = api
         self.workflows = workflows
         self.artifacts = artifacts
@@ -74,6 +78,7 @@ class WeightFlow:
             self.scan_workflow_path)
         self.scan_metadata = scan_metadata
         self.scan_parent_dir = scan_parent_dir
+        self.person_details = person_details
         if self.artifact_workflow_obj["data"]["input_format"] == 'application/zip':
             self.depth_input_format = 'depth'
         self.scan_directory = os.path.join(
@@ -151,12 +156,30 @@ class WeightFlow:
         weight_result.source_results = []
         weight_result.generated = generated_timestamp
         mean_prediction = self.get_mean_scan_results(predictions)
-        result = {'mean_weight': mean_prediction}
+        class_wfa = self.zscore_wfa(mean_prediction)
+        result = {'mean_weight': mean_prediction,
+                  'Weight Diagnosis': class_wfa}
         weight_result.data = result
 
         res.results.append(weight_result)
 
         return res
+
+    def zscore_wfa(self, mean_prediction):
+        sex = 'M' if self.person_details['sex'] == 'male' else 'F'
+        age_in_days = age(
+            self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
+        class_wfa = 'Not Found'
+        if age_in_days <= MAX_AGE:
+            zscore_wfa = Calculator().zScore_lhfa(
+                age_in_days=str(age_in_days), sex=sex, height=mean_prediction)
+            if zscore_wfa < -3:
+                class_wfa = 'Severly Under-weight'
+            elif zscore_wfa < -2:
+                class_wfa = 'Moderately Under-weight'
+            else:
+                class_wfa = 'Not underweight'
+        return class_wfa
 
     def post_weight_results(self, predictions, generated_timestamp):
         artifact_level_weight_result_bunch = self.artifact_level_weight_result_object(
