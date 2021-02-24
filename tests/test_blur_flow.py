@@ -12,7 +12,7 @@ import set_up_dummy_objects
 
 def test_bunch_object_to_json_object():
     """
-    Test to check if we get json object .
+    Test to check if we get json object
     """
     # Setup
     blurflow = set_up_dummy_objects.get_dummy_blur_flow_object()
@@ -26,3 +26,23 @@ def test_bunch_object_to_json_object():
     assert isinstance(truth, dict)
 
     # Cleanup - none required
+
+
+def test_get_input_path():
+    """
+    Test to check if we get input path
+    """
+    # Setup
+    blurflow = set_up_dummy_objects.get_dummy_blur_flow_object()
+    directory = 'app/scans'
+    filename = 'workflow.json'
+
+    # Exercise
+    result = blurflow.get_input_path(directory, filename)
+
+    # Verify
+    truth = 'app/scans/workflow.json'
+    assert result == truth
+
+    # Cleanup - none required
+

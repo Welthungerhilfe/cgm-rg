@@ -51,7 +51,6 @@ def prepare_depthmap(data, width, height, depthScale):
         width)
 
 
-# write obj
 def get_pcd(filename, calibration, data, maxConfidence, depthScale):
     pcd = []
     # count = str(get_count(calibration, data, depthScale))

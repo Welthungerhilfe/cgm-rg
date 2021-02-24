@@ -241,6 +241,7 @@ class HeightFlow:
     def get_mean_scan_results(self, predictions):
         return str(np.mean(predictions))
 
+    # TODO use function from preprocessing
     def process_depthmaps(self):
         depthmaps = []
         for artifact in self.artifacts:
