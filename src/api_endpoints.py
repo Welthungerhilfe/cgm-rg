@@ -27,7 +27,7 @@ class ApiEndpoints:
         self.person_detail_endpoint = person_detail_endpoint
         self.headers = {}
         self.auth_token = None
-        if os.environ['APP_ENV'] == 'SANDBOX' or os.environ['APP_ENV'] == 'DEMO':
+        if os.environ['APP_ENV'] == 'SANDBOX' or os.environ['APP_ENV'] == 'DEMO' or os.environ['APP_ENV'] == 'INBMZ':
             self.x_api_key = os.environ["API_KEY"]
 
     def set_auth_token(self):
@@ -88,7 +88,7 @@ class ApiEndpoints:
     def prepare_header(self):
         headers = copy.deepcopy(self.headers)
 
-        if os.environ['APP_ENV'] == 'SANDBOX' or os.environ['APP_ENV'] == 'DEMO':
+        if os.environ['APP_ENV'] == 'SANDBOX' or os.environ['APP_ENV'] == 'DEMO' or os.environ['APP_ENV'] == 'INBMZ':
             headers['X-API-Key'] = self.x_api_key
 
         return headers
