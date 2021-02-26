@@ -54,6 +54,8 @@ if __name__ == "__main__":
         url = "https://cgm-be-ci-dev-scanner-api.azurewebsites.net"
     elif os.environ['APP_ENV'] == 'DEMO':
         url = "https://cgm-be-ci-qa-scanner-api.azurewebsites.net"
+    elif os.environ['APP_ENV'] == 'INBMZ':
+        url = "https://cgm-be-ci-inbmz-scanner-api.azurewebsites.net"
 
     scan_endpoint = '/api/scans/unprocessed?limit=1'
     get_file_endpoint = '/api/files/'
