@@ -29,7 +29,7 @@ jobs:
       if: steps.cache-venv.outputs.cache-hit != 'true'
     - name: flake8
       run: |
-        . ./.venv/bin/activate && flake8 src/
+        . ./.venv/bin/activate && flake8 src/ --ignore=E501
     - name: pytest
       run: |
         . ./.venv/bin/activate && pytest --cov=src --cov-report=xml
