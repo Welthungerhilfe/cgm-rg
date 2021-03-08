@@ -27,7 +27,7 @@ class ApiEndpoints:
         self.person_detail_endpoint = person_detail_endpoint
         self.headers = {}
         self.auth_token = None
-        if os.environ['APP_ENV'] == 'SANDBOX' or os.environ['APP_ENV'] == 'DEMO':
+        if os.environ['APP_ENV'] == 'SANDBOX' or os.environ['APP_ENV'] == 'DEMO' or os.environ['APP_ENV'] == 'INBMZ':
             self.x_api_key = os.environ["API_KEY"]
 
     def set_auth_token(self):
@@ -88,7 +88,7 @@ class ApiEndpoints:
     def prepare_header(self):
         headers = copy.deepcopy(self.headers)
 
-        if os.environ['APP_ENV'] == 'SANDBOX' or os.environ['APP_ENV'] == 'DEMO':
+        if os.environ['APP_ENV'] == 'SANDBOX' or os.environ['APP_ENV'] == 'DEMO' or os.environ['APP_ENV'] == 'INBMZ':
             headers['X-API-Key'] = self.x_api_key
 
         return headers
@@ -266,5 +266,7 @@ if __name__ == "__main__":
         url = "https://cgm-be-ci-dev-scanner-api.azurewebsites.net"
     elif os.environ['APP_ENV'] == 'DEMO':
         url = "https://cgm-be-ci-qa-scanner-api.azurewebsites.net"
+    elif os.environ['APP_ENV'] == 'INBMZ':
+        url = "https://cgm-be-ci-inbmz-scanner-api.azurewebsites.net"
 
     scan_endpoint = '/api/scans/unprocessed?limit=1'
