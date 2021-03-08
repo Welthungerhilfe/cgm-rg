@@ -39,21 +39,26 @@ ADD requirements.txt /app/requirements.txt
 RUN pip install -r requirements.txt
 
 ADD . /app
-RUN chmod +x deployment/*.sh
+#RUN chmod +x deployment/*.sh
+
 
 #Environment name of the RG
-ENV RUN_ENV local
+ARG APP_ENV=LOCAL
+ENV APP_ENV ${APP_ENV}
+
+# Endpoints and env variables for authentication
+ARG APP_RESOURCE
+ENV APP_RESOURCE $(APP_RESOURCE)
+
+ARG TOKEN_ENDPOINT
+ENV TOKEN_ENDPOINT $(TOKEN_ENDPOINT)
+
+ARG APP_ENDPOINT
+ENV APP_ENDPOINT $(APP_ENDPOINT)
+
 
 RUN mkdir log
-
 RUN crontab deployment/crontab
+RUN chmod +x entrypoint_with_api.sh
 
-
-#Working
-#ENTRYPOINT ["python", "src/result_gen.py", "--height_model_id", "q3_depthmap_height_run_01", "--height_service", "q3-depthmap-height-run-01-ci", "--pose_model_id", "posenet_1.0", "--pose_service", "aci-posenet-ind", "--face_blur_model_id", "face_recogntion"]
-
-#Working
-#ENTRYPOINT ["pytest", "tests/"]
-
-#Working
-ENTRYPOINT ["cron", "-f"]
+ENTRYPOINT ["/app/entrypoint_with_api.sh"]

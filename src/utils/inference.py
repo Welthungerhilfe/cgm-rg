@@ -1,29 +1,9 @@
-#
-# Child Growth Monitor - Free Software for Zero Hunger
-# Copyright (c) 2019 Tristan Behrens <tristan@ai-guru.de> for Welthungerhilfe
-#
-#     This program is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     This program is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-
-
-import config  # noqa402
 import os
 import sys
-import json
 
-from azureml.core import Workspace
-from azureml.core.authentication import ServicePrincipalAuthentication
+# from azureml.core import Workspace
+# from azureml.core.authentication import ServicePrincipalAuthentication
+from tensorflow.keras.models import load_model
 
 # To include the config file
 sys.path.append(
@@ -41,65 +21,67 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 # TODO load the weights of passed model and generate results for passed
 # pointclouds
 
+try:
+    height_model = load_model(
+        '/app/models/height/outputs/best_model.ckpt/', compile=False)
+except OSError as error:
+    print(error)
+    print("Not able to load the Height model")
+except Exception as e:
+    print(e)
 
-def get_predictions(pointcloud_numpy, model_id, service):
-    # ws = Workspace.from_config('~/PythonCode/prod_ws_config.json')
+try:
+    weight_model = load_model(
+        '/app/models/weight/outputs/best_model.ckpt/', compile=False)
+except OSError as error:
+    print(error)
+    print("Not able to load the Weight model")
+except Exception as e:
+    print(e)
+
+try:
+    standing_laying = load_model('/app/models/Standing_laying/best_model.h5')
+except OSError as error:
+    print(error)
+    print("Not able to load the Standind Laying model")
+except Exception as e:
+    print(e)
+
+
+def get_height_predictions_local(numpy_array):
+    return height_model.predict(numpy_array)
+
+
+def get_weight_predictions_local(numpy_array):
+    return weight_model.predict(numpy_array)
+
+
+def get_standing_laying_prediction_local(numpy_array):
+    return standing_laying.predict(numpy_array)
+
+
+'''
+def get_predictions(numpy_array, service_name):
 
     sp = ServicePrincipalAuthentication(
-        tenant_id=config.TENANT_ID,
-        service_principal_id=config.SP_ID,
-        service_principal_password=config.SP_PASSWD)
+        tenant_id=os.environ['TENANT_ID'],
+        service_principal_id=os.environ['SP_ID'],
+        service_principal_password=os.environ['SP_PASSWD'])
 
     ws = Workspace.get(name="cgm-azureml-prod",
                        auth=sp,
-                       subscription_id=config.SUB_ID)
-
-    service = ws.webservices[service]
-    pointcloud_json = json.dumps({'data': pointcloud_numpy.tolist()})
-    predictions = service.run(input_data=pointcloud_json)
-    return predictions
-
-
-def get_pose_prediction(image, service):
-    # ws = Workspace.from_config('~/PythonCode/prod_ws_config.json')
-
-    sp = ServicePrincipalAuthentication(
-        tenant_id=config.TENANT_ID,
-        service_principal_id=config.SP_ID,
-        service_principal_password=config.SP_PASSWD)
-
-    ws = Workspace.get(name="cgm-azureml-prod",
-                       auth=sp,
-                       subscription_id=config.SUB_ID)
-
-    service = ws.webservices[service]
-    input_image_json = json.dumps({'input_image': image.tolist()})
-    predictions = service.run(input_data=input_image_json)
-    return predictions
-
-
-def get_predictions_2(pointcloud_numpy, model_id, service_name):
-
-    # ws = Workspace.from_config('~/PythonCode/prod_ws_config.json')
-
-    sp = ServicePrincipalAuthentication(
-        tenant_id=config.TENANT_ID,
-        service_principal_id=config.SP_ID,
-        service_principal_password=config.SP_PASSWD)
-
-    ws = Workspace.get(name="cgm-azureml-prod",
-                       auth=sp,
-                       subscription_id=config.SUB_ID)
+                       subscription_id=os.environ['SUB_ID'])
 
     service = ws.webservices[service_name]
     max_size = 20
     predictions = []
-    for i in range(0, len(pointcloud_numpy), max_size):
-        print(i, min(len(pointcloud_numpy), i + max_size))
-        pcd_numpy = pointcloud_numpy[i:i + max_size]
+    for i in range(0, len(numpy_array), max_size):
+        print(i, min(len(numpy_array), i + max_size))
+        pcd_numpy = numpy_array[i:i + max_size]
         # service = ws.webservices[service_name]
         pointcloud_json = json.dumps({'data': pcd_numpy.tolist()})
         prediction = service.run(input_data=pointcloud_json)
         predictions += prediction
 
     return predictions
+'''

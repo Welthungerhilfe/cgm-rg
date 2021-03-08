@@ -1,0 +1,11 @@
+{
+    "name": "q4-depthmap-plaincnn-weight-95k-mean",
+    "version": "run-12_01",
+    "result_format": "dict",
+    "result_binding": "scan",
+    "data":{
+        "input_format":"application/zip",
+        "model":"q4-depthmap-plaincnn-weight-95k"
+    },
+    "eligible": true
+}

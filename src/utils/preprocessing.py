@@ -1,30 +1,12 @@
 import zipfile
+
 import numpy as np
+import tensorflow as tf
 from pyntcloud import PyntCloud
 from skimage.transform import resize
-import cv2
-import os
-from typing import Iterable
-import face_recognition
 
-
-image_target_height = 240
-image_target_width = 180
-
-scan_type = {
-    'Standing_front': '_100_',
-    'Standing_360': '_101',
-    'Standing_back': '_102_',
-    'Laying_front': '_200_',
-    'Laying_360': '_201',
-    'Laying_back': '_202_'
-}
-
-CODES_FRONT_FACING = ("100", "200")
-CODES_BACK_FACING = ("102", "202")
-CODES_360 = ("101", "201")
-
-RESIZE_FACTOR = 4
+IMAGE_TARGET_HEIGHT = 240
+IMAGE_TARGET_WIDTH = 180
 
 
 def load_depth(filename):
@@ -37,16 +19,16 @@ def load_depth(filename):
             width = int(res[0])
             height = int(res[1])
             depthScale = float(header[1])
-            maxConfidence = float(header[2])
+            max_confidence = float(header[2])
             data = f.read()
             f.close()
         z.close()
-    return data, width, height, depthScale, maxConfidence
+    return data, width, height, depthScale, max_confidence
 
 
-def parseDepth(tx, ty, data, depthScale):
-    depth = data[(int(ty) * width + int(tx)) * 3 + 0] << 8
-    depth += data[(int(ty) * width + int(tx)) * 3 + 1]
+def parse_depth(tx, ty, data, depthScale):
+    depth = data[(int(ty) * WIDTH + int(tx)) * 3 + 0] << 8
+    depth += data[(int(ty) * WIDTH + int(tx)) * 3 + 1]
     depth *= depthScale
     return depth
 
@@ -56,11 +38,11 @@ def prepare_depthmap(data, width, height, depthScale):
     output = np.zeros((width, height, 1))
     for cx in range(width):
         for cy in range(height):
-            #             output[cx][height - cy - 1][0] = parseConfidence(cx, cy)
+            #             output[cx][height - cy - 1][0] = parse_confidence(cx, cy)
             #             output[cx][height - cy - 1][1] = im_array[cy][cx][1] / 255.0 #test matching on RGB data
-            #             output[cx][height - cy - 1][2] = 1.0 - min(parseDepth(cx, cy) / 2.0, 1.0) #depth data scaled to be visible
+            #             output[cx][height - cy - 1][2] = 1.0 - min(parse_depth(cx, cy) / 2.0, 1.0) #depth data scaled to be visible
             # depth data scaled to be visible
-            output[cx][height - cy - 1] = parseDepth(cx, cy, data, depthScale)
+            output[cx][height - cy - 1] = parse_depth(cx, cy, data, depthScale)
     return (
         np.array(
             output,
@@ -72,19 +54,19 @@ def prepare_depthmap(data, width, height, depthScale):
 
 
 # write obj
-def getPCD(filename, calibration, data, maxConfidence, depthScale):
+def get_pcd(filename, calibration, data, maxConfidence, depthScale):
     pcd = []
-    # count = str(getCount(calibration, data, depthScale))
+    # count = str(get_count(calibration, data, depthScale))
     # print(count)
-    for x in range(2, width - 2):
-        for y in range(2, height - 2):
-            depth = parseDepth(x, y, data, depthScale)
+    for x in range(2, WIDTH - 2):
+        for y in range(2, HEIGHT - 2):
+            depth = parse_depth(x, y, data, depthScale)
             if depth:
-                res = convert2Dto3D(calibration[1], x, y, depth)
+                res = convert_2d_to_3d(calibration[1], x, y, depth)
                 if res:
-                    # file.write(str(-res[0]) + ' ' + str(res[1]) + ' ' + str(res[2]) + ' ' + str(parseConfidence(x, y)) + '\n')
+                    # file.write(str(-res[0]) + ' ' + str(res[1]) + ' ' + str(res[2]) + ' ' + str(parse_confidence(x, y)) + '\n')
                     pcd.append([-res[0], res[1], res[2],
-                                parseConfidence(x, y, data, maxConfidence)])
+                                parse_confidence(x, y, data, maxConfidence)])
 
     return np.array(pcd)
 
@@ -99,26 +81,26 @@ def preprocess(depthmap):
     depthmap = preprocess_depthmap(depthmap)
     # depthmap = depthmap/depthmap.max()
     depthmap = depthmap / 7.5
-    depthmap = resize(depthmap, (image_target_height, image_target_width))
+    depthmap = resize(depthmap, (IMAGE_TARGET_HEIGHT, IMAGE_TARGET_WIDTH))
     depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
     # depthmap = depthmap[None, :]
     return depthmap
 
 
-def lenovo_pcd2depth(pcd, calibration):
+def lenovo_pcd_to_depth(pcd, calibration):
     try:
-        points = parsePCD(pcd)
+        points = parse_pcd(pcd)
     except Exception as error:
         print(error)
         return None
-    width = getWidth()
-    height = getHeight()
+    width = get_width()
+    height = get_height()
     # print(height, width)
     output = np.zeros((width, height, 1))
     # print(calibration)
     for p in points:
         try:
-            v = convert3Dto2D(calibration[1], p[0], p[1], p[2])
+            v = convert_3d_to_2d(calibration[1], p[0], p[1], p[2])
         except Exception as error:
             print(pcd, error)
         x = round(width - v[0] - 1)
@@ -131,7 +113,7 @@ def lenovo_pcd2depth(pcd, calibration):
 # parse line of numbers
 
 
-def parseNumbers(line):
+def parse_numbers(line):
     output = []
     values = line.split(" ")
     for value in values:
@@ -141,20 +123,20 @@ def parseNumbers(line):
 # parse calibration file
 
 
-def parseCalibration(filepath):
+def parse_calibration(filepath):
     # global calibration
     with open(filepath, 'r') as file:
         calibration = []
         file.readline()[:-1]
-        calibration.append(parseNumbers(file.readline()))
+        calibration.append(parse_numbers(file.readline()))
         # print(str(calibration[0]) + '\n') #color camera intrinsics - fx, fy,
         # cx, cy
         file.readline()[:-1]
-        calibration.append(parseNumbers(file.readline()))
+        calibration.append(parse_numbers(file.readline()))
         # print(str(calibration[1]) + '\n') #depth camera intrinsics - fx, fy,
         # cx, cy
         file.readline()[:-1]
-        calibration.append(parseNumbers(file.readline()))
+        calibration.append(parse_numbers(file.readline()))
         # print(str(calibration[2]) + '\n') #depth camera position relativelly
         # to color camera in meters
         calibration[2][1] *= 8.0  # workaround for wrong calibration data
@@ -163,12 +145,12 @@ def parseCalibration(filepath):
 # convert point into 3D
 
 
-def convert2Dto3D(intrisics, x, y, z):
+def convert_2d_to_3d(intrisics, x, y, z):
     # print(intrisics)
-    fx = intrisics[0] * float(width)
-    fy = intrisics[1] * float(height)
-    cx = intrisics[2] * float(width)
-    cy = intrisics[3] * float(height)
+    fx = intrisics[0] * float(WIDTH)
+    fy = intrisics[1] * float(HEIGHT)
+    cx = intrisics[2] * float(WIDTH)
+    cy = intrisics[3] * float(HEIGHT)
     tx = (x - cx) * z / fx
     ty = (y - cy) * z / fy
     output = []
@@ -180,12 +162,12 @@ def convert2Dto3D(intrisics, x, y, z):
 # convert point into 2D
 
 
-def convert3Dto2D(intrisics, x, y, z):
+def convert_3d_to_2d(intrisics, x, y, z):
     # print(intrisics)
-    fx = intrisics[0] * float(width)
-    fy = intrisics[1] * float(height)
-    cx = intrisics[2] * float(width)
-    cy = intrisics[3] * float(height)
+    fx = intrisics[0] * float(WIDTH)
+    fy = intrisics[1] * float(HEIGHT)
+    cx = intrisics[2] * float(WIDTH)
+    cy = intrisics[3] * float(HEIGHT)
     tx = x * fx / z + cx
     ty = y * fy / z + cy
     output = []
@@ -195,39 +177,39 @@ def convert3Dto2D(intrisics, x, y, z):
     return output
 
 
-def parseConfidence(tx, ty, data, maxConfidence):
-    return (data[(int(ty) * width + int(tx)) * 3 + 2]) / maxConfidence
+def parse_confidence(tx, ty, data, maxConfidence):
+    return (data[(int(ty) * WIDTH + int(tx)) * 3 + 2]) / maxConfidence
 
 # getter
 
 
-def getWidth():
-    return width
+def get_width():
+    return WIDTH
 
 # getter
 
 
-def getHeight():
-    return height
+def get_height():
+    return HEIGHT
 
 # setter
 
 
-def setWidth(value):
-    global width
-    width = value
+def set_width(value):
+    global WIDTH
+    WIDTH = value
 
 # setter
 
 
-def setHeight(value):
-    global height
-    height = value
+def set_height(value):
+    global HEIGHT
+    HEIGHT = value
 
     # parse PCD
 
 
-def parsePCD(filepath):
+def parse_pcd(filepath):
     with open(filepath, 'r') as file:
         data = []
         while True:
@@ -240,19 +222,19 @@ def parsePCD(filepath):
             if not line:
                 break
             else:
-                values = parseNumbers(line)
+                values = parse_numbers(line)
                 data.append(values)
         return data
 
 
 # get valid points in depthmaps
-def getCount(calibration, data, depthScale):
+def get_count(calibration, data, depthScale):
     count = 0
-    for x in range(2, width - 2):
-        for y in range(2, height - 2):
-            depth = parseDepth(x, y, data, depthScale)
+    for x in range(2, WIDTH - 2):
+        for y in range(2, HEIGHT - 2):
+            depth = parse_depth(x, y, data, depthScale)
             if depth:
-                res = convert2Dto3D(calibration[1], x, y, depth)
+                res = convert_2d_to_3d(calibration[1], x, y, depth)
                 if res:
                     count = count + 1
     return count
@@ -319,7 +301,7 @@ def preprocess_pointcloud(pointcloud, subsample_size, channels):
 def pcd_to_depthmap(paths, calibration):
     depthmaps = []
     for path in paths:
-        depthmap = lenovo_pcd2depth(path, calibration)
+        depthmap = lenovo_pcd_to_depth(path, calibration)
         if depthmap is not None:
             depthmap = preprocess(depthmap)
             depthmaps.append(depthmap)
@@ -333,7 +315,7 @@ def depthmap_to_pcd(paths, calibration, preprocessing_type, input_shape=[]):
     pcds = []
     for path in paths:
         data, width, height, depthScale, maxConfidence = load_depth(path)
-        pcd = getPCD(path, calibration, data, maxConfidence, depthScale)
+        pcd = get_pcd(path, calibration, data, maxConfidence, depthScale)
 
         if pcd.shape[0] == 0:
             continue
@@ -360,7 +342,7 @@ def get_depthmaps(paths):
     for path in paths:
         data, width, height, depthScale, maxConfidence = load_depth(path)
         depthmap, height, width = prepare_depthmap(
-            data, width, height, depthScale)
+            data, WIDTH, HEIGHT, depthScale)
         # print(height, width)
         depthmap = preprocess(depthmap)
         # print(depthmap.shape)
@@ -416,91 +398,11 @@ def pcd_processing_gapnet(pcd_paths):
     return pointclouds
 
 
-def posenet_processing(filename):
-    image = cv2.imread(filename)
-    if scan_type['Standing_front'] in filename or scan_type['Standing_back'] in filename or scan_type['Standing_360'] in filename:
-        image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
-    elif scan_type['Laying_front'] in filename or scan_type['Laying_back'] in filename or scan_type['Laying_360'] in filename:
-        image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
-
-    image = cv2.resize(image, (401, 401))
-
-    return image
-
-
-def blur_faces_in_file(source_path: str, target_path: str) -> bool:
-    """Blur image
-    Returns:
-        bool: True if blurred otherwise False
-    """
-
-    # Read the image.
-    assert os.path.exists(source_path), f"{source_path} does not exist"
-    rgb_image = cv2.imread(source_path)
-    image = rgb_image[:, :, ::-1]  # RGB -> BGR for OpenCV
-
-    # The images are provided in 90degrees turned. Here we rotate 90degress to the right.
-    image = np.swapaxes(image, 0, 1)
-
-    # Scale image down for faster prediction.
-    small_image = cv2.resize(image, (0, 0), fx=1. / RESIZE_FACTOR, fy=1. / RESIZE_FACTOR)
-
-    # Find face locations.
-    face_locations = face_recognition.face_locations(small_image, model="cnn")
-
-    # Check if image should be used.
-    if not should_image_be_used(source_path, number_of_faces=len(face_locations)):
-        # logging.warn(f"{len(face_locations)} face locations found and not blurred for path: {source_path}")
-        print(f"{len(face_locations)} face locations found and not blurred for path: {source_path}")
-        return False
-
-    file_directory = os.path.dirname(target_path)
-    if not os.path.isdir(file_directory):
-        os.makedirs(file_directory)
-
-    # Blur the image.
-    for top, right, bottom, left in face_locations:
-        # Scale back up face locations since the frame we detected in was scaled to 1/4 size
-        top *= RESIZE_FACTOR
-        right *= RESIZE_FACTOR
-        bottom *= RESIZE_FACTOR
-        left *= RESIZE_FACTOR
-
-        # Extract the region of the image that contains the face.
-        face_image = image[top:bottom, left:right]
-
-        # Blur the face image.
-        face_image = cv2.GaussianBlur(face_image, ksize=(99, 99), sigmaX=30)
-
-        # Put the blurred face region back into the frame image.
-        image[top:bottom, left:right] = face_image
-
-    # Rotate image back.
-    image = np.swapaxes(image, 0, 1)
-
-    # Write image to hard drive.
-    rgb_image = image[:, :, ::-1]  # BGR -> RGB for OpenCV
-    cv2.imwrite(target_path, rgb_image)
-
-    # logging.info(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
-    print(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
-    return True
-
-
-def should_image_be_used(source_path: str, number_of_faces: int) -> bool:
-    """Determines if an image should be skipped or not."""
-    if does_path_belong_to_codes(source_path, CODES_FRONT_FACING):
-        return number_of_faces == 1
-    elif does_path_belong_to_codes(source_path, CODES_360):
-        return True
-    elif does_path_belong_to_codes(source_path, CODES_BACK_FACING):
-        return True
-    else:
-        raise NameError(f"{source_path} does not have a correct code")
-
-
-def does_path_belong_to_codes(path: str, codes: Iterable) -> bool:
-    for code in codes:
-        if f"_{code}_" in path:
-            return True
-    return False
+def standing_laying_data_preprocessing(source_path):
+    img = tf.io.read_file(source_path)
+    img = tf.image.decode_jpeg(img, channels=3)
+    img = tf.cast(img, tf.float32) * (1. / 256)
+    img = tf.image.rot90(img, k=3)
+    img = tf.image.resize(img, [240, 180])
+    img = tf.expand_dims(img, axis=0)
+    return img
