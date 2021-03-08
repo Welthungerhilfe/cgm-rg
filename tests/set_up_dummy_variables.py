@@ -20,6 +20,7 @@ get_file_endpoint = '/api/files/'
 post_file_endpoint = '/api/files'
 result_endpoint = '/api/results'
 workflow_endpoint = '/api/workflows'
+person_detail_endpoint = '/api/persons/'
 
 workflows_path = current_working_directory.joinpath('tests', 'static_files', 'workflows.json')
 # workflows_path = 'static_files/workflows.json'
