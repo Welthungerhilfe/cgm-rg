@@ -70,14 +70,14 @@ def test_blur_face_file_exists():
     assert result
 
 
-def test_post_files_successful():
+def test_post_blur_files_successful():
     """
     Test to check if files are post to api successfully
     """
     pass
 
 
-def test_post_files_unsuccessful():
+def test_post_blur_files_unsuccessful():
     """
     Test to check if files are not post to api
     """
