@@ -22,6 +22,8 @@ result_endpoint = '/api/results'
 workflow_endpoint = '/api/workflows'
 person_detail_endpoint = '/api/persons/'
 
+person_details = {'age_estimated': False, 'date_of_birth': '2020-11-12', 'id': '95dd6f94-7bde-11eb-898c-d7e313a8f30a', 'qr_code': 'IN_AAH_RJ_TEST_JAN_2021_00002', 'qr_scanned': '2021-01-13T07:43:41Z', 'sex': 'female'}
+
 workflows_path = current_working_directory.joinpath('tests', 'static_files', 'workflows.json')
 # workflows_path = 'static_files/workflows.json'
 
