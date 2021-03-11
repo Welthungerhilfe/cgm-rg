@@ -24,7 +24,7 @@ def get_dummy_blur_flow_object(mock_some_fn):
 
 
 @patch.object(ProcessWorkflows, 'get_workflow_id')
-def get_dummy_height_flow_object():
+def get_dummy_height_flow_object(mock_some_fn):
     mock_some_fn.return_value = '44af5600-69d2-11eb-9498-8ffe0e3b2017'
     return HeightFlow(
             get_dummy_api_endpoint_object(),
