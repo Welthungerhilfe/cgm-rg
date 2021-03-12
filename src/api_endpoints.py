@@ -209,5 +209,5 @@ if __name__ == "__main__":
         url = "http://localhost:5001"
     else:
         url = os.environ['APP_URL']
-    
+
     scan_endpoint = '/api/scans/unprocessed?limit=1'
