@@ -4,10 +4,12 @@ import pytest
 from bunch import Bunch
 import json
 import os
-# from src.result_gen_with_api import BlurFlow
-from result_gen_with_api import BlurFlow, ProcessWorkflows
-# from api_endpoints import ApiEndpoints
+from result_generation.height import HeightFlow
+from result_gen_with_api import ProcessWorkflows
 import set_up_dummy_objects
+import numpy as np
+import utils.preprocessing as preprocessing
+from datetime import datetime
 
 
 def test_bunch_object_to_json_object():
@@ -33,16 +35,83 @@ def test_get_input_path():
     Test to check if we get input path
     """
     # Setup
-    blurflow = set_up_dummy_objects.get_dummy_blur_flow_object()
+    heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
     directory = 'app/scans'
     filename = 'workflow.json'
 
     # Exercise
-    result = blurflow.get_input_path(directory, filename)
+    result = heightflow.get_input_path(directory, filename)
 
     # Verify
     truth = 'app/scans/workflow.json'
     assert result == truth
 
     # Cleanup - none required
+
+
+def test_get_mean_scan_results():
+    """
+    Test to check if we get mean results
+    """
+    # Setup
+    heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
+    a = np.array([[4],[6],[5],[7]])
+
+    # Exercise
+    result = heightflow.get_mean_scan_results(a)
+
+    # Verify
+    truth = str(5.5)
+    assert result == truth
+
+
+def test_process_depthmaps():
+    """
+    Test to check proper processing of depthmaps
+    """
+    # Setup
+    heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
+    preprocessing.set_width(int(240))
+    preprocessing.set_height(int(180))
+
+    # Exercise
+    result = heightflow.process_depthmaps()
+
+    # Verify
+    
+    assert isinstance(result, np.ndarray)
+
+
+def test_artifact_level_height_result_object():
+    """
+    Test creation of artifact level height object
+    """
+    # Setup
+    heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
+    predictions = np.random.uniform(70, 80, [26, 1])
+    generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+
+    # Exercise
+    result = heightflow.artifact_level_height_result_object(predictions, generated_timestamp)
+
+    # Verify
+    
+    assert isinstance(result, Bunch)
+
+
+def test_scan_level_height_result_object():
+    """
+    Test creation of scan level height object
+    """
+    # Setup
+    heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
+    predictions = np.random.uniform(70, 80, [26, 1])
+    generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+
+    # Exercise
+    result = heightflow.scan_level_height_result_object(predictions, generated_timestamp)
+
+    # Verify
+    
+    assert isinstance(result, Bunch)
 
