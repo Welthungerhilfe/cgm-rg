@@ -42,4 +42,4 @@ rgb_artifacts = load_json(current_working_directory.joinpath('tests', 'static_fi
 
 depth_artifacts = load_json(current_working_directory.joinpath('tests', 'static_files', 'depth_artifacts.json'))['depth_artifacts']
 
-scan_parent_dir = 'static_files/'
+scan_parent_dir = current_working_directory.joinpath('tests', 'static_files')

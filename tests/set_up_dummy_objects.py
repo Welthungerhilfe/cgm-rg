@@ -3,6 +3,7 @@ import sys
 sys.path.append('./src')
 from result_generation.blur import BlurFlow
 from result_generation.height import HeightFlow
+from result_generation.weight import WeightFlow
 from result_gen_with_api import ProcessWorkflows
 from api_endpoints import ApiEndpoints
 from mock import patch
@@ -37,8 +38,18 @@ def get_dummy_height_flow_object(mock_some_fn):
             set_up_dummy_variables.person_details)
 
 
-def get_dummy_weight_flow_object():
-    pass
+@patch.object(ProcessWorkflows, 'get_workflow_id')
+def get_dummy_weight_flow_object(mock_some_fn):
+    mock_some_fn.return_value = '44af5600-69d2-11eb-9498-8ffe0e3b2017'
+    return WeightFlow(
+            get_dummy_api_endpoint_object(),
+            get_dummy_process_workflows_object(),
+            'src/workflows/weight-workflow-artifact.json',
+            'src/workflows/weight-workflow-scan.json',
+            set_up_dummy_variables.depth_artifacts,
+            set_up_dummy_variables.scan_parent_dir,
+            set_up_dummy_variables.scan_metadata,
+            set_up_dummy_variables.person_details)
 
 
 def get_dummy_get_scan_metadata_object():
