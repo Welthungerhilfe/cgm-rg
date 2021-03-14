@@ -1,0 +1,10 @@
+{
+    "name": "q3-MCNN-height-front",
+    "version": "run-06_01",
+    "result_format": "dict",
+    "result_binding": "artifact",
+    "data":{
+        "input_format":"application/zip",
+        "model":"q3-MCNN-height"
+    }
+}
