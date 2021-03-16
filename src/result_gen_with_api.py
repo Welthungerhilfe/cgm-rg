@@ -299,15 +299,12 @@ def main():
     preprocessing.set_height(int(180))
 
     print("\nApp Environment : ", os.environ['APP_ENV'])
+    print("\nApp URL : ", os.environ['APP_URL'])
 
     if os.environ['APP_ENV'] == 'LOCAL':
         url = "http://localhost:5001"
-    elif os.environ['APP_ENV'] == 'SANDBOX':
-        url = "https://cgm-be-ci-dev-scanner-api.azurewebsites.net"
-    elif os.environ['APP_ENV'] == 'DEMO':
-        url = "https://cgm-be-ci-qa-scanner-api.azurewebsites.net"
-    elif os.environ['APP_ENV'] == 'INBMZ':
-        url = "https://cgm-be-ci-inbmz-scanner-api.azurewebsites.net"
+    else:
+        url = os.environ['APP_URL']
 
     scan_endpoint = '/api/scans/unprocessed?limit=1'
     get_file_endpoint = '/api/files/'

@@ -46,17 +46,6 @@ ADD . /app
 ARG APP_ENV=LOCAL
 ENV APP_ENV ${APP_ENV}
 
-# Endpoints and env variables for authentication
-ARG APP_RESOURCE
-ENV APP_RESOURCE $(APP_RESOURCE)
-
-ARG TOKEN_ENDPOINT
-ENV TOKEN_ENDPOINT $(TOKEN_ENDPOINT)
-
-ARG APP_ENDPOINT
-ENV APP_ENDPOINT $(APP_ENDPOINT)
-
-
 RUN mkdir log
 RUN crontab deployment/crontab
 RUN chmod +x entrypoint_with_api.sh

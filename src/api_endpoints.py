@@ -26,69 +26,13 @@ class ApiEndpoints:
         self.workflow_endpoint = workflow_endpoint
         self.person_detail_endpoint = person_detail_endpoint
         self.headers = {}
-        self.auth_token = None
-        if os.environ['APP_ENV'] == 'SANDBOX' or os.environ['APP_ENV'] == 'DEMO' or os.environ['APP_ENV'] == 'INBMZ':
+        if os.environ['APP_ENV'] != 'LOCAL':
             self.x_api_key = os.environ["API_KEY"]
-
-    def set_auth_token(self):
-        auth_token = None
-
-        # resource = "https%3A%2F%2Fcgmb2csandbox.onmicrosoft.com%2F98e9e1be-53fb-47f4-b53a-5842aeb869d5"
-
-        headers = {
-            'Metadata': 'true',
-        }
-
-        '''
-        response_one = requests.get(
-            'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=' +
-            self.resource,
-            headers=headers)
-        '''
-
-        response_one = requests.get(
-            self.token_endpoint + '&resource=' + self.resource,
-            headers=headers)
-
-        print("\nresponse_one status code: ", response_one.status_code)
-
-        if response_one.status_code == 200:
-            token = response_one.json()
-            print("\ntoken : ", token)
-
-            access_token = token['access_token']
-            print("\naccess_token: ", access_token)
-
-            data = {"access_token": access_token}
-
-            '''
-            response_two = requests.post(
-                'https://cgm-be-ci-dev-scanner-api.azurewebsites.net/.auth/login/aad',
-                json=data)
-            '''
-
-            response_two = requests.post(
-                self.app_endpoint + '/.auth/login/aad', json=data)
-
-            print("\response_two status code: ", response_two.status_code)
-
-            if response_two.status_code == 200:
-                auth_token_json = response_two.json()
-                print("\nauth_token_json : ", auth_token_json)
-
-                auth_token = auth_token_json['authenticationToken']
-                print("\nauth_token: ", auth_token)
-            else:
-                print("\response_two Get request failed")
-        else:
-            print("\nresponse_one Get request failed")
-
-        return auth_token
 
     def prepare_header(self):
         headers = copy.deepcopy(self.headers)
 
-        if os.environ['APP_ENV'] == 'SANDBOX' or os.environ['APP_ENV'] == 'DEMO' or os.environ['APP_ENV'] == 'INBMZ':
+        if os.environ['APP_ENV'] != 'LOCAL':
             headers['X-API-Key'] = self.x_api_key
 
         return headers
@@ -260,13 +204,10 @@ class ApiEndpoints:
 
 
 if __name__ == "__main__":
+
     if os.environ['APP_ENV'] == 'LOCAL':
         url = "http://localhost:5001"
-    elif os.environ['APP_ENV'] == 'SANDBOX':
-        url = "https://cgm-be-ci-dev-scanner-api.azurewebsites.net"
-    elif os.environ['APP_ENV'] == 'DEMO':
-        url = "https://cgm-be-ci-qa-scanner-api.azurewebsites.net"
-    elif os.environ['APP_ENV'] == 'INBMZ':
-        url = "https://cgm-be-ci-inbmz-scanner-api.azurewebsites.net"
+    else:
+        url = os.environ['APP_URL']
 
     scan_endpoint = '/api/scans/unprocessed?limit=1'
