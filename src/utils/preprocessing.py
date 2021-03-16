@@ -2,7 +2,6 @@ import zipfile
 
 import numpy as np
 import tensorflow as tf
-from pyntcloud import PyntCloud
 from skimage.transform import resize
 
 IMAGE_TARGET_HEIGHT = 240
@@ -142,6 +141,21 @@ def get_count(calibration, data, depthScale):
                 if res:
                     count = count + 1
     return count
+
+
+def convert_2d_to_3d(intrisics, x, y, z):
+    # print(intrisics)
+    fx = intrisics[0] * float(WIDTH)
+    fy = intrisics[1] * float(HEIGHT)
+    cx = intrisics[2] * float(WIDTH)
+    cy = intrisics[3] * float(HEIGHT)
+    tx = (x - cx) * z / fx
+    ty = (y - cy) * z / fy
+    output = []
+    output.append(tx)
+    output.append(ty)
+    output.append(z)
+    return output
 
 
 def get_depthmaps(paths):

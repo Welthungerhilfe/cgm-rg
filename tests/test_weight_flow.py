@@ -1,11 +1,6 @@
 import sys
 sys.path.append('./src')
-import pytest
 from bunch import Bunch
-import json
-import os
-from result_generation.weight import WeightFlow
-from result_gen_with_api import ProcessWorkflows
 import set_up_dummy_objects
 import numpy as np
 import utils.preprocessing as preprocessing
@@ -55,7 +50,7 @@ def test_get_mean_scan_results():
     """
     # Setup
     weightflow = set_up_dummy_objects.get_dummy_weight_flow_object()
-    a = np.array([[4],[6],[5],[7]])
+    a = np.array([[4], [6], [5], [7]])
 
     # Exercise
     result = weightflow.get_mean_scan_results(a)
@@ -78,7 +73,7 @@ def test_process_depthmaps():
     result = weightflow.process_depthmaps()
 
     # Verify
-    
+
     assert isinstance(result, np.ndarray)
 
 
@@ -95,7 +90,7 @@ def test_artifact_level_weight_result_object():
     result = weightflow.artifact_level_weight_result_object(predictions, generated_timestamp)
 
     # Verify
-    
+
     assert isinstance(result, Bunch)
 
 
@@ -113,6 +108,6 @@ def test_scan_level_weight_result_object():
     result = weightflow.scan_level_weight_result_object(predictions, generated_timestamp)
 
     # Verify
-    
+
     assert isinstance(result, Bunch)
 '''

@@ -1,11 +1,6 @@
 import sys
 sys.path.append('./src')
-import pytest
 from bunch import Bunch
-import json
-import os
-from result_generation.height import HeightFlow
-from result_gen_with_api import ProcessWorkflows
 import set_up_dummy_objects
 import numpy as np
 import utils.preprocessing as preprocessing
@@ -55,7 +50,7 @@ def test_get_mean_scan_results():
     """
     # Setup
     heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
-    a = np.array([[4],[6],[5],[7]])
+    a = np.array([[4], [6], [5], [7]])
 
     # Exercise
     result = heightflow.get_mean_scan_results(a)
@@ -78,7 +73,7 @@ def test_process_depthmaps():
     result = heightflow.process_depthmaps()
 
     # Verify
-    
+
     assert isinstance(result, np.ndarray)
 
 
@@ -95,7 +90,7 @@ def test_artifact_level_height_result_object():
     result = heightflow.artifact_level_height_result_object(predictions, generated_timestamp)
 
     # Verify
-    
+
     assert isinstance(result, Bunch)
 
 
@@ -113,7 +108,6 @@ def test_scan_level_height_result_object():
     result = heightflow.scan_level_height_result_object(predictions, generated_timestamp)
 
     # Verify
-    
+
     assert isinstance(result, Bunch)
 '''
-

@@ -2,12 +2,7 @@ import sys
 sys.path.append('./src')
 import pytest
 from bunch import Bunch
-import json
-import os
 import pathlib
-from result_generation.blur import BlurFlow
-from result_gen_with_api import ProcessWorkflows
-# from api_endpoints import ApiEndpoints
 import set_up_dummy_objects
 
 current_working_directory = pathlib.Path.cwd()
@@ -66,7 +61,7 @@ def test_blur_face_file_exists():
     result = blurflow.blur_face(input_file)
 
     # Verify
-    
+
     assert result
 
 

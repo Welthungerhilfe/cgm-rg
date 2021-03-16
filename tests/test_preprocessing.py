@@ -6,6 +6,7 @@ import pickle
 
 current_working_directory = pathlib.Path.cwd()
 
+
 def test_load_depth():
     """
     Test to check load depth function
