@@ -406,3 +406,13 @@ def standing_laying_data_preprocessing(source_path):
     img = tf.image.resize(img, [240, 180])
     img = tf.expand_dims(img, axis=0)
     return img
+
+
+def sample_systematic_from_artifacts(artifacts: list, n_artifacts: int) -> list:
+    n_artifacts_total = len(artifacts)
+    n_skip = n_artifacts_total // n_artifacts  # 20 / 5 = 4
+    indexes_to_select = list(
+        range(n_skip // 2, n_artifacts_total, n_skip))[:n_artifacts]
+    selected_artifacts = [artifacts[i] for i in indexes_to_select]
+    assert len(selected_artifacts) == n_artifacts, str(artifacts)
+    return selected_artifacts
