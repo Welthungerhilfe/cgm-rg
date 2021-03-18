@@ -62,7 +62,7 @@ def test_blur_face_file_exists():
 
     # Verify
 
-    assert result
+    assert result[1]
 
 
 def test_post_blur_files_successful():

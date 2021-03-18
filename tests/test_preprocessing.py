@@ -24,7 +24,6 @@ def test_load_depth():
 
 
 def test_prepare_depthmap():
-    pass
     # Setup
     preprocessing.set_width(int(240 * 0.75))
     preprocessing.set_height(int(180 * 0.75))

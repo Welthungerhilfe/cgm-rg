@@ -40,7 +40,7 @@
                 "input_format": "application/zip",
                 "model": "q4-depthmap-plaincnn-weight-95k"
             },
-            "eligible": false,
+            "eligible": true,
             "id": "44b106da-69d2-11eb-9498-a7452f79bbf3",
             "name": "q4-depthmap-plaincnn-weight-95k-mean",
             "result_binding": "scan",
