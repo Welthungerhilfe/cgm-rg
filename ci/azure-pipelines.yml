@@ -53,6 +53,7 @@ stages:
             inputs:
               command: build
               repository: $(IMAGE_REPOSITORY)
+              arguments: --cache-from $(IMAGE_REPOSITORY):$(TAG)
               tags: |
                 $(Build.BuildId)
                 $(TAG)
