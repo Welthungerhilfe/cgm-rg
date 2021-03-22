@@ -47,6 +47,7 @@ stages:
               cacheHitVar: DOCKER_CACHE_RESTORED
           - script: |
               docker load < $(DOCKER_CACHE_DIR)/cgm-rg.tar
+              rm $(DOCKER_CACHE_DIR)/cgm-rg.tar
             condition: and(not(canceled()), eq(variables.DOCKER_CACHE_RESTORED, 'true'))
           - task: Docker@2
             displayName: Build Docker image
