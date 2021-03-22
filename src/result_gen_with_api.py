@@ -303,13 +303,8 @@ def main():
     preprocessing.set_width(int(240))
     preprocessing.set_height(int(180))
 
-    print("\nApp Environment : ", os.environ['APP_ENV'])
-    print("\nApp URL : ", os.environ['APP_URL'])
-
-    if os.environ['APP_ENV'] == 'LOCAL':
-        url = "http://localhost:5001"
-    else:
-        url = os.environ['APP_URL']
+    url = os.getenv('APP_URL', 'http://localhost:5001'())
+    print(f"App URL : {url}")
 
     scan_endpoint = '/api/scans/unprocessed?limit=1'
     get_file_endpoint = '/api/files/'

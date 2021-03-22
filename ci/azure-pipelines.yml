@@ -3,6 +3,8 @@ pool:
 
 variables:
   - group: cgm-rg
+  - name: DOCKER_CACHE_DIR
+    value: $(Pipeline.Workspace)/image
 
 parameters:
   - name: var_groups
@@ -14,21 +16,63 @@ parameters:
 #      - naunam
 
 stages:
+  - stage: Setup
+    jobs:
+      - job: Setup
+        steps:
+          - task: CmdLine@2
+            name: VariableSetup
+            displayName: Parse Version
+            inputs:
+              script: |
+                set -e
+                git_hash=$(git rev-parse HEAD)
+                echo "##vso[task.setvariable variable=TAG;isOutput=true]$git_hash"
   - stage: Build
+    displayName: Build Docker image
+    dependsOn:
+      - Setup
+    variables:
+      - name: TAG
+        value: $[stageDependencies.Setup.Setup.outputs['VariableSetup.TAG']]
     jobs:
       - job: Build
         displayName: Build Docker image
         steps:
-          - script: echo todo
-
+          - task: Cache@2
+            displayName: Caching Docker image
+            inputs:
+              key: 'docker | "$(Agent.OS)"'
+              path: $(DOCKER_CACHE_DIR)
+              cacheHitVar: DOCKER_CACHE_RESTORED
+          - script: |
+              docker load < $(DOCKER_CACHE_DIR)/cgm-rg.tar
+            condition: and(not(canceled()), eq(variables.DOCKER_CACHE_RESTORED, 'true'))
+          - task: Docker@2
+            displayName: Build Docker image
+            inputs:
+              command: build
+              repository: $(IMAGE_REPOSITORY)
+              tags: |
+                $(Build.BuildId)
+                $(TAG)
+          - script: |
+              set -e
+              mkdir -p $(DOCKER_CACHE_DIR)
+              docker image save --output "$(DOCKER_CACHE_DIR)/cgm-rg.tar" $(IMAGE_REPOSITORY):$(TAG)
+            condition: not(canceled())
+          - publish: $(DOCKER_CACHE_DIR)
+            artifact: RgDockerImage
   - ${{ each env in parameters.var_groups }}:
     - stage: Deploy_${{ replace(env, '-', '_') }}
       displayName: Deploy ${{ env }}
       dependsOn:
+        - Setup
         - Build
-#      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
       variables:
         - group: cgm-rg-${{ env }}-ci
+        - name: TAG
+          value: $[stageDependencies.Setup.Setup.outputs['VariableSetup.TAG']]
       jobs:
         - deployment: Deploy_Container_Instance
           displayName: "Container Instance deployment ${{ env }}"
@@ -37,6 +81,32 @@ stages:
             runOnce:
               deploy:
                 steps:
+                  - task: DownloadPipelineArtifact@2
+                    displayName: "Download docker image"
+                    inputs:
+                      source: current
+                      artifact: RgDockerImage
+                      path: $(Pipeline.Workspace)/image
+                  - task: CmdLine@2
+                    displayName: Load and Tag image
+                    inputs:
+                      script: |
+                        set -e
+                        docker image load -i $(DOCKER_CACHE_DIR)/cgm-rg.tar
+                        docker tag "$(IMAGE_REPOSITORY):$(TAG)" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
+                  - task: AzureCLI@2
+                    displayName: Push to target ACR
+                    inputs:
+                      azureSubscription: cgm-${{ env }}-sub-cd
+                      scriptType: bash
+                      scriptLocation: inlineScript
+                      inlineScript: |
+                        set -e
+
+                        az acr login --name $(TARGET_REGISTRY)
+
+                        IMAGE="$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
+                        docker push "$IMAGE"
                   - script: sudo snap install yq
                   - task: AzureCLI@2
                     displayName: Update Container Instance
@@ -47,9 +117,7 @@ stages:
                       inlineScript: |
                         set -e
 
-                        IMAGE_TAG=latest
-                        IMAGE=$TARGET_REGISTRY/$IMAGE_REPOSITORY:$IMAGE_TAG
-
+                        # Export current setup -> modify and use as input for in-place update
                         TMP_CONF_FILE=rg-ci-conf.yaml
                         az container export \
                           --name cgmbecidevrgaci \
@@ -57,23 +125,25 @@ stages:
                           --file "$TMP_CONF_FILE"
 
                         # Replace image
-                        IMAGE=cgmbecidevacr.azurecr.io/welthungerhilfe/cgm-rg:latest
+                        IMAGE="$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
                         export IMAGE
                         yq eval '.properties.containers[0].properties.image = strenv(IMAGE)' "$TMP_CONF_FILE" -i
 
 
                         # Insert registry credentials
                         REGISTRY_CREDENTIALS=$(az acr credential show --name "$TARGET_REGISTRY")
+
                         REGISTRY_USERNAME=$(echo "$REGISTRY_CREDENTIALS" | jq '.username' --raw-output )
-                        echo "Username: $REGISTRY_USERNAME"
-                        REGISTRY_PASSWORD=$(echo "$REGISTRY_CREDENTIALS" | jq '.passwords[0].value' --raw-output )
-
                         export REGISTRY_USERNAME
-                        yq eval '.properties.imageRegistryCredentials[0].username = strenv(REGISTRY_USERNAME)' "$TMP_CONF_FILE" -i
-                        export REGISTRY_PASSWORD
-                        yq eval '.properties.imageRegistryCredentials[0].password = strenv(REGISTRY_PASSWORD)' "$TMP_CONF_FILE" -i
+                        yq eval '.properties.imageRegistryCredentials[0].username = strenv(REGISTRY_USERNAME)' \
+                          "$TMP_CONF_FILE" --inplace
 
-                        echo Deploying
+                        REGISTRY_PASSWORD=$(echo "$REGISTRY_CREDENTIALS" | jq '.passwords[0].value' --raw-output )
+                        export REGISTRY_PASSWORD
+                        yq eval '.properties.imageRegistryCredentials[0].password = strenv(REGISTRY_PASSWORD)' \
+                          "$TMP_CONF_FILE" --inplace
+
+                        # Deploy updated image
                         az container create \
                           --name "$TARGET_CONTAINER_INSTANCE_NAME" \
                           --resource-group "$TARGET_RESOURCE_GROUP" \

@@ -34,19 +34,13 @@ RUN cd ~ && \
 
 
 WORKDIR /app
+RUN mkdir log
 
 ADD requirements.txt /app/requirements.txt
 RUN pip install -r requirements.txt
 
 ADD . /app
-#RUN chmod +x deployment/*.sh
 
-
-#Environment name of the RG
-ARG APP_ENV=LOCAL
-ENV APP_ENV ${APP_ENV}
-
-RUN mkdir log
 RUN crontab deployment/crontab
 RUN chmod +x entrypoint_with_api.sh
 

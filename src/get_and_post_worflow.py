@@ -45,14 +45,8 @@ def upsert_workflows(json_paths, workflows, cgm_api):
 
 
 if __name__ == "__main__":
-
-    print("\nApp Environment : ", os.environ['APP_ENV'])
-    print("\nApp URL : ", os.environ['APP_URL'])
-
-    if os.environ['APP_ENV'] == 'LOCAL':
-        url = "http://localhost:5001"
-    else:
-        url = os.environ['APP_URL']
+    url = os.getenv('APP_URL', 'http://localhost:5001')
+    print(f"App URL: {url}")
 
     scan_endpoint = '/api/scans/unprocessed?limit=1'
     get_file_endpoint = '/api/files/'

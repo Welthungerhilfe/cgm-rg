@@ -26,13 +26,12 @@ class ApiEndpoints:
         self.workflow_endpoint = workflow_endpoint
         self.person_detail_endpoint = person_detail_endpoint
         self.headers = {}
-        if os.environ['APP_ENV'] != 'LOCAL':
-            self.x_api_key = os.environ["API_KEY"]
+        self.x_api_key = os.environ["API_KEY"]
 
     def prepare_header(self):
         headers = copy.deepcopy(self.headers)
 
-        if os.environ['APP_ENV'] != 'LOCAL':
+        if self.x_api_key:
             headers['X-API-Key'] = self.x_api_key
 
         return headers
@@ -204,10 +203,5 @@ class ApiEndpoints:
 
 
 if __name__ == "__main__":
-
-    if os.environ['APP_ENV'] == 'LOCAL':
-        url = "http://localhost:5001"
-    else:
-        url = os.environ['APP_URL']
-
+    url = os.getenv('APP_URL','http://localhost:5001')
     scan_endpoint = '/api/scans/unprocessed?limit=1'
