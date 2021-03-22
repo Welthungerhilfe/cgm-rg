@@ -14,15 +14,21 @@ parameters:
 #      - naunam
 
 stages:
+  - stage: Build
+    jobs:
+      - job: Build
+        displayName: Build Docker image
+        steps:
+          - script: echo todo
+
   - ${{ each env in parameters.var_groups }}:
     - stage: Deploy_${{ replace(env, '-', '_') }}
       displayName: Deploy ${{ env }}
       dependsOn:
-        - Setup
-        - Test_and_Build
+        - Build
 #      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
       variables:
-        - group: cgm-api-${{ env }}-ci
+        - group: cgm-rg-${{ env }}-ci
       jobs:
         - deployment: Deploy_Container_Instance
           displayName: "Container Instance deployment ${{ env }}"
@@ -31,6 +37,7 @@ stages:
             runOnce:
               deploy:
                 steps:
+                  - script: snap install yq
                   - task: AzureCLI@2
                     displayName: Update Container Instance
                     inputs:
@@ -40,21 +47,24 @@ stages:
                       inlineScript: |
                         set -e
 
-                        TARGET_CONTAINER_INSTANCE_NAME=cgmbecidevrgaci
-                        TARGET_RESOURCE_GROUP=cgm-be-ci-dev-rg
-                        TARGET_REGISTRY=
+                        IMAGE_TAG=latest
+                        IMAGE=$TARGET_REGISTRY/IMAGE_REPOSITORY:$IMAGE_TAG
+                        REGISTRY_PASSWORD=$(
+                          az acr credential show \
+                            --name "$TARGET_REGISTRY" \
+                            --query "passwords[0].value"
+                        )
 
-                        REGISTRY_PASSWORD=$(az acr credential show --name "$TARGET_REGISTRY" --query "passwords[0].value")
-
+                        TMP_CONF_FILE=rg-ci-conf.yaml
                         az container export \
                           --name "$TARGET_CONTAINER_INSTANCE_NAME" \
                           --resource-group "$TARGET_RESOURCE_GROUP" \
-                          --file rg-ci-config.yaml
+                          --file "$TMP_CONF_FILE"
 
-                        sed -ri "s/^([[:space:]]+image:.+:).+$/\1$IMAGE_TAG/" ./rg-ci-conf.yaml
-                        sed -ri "s/^(([[:space:]]*)username:.*)$/\1\n\2password: $REGISTRY_PASSWORD/" ./rg-ci-config.yaml
+                        yq e ".properties.imageRegistryCredentials[0].password |= $REGISTRY_PASSWORD" $TMP_CONF_FILE -i
+                        yq e ".properties.containers[0].properties.image |= $IMAGE" $TMP_CONF_FILE -i
 
                         az container create \
                           --name "$TARGET_CONTAINER_INSTANCE_NAME" \
                           --resource-group "$TARGET_RESOURCE_GROUP" \
-                          --file rg-ci-config.yaml
+                          --file "$TMP_CONF_FILE"
