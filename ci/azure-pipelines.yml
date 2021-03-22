@@ -37,7 +37,7 @@ stages:
             runOnce:
               deploy:
                 steps:
-                  - script: snap install yq
+                  - script: sudo snap install yq
                   - task: AzureCLI@2
                     displayName: Update Container Instance
                     inputs:
@@ -48,22 +48,32 @@ stages:
                         set -e
 
                         IMAGE_TAG=latest
-                        IMAGE=$TARGET_REGISTRY/IMAGE_REPOSITORY:$IMAGE_TAG
-                        REGISTRY_PASSWORD=$(
-                          az acr credential show \
-                            --name "$TARGET_REGISTRY" \
-                            --query "passwords[0].value"
-                        )
+                        IMAGE=$TARGET_REGISTRY/$IMAGE_REPOSITORY:$IMAGE_TAG
 
                         TMP_CONF_FILE=rg-ci-conf.yaml
                         az container export \
-                          --name "$TARGET_CONTAINER_INSTANCE_NAME" \
+                          --name cgmbecidevrgaci \
                           --resource-group "$TARGET_RESOURCE_GROUP" \
                           --file "$TMP_CONF_FILE"
 
-                        yq e ".properties.imageRegistryCredentials[0].password |= $REGISTRY_PASSWORD" $TMP_CONF_FILE -i
-                        yq e ".properties.containers[0].properties.image |= $IMAGE" $TMP_CONF_FILE -i
+                        # Replace image
+                        IMAGE=cgmbecidevacr.azurecr.io/welthungerhilfe/cgm-rg:latest
+                        export IMAGE
+                        yq eval '.properties.containers[0].properties.image = strenv(IMAGE)' "$TMP_CONF_FILE" -i
 
+
+                        # Insert registry credentials
+                        REGISTRY_CREDENTIALS=$(az acr credential show --name "$TARGET_REGISTRY")
+                        REGISTRY_USERNAME=$(echo "$REGISTRY_CREDENTIALS" | jq '.username' --raw-output )
+                        echo "Username: $REGISTRY_USERNAME"
+                        REGISTRY_PASSWORD=$(echo "$REGISTRY_CREDENTIALS" | jq '.passwords[0].value' --raw-output )
+
+                        export REGISTRY_USERNAME
+                        yq eval '.properties.imageRegistryCredentials[0].username = strenv(REGISTRY_USERNAME)' "$TMP_CONF_FILE" -i
+                        export REGISTRY_PASSWORD
+                        yq eval '.properties.imageRegistryCredentials[0].password = strenv(REGISTRY_PASSWORD)' "$TMP_CONF_FILE" -i
+
+                        echo Deploying
                         az container create \
                           --name "$TARGET_CONTAINER_INSTANCE_NAME" \
                           --resource-group "$TARGET_RESOURCE_GROUP" \
