@@ -42,7 +42,7 @@ stages:
           - task: Cache@2
             displayName: Cache Docker image
             inputs:
-              key: 'docker | "$(Agent.OS)" | Dockerfile | requirements.txt'
+              key: 'rg-docker-cache | "$(Agent.OS)" | Dockerfile | requirements.txt'
               path: $(DOCKER_CACHE_DIR)
               cacheHitVar: DOCKER_CACHE_RESTORED
           - script: |
