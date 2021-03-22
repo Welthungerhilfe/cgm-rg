@@ -69,6 +69,7 @@ stages:
       dependsOn:
         - Setup
         - Build
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
       variables:
         - group: cgm-rg-${{ env }}-ci
         - name: TAG
