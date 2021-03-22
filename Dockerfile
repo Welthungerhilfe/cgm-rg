@@ -1,4 +1,3 @@
-# base docker file
 FROM python:3.6-slim-stretch
 
 RUN apt-get -y update
@@ -31,7 +30,6 @@ RUN cd ~ && \
     git clone -b 'v19.9' --single-branch https://github.com/davisking/dlib.git dlib/ && \
     cd  dlib/ && \
     python3 setup.py install --yes USE_AVX_INSTRUCTIONS
-
 
 WORKDIR /app
 RUN mkdir log
