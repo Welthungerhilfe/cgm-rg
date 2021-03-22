@@ -45,22 +45,23 @@ stages:
               key: 'docker | "$(Agent.OS)" | Dockerfile | requirements.txt'
               path: $(DOCKER_CACHE_DIR)
               cacheHitVar: DOCKER_CACHE_RESTORED
-          - script: |
-              docker load < $(DOCKER_CACHE_DIR)/cgm-rg.tar
-            condition: and(not(canceled()), eq(variables.DOCKER_CACHE_RESTORED, 'true'))
+#          - script: |
+#              docker load < $(DOCKER_CACHE_DIR)/cgm-rg.tar
+#            condition: and(not(canceled()), eq(variables.DOCKER_CACHE_RESTORED, 'true'))
           - task: Docker@2
             displayName: Build Docker image
             inputs:
               command: build
               repository: $(IMAGE_REPOSITORY)
-              arguments: --cache-from $(IMAGE_REPOSITORY):$(TAG)
+              arguments: --cache-from $(IMAGE_REPOSITORY):latest
               tags: |
+                latest
                 $(Build.BuildId)
                 $(TAG)
           - script: |
               set -e
               mkdir -p $(DOCKER_CACHE_DIR)
-              docker image save --output "$(DOCKER_CACHE_DIR)/cgm-rg.tar" $(IMAGE_REPOSITORY):$(TAG)
+              docker image save --output "$(DOCKER_CACHE_DIR)/cgm-rg.tar" $(IMAGE_REPOSITORY)
             condition: not(canceled())
           - publish: $(DOCKER_CACHE_DIR)
             artifact: RgDockerImage
