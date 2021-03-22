@@ -1,0 +1,60 @@
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: cgm-rg
+
+parameters:
+  - name: var_groups
+    type: object
+    default:
+      - sandbox
+#      - demo-qa
+#      - inbmz
+#      - naunam
+
+stages:
+  - ${{ each env in parameters.var_groups }}:
+    - stage: Deploy_${{ replace(env, '-', '_') }}
+      displayName: Deploy ${{ env }}
+      dependsOn:
+        - Setup
+        - Test_and_Build
+#      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+      variables:
+        - group: cgm-api-${{ env }}-ci
+      jobs:
+        - deployment: Deploy_Container_Instance
+          displayName: "Container Instance deployment ${{ env }}"
+          environment: cgm-rg-${{ env }}-env
+          strategy:
+            runOnce:
+              deploy:
+                steps:
+                  - task: AzureCLI@2
+                    displayName: Update Container Instance
+                    inputs:
+                      azureSubscription: cgm-${{ env }}-sub-cd
+                      scriptType: bash
+                      scriptLocation: inlineScript
+                      inlineScript: |
+                        set -e
+
+                        TARGET_CONTAINER_INSTANCE_NAME=cgmbecidevrgaci
+                        TARGET_RESOURCE_GROUP=cgm-be-ci-dev-rg
+                        TARGET_REGISTRY=
+
+                        REGISTRY_PASSWORD=$(az acr credential show --name "$TARGET_REGISTRY" --query "passwords[0].value")
+
+                        az container export \
+                          --name "$TARGET_CONTAINER_INSTANCE_NAME" \
+                          --resource-group "$TARGET_RESOURCE_GROUP" \
+                          --file rg-ci-config.yaml
+
+                        sed -ri "s/^([[:space:]]+image:.+:).+$/\1$IMAGE_TAG/" ./rg-ci-conf.yaml
+                        sed -ri "s/^(([[:space:]]*)username:.*)$/\1\n\2password: $REGISTRY_PASSWORD/" ./rg-ci-config.yaml
+
+                        az container create \
+                          --name "$TARGET_CONTAINER_INSTANCE_NAME" \
+                          --resource-group "$TARGET_RESOURCE_GROUP" \
+                          --file rg-ci-config.yaml
