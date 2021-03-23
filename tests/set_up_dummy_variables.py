@@ -10,8 +10,6 @@ def load_json(json_path):
     return json_obj
 
 
-os.environ['APP_ENV'] = 'LOCAL'
-
 current_working_directory = pathlib.Path.cwd()
 
 
