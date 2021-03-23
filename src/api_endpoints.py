@@ -203,5 +203,5 @@ class ApiEndpoints:
 
 
 if __name__ == "__main__":
-    url = os.getenv('APP_URL','http://localhost:5001')
+    url = os.getenv('APP_URL', 'http://localhost:5001')
     scan_endpoint = '/api/scans/unprocessed?limit=1'
