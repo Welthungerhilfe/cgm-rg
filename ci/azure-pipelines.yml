@@ -37,14 +37,13 @@ stages:
             inputs:
               key: 'rg-venv-cache | "$(Agent.OS)" | requirements.txt'
               path: $(VENV_CACHE_DIR)
-          - task: CmdLine@2
-            displayName: Install dependencies
-            inputs:
-              script: |
-                set -e
-                python -m venv ./.venv && . ./.venv/bin/activate
-                pip install setuptools==50.3.2 wheel==0.36.2
-                pip install -r requirements.txt
+              cacheHitVar: VENV_CACHE_RESTORED
+          - script: |
+              set -e
+              python -m venv ./.venv && . ./.venv/bin/activate
+              pip install setuptools==50.3.2 wheel==0.36.2
+              pip install -r requirements.txt
+            condition: and(not(canceled()), eq(variables.VENV_CACHE_RESTORED, 'false'))
           - task: CmdLine@2
             displayName: Run Flake8
             inputs:
