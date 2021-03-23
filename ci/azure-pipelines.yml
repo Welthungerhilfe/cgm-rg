@@ -18,9 +18,9 @@ parameters:
 #      - naunam
 
 stages:
-  - stage: Setup
+  - stage: Setup_and_Verify
     jobs:
-      - job: Setup
+      - job: Setup_and_Verfiy
         steps:
           - task: CmdLine@2
             name: VariableSetup
@@ -44,11 +44,6 @@ stages:
               pip install -r requirements.txt
             displayName: Install dependencies
             condition: and(not(canceled()), eq(variables.VENV_CACHE_RESTORED, 'false'))
-  - stage: Verify
-    dependsOn: Setup
-    jobs:
-      - job:
-        steps:
           - script: |
               set -e
               source $(VENV_CACHE_DIR)/bin/activate
@@ -71,9 +66,7 @@ stages:
               failTaskOnFailedTests: true
   - stage: Build
     displayName: Build Docker image
-    dependsOn:
-      - Setup
-      - Verify
+    dependsOn: Setup_and_Verify
     variables:
       - name: TAG
         value: $[stageDependencies.Setup.Setup.outputs['VariableSetup.TAG']]
@@ -112,7 +105,7 @@ stages:
     - stage: Deploy_${{ replace(env, '-', '_') }}
       displayName: Deploy ${{ env }}
       dependsOn:
-        - Setup
+        - Setup_and_Verify
         - Build
       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
       variables:
