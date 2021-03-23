@@ -18,7 +18,7 @@ parameters:
 #      - naunam
 
 stages:
-  - stage: Setup_and_Verify
+  - stage: Setup
     jobs:
       - job: Setup
         steps:
@@ -30,8 +30,6 @@ stages:
                 set -e
                 git_hash=$(git rev-parse HEAD)
                 echo "##vso[task.setvariable variable=TAG;isOutput=true]$git_hash"
-      - job: Verify
-        steps:
           - task: Cache@2
             displayName: Cache Python dependencies
             inputs:
@@ -40,25 +38,28 @@ stages:
               cacheHitVar: VENV_CACHE_RESTORED
           - script: |
               set -e
-              python -m venv ./.venv && . ./.venv/bin/activate
+              python -m venv $(VENV_CACHE_DIR)
+              source $(VENV_CACHE_DIR)/bin/activate
               pip install setuptools==50.3.2 wheel==0.36.2
               pip install -r requirements.txt
+            displayName: Install dependencies
             condition: and(not(canceled()), eq(variables.VENV_CACHE_RESTORED, 'false'))
-          - task: CmdLine@2
+  - stage: Verify
+    dependsOn: Setup
+    jobs:
+      - job:
+        steps:
+          - script: |
+              set -e
+              source $(VENV_CACHE_DIR)/bin/activate
+              flake8 src/ --ignore=E501,E402
             displayName: Run Flake8
-            inputs:
-              script: |
-                set -e
-                . ./.venv/bin/activate
-                flake8 src/ --ignore=E501,E402
-          - task: CmdLine@2
+          - script: |
+              set -e
+              source $(VENV_CACHE_DIR)/bin/activate
+              pytest --cov=src --cov-report=xml --junitxml="TEST-rg-pytest.xml"
             displayName: Run unit tests
             continueOnError: true
-            inputs:
-              script: |
-                set -e
-                . ./.venv/bin/activate
-                pytest --cov=src --cov-report=xml --junitxml="TEST-rg-pytest.xml"
           - task: PublishCodeCoverageResults@1
             inputs:
               codeCoverageTool: Cobertura
@@ -71,7 +72,8 @@ stages:
   - stage: Build
     displayName: Build Docker image
     dependsOn:
-      - Setup_and_Verify
+      - Setup
+      - Verify
     variables:
       - name: TAG
         value: $[stageDependencies.Setup.Setup.outputs['VariableSetup.TAG']]
@@ -110,7 +112,7 @@ stages:
     - stage: Deploy_${{ replace(env, '-', '_') }}
       displayName: Deploy ${{ env }}
       dependsOn:
-        - Setup_and_Verify
+        - Setup
         - Build
       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
       variables:
