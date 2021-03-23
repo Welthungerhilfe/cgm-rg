@@ -43,7 +43,7 @@ stages:
               script: |
                 set -e
                 python -m venv ./.venv && . ./.venv/bin/activate
-                pip install setuptools==50.3.2 wheel==0.36.2
+                pip install setuptools==50.3.2 wheel==0.36.2 flake8
                 pip install -r requirements.txt
           - task: CmdLine@2
             displayName: Run Flake8
