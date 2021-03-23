@@ -42,7 +42,7 @@ stages:
             inputs:
               script: |
                 set -e
-                python -m venv ./.venv && ./.venv/bin/activate
+                python -m venv ./.venv && . ./.venv/bin/activate
                 pip install setuptools==50.3.2 wheel==0.36.2
                 pip install -r requirements.txt
           - task: CmdLine@2
