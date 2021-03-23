@@ -26,7 +26,7 @@ class ApiEndpoints:
         self.workflow_endpoint = workflow_endpoint
         self.person_detail_endpoint = person_detail_endpoint
         self.headers = {}
-        self.x_api_key = os.environ["API_KEY"]
+        self.x_api_key = os.getenv("API_KEY", None)
 
     def prepare_header(self):
         headers = copy.deepcopy(self.headers)
