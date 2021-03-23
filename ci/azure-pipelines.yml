@@ -52,18 +52,21 @@ stages:
                 set -e
                 flake8 src/ --ignore=E501,E402
           - task: CmdLine@2
-              displayName: Run unit tests
-              inputs:
-                script: |
-                  set -e
-                  pytest --cov=src --cov-report=xml --junitxml="TEST-rg-pytest.xml"
-              continueOnError: true
+            displayName: Run unit tests
+            continueOnError: true
+            inputs:
+              script: |
+                set -e
+                pytest --cov=src --cov-report=xml --junitxml="TEST-rg-pytest.xml"
+          - task: PublishCodeCoverageResults@1
+            inputs:
+              codeCoverageTool: Cobertura
+              summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
           - task: PublishTestResults@2
             inputs:
               testResultsFormat: 'JUnit'
               testResultsFiles: '**/TEST-*.xml'
               failTaskOnFailedTests: true
-            condition: succeededOrFailed()
   - stage: Build
     displayName: Build Docker image
     dependsOn:
