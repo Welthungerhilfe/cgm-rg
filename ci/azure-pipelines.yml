@@ -5,6 +5,8 @@ variables:
   - group: cgm-rg
   - name: DOCKER_CACHE_DIR
     value: $(Pipeline.Workspace)/image
+  - name: VENV_CACHE_DIR
+    value: $(Pipeline.Workspace)/.venv
 
 parameters:
   - name: var_groups
@@ -16,7 +18,7 @@ parameters:
 #      - naunam
 
 stages:
-  - stage: Setup
+  - stage: Setup_and_Verify
     jobs:
       - job: Setup
         steps:
@@ -28,6 +30,40 @@ stages:
                 set -e
                 git_hash=$(git rev-parse HEAD)
                 echo "##vso[task.setvariable variable=TAG;isOutput=true]$git_hash"
+      - job: Verify
+        steps:
+          - task: Cache@2
+            displayName: Cache Python dependencies
+            inputs:
+              key: 'rg-venv-cache | "$(Agent.OS)" | requirements.txt'
+              path: $(VENV_CACHE_DIR)
+          - task: CmdLine@2
+            displayName: Install dependencies
+            inputs:
+              script: |
+                set -e
+                python -m venv ./.venv && ./.venv/bin/activate
+                pip install setuptools==50.3.2 wheel==0.36.2
+                pip install -r requirements.txt
+          - task: CmdLine@2
+            displayName: Run Flake8
+            inputs:
+              script: |
+                set -e
+                flake8 src/ --ignore=E501,E402
+          - task: CmdLine@2
+              displayName: Run unit tests
+              inputs:
+                script: |
+                  set -e
+                  pytest --cov=src --cov-report=xml --junitxml="TEST-rg-pytest.xml"
+              continueOnError: true
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/TEST-*.xml'
+              failTaskOnFailedTests: true
+            condition: succeededOrFailed()
   - stage: Build
     displayName: Build Docker image
     dependsOn:
