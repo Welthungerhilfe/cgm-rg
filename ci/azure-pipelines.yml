@@ -70,7 +70,7 @@ stages:
   - stage: Build
     displayName: Build Docker image
     dependsOn:
-      - Setup
+      - Setup_and_Verify
     variables:
       - name: TAG
         value: $[stageDependencies.Setup.Setup.outputs['VariableSetup.TAG']]
@@ -109,7 +109,7 @@ stages:
     - stage: Deploy_${{ replace(env, '-', '_') }}
       displayName: Deploy ${{ env }}
       dependsOn:
-        - Setup
+        - Setup_and_Verify
         - Build
       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
       variables:
