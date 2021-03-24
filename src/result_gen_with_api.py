@@ -417,6 +417,10 @@ def main():
 
         try:
             heightflow.run_height_flow()
+        except Exception as e:
+            print(e)
+
+        try:
             heightflow.run_height_flow_MCNN()
         except Exception as e:
             print(e)
