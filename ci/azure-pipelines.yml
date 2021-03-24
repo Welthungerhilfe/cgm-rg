@@ -111,7 +111,7 @@ stages:
       variables:
         - group: cgm-rg-${{ env }}-ci
         - name: TAG
-          value: $[stageDependencies.Setup.Setup.outputs['VariableSetup.TAG']]
+          value: $[stageDependencies.Setup_and_Verfiy.Setup_and_Verfiy.outputs['VariableSetup.TAG']]
       jobs:
         - deployment: Deploy_Container_Instance
           displayName: "Container Instance deployment ${{ env }}"
