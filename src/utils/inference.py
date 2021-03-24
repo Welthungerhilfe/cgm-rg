@@ -24,11 +24,18 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 try:
     height_model = load_model(
         '/app/models/height/outputs/best_model.ckpt/', compile=False)
+except OSError as error:
+    print(error)
+    print("Not able to load the Height model")
+except Exception as e:
+    print(e)
+
+try:
     MCNN_height_model = load_model(
         '/app/models/MCNN/outputs/best_model.ckpt', compile=False)
 except OSError as error:
     print(error)
-    print("Not able to load the Height model")
+    print("Not able to load the MCNN Height model")
 except Exception as e:
     print(e)
 
