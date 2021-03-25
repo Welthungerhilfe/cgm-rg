@@ -172,7 +172,7 @@ class HeightFlow:
         if self.api.post_results(scan_depthmapmultiartifactlatefusion_level_height_result_json) == 201:
             print(
                 "successfully posted scan step level M-CNN height results: ",
-                scan_MCNN_level_height_result_json)
+                scan_depthmapmultiartifactlatefusion_level_height_result_json)
 
     def artifact_level_height_result_object(
             self, predictions, generated_timestamp):
