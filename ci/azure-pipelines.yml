@@ -158,7 +158,7 @@ stages:
                         # Export current setup -> modify and use as input for in-place update
                         TMP_CONF_FILE=rg-ci-conf.yaml
                         az container export \
-                          --name cgmbecidevrgaci \
+                          --name "$TARGET_CONTAINER_INSTANCE_NAME" \
                           --resource-group "$TARGET_RESOURCE_GROUP" \
                           --file "$TMP_CONF_FILE"
 
