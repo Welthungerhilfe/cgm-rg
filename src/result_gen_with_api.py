@@ -10,6 +10,7 @@ from api_endpoints import ApiEndpoints
 from result_generation.blur import BlurFlow
 from result_generation.depthmap_image import DepthMapImgFlow
 from result_generation.height import HeightFlow
+from result_generation.height_mutiartifact import HeightFlowMutliArtifact
 from result_generation.standing import Standing_laying
 from result_generation.weight import WeightFlow
 
@@ -303,7 +304,7 @@ def main():
     preprocessing.set_width(int(240))
     preprocessing.set_height(int(180))
 
-    url = os.getenv('APP_URL', 'http://localhost:5001'())
+    url = os.getenv('APP_URL', 'http://localhost:5001')
     print(f"App URL : {url}")
 
     scan_endpoint = '/api/scans/unprocessed?limit=1'
@@ -377,7 +378,6 @@ def main():
             workflow,
             height_workflow_artifact_path,
             height_workflow_scan_path,
-            height_depthmapmultiartifactlatefusion_workflow_path,
             depth_artifacts,
             scan_parent_dir,
             scan_metadata,
