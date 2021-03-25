@@ -45,17 +45,8 @@ def upsert_workflows(json_paths, workflows, cgm_api):
 
 
 if __name__ == "__main__":
-
-    print("\nApp Environment : ", os.environ['APP_ENV'])
-
-    if os.environ['APP_ENV'] == 'LOCAL':
-        url = "http://localhost:5001"
-    elif os.environ['APP_ENV'] == 'SANDBOX':
-        url = "https://cgm-be-ci-dev-scanner-api.azurewebsites.net"
-    elif os.environ['APP_ENV'] == 'DEMO':
-        url = "https://cgm-be-ci-qa-scanner-api.azurewebsites.net"
-    elif os.environ['APP_ENV'] == 'INBMZ':
-        url = "https://cgm-be-ci-inbmz-scanner-api.azurewebsites.net"
+    url = os.getenv('APP_URL', 'http://localhost:5001')
+    print(f"App URL: {url}")
 
     scan_endpoint = '/api/scans/unprocessed?limit=1'
     get_file_endpoint = '/api/files/'

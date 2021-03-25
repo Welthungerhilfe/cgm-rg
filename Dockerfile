@@ -1,4 +1,3 @@
-# base docker file
 FROM python:3.6-slim-stretch
 
 RUN apt-get -y update
@@ -32,32 +31,14 @@ RUN cd ~ && \
     cd  dlib/ && \
     python3 setup.py install --yes USE_AVX_INSTRUCTIONS
 
-
 WORKDIR /app
+RUN mkdir log
 
 ADD requirements.txt /app/requirements.txt
 RUN pip install -r requirements.txt
 
 ADD . /app
-#RUN chmod +x deployment/*.sh
 
-
-#Environment name of the RG
-ARG APP_ENV=LOCAL
-ENV APP_ENV ${APP_ENV}
-
-# Endpoints and env variables for authentication
-ARG APP_RESOURCE
-ENV APP_RESOURCE $(APP_RESOURCE)
-
-ARG TOKEN_ENDPOINT
-ENV TOKEN_ENDPOINT $(TOKEN_ENDPOINT)
-
-ARG APP_ENDPOINT
-ENV APP_ENDPOINT $(APP_ENDPOINT)
-
-
-RUN mkdir log
 RUN crontab deployment/crontab
 RUN chmod +x entrypoint_with_api.sh
 
