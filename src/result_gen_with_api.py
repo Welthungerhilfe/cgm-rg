@@ -275,10 +275,10 @@ def main():
                         type=str,
                         help='Height Workflow Artifact path')
 
-    parser.add_argument('--height_MCNN_workflow_path',
-                        default="src/workflows/height-MCNN-workflow.json",
+    parser.add_argument('--height_depthmapmultiartifactlatefusion_workflow_path',
+                        default="src/workflows/height-depthmapmultiartifactlatefusion-workflow.json",
                         type=str,
-                        help='Height Workflow MCNN Artifact path')
+                        help='Height Workflow depthmapmultiartifactlatefusion Artifact path')
 
     parser.add_argument('--height_workflow_scan_path',
                         default="src/workflows/height-workflow-scan.json",
@@ -327,7 +327,7 @@ def main():
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
-    height_MCNN_workflow_path = args.height_MCNN_workflow_path
+    height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
 
@@ -385,7 +385,7 @@ def main():
             workflow,
             height_workflow_artifact_path,
             height_workflow_scan_path,
-            height_MCNN_workflow_path,
+            height_depthmapmultiartifactlatefusion_workflow_path,
             depth_artifacts,
             scan_parent_dir,
             scan_metadata,
@@ -421,7 +421,7 @@ def main():
             print(e)
 
         try:
-            heightflow.run_height_flow_MCNN()
+            heightflow.run_height_flow_depthmapmultiartifactlatefusion()
         except Exception as e:
             print(e)
 
