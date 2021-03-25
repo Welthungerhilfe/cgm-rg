@@ -116,10 +116,10 @@ class HeightFlow:
             input_path = self.get_input_path(
                 self.scan_directory, artifact['file'])
 
-            data, width, height, depthScale, max_confidence = preprocessing.load_depth(
+            data, width, height, depth_scale, max_confidence = preprocessing.load_depth(
                 input_path)
             depthmap, height, width = preprocessing.prepare_depthmap(
-                data, width, height, depthScale)
+                data, width, height, depth_scale)
             depthmap = preprocessing.preprocess(depthmap)
             depthmaps.append(depthmap)
 
@@ -143,10 +143,10 @@ class HeightFlow:
         depthmaps = np.zeros((240, 180, 5))
 
         for i, depthmap_path in enumerate(depthmap[0]):
-            data, width, height, depthScale, max_confidence = preprocessing.load_depth(
+            data, width, height, depth_scale, max_confidence = preprocessing.load_depth(
                 depthmap_path)
             depthmap, height, width = preprocessing.prepare_depthmap(
-                data, width, height, depthScale)
+                data, width, height, depth_scale)
             depthmap = preprocessing.preprocess(depthmap)
             depthmaps[:, :, i] = tf.squeeze(depthmap, axis=2)
 
