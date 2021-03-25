@@ -1,10 +1,10 @@
 {
-    "name": "q3-depthmapmultiartifactlatefusion-plaincnn-height-95k",
+    "name": "q3-depthmapmultiartifactlatefusion-height",
     "version": "run-06_01",
     "result_format": "dict",
     "result_binding": "scan",
     "data":{
         "input_format":"application/zip",
-        "model":"q3-depthmapmultiartifactlatefusion-plaincnn-height-95k"
+        "model":"q3-depthmapmultiartifactlatefusion-height"
     }
 }
