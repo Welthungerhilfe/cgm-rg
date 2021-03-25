@@ -69,7 +69,7 @@ stages:
     dependsOn: Setup_and_Verify
     variables:
       - name: TAG
-        value: $[stageDependencies.Setup.Setup.outputs['VariableSetup.TAG']]
+        value: $[stageDependencies.Setup_and_Verify.Setup_and_Verify.outputs['VariableSetup.TAG']]
     jobs:
       - job: Build
         displayName: Build Docker image
