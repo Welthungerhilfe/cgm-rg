@@ -272,7 +272,7 @@ def main():
                         help='Depthmap Image Workflow path')
 
     parser.add_argument('--height_workflow_artifact_path',
-                        default="src/workflows/height-workflow-artifact.json",
+                        default="src/workflows/height-plaincnn-workflow-artifact.json",
                         type=str,
                         help='Height Workflow Artifact path')
 
@@ -282,7 +282,7 @@ def main():
                         help='Height Workflow depthmapmultiartifactlatefusion Artifact path')
 
     parser.add_argument('--height_workflow_scan_path',
-                        default="src/workflows/height-workflow-scan.json",
+                        default="src/workflows/height-plaincnn-workflow-scan.json",
                         type=str,
                         help='Height Workflow Scan path')
 
@@ -385,7 +385,7 @@ def main():
         heightflow_mutliartifact = HeightFlowMutliArtifact(
             cgm_api,
             workflow,
-            '/',
+            height_workflow_artifact_path,
             height_depthmapmultiartifactlatefusion_workflow_path,
             depth_artifacts,
             scan_parent_dir,
