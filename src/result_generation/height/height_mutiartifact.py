@@ -53,5 +53,5 @@ class HeightFlowMutliArtifact(HeightFlow):
             scan_depthmapmultiartifactlatefusion_level_height_result_bunch)
         if self.api.post_results(scan_depthmapmultiartifactlatefusion_level_height_result_json) == 201:
             print(
-                "successfully posted scan step level M-CNN height results: ",
+                "successfully posted scan step level depthmapmultiartifactlatefusion height results: ",
                 scan_depthmapmultiartifactlatefusion_level_height_result_json)
