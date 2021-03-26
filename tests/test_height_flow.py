@@ -64,7 +64,6 @@ def test_get_mean_scan_results():
     assert result == truth
 
 
-'''
 def test_process_depthmaps():
     """
     Test to check proper processing of depthmaps
@@ -80,7 +79,6 @@ def test_process_depthmaps():
     # Verify
 
     assert isinstance(result, np.ndarray)
-'''
 
 
 def test_artifact_level_height_result_object():
