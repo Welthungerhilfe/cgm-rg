@@ -10,7 +10,7 @@ from api_endpoints import ApiEndpoints
 from result_generation.blur import BlurFlow
 from result_generation.depthmap_image import DepthMapImgFlow
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
-from result_generation.height.height_mutiartifact import HeightFlowMutliArtifact
+from result_generation.height.height_mutiartifact import HeightFlowMultiArtifact
 from result_generation.standing import Standing_laying
 from result_generation.weight import WeightFlow
 
@@ -382,7 +382,7 @@ def main():
             scan_parent_dir,
             scan_metadata,
             person_details)
-        heightflow_mutliartifact = HeightFlowMutliArtifact(
+        heightflow_mutliartifact = HeightFlowMultiArtifact(
             cgm_api,
             workflow,
             height_workflow_artifact_path,
