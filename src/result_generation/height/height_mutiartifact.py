@@ -22,7 +22,7 @@ class HeightFlowMutliArtifact(HeightFlow):
                 self.scan_directory, artifact['file'])
             depthmaps_file.append(input_path)
         scans = []
-        scans.append(depthmaps_file)
+        scans = [depthmaps_file]
         samples = list(
             map(partial(preprocessing.sample_systematic_from_artifacts, n_artifacts=5), scans))
         return samples
