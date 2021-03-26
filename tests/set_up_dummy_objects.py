@@ -1,7 +1,6 @@
 import sys
 
 import set_up_dummy_variables
-
 sys.path.append('./src')  # noqa: E402
 from api_endpoints import ApiEndpoints
 from mock import patch
