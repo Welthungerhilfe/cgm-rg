@@ -1,16 +1,18 @@
-import set_up_dummy_variables
 import sys
-sys.path.append('./src')
-from result_generation.blur import BlurFlow
-from result_generation.height import HeightFlow
-from result_generation.weight import WeightFlow
-from result_gen_with_api import ProcessWorkflows
+
+import set_up_dummy_variables
+
+sys.path.append('./src')  # noqa: E402
 from api_endpoints import ApiEndpoints
 from mock import patch
-
+from result_gen_with_api import ProcessWorkflows
+from result_generation.blur import BlurFlow
+from result_generation.height.height_plaincnn import HeightFlowPlainCnn
+from result_generation.weight import WeightFlow
 
 # @patch('workflows.get_workflow_id')
 # @patch('BlurFlow.get_workflow_id', return_value="44af5600-69d2-11eb-9498-8ffe0e3b2017")
+
 
 @patch.object(ProcessWorkflows, 'get_workflow_id')
 def get_dummy_blur_flow_object(mock_some_fn):
@@ -27,7 +29,7 @@ def get_dummy_blur_flow_object(mock_some_fn):
 @patch.object(ProcessWorkflows, 'get_workflow_id')
 def get_dummy_height_flow_object(mock_some_fn):
     mock_some_fn.return_value = '44af5600-69d2-11eb-9498-8ffe0e3b2017'
-    return HeightFlow(
+    return HeightFlowPlainCnn(
         get_dummy_api_endpoint_object(),
         get_dummy_process_workflows_object(),
         'src/workflows/height-workflow-artifact.json',
