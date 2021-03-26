@@ -9,8 +9,8 @@ import utils.preprocessing as preprocessing
 from api_endpoints import ApiEndpoints
 from result_generation.blur import BlurFlow
 from result_generation.depthmap_image import DepthMapImgFlow
-from result_generation.height import HeightFlow
-from result_generation.height_mutiartifact import HeightFlowMutliArtifact
+from result_generation.height.height_plaincnn import HeightFlowPlainCnn
+from result_generation.height.height_mutiartifact import HeightFlowMutliArtifact
 from result_generation.standing import Standing_laying
 from result_generation.weight import WeightFlow
 
@@ -373,11 +373,20 @@ def main():
             depth_artifacts,
             scan_parent_dir,
             scan_metadata)
-        heightflow = HeightFlow(
+        heightflow_plaincnn = HeightFlowPlainCnn(
             cgm_api,
             workflow,
             height_workflow_artifact_path,
             height_workflow_scan_path,
+            depth_artifacts,
+            scan_parent_dir,
+            scan_metadata,
+            person_details)
+        heightflow_mutliartifact = HeightFlowMutliArtifact(
+            cgm_api,
+            workflow,
+            '/',
+            height_depthmapmultiartifactlatefusion_workflow_path,
             depth_artifacts,
             scan_parent_dir,
             scan_metadata,
@@ -408,12 +417,12 @@ def main():
             print(e)
 
         try:
-            heightflow.run_height_flow()
+            heightflow_plaincnn.run_height_flow()
         except Exception as e:
             print(e)
 
         try:
-            heightflow.run_height_flow_depthmapmultiartifactlatefusion()
+            heightflow_mutliartifact.run_height_flow_depthmapmultiartifactlatefusion()
         except Exception as e:
             print(e)
 
