@@ -26,11 +26,18 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 try:
     height_model = load_model(
         '/app/models/height/outputs/best_model.ckpt/', compile=False)
-    MCNN_height_model = load_model(
-        '/app/models/MCNN/outputs/best_model.ckpt', compile=False)
 except OSError as error:
     print(error)
     print("Not able to load the Height model")
+except Exception as e:
+    print(e)
+
+try:
+    depthmapmultiartifactlatefusion_height_model = load_model(
+        '/app/models/depthmapmultiartifactlatefusion/outputs/best_model.ckpt', compile=False)
+except OSError as error:
+    print(error)
+    print("Not able to load the depthmapmultiartifactlatefusion Height model")
 except Exception as e:
     print(e)
 
@@ -64,8 +71,8 @@ def get_standing_laying_prediction_local(numpy_array):
     return standing_laying.predict(numpy_array)
 
 
-def get_MCNN_height_predictions_local(numpy_array):
-    return MCNN_height_model.predict(numpy_array)
+def get_depthmapmultiartifactlatefusion_height_predictions_local(numpy_array):
+    return depthmapmultiartifactlatefusion_height_model.predict(numpy_array)
 
 
 '''

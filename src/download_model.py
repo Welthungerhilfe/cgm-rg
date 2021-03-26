@@ -68,7 +68,7 @@ def main():
                    experiment_name='q3-depthmapmultiartifactlatefusion-plaincnn-height-95',
                    run_id='q3-depthmapmultiartifactlatefusion-plaincnn-height-95k_1614177517_ecd7b6e2',
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
-                   output_location=REPO_DIR / 'models/MCNN')
+                   output_location=REPO_DIR / 'models/depthmapmultiartifactlatefusion')
 
 
 if __name__ == "__main__":

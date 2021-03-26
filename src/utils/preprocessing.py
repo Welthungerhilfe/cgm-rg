@@ -185,6 +185,10 @@ def standing_laying_data_preprocessing(source_path):
 
 
 def sample_systematic_from_artifacts(artifacts: list, n_artifacts: int) -> list:
+    '''
+    Code reference from cgm-ml
+    https://github.com/Welthungerhilfe/cgm-rg/blob/458bde6710758fc7c16331ad41e043b060b53c49/src/utils/preprocessing.py#L187
+    '''
     n_artifacts_total = len(artifacts)
     n_skip = n_artifacts_total // n_artifacts  # 20 / 5 = 4
     indexes_to_select = list(

@@ -32,7 +32,7 @@ def get_dummy_height_flow_object(mock_some_fn):
         get_dummy_process_workflows_object(),
         'src/workflows/height-workflow-artifact.json',
         'src/workflows/height-workflow-scan.json',
-        'src/workflows/height-MCNN-workflow.json',
+        'src/workflows/height-depthmapmultiartifactlatefusion-workflow.json',
         set_up_dummy_variables.depth_artifacts,
         set_up_dummy_variables.scan_parent_dir,
         set_up_dummy_variables.scan_metadata,

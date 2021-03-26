@@ -65,7 +65,7 @@ class HeightFlow:
             workflows,
             artifact_workflow_path,
             scan_workflow_path,
-            scan_MCNN_workflow_path,
+            scan_depthmapmultiartifactlatefusion_workflow_path,
             artifacts,
             scan_parent_dir,
             scan_metadata,
@@ -75,13 +75,13 @@ class HeightFlow:
         self.artifacts = artifacts
         self.artifact_workflow_path = artifact_workflow_path
         self.scan_workflow_path = scan_workflow_path
-        self.scan_MCNN_workflow_path = scan_MCNN_workflow_path
+        self.scan_depthmapmultiartifactlatefusion_workflow_path = scan_depthmapmultiartifactlatefusion_workflow_path
         self.artifact_workflow_obj = self.workflows.load_workflows(
             self.artifact_workflow_path)
         self.scan_workflow_obj = self.workflows.load_workflows(
             self.scan_workflow_path)
-        self.scan_MCNN_workflow_obj = self.workflows.load_workflows(
-            self.scan_MCNN_workflow_path)
+        self.scan_depthmapmultiartifactlatefusion_workflow_obj = self.workflows.load_workflows(
+            self.scan_depthmapmultiartifactlatefusion_workflow_path)
         self.scan_metadata = scan_metadata
         self.person_details = person_details
         self.scan_parent_dir = scan_parent_dir
@@ -95,8 +95,8 @@ class HeightFlow:
             self.artifact_workflow_obj['name'], self.artifact_workflow_obj['version'])
         self.scan_workflow_obj['id'] = self.workflows.get_workflow_id(
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
-        self.scan_MCNN_workflow_obj['id'] = self.workflows.get_workflow_id(
-            self.scan_MCNN_workflow_obj['name'], self.scan_MCNN_workflow_obj['version'])
+        self.scan_depthmapmultiartifactlatefusion_workflow_obj['id'] = self.workflows.get_workflow_id(
+            self.scan_depthmapmultiartifactlatefusion_workflow_obj['name'], self.scan_depthmapmultiartifactlatefusion_workflow_obj['version'])
 
     def bunch_object_to_json_object(self, bunch_object):
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
@@ -116,10 +116,10 @@ class HeightFlow:
             input_path = self.get_input_path(
                 self.scan_directory, artifact['file'])
 
-            data, width, height, depthScale, max_confidence = preprocessing.load_depth(
+            data, width, height, depth_scale, max_confidence = preprocessing.load_depth(
                 input_path)
             depthmap, height, width = preprocessing.prepare_depthmap(
-                data, width, height, depthScale)
+                data, width, height, depth_scale)
             depthmap = preprocessing.preprocess(depthmap)
             depthmaps.append(depthmap)
 
@@ -127,7 +127,7 @@ class HeightFlow:
 
         return depthmaps
 
-    def process_depthmaps_MCNN(self):
+    def process_depthmaps_depthmapmultiartifactlatefusion(self):
         depthmaps_file = []
         for artifact in self.artifacts:
             input_path = self.get_input_path(
@@ -143,10 +143,10 @@ class HeightFlow:
         depthmaps = np.zeros((240, 180, 5))
 
         for i, depthmap_path in enumerate(depthmap[0]):
-            data, width, height, depthScale, max_confidence = preprocessing.load_depth(
+            data, width, height, depth_scale, max_confidence = preprocessing.load_depth(
                 depthmap_path)
             depthmap, height, width = preprocessing.prepare_depthmap(
-                data, width, height, depthScale)
+                data, width, height, depth_scale)
             depthmap = preprocessing.preprocess(depthmap)
             depthmaps[:, :, i] = tf.squeeze(depthmap, axis=2)
 
@@ -159,20 +159,20 @@ class HeightFlow:
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         self.post_height_results(height_predictions, generated_timestamp)
 
-    def run_height_flow_MCNN(self):
-        depthmap = self.process_depthmaps_MCNN()
+    def run_height_flow_depthmapmultiartifactlatefusion(self):
+        depthmap = self.process_depthmaps_depthmapmultiartifactlatefusion()
         depthmap = self.create_multiartifact_sample(depthmap)
-        height_predictions = inference.get_MCNN_height_predictions_local(
+        height_predictions = inference.get_depthmapmultiartifactlatefusion_height_predictions_local(
             depthmap)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-        scan_MCNN_level_height_result_bunch = self.scan_level_height_result_object(
-            height_predictions, generated_timestamp, self.scan_MCNN_workflow_obj)
-        scan_MCNN_level_height_result_json = self.bunch_object_to_json_object(
-            scan_MCNN_level_height_result_bunch)
-        if self.api.post_results(scan_MCNN_level_height_result_json) == 201:
+        scan_depthmapmultiartifactlatefusion_level_height_result_bunch = self.scan_level_height_result_object(
+            height_predictions, generated_timestamp, self.scan_depthmapmultiartifactlatefusion_workflow_obj)
+        scan_depthmapmultiartifactlatefusion_level_height_result_json = self.bunch_object_to_json_object(
+            scan_depthmapmultiartifactlatefusion_level_height_result_bunch)
+        if self.api.post_results(scan_depthmapmultiartifactlatefusion_level_height_result_json) == 201:
             print(
                 "successfully posted scan step level M-CNN height results: ",
-                scan_MCNN_level_height_result_json)
+                scan_depthmapmultiartifactlatefusion_level_height_result_json)
 
     def artifact_level_height_result_object(
             self, predictions, generated_timestamp):
