@@ -1,10 +1,8 @@
 import sys
 from datetime import datetime
-from functools import partial
 from pathlib import Path
 
 import numpy as np
-import tensorflow as tf
 
 from result_generation.height.height import HeightFlow
 
