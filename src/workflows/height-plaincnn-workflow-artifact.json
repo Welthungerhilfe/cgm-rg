@@ -5,6 +5,6 @@
     "result_binding": "artifact",
     "data":{
         "input_format":"application/zip",
-        "model":"q3-depthmap-height"
+        "model":"q3-depthmap-plaincnn-height-95k"
     }
 }
