@@ -13,7 +13,7 @@ import utils.inference as inference  # noqa: E402
 import utils.preprocessing as preprocessing  # noqa: E402
 
 
-class HeightFlowMutliArtifact(HeightFlow):
+class HeightFlowMultiArtifact(HeightFlow):
 
     def process_depthmaps_depthmapmultiartifactlatefusion(self):
         depthmaps_file = [self.get_input_path(self.scan_directory, artifact['file'])
