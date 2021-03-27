@@ -1,3 +1,4 @@
+[![codecov](https://codecov.io/gh/Welthungerhilfe/cgm-rg/branch/develop/graph/badge.svg?token=W9UYS0I78M)](https://codecov.io/gh/Welthungerhilfe/cgm-rg)
 # Child Growth Monitor Result Generation
 
 [Child Growth Monitor (CGM)](https://childgrowthmonitor.org) is a
