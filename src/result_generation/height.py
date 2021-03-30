@@ -5,9 +5,7 @@ import uuid
 from datetime import datetime
 from functools import partial
 from pathlib import Path
-
 import numpy as np
-import tensorflow as tf
 from bunch import Bunch
 from cgmzscore import Calculator
 
@@ -22,41 +20,16 @@ class HeightFlow:
     """
     A class to handle height results generation.
 
-    Attributes
-    ----------
-    api : object
-        object of ApiEndpoints class
-    workflows : list
-        list of registered workflows
-    artifact_workflow_path : str
-        path of the workflow file for artifact level height results
-    scan_workflow_path : json
-        path of the workflow file for scan level height results
-    artifacts : list
-        list of artifacts to run heigth flow on
-    scan_parent_dir : str
-        directory where scans are stored
-    scan_metadata : json
-        metadata of the scan to run height flow on
-
-    Methods
-    -------
-    bunch_object_to_json_object(bunch_object):
-        Converts given bunch object to json object.
-    get_input_path(directory, file_name):
-        Returns input path for given directory name and file name.
-    get_mean_scan_results(predictions):
-        Returns the average prediction from given list of predictions.
-    process_depthmaps():
-        Loads the list of depthmaps in scan as numpy array.
-    run_height_flow():
-        Driver method for height flow.
-    artifact_level_height_result_object(predictions, generated_timestamp):
-        Prepares artifact level height result object.
-    scan_level_height_result_object(predictions, generated_timestamp):
-        Prepares scan level height result object.
-    post_height_results(predictions, generated_timestamp):
-        Posts the artifact and scan level height results to api.
+    Args:
+        api (object): object of ApiEndpoints class
+        workflows (list): list of registered workflows
+        artifact_workflow_path (str): path of the workflow file for artifact level height results
+        scan_workflow_path (str): path of the workflow file for scan level height results
+        scan_MCNN_workflow_path (str): path of the workflow file for scan level MCNN model height results
+        artifacts (list): list of artifacts to run heigth flow on
+        scan_parent_dir (str): directory where scans are stored
+        scan_metadata (json): metadata of the scan to run height flow on
+        person_details (dict): details of the child (sex, age)
     """
 
     def __init__(
