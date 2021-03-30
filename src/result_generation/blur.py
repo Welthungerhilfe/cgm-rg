@@ -3,8 +3,8 @@ import os
 import uuid
 from datetime import datetime
 
-import cv2
-import face_recognition
+# import cv2
+# import face_recognition
 import numpy as np
 from bunch import Bunch
 
@@ -14,40 +14,14 @@ RESIZE_FACTOR = 4
 class BlurFlow:
     """
     A class to handle face blur results generation.
-
-    Attributes
-    ----------
-    api : object
-        object of ApiEndpoints class
-    workflows : list
-        list of registered workflows
-    workflow_path : str
-        path of the workflow file for face blurring
-    artifacts : list
-        list of artifacts to run blur flow on
-    scan_parent_dir : str
-        directory where scans are stored
-    scan_metadata : json
-        metadata of the scan to run blur flow on
-
-    Methods
-    -------
-    bunch_object_to_json_object(bunch_object):
-        Converts given bunch object to json object.
-    get_input_path(directory, file_name):
-        Returns input path for given directory name and file name.
-    run_blur_flow():
-        Driver method for blur flow.
-    blur_artifacts():
-        Blurs the list of artifacts.
-    blur_face(source_path):
-        Runs face blur on given source_path.
-    post_blur_files():
-        Posts the blurred file to api.
-    prepare_result_object():
-        Prepares result object for results generated.
-    post_result_object():
-        Posts the result object to api.
+    
+    Args:
+        api (object): object of ApiEndpoints class
+        workflows (list): list of registered workflows
+        workflow_path (str): path of the workflow file for face blurring
+        artifacts (list): list of artifacts to run blur flow on
+        scan_parent_dir (str): directory where scans are stored
+        scan_metadata (json): metadata of the scan to run blur flow on
     """
 
     def __init__(
@@ -75,20 +49,47 @@ class BlurFlow:
             self.workflow_obj['name'], self.workflow_obj['version'])
 
     def bunch_object_to_json_object(self, bunch_object):
+        """
+        Convert a bunch object to json object.
+        
+        Args:
+            bunch_object (Bunch): The data to be converted as bunch_object.
+
+        Returns:
+            Returns the data as a json object.
+
+        """
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
         json_object = json.loads(json_string)
 
         return json_object
 
     def get_input_path(self, directory, file_name):
+        """
+        Returns the input path for given directory and filename
+        
+        Args:
+            directory (str): directory of the file.
+            file_name (str): name of the file.
+
+        Returns:
+            Returns the input_path as a string.
+
+        """
         return os.path.join(directory, file_name)
 
     def run_blur_flow(self):
+        """
+        Driver method for blur flow.
+        """
         self.blur_artifacts()
         self.post_blur_files()
         self.post_result_object()
 
     def blur_artifacts(self):
+        """
+        Runs face blurring on all the artifacts.
+        """
         for i, artifact in enumerate(self.artifacts):
 
             input_path = self.get_input_path(
@@ -105,7 +106,9 @@ class BlurFlow:
                 artifact['blurred_image'] = blur_img_binary
 
     def blur_face(self, source_path: str):
-        """Blur image
+        """
+        Blur image.
+        
         Returns:
             bool: True if blurred otherwise False
         """
@@ -157,6 +160,9 @@ class BlurFlow:
         return rgb_image, True
 
     def post_blur_files(self):
+        """
+        Posts all the blur files using API and stores the file_id returned by API.
+        """
         for artifact in self.artifacts:
             blur_id_from_post_request, post_status = self.api.post_files(
                 artifact['blurred_image'])
@@ -166,6 +172,12 @@ class BlurFlow:
                     '%Y-%m-%dT%H:%M:%SZ')
 
     def prepare_result_object(self):
+        """
+        Prepares a result object according to specifications of the API.
+
+        Returns:
+            result object as a Bunch object.
+        """
         res = Bunch()
         res.results = []
         for artifact in self.artifacts:
@@ -182,6 +194,9 @@ class BlurFlow:
         return res
 
     def post_result_object(self):
+        """
+        Posts the results to the API
+        """
         blur_result = self.prepare_result_object()
         blur_result_object = self.bunch_object_to_json_object(blur_result)
         if self.api.post_results(blur_result_object) == 201:
