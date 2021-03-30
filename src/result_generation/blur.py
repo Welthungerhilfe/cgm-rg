@@ -3,8 +3,8 @@ import os
 import uuid
 from datetime import datetime
 
-# import cv2
-# import face_recognition
+import cv2
+import face_recognition
 import numpy as np
 from bunch import Bunch
 
@@ -14,7 +14,7 @@ RESIZE_FACTOR = 4
 class BlurFlow:
     """
     A class to handle face blur results generation.
-    
+
     Args:
         api (object): object of ApiEndpoints class
         workflows (list): list of registered workflows
@@ -51,7 +51,7 @@ class BlurFlow:
     def bunch_object_to_json_object(self, bunch_object):
         """
         Convert a bunch object to json object.
-        
+
         Args:
             bunch_object (Bunch): The data to be converted as bunch_object.
 
@@ -67,7 +67,7 @@ class BlurFlow:
     def get_input_path(self, directory, file_name):
         """
         Returns the input path for given directory and filename
-        
+
         Args:
             directory (str): directory of the file.
             file_name (str): name of the file.
@@ -108,7 +108,7 @@ class BlurFlow:
     def blur_face(self, source_path: str):
         """
         Blur image.
-        
+
         Returns:
             bool: True if blurred otherwise False
         """

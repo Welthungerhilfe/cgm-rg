@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 from bunch import Bunch
 from cgmzscore import Calculator
+import tensorflow as tf
 
 from result_generation.utils import MAX_AGE, MAX_HEIGHT, MIN_HEIGHT, age
 
@@ -74,7 +75,7 @@ class HeightFlow:
     def bunch_object_to_json_object(self, bunch_object):
         """
         Convert a bunch object to json object.
-        
+
         Args:
             bunch_object (Bunch): The data to be converted as bunch_object.
 
@@ -90,7 +91,7 @@ class HeightFlow:
     def get_input_path(self, directory, file_name):
         """
         Returns the input path for given directory and filename.
-        
+
         Args:
             directory (str): directory of the file.
             file_name (str): name of the file.
@@ -107,7 +108,7 @@ class HeightFlow:
 
         Args:
             predictions (numpy.ndarray): numpy array of float values.
-        
+
         Returns:
             str of mean value of all values
 

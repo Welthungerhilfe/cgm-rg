@@ -67,7 +67,7 @@ class WeightFlow:
     def bunch_object_to_json_object(self, bunch_object):
         """
         Convert a bunch object to json object.
-        
+
         Args:
             bunch_object (Bunch): The data to be converted as bunch_object.
 
@@ -83,7 +83,7 @@ class WeightFlow:
     def get_input_path(self, directory, file_name):
         """
         Returns the input path for given directory and filename
-        
+
         Args:
             directory (str): directory of the file.
             file_name (str): name of the file.
@@ -100,7 +100,7 @@ class WeightFlow:
 
         Args:
             predictions (numpy.ndarray): numpy array of float values.
-        
+
         Returns:
             str of mean value of all values
 
