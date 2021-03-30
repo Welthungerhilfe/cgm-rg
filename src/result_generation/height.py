@@ -72,18 +72,55 @@ class HeightFlow:
             self.scan_MCNN_workflow_obj['name'], self.scan_MCNN_workflow_obj['version'])
 
     def bunch_object_to_json_object(self, bunch_object):
+        """
+        Convert a bunch object to json object.
+        
+        Args:
+            bunch_object (Bunch): The data to be converted as bunch_object.
+
+        Returns:
+            Returns the data as a json object.
+
+        """
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
         json_object = json.loads(json_string)
 
         return json_object
 
     def get_input_path(self, directory, file_name):
+        """
+        Returns the input path for given directory and filename.
+        
+        Args:
+            directory (str): directory of the file.
+            file_name (str): name of the file.
+
+        Returns:
+            Returns the input_path as a string.
+
+        """
         return os.path.join(directory, file_name)
 
     def get_mean_scan_results(self, predictions):
+        """
+        Returns the mean of the given list of predictions.
+
+        Args:
+            predictions (numpy.ndarray): numpy array of float values.
+        
+        Returns:
+            str of mean value of all values
+
+        """
         return str(np.mean(predictions))
 
     def process_depthmaps(self):
+        """
+        Loads all the depthmaps in a scan and append them as a single numpy array.
+
+        Returns:
+            numpy array of all depthmaps
+        """
         depthmaps = []
         for artifact in self.artifacts:
             input_path = self.get_input_path(
@@ -127,12 +164,18 @@ class HeightFlow:
         return depthmaps
 
     def run_height_flow(self):
+        """
+        Driver method for height flow.
+        """
         depthmaps = self.process_depthmaps()
         height_predictions = inference.get_height_predictions_local(depthmaps)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         self.post_height_results(height_predictions, generated_timestamp)
 
     def run_height_flow_MCNN(self):
+        """
+        Driver method for running MCNN height flow.
+        """
         depthmap = self.process_depthmaps_MCNN()
         depthmap = self.create_multiartifact_sample(depthmap)
         height_predictions = inference.get_MCNN_height_predictions_local(
@@ -149,6 +192,12 @@ class HeightFlow:
 
     def artifact_level_height_result_object(
             self, predictions, generated_timestamp):
+        """
+        Prepares a artifact level height result object according to specifications of the API.
+
+        Returns:
+            artifact level height result object as a Bunch object.
+        """
         res = Bunch()
         res.results = []
         for artifact, prediction in zip(self.artifacts, predictions):
@@ -167,6 +216,12 @@ class HeightFlow:
 
     def scan_level_height_result_object(
             self, predictions, generated_timestamp, workflow_obj):
+        """
+        Prepares a scan level height result object according to specifications of the API.
+
+        Returns:
+            scan level height result object as a Bunch object.
+        """
         res = Bunch()
         res.results = []
         height_result = Bunch()
@@ -188,6 +243,15 @@ class HeightFlow:
         return res
 
     def zscore_lhfa(self, mean_prediction):
+        """
+        Calculates the length for age z_score using given height prediction value and person details(age, sex)
+
+        Args:
+            mean_prediction (str): mean value of predictions for a scan
+
+        Returns:
+            string of class where the person belongs(Severly Stunted, Moderately Stunted, Not Stunted)
+        """
         sex = 'M' if self.person_details['sex'] == 'male' else 'F'
         age_in_days = age(
             self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
@@ -204,6 +268,9 @@ class HeightFlow:
         return class_lhfa
 
     def post_height_results(self, predictions, generated_timestamp):
+        """
+        Posts the prepared scan and artifact level height results to the API
+        """
         artifact_level_height_result_bunch = self.artifact_level_height_result_object(
             predictions, generated_timestamp)
         artifact_level_height_result_json = self.bunch_object_to_json_object(

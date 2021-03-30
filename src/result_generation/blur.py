@@ -173,7 +173,7 @@ class BlurFlow:
 
     def prepare_result_object(self):
         """
-        Prepares a result object according to specifications of the API.
+        Prepares a blur result object according to specifications of the API.
 
         Returns:
             result object as a Bunch object.
@@ -195,7 +195,7 @@ class BlurFlow:
 
     def post_result_object(self):
         """
-        Posts the results to the API
+        Posts the prepared blur results to the API
         """
         blur_result = self.prepare_result_object()
         blur_result_object = self.bunch_object_to_json_object(blur_result)

@@ -20,41 +20,15 @@ class WeightFlow:
     """
     A class to handle weight results generation.
 
-    Attributes
-    ----------
-    api : object
-        object of ApiEndpoints class
-    workflows : list
-        list of registered workflows
-    artifact_workflow_path : str
-        path of the workflow file for artifact level weight results
-    scan_workflow_path : json
-        path of the workflow file for scan level weight results
-    artifacts : list
-        list of artifacts to run weigth flow on
-    scan_parent_dir : str
-        directory where scans are stored
-    scan_metadata : json
-        metadata of the scan to run weight flow on
-
-    Methods
-    -------
-    bunch_object_to_json_object(bunch_object):
-        Converts given bunch object to json object.
-    get_input_path(directory, file_name):
-        Returns input path for given directory name and file name.
-    get_mean_scan_results(predictions):
-        Returns the average prediction from given list of predictions.
-    process_depthmaps():
-        Loads the list of depthmaps in scan as numpy array.
-    run_weight_flow():
-        Driver method for weight flow.
-    artifact_level_weight_result_object(predictions, generated_timestamp):
-        Prepares artifact level weight result object.
-    scan_level_weight_result_object(predictions, generated_timestamp):
-        Prepares scan level weight result object.
-    post_weight_results(predictions, generated_timestamp):
-        Posts the artifact and scan level weight results to api.
+    Args:
+        api (object): object of ApiEndpoints class
+        workflows (list): list of registered workflows
+        artifact_workflow_path (str): path of the workflow file for artifact level weight results
+        scan_workflow_path (str): path of the workflow file for scan level weight results
+        artifacts (list): list of artifacts to run weigth flow on
+        scan_parent_dir (str): directory where scans are stored
+        scan_metadata (json): metadata of the scan to run height flow on
+        person_details (dict): details of the child (sex, age)
     """
 
     def __init__(
@@ -91,18 +65,55 @@ class WeightFlow:
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
 
     def bunch_object_to_json_object(self, bunch_object):
+        """
+        Convert a bunch object to json object.
+        
+        Args:
+            bunch_object (Bunch): The data to be converted as bunch_object.
+
+        Returns:
+            Returns the data as a json object.
+
+        """
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
         json_object = json.loads(json_string)
 
         return json_object
 
     def get_input_path(self, directory, file_name):
+        """
+        Returns the input path for given directory and filename
+        
+        Args:
+            directory (str): directory of the file.
+            file_name (str): name of the file.
+
+        Returns:
+            Returns the input_path as a string.
+
+        """
         return os.path.join(directory, file_name)
 
     def get_mean_scan_results(self, predictions):
+        """
+        Returns the mean of the given list of predictions.
+
+        Args:
+            predictions (numpy.ndarray): numpy array of float values.
+        
+        Returns:
+            str of mean value of all values
+
+        """
         return str(np.mean(predictions))
 
     def process_depthmaps(self):
+        """
+        Loads all the depthmaps in a scan and append them as a single numpy array.
+
+        Returns:
+            numpy array of all depthmaps
+        """
         depthmaps = []
         for artifact in self.artifacts:
             input_path = self.get_input_path(
@@ -120,6 +131,9 @@ class WeightFlow:
         return depthmaps
 
     def run_weight_flow(self):
+        """
+        Driver method for weight flow.
+        """
         depthmaps = self.process_depthmaps()
         weight_predictions = inference.get_weight_predictions_local(depthmaps)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -127,6 +141,12 @@ class WeightFlow:
 
     def artifact_level_weight_result_object(
             self, predictions, generated_timestamp):
+        """
+        Prepares a artifact level weight result object according to specifications of the API.
+
+        Returns:
+            artifact level weight result object as a Bunch object.
+        """
         res = Bunch()
         res.results = []
         for artifact, prediction in zip(self.artifacts, predictions):
@@ -145,6 +165,12 @@ class WeightFlow:
 
     def scan_level_weight_result_object(
             self, predictions, generated_timestamp):
+        """
+        Prepares a scan level weight result object according to specifications of the API.
+
+        Returns:
+            scan level weight result object as a Bunch object.
+        """
         res = Bunch()
         res.results = []
         weight_result = Bunch()
@@ -166,6 +192,15 @@ class WeightFlow:
         return res
 
     def zscore_wfa(self, mean_prediction):
+        """
+        Calculates the weight for age z_score using given weight prediction value and person details(age, sex)
+
+        Args:
+            mean_prediction (str): mean value of predictions for a scan
+
+        Returns:
+            string of class where the person belongs(Severly Under-weight, Moderately Under-weight, Not underweight)
+        """
         sex = 'M' if self.person_details['sex'] == 'male' else 'F'
         age_in_days = age(
             self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
@@ -182,6 +217,9 @@ class WeightFlow:
         return class_wfa
 
     def post_weight_results(self, predictions, generated_timestamp):
+        """
+        Posts the prepared scan and artifact level weight results to the API
+        """
         artifact_level_weight_result_bunch = self.artifact_level_weight_result_object(
             predictions, generated_timestamp)
         artifact_level_weight_result_json = self.bunch_object_to_json_object(
