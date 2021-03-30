@@ -38,8 +38,92 @@
 <div class="section" id="weight-flow">
 <h2>Weight Flow<a class="headerlink" href="#weight-flow" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="blur-flow">
-<h2>Blur Flow<a class="headerlink" href="#blur-flow" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-src.result_generation.blur">
+<span id="blur-flow"></span><h2>Blur Flow<a class="headerlink" href="#module-src.result_generation.blur" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="src.result_generation.blur.BlurFlow">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">src.result_generation.blur.</span></code><code class="sig-name descname"><span class="pre">BlurFlow</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">artifacts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_parent_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/result_generation/blur.html#BlurFlow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to handle face blur results generation.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>api (object): object of ApiEndpoints class
+workflows (list): list of registered workflows
+workflow_path (str): path of the workflow file for face blurring
+artifacts (list): list of artifacts to run blur flow on
+scan_parent_dir (str): directory where scans are stored
+scan_metadata (json): metadata of the scan to run blur flow on</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.blur_artifacts">
+<code class="sig-name descname"><span class="pre">blur_artifacts</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/result_generation/blur.html#BlurFlow.blur_artifacts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.blur_artifacts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs face blurring on all the artifacts.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.blur_face">
+<code class="sig-name descname"><span class="pre">blur_face</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/result_generation/blur.html#BlurFlow.blur_face"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.blur_face" title="Permalink to this definition">¶</a></dt>
+<dd><p>Blur image.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>bool: True if blurred otherwise False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.bunch_object_to_json_object">
+<code class="sig-name descname"><span class="pre">bunch_object_to_json_object</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bunch_object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/result_generation/blur.html#BlurFlow.bunch_object_to_json_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.bunch_object_to_json_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a bunch object to json object.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>bunch_object (Bunch): The data to be converted as bunch_object.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Returns the data as a json object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.get_input_path">
+<code class="sig-name descname"><span class="pre">get_input_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/result_generation/blur.html#BlurFlow.get_input_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.get_input_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the input path for given directory and filename</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>directory (str): directory of the file.
+file_name (str): name of the file.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Returns the input_path as a string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.post_blur_files">
+<code class="sig-name descname"><span class="pre">post_blur_files</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/result_generation/blur.html#BlurFlow.post_blur_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.post_blur_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Posts all the blur files using API and stores the file_id returned by API.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.post_result_object">
+<code class="sig-name descname"><span class="pre">post_result_object</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/result_generation/blur.html#BlurFlow.post_result_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.post_result_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Posts the results to the API</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.prepare_result_object">
+<code class="sig-name descname"><span class="pre">prepare_result_object</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/result_generation/blur.html#BlurFlow.prepare_result_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.prepare_result_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares a result object according to specifications of the API.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>result object as a Bunch object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.run_blur_flow">
+<code class="sig-name descname"><span class="pre">run_blur_flow</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/result_generation/blur.html#BlurFlow.run_blur_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.run_blur_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Driver method for blur flow.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 

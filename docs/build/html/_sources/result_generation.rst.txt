@@ -8,13 +8,13 @@ Height Flow
    :members:
 
 Weight Flow
-------
+---------------
 
 .. automodule:: src.result_generation.weight
    :members:
 
 Blur Flow
--------
+---------------
 
 .. automodule:: src.result_generation.blur
    :members:
