@@ -36,8 +36,8 @@
 <span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 
-<span class="c1"># import cv2</span>
-<span class="c1"># import face_recognition</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">face_recognition</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">bunch</span> <span class="kn">import</span> <span class="n">Bunch</span>
 
@@ -47,7 +47,7 @@
 <div class="viewcode-block" id="BlurFlow"><a class="viewcode-back" href="../../../result_generation.html#src.result_generation.blur.BlurFlow">[docs]</a><span class="k">class</span> <span class="nc">BlurFlow</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class to handle face blur results generation.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        api (object): object of ApiEndpoints class</span>
 <span class="sd">        workflows (list): list of registered workflows</span>
@@ -84,7 +84,7 @@
 <div class="viewcode-block" id="BlurFlow.bunch_object_to_json_object"><a class="viewcode-back" href="../../../result_generation.html#src.result_generation.blur.BlurFlow.bunch_object_to_json_object">[docs]</a>    <span class="k">def</span> <span class="nf">bunch_object_to_json_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bunch_object</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert a bunch object to json object.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            bunch_object (Bunch): The data to be converted as bunch_object.</span>
 
@@ -100,7 +100,7 @@
 <div class="viewcode-block" id="BlurFlow.get_input_path"><a class="viewcode-back" href="../../../result_generation.html#src.result_generation.blur.BlurFlow.get_input_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_input_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the input path for given directory and filename</span>
-<span class="sd">        </span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            directory (str): directory of the file.</span>
 <span class="sd">            file_name (str): name of the file.</span>
@@ -141,12 +141,12 @@
 <div class="viewcode-block" id="BlurFlow.blur_face"><a class="viewcode-back" href="../../../result_generation.html#src.result_generation.blur.BlurFlow.blur_face">[docs]</a>    <span class="k">def</span> <span class="nf">blur_face</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Blur image.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if blurred otherwise False</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Read the image.</span>
-        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">source_path</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{source_path}</span><span class="s2"> does not exist&quot;</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">source_path</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">source_path</span><span class="si">}</span><span class="s2"> does not exist&quot;</span>
         <span class="n">rgb_image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">source_path</span><span class="p">)</span>
         <span class="n">image</span> <span class="o">=</span> <span class="n">rgb_image</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># RGB -&gt; BGR for OpenCV</span>
 
@@ -189,7 +189,7 @@
 
         <span class="c1"># logging.info(f&quot;{len(face_locations)} face locations found and blurred for path: {source_path}&quot;)</span>
         <span class="nb">print</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;{len(face_locations)} face locations found and blurred for path: </span><span class="si">{source_path}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">face_locations</span><span class="p">)</span><span class="si">}</span><span class="s2"> face locations found and blurred for path: </span><span class="si">{</span><span class="n">source_path</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">rgb_image</span><span class="p">,</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="BlurFlow.post_blur_files"><a class="viewcode-back" href="../../../result_generation.html#src.result_generation.blur.BlurFlow.post_blur_files">[docs]</a>    <span class="k">def</span> <span class="nf">post_blur_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -206,7 +206,7 @@
 
 <div class="viewcode-block" id="BlurFlow.prepare_result_object"><a class="viewcode-back" href="../../../result_generation.html#src.result_generation.blur.BlurFlow.prepare_result_object">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_result_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Prepares a result object according to specifications of the API.</span>
+<span class="sd">        Prepares a blur result object according to specifications of the API.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            result object as a Bunch object.</span>
@@ -215,7 +215,7 @@
         <span class="n">res</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">artifact</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">artifacts</span><span class="p">:</span>
             <span class="n">blur_result</span> <span class="o">=</span> <span class="n">Bunch</span><span class="p">()</span>
-            <span class="n">blur_result</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;{uuid.uuid4()}&quot;</span>
+            <span class="n">blur_result</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">blur_result</span><span class="o">.</span><span class="n">scan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan_metadata</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
             <span class="n">blur_result</span><span class="o">.</span><span class="n">workflow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workflow_obj</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
             <span class="n">blur_result</span><span class="o">.</span><span class="n">source_artifacts</span> <span class="o">=</span> <span class="p">[</span><span class="n">artifact</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
@@ -228,7 +228,7 @@
 
 <div class="viewcode-block" id="BlurFlow.post_result_object"><a class="viewcode-back" href="../../../result_generation.html#src.result_generation.blur.BlurFlow.post_result_object">[docs]</a>    <span class="k">def</span> <span class="nf">post_result_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Posts the results to the API</span>
+<span class="sd">        Posts the prepared blur results to the API</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">blur_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_result_object</span><span class="p">()</span>
         <span class="n">blur_result_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bunch_object_to_json_object</span><span class="p">(</span><span class="n">blur_result</span><span class="p">)</span>
@@ -252,6 +252,10 @@
 
 
 <h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../result_generation.html">RG Docs</a></li>
+</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>

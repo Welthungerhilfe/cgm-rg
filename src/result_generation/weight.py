@@ -9,11 +9,11 @@ import numpy as np
 from bunch import Bunch
 from cgmzscore import Calculator
 
-from result_generation.utils import MAX_AGE, age
+from src.result_generation.utils import MAX_AGE, age
 
-sys.path.append(str(Path(__file__).parents[1]))
-import utils.inference as inference  # noqa: E402
-import utils.preprocessing as preprocessing  # noqa: E402
+# sys.path.append(str(Path(__file__).parents[1]))
+import src.utils.inference as inference  # noqa: E402
+import src.utils.preprocessing as preprocessing  # noqa: E402
 
 
 class WeightFlow:

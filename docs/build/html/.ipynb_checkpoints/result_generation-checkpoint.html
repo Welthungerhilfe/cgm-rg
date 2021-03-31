@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RG Docs &#8212; CGM Result Generation  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="rg-docs">
+<h1>RG Docs<a class="headerlink" href="#rg-docs" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-src.result_generation.height">
+<span id="height-flow"></span><h2>Height Flow<a class="headerlink" href="#module-src.result_generation.height" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="src.result_generation.height.HeightFlow">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">src.result_generation.height.</span></code><code class="sig-name descname"><span class="pre">HeightFlow</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">artifact_workflow_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_workflow_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_MCNN_workflow_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">artifacts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_parent_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">person_details</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/height.html#HeightFlow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.height.HeightFlow" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to handle height results generation.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>api (object): object of ApiEndpoints class
+workflows (list): list of registered workflows
+artifact_workflow_path (str): path of the workflow file for artifact level height results
+scan_workflow_path (str): path of the workflow file for scan level height results
+scan_MCNN_workflow_path (str): path of the workflow file for scan level MCNN model height results
+artifacts (list): list of artifacts to run heigth flow on
+scan_parent_dir (str): directory where scans are stored
+scan_metadata (json): metadata of the scan to run height flow on
+person_details (dict): details of the child (sex, age)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="src.result_generation.height.HeightFlow.artifact_level_height_result_object">
+<code class="sig-name descname"><span class="pre">artifact_level_height_result_object</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generated_timestamp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/height.html#HeightFlow.artifact_level_height_result_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.height.HeightFlow.artifact_level_height_result_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares a artifact level height result object according to specifications of the API.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>artifact level height result object as a Bunch object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.height.HeightFlow.bunch_object_to_json_object">
+<code class="sig-name descname"><span class="pre">bunch_object_to_json_object</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bunch_object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/height.html#HeightFlow.bunch_object_to_json_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.height.HeightFlow.bunch_object_to_json_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a bunch object to json object.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>bunch_object (Bunch): The data to be converted as bunch_object.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Returns the data as a json object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.height.HeightFlow.get_input_path">
+<code class="sig-name descname"><span class="pre">get_input_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/height.html#HeightFlow.get_input_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.height.HeightFlow.get_input_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the input path for given directory and filename.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>directory (str): directory of the file.
+file_name (str): name of the file.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Returns the input_path as a string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.height.HeightFlow.get_mean_scan_results">
+<code class="sig-name descname"><span class="pre">get_mean_scan_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/height.html#HeightFlow.get_mean_scan_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.height.HeightFlow.get_mean_scan_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mean of the given list of predictions.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>predictions (numpy.ndarray): numpy array of float values.</p>
+</dd>
+<dt>Returns:</dt><dd><p>str of mean value of all values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.height.HeightFlow.post_height_results">
+<code class="sig-name descname"><span class="pre">post_height_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generated_timestamp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/height.html#HeightFlow.post_height_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.height.HeightFlow.post_height_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Posts the prepared scan and artifact level height results to the API</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.height.HeightFlow.process_depthmaps">
+<code class="sig-name descname"><span class="pre">process_depthmaps</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/height.html#HeightFlow.process_depthmaps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.height.HeightFlow.process_depthmaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads all the depthmaps in a scan and append them as a single numpy array.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>numpy array of all depthmaps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.height.HeightFlow.run_height_flow">
+<code class="sig-name descname"><span class="pre">run_height_flow</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/height.html#HeightFlow.run_height_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.height.HeightFlow.run_height_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Driver method for height flow.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.height.HeightFlow.run_height_flow_MCNN">
+<code class="sig-name descname"><span class="pre">run_height_flow_MCNN</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/height.html#HeightFlow.run_height_flow_MCNN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.height.HeightFlow.run_height_flow_MCNN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Driver method for running MCNN height flow.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.height.HeightFlow.scan_level_height_result_object">
+<code class="sig-name descname"><span class="pre">scan_level_height_result_object</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generated_timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/height.html#HeightFlow.scan_level_height_result_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.height.HeightFlow.scan_level_height_result_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares a scan level height result object according to specifications of the API.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>scan level height result object as a Bunch object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.height.HeightFlow.zscore_lhfa">
+<code class="sig-name descname"><span class="pre">zscore_lhfa</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean_prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/height.html#HeightFlow.zscore_lhfa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.height.HeightFlow.zscore_lhfa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the length for age z_score using given height prediction value and person details(age, sex)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>mean_prediction (str): mean value of predictions for a scan</p>
+</dd>
+<dt>Returns:</dt><dd><p>string of class where the person belongs(Severly Stunted, Moderately Stunted, Not Stunted)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.result_generation.weight">
+<span id="weight-flow"></span><h2>Weight Flow<a class="headerlink" href="#module-src.result_generation.weight" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="src.result_generation.weight.WeightFlow">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">src.result_generation.weight.</span></code><code class="sig-name descname"><span class="pre">WeightFlow</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">artifact_workflow_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_workflow_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">artifacts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_parent_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">person_details</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/weight.html#WeightFlow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.weight.WeightFlow" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to handle weight results generation.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>api (object): object of ApiEndpoints class
+workflows (list): list of registered workflows
+artifact_workflow_path (str): path of the workflow file for artifact level weight results
+scan_workflow_path (str): path of the workflow file for scan level weight results
+artifacts (list): list of artifacts to run weigth flow on
+scan_parent_dir (str): directory where scans are stored
+scan_metadata (json): metadata of the scan to run height flow on
+person_details (dict): details of the child (sex, age)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="src.result_generation.weight.WeightFlow.artifact_level_weight_result_object">
+<code class="sig-name descname"><span class="pre">artifact_level_weight_result_object</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generated_timestamp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/weight.html#WeightFlow.artifact_level_weight_result_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.weight.WeightFlow.artifact_level_weight_result_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares a artifact level weight result object according to specifications of the API.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>artifact level weight result object as a Bunch object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.weight.WeightFlow.bunch_object_to_json_object">
+<code class="sig-name descname"><span class="pre">bunch_object_to_json_object</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bunch_object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/weight.html#WeightFlow.bunch_object_to_json_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.weight.WeightFlow.bunch_object_to_json_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a bunch object to json object.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>bunch_object (Bunch): The data to be converted as bunch_object.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Returns the data as a json object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.weight.WeightFlow.get_input_path">
+<code class="sig-name descname"><span class="pre">get_input_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/weight.html#WeightFlow.get_input_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.weight.WeightFlow.get_input_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the input path for given directory and filename</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>directory (str): directory of the file.
+file_name (str): name of the file.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Returns the input_path as a string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.weight.WeightFlow.get_mean_scan_results">
+<code class="sig-name descname"><span class="pre">get_mean_scan_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/weight.html#WeightFlow.get_mean_scan_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.weight.WeightFlow.get_mean_scan_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mean of the given list of predictions.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>predictions (numpy.ndarray): numpy array of float values.</p>
+</dd>
+<dt>Returns:</dt><dd><p>str of mean value of all values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.weight.WeightFlow.post_weight_results">
+<code class="sig-name descname"><span class="pre">post_weight_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generated_timestamp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/weight.html#WeightFlow.post_weight_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.weight.WeightFlow.post_weight_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Posts the prepared scan and artifact level weight results to the API</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.weight.WeightFlow.process_depthmaps">
+<code class="sig-name descname"><span class="pre">process_depthmaps</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/weight.html#WeightFlow.process_depthmaps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.weight.WeightFlow.process_depthmaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads all the depthmaps in a scan and append them as a single numpy array.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>numpy array of all depthmaps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.weight.WeightFlow.run_weight_flow">
+<code class="sig-name descname"><span class="pre">run_weight_flow</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/weight.html#WeightFlow.run_weight_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.weight.WeightFlow.run_weight_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Driver method for weight flow.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.weight.WeightFlow.scan_level_weight_result_object">
+<code class="sig-name descname"><span class="pre">scan_level_weight_result_object</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generated_timestamp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/weight.html#WeightFlow.scan_level_weight_result_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.weight.WeightFlow.scan_level_weight_result_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares a scan level weight result object according to specifications of the API.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>scan level weight result object as a Bunch object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.weight.WeightFlow.zscore_wfa">
+<code class="sig-name descname"><span class="pre">zscore_wfa</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean_prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/weight.html#WeightFlow.zscore_wfa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.weight.WeightFlow.zscore_wfa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the weight for age z_score using given weight prediction value and person details(age, sex)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>mean_prediction (str): mean value of predictions for a scan</p>
+</dd>
+<dt>Returns:</dt><dd><p>string of class where the person belongs(Severly Under-weight, Moderately Under-weight, Not underweight)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.result_generation.blur">
+<span id="blur-flow"></span><h2>Blur Flow<a class="headerlink" href="#module-src.result_generation.blur" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="src.result_generation.blur.BlurFlow">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">src.result_generation.blur.</span></code><code class="sig-name descname"><span class="pre">BlurFlow</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">artifacts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_parent_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/blur.html#BlurFlow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to handle face blur results generation.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>api (object): object of ApiEndpoints class
+workflows (list): list of registered workflows
+workflow_path (str): path of the workflow file for face blurring
+artifacts (list): list of artifacts to run blur flow on
+scan_parent_dir (str): directory where scans are stored
+scan_metadata (json): metadata of the scan to run blur flow on</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.blur_artifacts">
+<code class="sig-name descname"><span class="pre">blur_artifacts</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/blur.html#BlurFlow.blur_artifacts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.blur_artifacts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs face blurring on all the artifacts.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.blur_face">
+<code class="sig-name descname"><span class="pre">blur_face</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/blur.html#BlurFlow.blur_face"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.blur_face" title="Permalink to this definition">¶</a></dt>
+<dd><p>Blur image.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>bool: True if blurred otherwise False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.bunch_object_to_json_object">
+<code class="sig-name descname"><span class="pre">bunch_object_to_json_object</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bunch_object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/blur.html#BlurFlow.bunch_object_to_json_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.bunch_object_to_json_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a bunch object to json object.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>bunch_object (Bunch): The data to be converted as bunch_object.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Returns the data as a json object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.get_input_path">
+<code class="sig-name descname"><span class="pre">get_input_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/blur.html#BlurFlow.get_input_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.get_input_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the input path for given directory and filename</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>directory (str): directory of the file.
+file_name (str): name of the file.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Returns the input_path as a string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.post_blur_files">
+<code class="sig-name descname"><span class="pre">post_blur_files</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/blur.html#BlurFlow.post_blur_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.post_blur_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Posts all the blur files using API and stores the file_id returned by API.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.post_result_object">
+<code class="sig-name descname"><span class="pre">post_result_object</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/blur.html#BlurFlow.post_result_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.post_result_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Posts the prepared blur results to the API</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.prepare_result_object">
+<code class="sig-name descname"><span class="pre">prepare_result_object</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/blur.html#BlurFlow.prepare_result_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.prepare_result_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares a blur result object according to specifications of the API.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>result object as a Bunch object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.result_generation.blur.BlurFlow.run_blur_flow">
+<code class="sig-name descname"><span class="pre">run_blur_flow</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/result_generation/blur.html#BlurFlow.run_blur_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.result_generation.blur.BlurFlow.run_blur_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Driver method for blur flow.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">CGM Result Generation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../result_generation.html">RG Docs</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, CGM.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/.ipynb_checkpoints/result_generation-checkpoint.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

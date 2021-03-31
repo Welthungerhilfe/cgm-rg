@@ -9,6 +9,8 @@ Welcome to CGM Result Generation's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+   
+   result_generation.rst
 
 
 
