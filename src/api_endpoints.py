@@ -9,6 +9,18 @@ import requests
 
 
 class ApiEndpoints:
+    """
+    A interface to interact with API endpoints.
+
+    Args:
+        url (str): url of the API.
+        scan_endpoint (str): endpoint to get unprocessed scan.
+        get_file_endpoint (str): endpoint to get a file.
+        post_file_endpoint (str): endpoint to post a file.
+        result_endpoint (str): endpoint to post the generated results.
+        workflow_endpoint (str): endpoint to get list of registered workflows.
+        person_detail_endpoint (str): endpoint to get details of the person.
+    """
     def __init__(
             self,
             url,
@@ -30,6 +42,12 @@ class ApiEndpoints:
             self.x_api_key = os.environ["API_KEY"]
 
     def prepare_header(self):
+        """
+        Prepares header by adding required authentication key.
+
+        Returns:
+            Returns the header dict with required authentication key.
+        """
         headers = copy.deepcopy(self.headers)
 
         if os.environ['APP_ENV'] != 'LOCAL':
@@ -39,7 +57,14 @@ class ApiEndpoints:
 
     def get_files(self, file_id, save_dir):
         '''
-        Get the files from api using file id
+        Gets file from api for given file id and stores it in given save directory.
+
+        Args:
+            file_id (str): unique id of the file required from the API.
+            save_dir (str): the directory where the file needs to be stored after getting it from API.
+        
+        Returns:
+            status code of the request from the API.
         '''
         endpoint = self.url + self.get_file_endpoint
 
@@ -56,7 +81,14 @@ class ApiEndpoints:
 
     def post_files_using_path(self, file_path, type_):
         '''
-        Post the files using the path of the file
+        Post the file in given file_path.
+
+        Args:
+            file_path (str): path of the file to be posted to API.
+            type_ (str): type of the file.
+        
+        Returns:
+            unique id of the file returned by the API and the status code of the post request.
         '''
         headers = self.prepare_header()
         headers['content_type'] = 'multipart/form-data'  # status_code 201
@@ -80,8 +112,16 @@ class ApiEndpoints:
 
     def post_files(self, bin_file):
         '''
-        Post the file result produced such as blur directly
-        without saving it to a location to avoid I/O overhead
+        Post the given binary file to API.
+
+        Advantages: No need to save file, reduces I/O overhead.
+
+        Args:
+            bin_file (bytes): bytes array of the file to be posted to API.
+
+        Returns:
+            unique id of the file returned by the API and the status code of the post request.
+
         '''
         headers = self.prepare_header()
         headers['content_type'] = 'multipart/form-data'    # status_code 201
@@ -115,8 +155,13 @@ class ApiEndpoints:
 
     def post_results(self, result_json_obj):
         '''
-        Post the result object produced while Result Generation
-        using POST /results
+        Post the given result object produced by Result Generation.
+
+        Args:
+            result_json_obj (dict): dictionary with results to be posted.
+        
+        Returns:
+            status code of the request to the API.
         '''
         headers = self.prepare_header()
         endpoint = self.url + self.result_endpoint
@@ -132,9 +177,14 @@ class ApiEndpoints:
 
     def post_workflow_and_save_response(self, workflow_obj):
         '''
-        Post the workflow and saves the response
-        '''
+        Post the given workflow.
 
+        Args:
+            workflow_obj (dict): Workflow object to be posted to the API.
+
+        Returns:
+            response from the API to the post request.
+        '''
         print("Workflow Post Object: ")
         pprint.pprint(workflow_obj)
 
@@ -146,23 +196,19 @@ class ApiEndpoints:
 
         if response.status_code in [201, 200]:
             content = response.json()
-            # content['data'] = workflow_obj["data"]
             pprint.pprint(content)
-
-            # with open(response_path, 'w') as f:
-            #     json.dump(content, f)
 
         return response
 
-    def post_workflow(self, workflow_path):
-        '''
-        Mockup of Post the workflows using POST /files
-        '''
-        return str(uuid.uuid4()), 200
-
     def get_scan(self, scan_path):
         '''
-        Get the scan metadata
+        Get the unprocessed scan metadata from the API and store it in given file path.
+
+        Args:
+            scan_path (str): file path where the scan metadata will be saved as json file.
+
+        Returns:
+            no of scans in received scan metadata.
         '''
         headers = self.prepare_header()
         response = requests.get(self.url + self.scan_endpoint, headers=headers)
@@ -194,7 +240,10 @@ class ApiEndpoints:
 
     def get_workflows(self):
         '''
-        Get all registerd workflows
+        Get all registerd workflows from API.
+
+        Returns:
+            json object with list of all the workflows.
         '''
         headers = self.prepare_header()
         response = requests.get(
