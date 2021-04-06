@@ -84,6 +84,7 @@ stages:
               docker load < $(DOCKER_CACHE_DIR)/cgm-rg.tar
               rm $(DOCKER_CACHE_DIR)/cgm-rg.tar
             condition: and(not(canceled()), eq(variables.DOCKER_CACHE_RESTORED, 'true'))
+          - script: docker images
           - task: Docker@2
             displayName: Build Docker image
             inputs:
