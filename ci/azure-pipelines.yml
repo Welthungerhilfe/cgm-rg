@@ -4,7 +4,9 @@ pool:
 variables:
   - group: cgm-rg
   - name: DOCKER_CACHE_DIR
-    value: $(Pipeline.Workspace)/image
+    value: $(Pipeline.Workspace)/docker_cache
+  - name: DOCKER_CACHE_IMG_FILE
+    value: image.tar
   - name: VENV_CACHE_DIR
     value: $(Pipeline.Workspace)/.venv
 
@@ -67,6 +69,7 @@ stages:
   - stage: Build
     displayName: Build Docker image
     dependsOn: Setup_and_Verify
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
     variables:
       - name: TAG
         value: $[stageDependencies.Setup_and_Verify.Setup_and_Verify.outputs['VariableSetup.TAG']]
@@ -74,17 +77,6 @@ stages:
       - job: Build
         displayName: Build Docker image
         steps:
-          - task: Cache@2
-            displayName: Cache Docker image
-            inputs:
-              key: 'rg-docker-cache | "$(Agent.OS)" | Dockerfile | requirements.txt'
-              path: $(DOCKER_CACHE_DIR)
-              cacheHitVar: DOCKER_CACHE_RESTORED
-          - script: |
-              docker load < $(DOCKER_CACHE_DIR)/cgm-rg.tar
-              rm $(DOCKER_CACHE_DIR)/cgm-rg.tar
-            condition: and(not(canceled()), eq(variables.DOCKER_CACHE_RESTORED, 'true'))
-          - script: docker images
           - task: Docker@2
             displayName: Build Docker image
             inputs:
@@ -97,10 +89,10 @@ stages:
           - script: |
               set -e
               mkdir -p $(DOCKER_CACHE_DIR)
-              docker image save --output "$(DOCKER_CACHE_DIR)/cgm-rg.tar" $(IMAGE_REPOSITORY)
+              docker image save --output "$(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)" $(IMAGE_REPOSITORY)
             condition: not(canceled())
           - publish: $(DOCKER_CACHE_DIR)
-            artifact: RgDockerImage
+            artifact: DockerCache
   - ${{ each env in parameters.var_groups }}:
     - stage: Deploy_${{ replace(env, '-', '_') }}
       displayName: Deploy ${{ env }}
@@ -123,14 +115,14 @@ stages:
                   - task: DownloadPipelineArtifact@2
                     inputs:
                       source: current
-                      artifact: RgDockerImage
-                      path: $(Pipeline.Workspace)/image
+                      artifact: DockerCache
+                      path: $(DOCKER_CACHE_DIR)
                   - task: CmdLine@2
                     displayName: Load and Tag image
                     inputs:
                       script: |
                         set -e
-                        docker image load -i $(DOCKER_CACHE_DIR)/cgm-rg.tar
+                        docker image load -i $(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)
                         docker tag "$(IMAGE_REPOSITORY):$(TAG)" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
                   - task: AzureCLI@2
                     displayName: Push to target ACR
