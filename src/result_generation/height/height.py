@@ -46,10 +46,8 @@ class HeightFlow:
         self.artifacts = artifacts
         self.artifact_workflow_path = artifact_workflow_path
         self.scan_workflow_path = scan_workflow_path
-        self.artifact_workflow_obj = self.workflows.load_workflows(
-            self.artifact_workflow_path)
-        self.scan_workflow_obj = self.workflows.load_workflows(
-            self.scan_workflow_path)
+        self.artifact_workflow_obj = self.workflows.load_workflows(self.artifact_workflow_path)
+        self.scan_workflow_obj = self.workflows.load_workflows(self.scan_workflow_path)
         self.scan_metadata = scan_metadata
         self.person_details = person_details
         self.scan_parent_dir = scan_parent_dir
@@ -98,7 +96,7 @@ class HeightFlow:
         return res
 
     def scan_level_height_result_object(self, predictions, generated_timestamp, workflow_obj):
-        """Prepares scan level height result object"""
+        """Prepare scan level height result object"""
         res = Bunch()
         res.results = []
         height_result = Bunch()
@@ -121,8 +119,7 @@ class HeightFlow:
 
     def zscore_lhfa(self, mean_prediction):
         sex = 'M' if self.person_details['sex'] == 'male' else 'F'
-        age_in_days = age(
-            self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
+        age_in_days = age(self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
         class_lhfa = 'Not Found'
         if MIN_HEIGHT < float(mean_prediction) <= MAX_HEIGHT and age_in_days <= MAX_AGE:
             zscore_lhfa = Calculator().zScore_lhfa(
