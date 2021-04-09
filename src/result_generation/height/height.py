@@ -10,8 +10,7 @@ from result_generation.utils import MAX_AGE, MAX_HEIGHT, MIN_HEIGHT, age
 
 
 class HeightFlow:
-    """
-    A class to handle height results generation.
+    """Handle height results generation.
 
     Attributes
     ----------

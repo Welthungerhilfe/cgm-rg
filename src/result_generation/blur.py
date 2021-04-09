@@ -12,8 +12,7 @@ RESIZE_FACTOR = 4
 
 
 class BlurFlow:
-    """
-    A class to handle face blur results generation.
+    """Face blur results generation
 
     Attributes
     ----------
@@ -77,7 +76,6 @@ class BlurFlow:
     def bunch_object_to_json_object(self, bunch_object):
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
         json_object = json.loads(json_string)
-
         return json_object
 
     def get_input_path(self, directory, file_name):
@@ -89,23 +87,16 @@ class BlurFlow:
         self.post_result_object()
 
     def blur_artifacts(self):
-        for i, artifact in enumerate(self.artifacts):
-
-            input_path = self.get_input_path(
-                self.scan_directory,
-                artifact['file'])
-            # target_path = input_path + '_blur.jpg'
-
-            print("input_path of image to perform blur: ", input_path, '\n')
-
-            # blur_status = blur_faces_in_file(input_path, target_path)
+        for artifact in self.artifacts:
+            input_path = self.get_input_path(self.scan_directory, artifact['file'])
+            print(f"input_path of image to perform blur: {input_path}\n")
             blur_img_binary, blur_status = self.blur_face(input_path)
-
             if blur_status:
                 artifact['blurred_image'] = blur_img_binary
 
-    def blur_face(self, source_path: str):
+    def blur_face(self, source_path: str) -> bool:
         """Blur image
+
         Returns:
             bool: True if blurred otherwise False
         """
@@ -114,17 +105,14 @@ class BlurFlow:
         rgb_image = cv2.imread(source_path)
         image = rgb_image[:, :, ::-1]  # RGB -> BGR for OpenCV
 
-        # The images are provided in 90degrees turned. Here we rotate 90degress to
-        # the right.
+        # The images are provided in 90degrees turned. Here we rotate 90degress to the right.
         image = np.swapaxes(image, 0, 1)
 
         # Scale image down for faster prediction.
-        small_image = cv2.resize(
-            image, (0, 0), fx=1.0 / RESIZE_FACTOR, fy=1.0 / RESIZE_FACTOR)
+        small_image = cv2.resize(image, (0, 0), fx=1.0 / RESIZE_FACTOR, fy=1.0 / RESIZE_FACTOR)
 
         # Find face locations.
-        face_locations = face_recognition.face_locations(
-            small_image, model="cnn")
+        face_locations = face_recognition.face_locations(small_image, model="cnn")
 
         # Blur the image.
         for top, right, bottom, left in face_locations:
@@ -152,8 +140,7 @@ class BlurFlow:
         rgb_image = image[:, :, ::-1]  # BGR -> RGB for OpenCV
 
         # logging.info(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
-        print(
-            f"{len(face_locations)} face locations found and blurred for path: {source_path}\n")
+        print(f"{len(face_locations)} face locations found and blurred for path: {source_path}\n")
         return rgb_image, True
 
     def post_blur_files(self):
