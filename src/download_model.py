@@ -10,6 +10,7 @@ REPO_DIR = Path(__file__).parents[1].absolute()
 
 def download_model(ws, experiment_name, run_id, input_location, output_location):
     """Download the pretrained model
+
     Args:
          ws: workspace to access the experiment
          experiment_name: Name of the experiment in which model is saved

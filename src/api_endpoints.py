@@ -37,9 +37,7 @@ class ApiEndpoints:
         return headers
 
     def get_files(self, file_id, save_dir):
-        '''
-        Get the files from api using file id
-        '''
+        '''Get the files from api using file id'''
         endpoint = self.url + self.get_file_endpoint
 
         headers = self.prepare_header()
@@ -54,9 +52,7 @@ class ApiEndpoints:
         return response.status_code
 
     def post_files_using_path(self, file_path, type_):
-        '''
-        Post the files using the path of the file
-        '''
+        '''Post the files using the path of the file'''
         headers = self.prepare_header()
         headers['content_type'] = 'multipart/form-data'  # status_code 201
         # headers['content-type'] = 'multipart/form-data'  # status_code 400
@@ -113,10 +109,7 @@ class ApiEndpoints:
         return file_id, response.status_code
 
     def post_results(self, result_json_obj):
-        '''
-        Post the result object produced while Result Generation
-        using POST /results
-        '''
+        '''Post the result object produced while Result Generation using POST /results'''
         headers = self.prepare_header()
         endpoint = self.url + self.result_endpoint
 
@@ -130,10 +123,7 @@ class ApiEndpoints:
         return response.status_code
 
     def post_workflow_and_save_response(self, workflow_obj):
-        '''
-        Post the workflow and saves the response
-        '''
-
+        '''Post the workflow and saves the response'''
         print("Workflow Post Object: ")
         pprint.pprint(workflow_obj)
 
@@ -150,19 +140,14 @@ class ApiEndpoints:
 
             # with open(response_path, 'w') as f:
             #     json.dump(content, f)
-
         return response
 
     def post_workflow(self, workflow_path):
-        '''
-        Mockup of Post the workflows using POST /files
-        '''
+        '''Mockup of Post the workflows using POST /files'''
         return str(uuid.uuid4()), 200
 
     def get_scan(self, scan_path):
-        '''
-        Get the scan metadata
-        '''
+        '''Get the scan metadata'''
         headers = self.prepare_header()
         response = requests.get(self.url + self.scan_endpoint, headers=headers)
 
@@ -192,13 +177,10 @@ class ApiEndpoints:
         return content
 
     def get_workflows(self):
-        '''
-        Get all registerd workflows
-        '''
+        '''Get all registerd workflows'''
         headers = self.prepare_header()
         response = requests.get(
             self.url + self.workflow_endpoint, headers=headers)
-
         return response.json()
 
 
