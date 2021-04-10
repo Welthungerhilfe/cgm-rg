@@ -18,7 +18,6 @@ class HeightFlowMultiArtifact(HeightFlow):
     def process_depthmaps_depthmapmultiartifactlatefusion(self):
         depthmaps_file = [self.get_input_path(self.scan_directory, artifact['file'])
                           for artifact in self.artifacts]
-        scans = []
         scans = [depthmaps_file]
         samples = list(
             map(partial(preprocessing.sample_systematic_from_artifacts, n_artifacts=5), scans))
@@ -28,7 +27,7 @@ class HeightFlowMultiArtifact(HeightFlow):
         depthmaps = np.zeros((240, 180, 5))
 
         for i, depthmap_path in enumerate(depthmap[0]):
-            data, width, height, depth_scale, max_confidence = preprocessing.load_depth(
+            data, width, height, depth_scale, _max_confidence = preprocessing.load_depth(
                 depthmap_path)
             depthmap, height, width = preprocessing.prepare_depthmap(
                 data, width, height, depth_scale)

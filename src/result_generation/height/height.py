@@ -10,44 +10,24 @@ from result_generation.utils import MAX_AGE, MAX_HEIGHT, MIN_HEIGHT, age
 
 
 class HeightFlow:
-    """
-    A class to handle height results generation.
+    """Handle height results generation.
 
     Attributes
     ----------
-    api : object
+    api: object
         object of ApiEndpoints class
-    workflows : list
+    workflows: list
         list of registered workflows
-    artifact_workflow_path : str
+    artifact_workflow_path: str
         path of the workflow file for artifact level height results
-    scan_workflow_path : json
+    scan_workflow_path: json
         path of the workflow file for scan level height results
-    artifacts : list
+    artifacts: list
         list of artifacts to run heigth flow on
-    scan_parent_dir : str
+    scan_parent_dir: str
         directory where scans are stored
-    scan_metadata : json
+    scan_metadata: json
         metadata of the scan to run height flow on
-
-    Methods
-    -------
-    bunch_object_to_json_object(bunch_object):
-        Converts given bunch object to json object.
-    get_input_path(directory, file_name):
-        Returns input path for given directory name and file name.
-    get_mean_scan_results(predictions):
-        Returns the average prediction from given list of predictions.
-    process_depthmaps():
-        Loads the list of depthmaps in scan as numpy array.
-    run_height_flow():
-        Driver method for height flow.
-    artifact_level_height_result_object(predictions, generated_timestamp):
-        Prepares artifact level height result object.
-    scan_level_height_result_object(predictions, generated_timestamp):
-        Prepares scan level height result object.
-    post_height_results(predictions, generated_timestamp):
-        Posts the artifact and scan level height results to api.
     """
 
     def __init__(
@@ -65,10 +45,8 @@ class HeightFlow:
         self.artifacts = artifacts
         self.artifact_workflow_path = artifact_workflow_path
         self.scan_workflow_path = scan_workflow_path
-        self.artifact_workflow_obj = self.workflows.load_workflows(
-            self.artifact_workflow_path)
-        self.scan_workflow_obj = self.workflows.load_workflows(
-            self.scan_workflow_path)
+        self.artifact_workflow_obj = self.workflows.load_workflows(self.artifact_workflow_path)
+        self.scan_workflow_obj = self.workflows.load_workflows(self.scan_workflow_path)
         self.scan_metadata = scan_metadata
         self.person_details = person_details
         self.scan_parent_dir = scan_parent_dir
@@ -84,19 +62,22 @@ class HeightFlow:
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
 
     def bunch_object_to_json_object(self, bunch_object):
+        """Convert given bunch object to json object"""
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
         json_object = json.loads(json_string)
 
         return json_object
 
     def get_input_path(self, directory, file_name):
+        """Returns input path for given directory name and file name"""
         return os.path.join(directory, file_name)
 
     def get_mean_scan_results(self, predictions):
+        """Return the average prediction from given list of predictions"""
         return str(np.mean(predictions))
 
-    def artifact_level_height_result_object(
-            self, predictions, generated_timestamp):
+    def artifact_level_height_result_object(self, predictions, generated_timestamp):
+        """Prepare artifact level height result object."""
         res = Bunch()
         res.results = []
         for artifact, prediction in zip(self.artifacts, predictions):
@@ -113,8 +94,8 @@ class HeightFlow:
 
         return res
 
-    def scan_level_height_result_object(
-            self, predictions, generated_timestamp, workflow_obj):
+    def scan_level_height_result_object(self, predictions, generated_timestamp, workflow_obj):
+        """Prepare scan level height result object"""
         res = Bunch()
         res.results = []
         height_result = Bunch()
@@ -137,8 +118,7 @@ class HeightFlow:
 
     def zscore_lhfa(self, mean_prediction):
         sex = 'M' if self.person_details['sex'] == 'male' else 'F'
-        age_in_days = age(
-            self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
+        age_in_days = age(self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
         class_lhfa = 'Not Found'
         if MIN_HEIGHT < float(mean_prediction) <= MAX_HEIGHT and age_in_days <= MAX_AGE:
             zscore_lhfa = Calculator().zScore_lhfa(
@@ -152,6 +132,7 @@ class HeightFlow:
         return class_lhfa
 
     def post_height_results(self, predictions, generated_timestamp):
+        """Post the artifact and scan level height results to API"""
         artifact_level_height_result_bunch = self.artifact_level_height_result_object(
             predictions, generated_timestamp)
         artifact_level_height_result_json = self.bunch_object_to_json_object(

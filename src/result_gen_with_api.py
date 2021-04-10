@@ -11,7 +11,7 @@ from result_generation.blur import BlurFlow
 from result_generation.depthmap_image import DepthMapImgFlow
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.height.height_mutiartifact import HeightFlowMultiArtifact
-from result_generation.standing import Standing_laying
+from result_generation.standing import StandingLaying
 from result_generation.weight import WeightFlow
 
 
@@ -359,7 +359,7 @@ def main():
             rgb_artifacts,
             scan_parent_dir,
             scan_metadata)
-        standing_laying = Standing_laying(
+        standing_laying = StandingLaying(
             cgm_api,
             workflow,
             standing_laying_workflow_path,
