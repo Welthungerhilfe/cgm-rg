@@ -5,6 +5,6 @@
     "result_binding": "artifact",
     "data":{
         "input_format":"image/jpeg",
-        "model":"standing_laying"
+        "model":"q4-rgb-plaincnn-classifaction-standing-lying-8k"
     }
 }

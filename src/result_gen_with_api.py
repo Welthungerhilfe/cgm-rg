@@ -9,8 +9,9 @@ import utils.preprocessing as preprocessing
 from api_endpoints import ApiEndpoints
 from result_generation.blur import BlurFlow
 from result_generation.depthmap_image import DepthMapImgFlow
-from result_generation.height import HeightFlow
-from result_generation.standing import Standing_laying
+from result_generation.height.height_plaincnn import HeightFlowPlainCnn
+from result_generation.height.height_mutiartifact import HeightFlowMultiArtifact
+from result_generation.standing import StandingLaying
 from result_generation.weight import WeightFlow
 
 
@@ -271,17 +272,17 @@ def main():
                         help='Depthmap Image Workflow path')
 
     parser.add_argument('--height_workflow_artifact_path',
-                        default="src/workflows/height-workflow-artifact.json",
+                        default="src/workflows/height-plaincnn-workflow-artifact.json",
                         type=str,
                         help='Height Workflow Artifact path')
 
-    parser.add_argument('--height_MCNN_workflow_path',
-                        default="src/workflows/height-MCNN-workflow.json",
+    parser.add_argument('--height_depthmapmultiartifactlatefusion_workflow_path',
+                        default="src/workflows/height-depthmapmultiartifactlatefusion-workflow.json",
                         type=str,
-                        help='Height Workflow MCNN Artifact path')
+                        help='Height Workflow depthmapmultiartifactlatefusion Artifact path')
 
     parser.add_argument('--height_workflow_scan_path',
-                        default="src/workflows/height-workflow-scan.json",
+                        default="src/workflows/height-plaincnn-workflow-scan.json",
                         type=str,
                         help='Height Workflow Scan path')
 
@@ -303,13 +304,8 @@ def main():
     preprocessing.set_width(int(240))
     preprocessing.set_height(int(180))
 
-    print("\nApp Environment : ", os.environ['APP_ENV'])
-    print("\nApp URL : ", os.environ['APP_URL'])
-
-    if os.environ['APP_ENV'] == 'LOCAL':
-        url = "http://localhost:5001"
-    else:
-        url = os.environ['APP_URL']
+    url = os.getenv('APP_URL', 'http://localhost:5001')
+    print(f"App URL : {url}")
 
     scan_endpoint = '/api/scans/unprocessed?limit=1'
     get_file_endpoint = '/api/files/'
@@ -324,7 +320,7 @@ def main():
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
-    height_MCNN_workflow_path = args.height_MCNN_workflow_path
+    height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
 
@@ -363,7 +359,7 @@ def main():
             rgb_artifacts,
             scan_parent_dir,
             scan_metadata)
-        standing_laying = Standing_laying(
+        standing_laying = StandingLaying(
             cgm_api,
             workflow,
             standing_laying_workflow_path,
@@ -377,12 +373,20 @@ def main():
             depth_artifacts,
             scan_parent_dir,
             scan_metadata)
-        heightflow = HeightFlow(
+        heightflow_plaincnn = HeightFlowPlainCnn(
             cgm_api,
             workflow,
             height_workflow_artifact_path,
             height_workflow_scan_path,
-            height_MCNN_workflow_path,
+            depth_artifacts,
+            scan_parent_dir,
+            scan_metadata,
+            person_details)
+        heightflow_mutliartifact = HeightFlowMultiArtifact(
+            cgm_api,
+            workflow,
+            height_workflow_artifact_path,
+            height_depthmapmultiartifactlatefusion_workflow_path,
             depth_artifacts,
             scan_parent_dir,
             scan_metadata,
@@ -413,8 +417,12 @@ def main():
             print(e)
 
         try:
-            heightflow.run_height_flow()
-            heightflow.run_height_flow_MCNN()
+            heightflow_plaincnn.run_height_flow()
+        except Exception as e:
+            print(e)
+
+        try:
+            heightflow_mutliartifact.run_height_flow_depthmapmultiartifactlatefusion()
         except Exception as e:
             print(e)
 
