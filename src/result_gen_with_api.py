@@ -362,7 +362,7 @@ def main():
             scan_parent_dir,
             scan_metadata,
             scan_version)
-        standing_laying = Standing_laying(
+        standing_laying = StandingLaying(
             cgm_api,
             workflow,
             standing_laying_workflow_path,

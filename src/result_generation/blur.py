@@ -8,8 +8,6 @@ import face_recognition
 import numpy as np
 from bunch import Bunch
 
-#RESIZE_FACTOR = 4
-
 
 class BlurFlow:
     """Face blur results generation
@@ -126,7 +124,7 @@ class BlurFlow:
             print("resize_factor is ", resize_factor)
             print("scan_version is ", self.scan_version)
 
-        elif self.scan_version in ["v0.2", "v0.4", "v0.6"]: 
+        elif self.scan_version in ["v0.2", "v0.4", "v0.6"]:
             resize_factor = 3
             print("resize_factor is ", resize_factor)
             print("scan_version is ", self.scan_version)
@@ -141,7 +139,6 @@ class BlurFlow:
             image = np.swapaxes(image, 0, 1)
             print("scan_version is ", self.scan_version)
             print("swapped image axis")
-
 
         # Scale image down for faster prediction.
         small_image = cv2.resize(
@@ -169,12 +166,10 @@ class BlurFlow:
             # Put the blurred face region back into the frame image.
             image[top:bottom, left:right] = face_image
 
-
-        #if self.scan_version in ["v0.2", "v0.4", "v0.6", "v0.7", "v0.8"]:
+        # if self.scan_version in ["v0.2", "v0.4", "v0.6", "v0.7", "v0.8"]:
         #    # Rotate image back.
         #    image = np.swapaxes(image, 0, 1)
 
-        
         # Write image to hard drive.
         rgb_image = image[:, :, ::-1]  # BGR -> RGB for OpenCV
 
