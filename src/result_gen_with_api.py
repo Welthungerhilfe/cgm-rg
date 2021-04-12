@@ -342,6 +342,8 @@ def main():
 
     if get_scan_metadata.get_unprocessed_scans() > 0:
         scan_metadata = get_scan_metadata.get_scan_metadata()
+        scan_version = scan_metadata['version']
+        print("Scan Type Version: ", scan_version)
         workflow.get_list_of_worflows()
         data_processing = PrepareArtifacts(
             cgm_api, scan_metadata, scan_parent_dir)
@@ -358,7 +360,8 @@ def main():
             blur_workflow_path,
             rgb_artifacts,
             scan_parent_dir,
-            scan_metadata)
+            scan_metadata,
+            scan_version)
         standing_laying = Standing_laying(
             cgm_api,
             workflow,
