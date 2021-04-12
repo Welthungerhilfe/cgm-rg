@@ -22,7 +22,8 @@ def get_dummy_blur_flow_object(mock_some_fn):
         'src/workflows/blur-workflow.json',
         set_up_dummy_variables.rgb_artifacts,
         set_up_dummy_variables.scan_parent_dir,
-        set_up_dummy_variables.scan_metadata)
+        set_up_dummy_variables.scan_metadata,
+        set_up_dummy_variables.scan_version)
 
 
 @patch.object(ProcessWorkflows, 'get_workflow_id')
