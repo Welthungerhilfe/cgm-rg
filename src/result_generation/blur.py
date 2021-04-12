@@ -8,7 +8,7 @@ import face_recognition
 import numpy as np
 from bunch import Bunch
 
-RESIZE_FACTOR = 4
+#RESIZE_FACTOR = 4
 
 
 class BlurFlow:
@@ -56,7 +56,8 @@ class BlurFlow:
             workflow_path,
             artifacts,
             scan_parent_dir,
-            scan_metadata):
+            scan_metadata,
+            scan_version):
         self.api = api
         self.workflows = workflows
         self.artifacts = artifacts
@@ -72,6 +73,7 @@ class BlurFlow:
             self.blur_input_format)
         self.workflow_obj['id'] = self.workflows.get_workflow_id(
             self.workflow_obj['name'], self.workflow_obj['version'])
+        self.scan_version = scan_version
 
     def bunch_object_to_json_object(self, bunch_object):
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
@@ -103,13 +105,47 @@ class BlurFlow:
         # Read the image.
         assert os.path.exists(source_path), f"{source_path} does not exist"
         rgb_image = cv2.imread(source_path)
+
+        if self.scan_version in ["v0.7"]:
+            # Make the image smaller, The limit of cgm-api to post an image is 500 KB.
+            # Some of the images of v0.7 is greater than 500 KB
+            rgb_image = cv2.resize(
+                rgb_image, (0, 0), fx=1.0 / 1.3, fy=1.0 / 1.3)
+
+        # face_locations = [0]
+        # print("scan_version is ", self.scan_version)
         image = rgb_image[:, :, ::-1]  # RGB -> BGR for OpenCV
 
-        # The images are provided in 90degrees turned. Here we rotate 90degress to the right.
-        image = np.swapaxes(image, 0, 1)
+        if self.scan_version in ["v0.7"]:
+            resize_factor = 4
+            print("resize_factor is ", resize_factor)
+            print("scan_version is ", self.scan_version)
+
+        elif self.scan_version in ["v0.8"]:
+            resize_factor = 1
+            print("resize_factor is ", resize_factor)
+            print("scan_version is ", self.scan_version)
+
+        elif self.scan_version in ["v0.2", "v0.4", "v0.6"]: 
+            resize_factor = 3
+            print("resize_factor is ", resize_factor)
+            print("scan_version is ", self.scan_version)
+
+        else:
+            print("Version Type not supported")
+            print("scan_version is ", self.scan_version)
+
+        if self.scan_version in ["v0.2", "v0.4", "v0.6", "v0.7", "v0.8"]:
+            # The images are provided in 90degrees turned. Here we rotate 90degress to
+            # the right.
+            image = np.swapaxes(image, 0, 1)
+            print("scan_version is ", self.scan_version)
+            print("swapped image axis")
+
 
         # Scale image down for faster prediction.
-        small_image = cv2.resize(image, (0, 0), fx=1.0 / RESIZE_FACTOR, fy=1.0 / RESIZE_FACTOR)
+        small_image = cv2.resize(
+            image, (0, 0), fx=1.0 / resize_factor, fy=1.0 / resize_factor)
 
         # Find face locations.
         face_locations = face_recognition.face_locations(small_image, model="cnn")
@@ -118,10 +154,10 @@ class BlurFlow:
         for top, right, bottom, left in face_locations:
             # Scale back up face locations since the frame we detected in was
             # scaled to 1/4 size
-            top *= RESIZE_FACTOR
-            right *= RESIZE_FACTOR
-            bottom *= RESIZE_FACTOR
-            left *= RESIZE_FACTOR
+            top *= resize_factor
+            right *= resize_factor
+            bottom *= resize_factor
+            left *= resize_factor
 
             # Extract the region of the image that contains the face.
             face_image = image[top:bottom, left:right]
@@ -133,9 +169,12 @@ class BlurFlow:
             # Put the blurred face region back into the frame image.
             image[top:bottom, left:right] = face_image
 
-        # Rotate image back.
-        image = np.swapaxes(image, 0, 1)
 
+        #if self.scan_version in ["v0.2", "v0.4", "v0.6", "v0.7", "v0.8"]:
+        #    # Rotate image back.
+        #    image = np.swapaxes(image, 0, 1)
+
+        
         # Write image to hard drive.
         rgb_image = image[:, :, ::-1]  # BGR -> RGB for OpenCV
 
