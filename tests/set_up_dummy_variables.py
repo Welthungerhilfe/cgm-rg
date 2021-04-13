@@ -36,6 +36,8 @@ scan_metadata_path = current_working_directory.joinpath('tests', 'static_files',
 
 scan_metadata = load_json(scan_metadata_path)['scans'][0]
 
+scan_version = scan_metadata['version']
+
 rgb_artifacts = load_json(current_working_directory.joinpath('tests', 'static_files', 'rgb_artifacts.json'))['rgb_artifacts']
 
 depth_artifacts = load_json(current_working_directory.joinpath('tests', 'static_files', 'depth_artifacts.json'))['depth_artifacts']

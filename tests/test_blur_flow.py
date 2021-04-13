@@ -57,6 +57,8 @@ def test_blur_face_file_exists():
     blurflow = set_up_dummy_objects.get_dummy_blur_flow_object()
     input_file = str(current_working_directory.joinpath('tests', 'static_files', 'be1faf54-69c7-11eb-984b-a3ffd42e7b5a', 'img', 'bd8ba746-69c7-11eb-984b-23c55a7d518b'))
 
+    #Set Resize factor to be used in the blur_face
+    blurflow.blur_set_resize_factor()
     # Exercise
     result = blurflow.blur_face(input_file)
 
