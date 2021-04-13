@@ -309,7 +309,7 @@ def main():
 
     scan_endpoint = '/api/scans/unprocessed?limit=1'
     get_file_endpoint = '/api/files/'
-    post_file_endpoint = '/api/files'
+    post_file_endpoint = '/api/files?storage=result'
     result_endpoint = '/api/results'
     workflow_endpoint = '/api/workflows'
     person_detail_endpoint = '/api/persons/'
