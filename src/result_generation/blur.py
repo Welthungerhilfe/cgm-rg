@@ -109,7 +109,7 @@ class BlurFlow:
             print("resize_factor is ", self.resize_factor)
             print("scan_version is ", self.scan_version)
         else:
-            #Default Resize factor to 1
+            # Default Resize factor to 1
             print("New Scan Version Type")
             self.resize_factor = 1
             print("Default resize_factor is ", self.resize_factor)
@@ -131,9 +131,8 @@ class BlurFlow:
             image = np.swapaxes(image, 0, 1)
             print("scan_version is ", self.scan_version)
             print("swapped image axis")
-        
-        return image
 
+        return image
 
     def blur_face(self, source_path: str) -> bool:
         """Blur image
