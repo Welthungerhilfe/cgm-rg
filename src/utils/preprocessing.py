@@ -53,7 +53,7 @@ def parse_depth(tx: int, ty: int, data: bytes, depth_scale: float, width: int) -
 
 
 def prepare_depthmap(data: bytes, width: int, height: int, depth_scale: float) -> np.array:
-    """Converts bytes array into np.array"""
+    """Convert bytes array into np.array"""
     output = np.zeros((width, height, 1))
     for cx in range(width):
         for cy in range(height):
@@ -73,34 +73,6 @@ def preprocess(depthmap):
     depthmap = resize(depthmap, (IMAGE_TARGET_HEIGHT, IMAGE_TARGET_WIDTH))
     depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
     return depthmap
-
-
-def parse_numbers(line):
-    output = []
-    values = line.split(" ")
-    for value in values:
-        output.append(float(value))
-    return output
-
-
-def parse_calibration(filepath):
-    # global calibration
-    with open(filepath, 'r') as f:
-        calibration = []
-        f.readline()[:-1]
-        calibration.append(parse_numbers(f.readline()))
-        # print(str(calibration[0]) + '\n') #color camera intrinsics - fx, fy,
-        # cx, cy
-        f.readline()[:-1]
-        calibration.append(parse_numbers(f.readline()))
-        # print(str(calibration[1]) + '\n') #depth camera intrinsics - fx, fy,
-        # cx, cy
-        f.readline()[:-1]
-        calibration.append(parse_numbers(f.readline()))
-        # print(str(calibration[2]) + '\n') #depth camera position relativelly
-        # to color camera in meters
-        calibration[2][1] *= 8.0  # workaround for wrong calibration data
-    return calibration
 
 
 def get_depthmaps(fpaths):
