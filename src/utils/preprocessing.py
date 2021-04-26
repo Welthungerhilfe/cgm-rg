@@ -1,4 +1,5 @@
 import zipfile
+from typing import Tuple
 
 import numpy as np
 import tensorflow as tf
@@ -9,21 +10,35 @@ IMAGE_TARGET_WIDTH = 180
 NORMALIZATION_VALUE = 7.5
 
 
-def load_depth(filename):
-    with zipfile.ZipFile(filename) as z:
+def load_depth(fpath: str) -> Tuple[bytes, int, int, float, float]:
+    """Take ZIP file and extract depth and metadata
+
+    Args:
+        fpath (str): File path to the ZIP
+
+    Returns:
+        depth_data (bytes): depthmap data
+        width(int): depthmap width in pixel
+        height(int): depthmap height in pixel
+        depth_scale(float)
+        max_confidence(float)
+    """
+
+    with zipfile.ZipFile(fpath) as z:
         with z.open('data') as f:
-            line = str(f.readline())[2:-3]
-            header = line.split("_")
+            # Example for a first_line: '180x135_0.001_7_0.57045287_-0.0057296_0.0022602521_0.82130724_-0.059177425_0.0024800065_0.030834956'
+            first_line = f.readline().decode().strip()
+
+            file_header = first_line.split("_")
 
             # header[0] example: 180x135
-            width, height = header[0].split("x")
+            width, height = file_header[0].split("x")
+            width, height = int(width), int(height)
+            depth_scale = float(file_header[1])
+            max_confidence = float(file_header[2])
 
-            depth_scale = float(header[1])
-            max_confidence = float(header[2])
-            data = f.read()
-            f.close()
-        z.close()
-    return data, width, height, depth_scale, max_confidence
+            depth_data = f.read()
+    return depth_data, width, height, depth_scale, max_confidence
 
 
 def parse_depth(tx, ty, data, depth_scale, width):
