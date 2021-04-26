@@ -53,9 +53,6 @@ class DepthMapImgFlow:
     def preprocess_depthmap(self, input_path):
         data, width, height, depthScale, _max_confidence = preprocessing.load_depth(input_path)
 
-        preprocessing.set_width(int(width))
-        preprocessing.set_height(int(height))
-
         depthmap = preprocessing.prepare_depthmap(data, width, height, depthScale)
 
         # depthmap = preprocessing.preprocess(depthmap)

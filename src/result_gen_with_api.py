@@ -298,12 +298,6 @@ def main():
 
     args = parser.parse_args()
 
-    # preprocessing.set_width(int(240 * 0.75))
-    # preprocessing.set_height(int(180 * 0.75))
-
-    preprocessing.set_width(int(240))
-    preprocessing.set_height(int(180))
-
     url = os.getenv('APP_URL', 'http://localhost:5001')
     print(f"App URL : {url}")
 
