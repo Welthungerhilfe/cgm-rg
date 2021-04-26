@@ -38,9 +38,6 @@ def prepare_depthmap(data, width, height, depth_scale):
     output = np.zeros((width, height, 1))
     for cx in range(width):
         for cy in range(height):
-            #             output[cx][height - cy - 1][0] = parse_confidence(cx, cy)
-            #             output[cx][height - cy - 1][1] = im_array[cy][cx][1] / 255.0 #test matching on RGB data
-            #             output[cx][height - cy - 1][2] = 1.0 - min(parse_depth(cx, cy) / 2.0, 1.0) #depth data scaled to be visible
             # depth data scaled to be visible
             output[cx][height - cy - 1] = parse_depth(cx, cy, data, depth_scale)
     arr = np.array(output, dtype='float32')
