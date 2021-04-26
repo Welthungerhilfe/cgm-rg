@@ -5,7 +5,6 @@ from datetime import datetime
 
 import cv2
 import face_recognition
-import numpy as np
 from bunch import Bunch
 
 
