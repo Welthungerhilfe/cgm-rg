@@ -163,18 +163,15 @@ def convert_2d_to_3d(intrisics, x, y, z):
     return output
 
 
-def get_depthmaps(paths):
+def get_depthmaps(fpaths):
     depthmaps = []
-    for path in paths:
-        data, width, height, depthScale, maxConfidence = load_depth(path)
+    for fpath in fpaths:
+        data, width, height, depthScale, _ = load_depth(fpath)
         depthmap = prepare_depthmap(data, width, height, depthScale)
-        # print(height, width)
         depthmap = preprocess(depthmap)
-        # print(depthmap.shape)
         depthmaps.append(depthmap)
 
     depthmaps = np.array(depthmaps)
-
     return depthmaps
 
 
