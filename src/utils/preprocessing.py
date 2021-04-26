@@ -14,10 +14,10 @@ def load_depth(filename):
         with z.open('data') as f:
             line = str(f.readline())[2:-3]
             header = line.split("_")
-            res = header[0].split("x")
-            # print(res)
-            width = int(res[0])
-            height = int(res[1])
+
+            # header[0] example: 180x135
+            width, height = header[0].split("x")
+
             depth_scale = float(header[1])
             max_confidence = float(header[2])
             data = f.read()
