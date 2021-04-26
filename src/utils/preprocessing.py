@@ -26,9 +26,9 @@ def load_depth(filename):
     return data, width, height, depth_scale, max_confidence
 
 
-def parse_depth(tx, ty, data, depth_scale):
-    depth = data[(int(ty) * WIDTH + int(tx)) * 3 + 0] << 8
-    depth += data[(int(ty) * WIDTH + int(tx)) * 3 + 1]
+def parse_depth(tx, ty, data, depth_scale, width):
+    depth = data[(int(ty) * width + int(tx)) * 3 + 0] << 8
+    depth += data[(int(ty) * width + int(tx)) * 3 + 1]
     depth *= depth_scale
     return depth
 
@@ -39,9 +39,9 @@ def prepare_depthmap(data, width, height, depth_scale):
     for cx in range(width):
         for cy in range(height):
             # depth data scaled to be visible
-            output[cx][height - cy - 1] = parse_depth(cx, cy, data, depth_scale)
+            output[cx][height - cy - 1] = parse_depth(cx, cy, data, depth_scale, width)
     arr = np.array(output, dtype='float32')
-    return arr.reshape(width, height), height, width
+    return arr.reshape(width, height), height, width  # TODO don't return width and height
 
 
 def preprocess_depthmap(depthmap):
@@ -121,7 +121,7 @@ def get_count(calibration, data, depth_scale):
     count = 0
     for x in range(2, WIDTH - 2):
         for y in range(2, HEIGHT - 2):
-            depth = parse_depth(x, y, data, depth_scale)
+            depth = parse_depth(x, y, data, depth_scale, WIDTH)
             if depth:
                 res = convert_2d_to_3d(calibration[1], x, y, depth)
                 if res:
