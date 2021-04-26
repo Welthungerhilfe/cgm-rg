@@ -103,9 +103,6 @@ def parse_calibration(filepath):
     return calibration
 
 
-def parse_confidence(tx, ty, data, max_confidence):
-    return (data[(int(ty) * WIDTH + int(tx)) * 3 + 2]) / max_confidence
-
 # getter
 
 
@@ -133,34 +130,6 @@ def set_height(value):
     HEIGHT = value
 
     # parse PCD
-
-
-# get valid points in depthmaps
-def get_count(calibration, data, depth_scale):
-    count = 0
-    for x in range(2, WIDTH - 2):
-        for y in range(2, HEIGHT - 2):
-            depth = parse_depth(x, y, data, depth_scale, WIDTH)
-            if depth:
-                res = convert_2d_to_3d(calibration[1], x, y, depth)
-                if res:
-                    count = count + 1
-    return count
-
-
-def convert_2d_to_3d(intrisics, x, y, z):
-    # print(intrisics)
-    fx = intrisics[0] * float(WIDTH)
-    fy = intrisics[1] * float(HEIGHT)
-    cx = intrisics[2] * float(WIDTH)
-    cy = intrisics[3] * float(HEIGHT)
-    tx = (x - cx) * z / fx
-    ty = (y - cy) * z / fy
-    output = []
-    output.append(tx)
-    output.append(ty)
-    output.append(z)
-    return output
 
 
 def get_depthmaps(fpaths):
