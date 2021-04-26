@@ -41,22 +41,26 @@ def load_depth(fpath: str) -> Tuple[bytes, int, int, float, float]:
     return depth_data, width, height, depth_scale, max_confidence
 
 
-def parse_depth(tx, ty, data, depth_scale, width):
-    depth = data[(int(ty) * width + int(tx)) * 3 + 0] << 8
-    depth += data[(int(ty) * width + int(tx)) * 3 + 1]
+def parse_depth(tx: int, ty: int, data: bytes, depth_scale: float, width: int) -> float:
+    assert isinstance(tx, int)
+    assert isinstance(ty, int)
+
+    depth = data[(ty * width + tx) * 3 + 0] << 8
+    depth += data[(ty * width + tx) * 3 + 1]
+
     depth *= depth_scale
     return depth
 
 
-def prepare_depthmap(data, width, height, depth_scale):
-    # prepare array for output
+def prepare_depthmap(data: bytes, width: int, height: int, depth_scale: float) -> np.array:
+    """Converts bytes array into np.array"""
     output = np.zeros((width, height, 1))
     for cx in range(width):
         for cy in range(height):
             # depth data scaled to be visible
             output[cx][height - cy - 1] = parse_depth(cx, cy, data, depth_scale, width)
     arr = np.array(output, dtype='float32')
-    return arr.reshape(width, height), height, width  # TODO don't return width and height
+    return arr.reshape(width, height)
 
 
 def preprocess_depthmap(depthmap):
@@ -163,7 +167,7 @@ def get_depthmaps(paths):
     depthmaps = []
     for path in paths:
         data, width, height, depthScale, maxConfidence = load_depth(path)
-        depthmap, _, _ = prepare_depthmap(data, width, height, depthScale)
+        depthmap = prepare_depthmap(data, width, height, depthScale)
         # print(height, width)
         depthmap = preprocess(depthmap)
         # print(depthmap.shape)

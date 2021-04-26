@@ -109,7 +109,7 @@ class WeightFlow:
                 self.scan_directory, artifact['file'])
 
             data, width, height, depthScale, _max_confidence = preprocessing.load_depth(input_path)
-            depthmap, height, width = preprocessing.prepare_depthmap(data, width, height, depthScale)
+            depthmap = preprocessing.prepare_depthmap(data, width, height, depthScale)
             depthmap = preprocessing.preprocess(depthmap)
             depthmaps.append(depthmap)
 

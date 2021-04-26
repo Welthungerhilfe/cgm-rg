@@ -27,10 +27,8 @@ class HeightFlowMultiArtifact(HeightFlow):
         depthmaps = np.zeros((240, 180, 5))
 
         for i, depthmap_path in enumerate(depthmap[0]):
-            data, width, height, depth_scale, _max_confidence = preprocessing.load_depth(
-                depthmap_path)
-            depthmap, height, width = preprocessing.prepare_depthmap(
-                data, width, height, depth_scale)
+            data, width, height, depth_scale, _max_confidence = preprocessing.load_depth(depthmap_path)
+            depthmap = preprocessing.prepare_depthmap(data, width, height, depth_scale)
             depthmap = preprocessing.preprocess(depthmap)
             depthmaps[:, :, i] = tf.squeeze(depthmap, axis=2)
 

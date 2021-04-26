@@ -27,18 +27,16 @@ def test_load_depth():
 
 def test_prepare_depthmap():
     # Setup
-    preprocessing.set_width(int(WIDTH * 0.75))
-    preprocessing.set_height(int(HEIGHT * 0.75))
+    width, height = int(WIDTH * 0.75), int(HEIGHT * 0.75)
     dummy_depth_data_file = CWD.joinpath('tests', 'static_files', 'dummy_depth_data.pkl')
     with open(dummy_depth_data_file, 'rb') as f:
         dummy_depth_data = pickle.load(f)
 
     # Exercise
-    result = preprocessing.prepare_depthmap(dummy_depth_data[0], dummy_depth_data[1], dummy_depth_data[2], dummy_depth_data[3])
+    depthmap = preprocessing.prepare_depthmap(dummy_depth_data[0], width, height, dummy_depth_data[3])
 
     # Verify
-    assert result[0].shape[0] == result[2]
-    assert result[0].shape[1] == result[1]
+    assert depthmap.shape == (width, height)
 
 
 def test_get_depthmaps_small():
@@ -62,5 +60,6 @@ def test_get_depthmaps_big():
 
 
 if __name__ == "__main__":
-    test_get_depthmaps_small()
-    test_get_depthmaps_big()
+    # test_get_depthmaps_small()
+    # test_get_depthmaps_big()
+    test_prepare_depthmap()
