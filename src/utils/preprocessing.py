@@ -103,35 +103,6 @@ def parse_calibration(filepath):
     return calibration
 
 
-# getter
-
-
-def get_width():
-    return WIDTH
-
-# getter
-
-
-def get_height():
-    return HEIGHT
-
-# setter
-
-
-def set_width(value):
-    global WIDTH
-    WIDTH = value
-
-# setter
-
-
-def set_height(value):
-    global HEIGHT
-    HEIGHT = value
-
-    # parse PCD
-
-
 def get_depthmaps(fpaths):
     depthmaps = []
     for fpath in fpaths:
