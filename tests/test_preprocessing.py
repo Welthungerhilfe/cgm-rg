@@ -1,8 +1,9 @@
-import sys
-sys.path.append('./src')
-from utils import preprocessing
 import pathlib
 import pickle
+import sys
+
+sys.path.append('./src')
+from utils import preprocessing
 
 current_working_directory = pathlib.Path.cwd()
 
@@ -37,3 +38,19 @@ def test_prepare_depthmap():
     # Verify
     assert result[0].shape[0] == result[2]
     assert result[0].shape[1] == result[1]
+
+
+def test_get_depthmaps():
+    FACTOR = 1 # 0.75
+    preprocessing.set_width(int(240 * FACTOR))
+    preprocessing.set_height(int(180 * FACTOR))
+
+    path_that_fails = current_working_directory.joinpath('tests', "4ed427b5-3fd9-4f4d-8e58-19e39c7d77b6") # 180x135
+    path_that_works = current_working_directory.joinpath('tests', "6b0c5a4f-d8f2-4658-b7f9-9406f1770259")
+
+    # assert preprocessing.get_depthmaps([path_that_fails])
+    preprocessing.load_depth(path_that_fails)
+
+
+if __name__ == "__main__":
+    test_get_depthmaps()
