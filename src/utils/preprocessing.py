@@ -148,8 +148,7 @@ def get_depthmaps(paths):
     depthmaps = []
     for path in paths:
         data, width, height, depthScale, maxConfidence = load_depth(path)
-        depthmap, height, width = prepare_depthmap(
-            data, WIDTH, HEIGHT, depthScale)
+        depthmap, _, _ = prepare_depthmap(data, width, height, depthScale)
         # print(height, width)
         depthmap = preprocess(depthmap)
         # print(depthmap.shape)
