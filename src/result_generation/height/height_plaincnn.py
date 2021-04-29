@@ -23,10 +23,8 @@ class HeightFlowPlainCnn(HeightFlow):
         for artifact in self.artifacts:
             input_path = self.get_input_path(self.scan_directory, artifact['file'])
 
-            data, width, height, depth_scale, _max_confidence = preprocessing.load_depth(
-                input_path)
-            depthmap, height, width = preprocessing.prepare_depthmap(
-                data, width, height, depth_scale)
+            data, width, height, depth_scale, _max_confidence = preprocessing.load_depth(input_path)
+            depthmap = preprocessing.prepare_depthmap(data, width, height, depth_scale)
             depthmap = preprocessing.preprocess(depthmap)
             depthmaps.append(depthmap)
 

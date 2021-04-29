@@ -5,7 +5,6 @@ import os
 import pprint
 import uuid
 
-import utils.preprocessing as preprocessing
 from api_endpoints import ApiEndpoints
 from result_generation.blur import BlurFlow
 from result_generation.depthmap_image import DepthMapImgFlow
@@ -297,12 +296,6 @@ def main():
                         help='Weight Workflow Scan path')
 
     args = parser.parse_args()
-
-    # preprocessing.set_width(int(240 * 0.75))
-    # preprocessing.set_height(int(180 * 0.75))
-
-    preprocessing.set_width(int(240))
-    preprocessing.set_height(int(180))
 
     url = os.getenv('APP_URL', 'http://localhost:5001')
     print(f"App URL : {url}")

@@ -1,4 +1,5 @@
 import zipfile
+from typing import Tuple
 
 import numpy as np
 import tensorflow as tf
@@ -9,42 +10,57 @@ IMAGE_TARGET_WIDTH = 180
 NORMALIZATION_VALUE = 7.5
 
 
-def load_depth(filename):
-    with zipfile.ZipFile(filename) as z:
+def load_depth(fpath: str) -> Tuple[bytes, int, int, float, float]:
+    """Take ZIP file and extract depth and metadata
+
+    Args:
+        fpath (str): File path to the ZIP
+
+    Returns:
+        depth_data (bytes): depthmap data
+        width(int): depthmap width in pixel
+        height(int): depthmap height in pixel
+        depth_scale(float)
+        max_confidence(float)
+    """
+
+    with zipfile.ZipFile(fpath) as z:
         with z.open('data') as f:
-            line = str(f.readline())[2:-3]
-            header = line.split("_")
-            res = header[0].split("x")
-            # print(res)
-            width = int(res[0])
-            height = int(res[1])
-            depth_scale = float(header[1])
-            max_confidence = float(header[2])
-            data = f.read()
-            f.close()
-        z.close()
-    return data, width, height, depth_scale, max_confidence
+            # Example for a first_line: '180x135_0.001_7_0.57045287_-0.0057296_0.0022602521_0.82130724_-0.059177425_0.0024800065_0.030834956'
+            first_line = f.readline().decode().strip()
+
+            file_header = first_line.split("_")
+
+            # header[0] example: 180x135
+            width, height = file_header[0].split("x")
+            width, height = int(width), int(height)
+            depth_scale = float(file_header[1])
+            max_confidence = float(file_header[2])
+
+            depth_data = f.read()
+    return depth_data, width, height, depth_scale, max_confidence
 
 
-def parse_depth(tx, ty, data, depth_scale):
-    depth = data[(int(ty) * WIDTH + int(tx)) * 3 + 0] << 8
-    depth += data[(int(ty) * WIDTH + int(tx)) * 3 + 1]
+def parse_depth(tx: int, ty: int, data: bytes, depth_scale: float, width: int) -> float:
+    assert isinstance(tx, int)
+    assert isinstance(ty, int)
+
+    depth = data[(ty * width + tx) * 3 + 0] << 8
+    depth += data[(ty * width + tx) * 3 + 1]
+
     depth *= depth_scale
     return depth
 
 
-def prepare_depthmap(data, width, height, depth_scale):
-    # prepare array for output
+def prepare_depthmap(data: bytes, width: int, height: int, depth_scale: float) -> np.array:
+    """Convert bytes array into np.array"""
     output = np.zeros((width, height, 1))
     for cx in range(width):
         for cy in range(height):
-            #             output[cx][height - cy - 1][0] = parse_confidence(cx, cy)
-            #             output[cx][height - cy - 1][1] = im_array[cy][cx][1] / 255.0 #test matching on RGB data
-            #             output[cx][height - cy - 1][2] = 1.0 - min(parse_depth(cx, cy) / 2.0, 1.0) #depth data scaled to be visible
             # depth data scaled to be visible
-            output[cx][height - cy - 1] = parse_depth(cx, cy, data, depth_scale)
+            output[cx][height - cy - 1] = parse_depth(cx, cy, data, depth_scale, width)
     arr = np.array(output, dtype='float32')
-    return arr.reshape(width, height), height, width
+    return arr.reshape(width, height)
 
 
 def preprocess_depthmap(depthmap):
@@ -59,107 +75,15 @@ def preprocess(depthmap):
     return depthmap
 
 
-def parse_numbers(line):
-    output = []
-    values = line.split(" ")
-    for value in values:
-        output.append(float(value))
-    return output
-
-
-def parse_calibration(filepath):
-    # global calibration
-    with open(filepath, 'r') as f:
-        calibration = []
-        f.readline()[:-1]
-        calibration.append(parse_numbers(f.readline()))
-        # print(str(calibration[0]) + '\n') #color camera intrinsics - fx, fy,
-        # cx, cy
-        f.readline()[:-1]
-        calibration.append(parse_numbers(f.readline()))
-        # print(str(calibration[1]) + '\n') #depth camera intrinsics - fx, fy,
-        # cx, cy
-        f.readline()[:-1]
-        calibration.append(parse_numbers(f.readline()))
-        # print(str(calibration[2]) + '\n') #depth camera position relativelly
-        # to color camera in meters
-        calibration[2][1] *= 8.0  # workaround for wrong calibration data
-    return calibration
-
-
-def parse_confidence(tx, ty, data, max_confidence):
-    return (data[(int(ty) * WIDTH + int(tx)) * 3 + 2]) / max_confidence
-
-# getter
-
-
-def get_width():
-    return WIDTH
-
-# getter
-
-
-def get_height():
-    return HEIGHT
-
-# setter
-
-
-def set_width(value):
-    global WIDTH
-    WIDTH = value
-
-# setter
-
-
-def set_height(value):
-    global HEIGHT
-    HEIGHT = value
-
-    # parse PCD
-
-
-# get valid points in depthmaps
-def get_count(calibration, data, depth_scale):
-    count = 0
-    for x in range(2, WIDTH - 2):
-        for y in range(2, HEIGHT - 2):
-            depth = parse_depth(x, y, data, depth_scale)
-            if depth:
-                res = convert_2d_to_3d(calibration[1], x, y, depth)
-                if res:
-                    count = count + 1
-    return count
-
-
-def convert_2d_to_3d(intrisics, x, y, z):
-    # print(intrisics)
-    fx = intrisics[0] * float(WIDTH)
-    fy = intrisics[1] * float(HEIGHT)
-    cx = intrisics[2] * float(WIDTH)
-    cy = intrisics[3] * float(HEIGHT)
-    tx = (x - cx) * z / fx
-    ty = (y - cy) * z / fy
-    output = []
-    output.append(tx)
-    output.append(ty)
-    output.append(z)
-    return output
-
-
-def get_depthmaps(paths):
+def get_depthmaps(fpaths):
     depthmaps = []
-    for path in paths:
-        data, width, height, depthScale, maxConfidence = load_depth(path)
-        depthmap, height, width = prepare_depthmap(
-            data, WIDTH, HEIGHT, depthScale)
-        # print(height, width)
+    for fpath in fpaths:
+        data, width, height, depthScale, _ = load_depth(fpath)
+        depthmap = prepare_depthmap(data, width, height, depthScale)
         depthmap = preprocess(depthmap)
-        # print(depthmap.shape)
         depthmaps.append(depthmap)
 
     depthmaps = np.array(depthmaps)
-
     return depthmaps
 
 
@@ -174,10 +98,10 @@ def standing_laying_data_preprocessing(source_path):
 
 
 def sample_systematic_from_artifacts(artifacts: list, n_artifacts: int) -> list:
-    '''
+    """
     Code reference from cgm-ml
     https://github.com/Welthungerhilfe/cgm-ml/blob/main/src/common/model_utils/preprocessing_multiartifact_python.py#L89
-    '''
+    """
     n_artifacts_total = len(artifacts)
     n_skip = n_artifacts_total // n_artifacts  # 20 / 5 = 4
     indexes_to_select = list(

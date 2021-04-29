@@ -70,8 +70,6 @@ def test_process_depthmaps():
     """
     # Setup
     heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
-    preprocessing.set_width(int(240))
-    preprocessing.set_height(int(180))
 
     # Exercise
     result = heightflow.process_depthmaps()
