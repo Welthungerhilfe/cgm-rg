@@ -1,6 +1,7 @@
 import json
 import os
 import uuid
+from pathlib import Path
 
 import numpy as np
 from bunch import Bunch
@@ -37,7 +38,7 @@ class HeightFlow:
             artifact_workflow_path,
             scan_workflow_path,
             artifacts,
-            scan_parent_dir,
+            scan_parent_dir: str,
             scan_metadata,
             person_details):
         self.api = api
@@ -50,12 +51,11 @@ class HeightFlow:
         self.scan_metadata = scan_metadata
         self.person_details = person_details
         self.scan_parent_dir = scan_parent_dir
+
         if self.artifact_workflow_obj["data"]["input_format"] == 'application/zip':
             self.depth_input_format = 'depth'
-        self.scan_directory = os.path.join(
-            self.scan_parent_dir,
-            self.scan_metadata['id'],
-            self.depth_input_format)
+            self.scan_directory = Path(self.scan_parent_dir) / self.scan_metadata['id'] / self.depth_input_format
+
         self.artifact_workflow_obj['id'] = self.workflows.get_workflow_id(
             self.artifact_workflow_obj['name'], self.artifact_workflow_obj['version'])
         self.scan_workflow_obj['id'] = self.workflows.get_workflow_id(
@@ -70,7 +70,7 @@ class HeightFlow:
 
     def get_input_path(self, directory, file_name):
         """Returns input path for given directory name and file name"""
-        return os.path.join(directory, file_name)
+        return Path(directory) /file_name
 
     def get_mean_scan_results(self, predictions):
         """Return the average prediction from given list of predictions"""
