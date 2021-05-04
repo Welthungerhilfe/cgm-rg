@@ -361,10 +361,15 @@ def main():
     get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
 
 
+    filterby_workflow_metadata = workflow.load_workflows(height_depthmapmultiartifactlatefusion_workflow_path)
     filterby_scan_version_val = 'v0.9'
-    filterby_workflow_name =  
-    filterby_workflow_version = 
-    filterby_workflow_id_val = get_workflow_id(filterby_workflow_name, filterby_workflow_version)
+
+    filterby_workflow_name =  filterby_workflow_metadata['name']
+    filterby_workflow_version = filterby_workflow_metadata['version']
+    print("Filter by workflow Name: ", filterby_workflow_name)
+    print("Filter by workflow Version: ", filterby_workflow_version)
+
+    filterby_workflow_id_val = workflow.get_workflow_id(filterby_workflow_name, filterby_workflow_version)
 
     filterby_scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     filterby_scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
