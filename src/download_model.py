@@ -10,6 +10,7 @@ REPO_DIR = Path(__file__).parents[1].absolute()
 
 def download_model(ws, experiment_name, run_id, input_location, output_location):
     """Download the pretrained model
+
     Args:
          ws: workspace to access the experiment
          experiment_name: Name of the experiment in which model is saved
@@ -62,6 +63,13 @@ def main():
                    run_id='q4-depthmap-plaincnn-weight-95k_1611336518_642a9c58',
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/weight')
+
+    # Download M-CNN Model for height
+    download_model(ws=ws,
+                   experiment_name='q3-depthmapmultiartifactlatefusion-plaincnn-height-95',
+                   run_id='q3-depthmapmultiartifactlatefusion-plaincnn-height-95k_1614177517_ecd7b6e2',
+                   input_location=os.path.join('outputs', 'best_model.ckpt'),
+                   output_location=REPO_DIR / 'models/depthmapmultiartifactlatefusion')
 
 
 if __name__ == "__main__":

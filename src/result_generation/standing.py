@@ -13,7 +13,7 @@ import utils.inference as inference  # noqa: E402
 import utils.preprocessing as preprocessing  # noqa: E402
 
 
-class Standing_laying:
+class StandingLaying:
     """
     A class to handle standing/laying results generation.
 

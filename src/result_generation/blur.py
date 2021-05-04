@@ -5,15 +5,11 @@ from datetime import datetime
 
 import cv2
 import face_recognition
-import numpy as np
 from bunch import Bunch
-
-RESIZE_FACTOR = 4
 
 
 class BlurFlow:
-    """
-    A class to handle face blur results generation.
+    """Face blur results generation
 
     Attributes
     ----------
@@ -57,7 +53,8 @@ class BlurFlow:
             workflow_path,
             artifacts,
             scan_parent_dir,
-            scan_metadata):
+            scan_metadata,
+            scan_version):
         self.api = api
         self.workflows = workflows
         self.artifacts = artifacts
@@ -73,67 +70,96 @@ class BlurFlow:
             self.blur_input_format)
         self.workflow_obj['id'] = self.workflows.get_workflow_id(
             self.workflow_obj['name'], self.workflow_obj['version'])
+        self.scan_version = scan_version
 
     def bunch_object_to_json_object(self, bunch_object):
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
         json_object = json.loads(json_string)
-
         return json_object
 
     def get_input_path(self, directory, file_name):
         return os.path.join(directory, file_name)
 
     def run_blur_flow(self):
+        self.blur_set_resize_factor()
         self.blur_artifacts()
         self.post_blur_files()
         self.post_result_object()
 
     def blur_artifacts(self):
-        for i, artifact in enumerate(self.artifacts):
-
-            input_path = self.get_input_path(
-                self.scan_directory,
-                artifact['file'])
-            # target_path = input_path + '_blur.jpg'
-
-            print("input_path of image to perform blur: ", input_path, '\n')
-
-            # blur_status = blur_faces_in_file(input_path, target_path)
+        for artifact in self.artifacts:
+            input_path = self.get_input_path(self.scan_directory, artifact['file'])
+            print(f"input_path of image to perform blur: {input_path}\n")
             blur_img_binary, blur_status = self.blur_face(input_path)
-
             if blur_status:
                 artifact['blurred_image'] = blur_img_binary
 
-    def blur_face(self, source_path: str):
+    def blur_set_resize_factor(self):
+        if self.scan_version in ["v0.1", "v0.2", "v0.4", "v0.5", "v0.6"]:
+            self.resize_factor = 3
+            print("resize_factor is ", self.resize_factor)
+            print("scan_version is ", self.scan_version)
+        elif self.scan_version in ["v0.7"]:
+            self.resize_factor = 4
+            print("resize_factor is ", self.resize_factor)
+            print("scan_version is ", self.scan_version)
+        elif self.scan_version in ["v0.8", "v0.9", "v1.0"]:
+            self.resize_factor = 1
+            print("resize_factor is ", self.resize_factor)
+            print("scan_version is ", self.scan_version)
+        else:
+            # Default Resize factor to 1
+            print("New Scan Version Type")
+            self.resize_factor = 1
+            print("Default resize_factor is ", self.resize_factor)
+            print("scan_version is ", self.scan_version)
+
+    def blur_img_transformation_using_scan_version(self, rgb_image):
+        if self.scan_version in ["v0.7"]:
+            # Make the image smaller, The limit of cgm-api to post an image is 500 KB.
+            # Some of the images of v0.7 is greater than 500 KB
+            rgb_image = cv2.resize(
+                rgb_image, (0, 0), fx=1.0 / 1.3, fy=1.0 / 1.3)
+
+        # print("scan_version is ", self.scan_version)
+        image = rgb_image[:, :, ::-1]  # RGB -> BGR for OpenCV
+
+        if self.scan_version in ["v0.1", "v0.2", "v0.4", "v0.5", "v0.6", "v0.7", "v0.8", "v0.9", "v1.0"]:
+            # The images are provided in 90degrees turned. Here we rotate 90degress to
+            # the right.
+            image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+            print("scan_version is ", self.scan_version)
+            print("swapped image axis")
+
+        return image
+
+    def blur_face(self, source_path: str) -> bool:
         """Blur image
+
         Returns:
             bool: True if blurred otherwise False
         """
         # Read the image.
         assert os.path.exists(source_path), f"{source_path} does not exist"
         rgb_image = cv2.imread(source_path)
-        image = rgb_image[:, :, ::-1]  # RGB -> BGR for OpenCV
 
-        # The images are provided in 90degrees turned. Here we rotate 90degress to
-        # the right.
-        image = np.swapaxes(image, 0, 1)
+        image = self.blur_img_transformation_using_scan_version(rgb_image)
 
         # Scale image down for faster prediction.
         small_image = cv2.resize(
-            image, (0, 0), fx=1.0 / RESIZE_FACTOR, fy=1.0 / RESIZE_FACTOR)
+            image, (0, 0), fx=1.0 / self.resize_factor, fy=1.0 / self.resize_factor)
 
         # Find face locations.
-        face_locations = face_recognition.face_locations(
-            small_image, model="cnn")
+        face_locations = face_recognition.face_locations(small_image, model="cnn")
 
         # Blur the image.
         for top, right, bottom, left in face_locations:
             # Scale back up face locations since the frame we detected in was
             # scaled to 1/4 size
-            top *= RESIZE_FACTOR
-            right *= RESIZE_FACTOR
-            bottom *= RESIZE_FACTOR
-            left *= RESIZE_FACTOR
+            top *= self.resize_factor
+            right *= self.resize_factor
+            bottom *= self.resize_factor
+            left *= self.resize_factor
 
             # Extract the region of the image that contains the face.
             face_image = image[top:bottom, left:right]
@@ -145,15 +171,15 @@ class BlurFlow:
             # Put the blurred face region back into the frame image.
             image[top:bottom, left:right] = face_image
 
-        # Rotate image back.
-        image = np.swapaxes(image, 0, 1)
+        # if self.scan_version in ["v0.2", "v0.4", "v0.6", "v0.7", "v0.8"]:
+        #    # Rotate image back.
+        #    image = np.swapaxes(image, 0, 1)
 
         # Write image to hard drive.
         rgb_image = image[:, :, ::-1]  # BGR -> RGB for OpenCV
 
         # logging.info(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
-        print(
-            f"{len(face_locations)} face locations found and blurred for path: {source_path}\n")
+        print(f"{len(face_locations)} face locations found and blurred for path: {source_path}\n")
         return rgb_image, True
 
     def post_blur_files(self):

@@ -108,15 +108,12 @@ class WeightFlow:
             input_path = self.get_input_path(
                 self.scan_directory, artifact['file'])
 
-            data, width, height, depthScale, max_confidence = preprocessing.load_depth(
-                input_path)
-            depthmap, height, width = preprocessing.prepare_depthmap(
-                data, width, height, depthScale)
+            data, width, height, depthScale, _max_confidence = preprocessing.load_depth(input_path)
+            depthmap = preprocessing.prepare_depthmap(data, width, height, depthScale)
             depthmap = preprocessing.preprocess(depthmap)
             depthmaps.append(depthmap)
 
         depthmaps = np.array(depthmaps)
-
         return depthmaps
 
     def run_weight_flow(self):
@@ -151,18 +148,15 @@ class WeightFlow:
         weight_result.id = f"{uuid.uuid4()}"
         weight_result.scan = self.scan_metadata['id']
         weight_result.workflow = self.scan_workflow_obj["id"]
-        weight_result.source_artifacts = [
-            artifact['id'] for artifact in self.artifacts]
+        weight_result.source_artifacts = [artifact['id'] for artifact in self.artifacts]
         weight_result.source_results = []
         weight_result.generated = generated_timestamp
         mean_prediction = self.get_mean_scan_results(predictions)
         class_wfa = self.zscore_wfa(mean_prediction)
-        result = {'mean_weight': mean_prediction,
-                  'Weight Diagnosis': class_wfa}
+        result = {'mean_weight': mean_prediction, 'Weight Diagnosis': class_wfa}
         weight_result.data = result
 
         res.results.append(weight_result)
-
         return res
 
     def zscore_wfa(self, mean_prediction):
