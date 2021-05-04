@@ -172,8 +172,8 @@ class ApiEndpoints:
         '''Get the scan metadata'''
         headers = self.prepare_header()
         # TODO use scan_version and workflow id
-        mod_scan_endpoint = self.mod_scan_endpoint + '&scan_version='+ scan_version
-        #mod_scan_endpoint = self.mod_scan_endpoint + '&scan_version='+ scan_version + '&workflow=' + workflow_id
+        mod_scan_endpoint = self.mod_scan_endpoint + '&scan_version=' + scan_version
+        # mod_scan_endpoint = self.mod_scan_endpoint + '&scan_version='+ scan_version + '&workflow=' + workflow_id
         print("modified scan endpoint : ", mod_scan_endpoint)
 
         response = requests.get(
