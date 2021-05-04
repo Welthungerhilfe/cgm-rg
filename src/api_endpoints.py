@@ -17,7 +17,8 @@ class ApiEndpoints:
             post_file_endpoint,
             result_endpoint,
             workflow_endpoint,
-            person_detail_endpoint):
+            person_detail_endpoint,
+            mod_scan_endpoint):
         self.url = url
         self.scan_endpoint = scan_endpoint
         self.get_file_endpoint = get_file_endpoint
@@ -25,6 +26,7 @@ class ApiEndpoints:
         self.result_endpoint = result_endpoint
         self.workflow_endpoint = workflow_endpoint
         self.person_detail_endpoint = person_detail_endpoint
+        self.mod_scan_endpoint = mod_scan_endpoint
         self.headers = {}
         self.x_api_key = os.getenv("API_KEY", None)
 

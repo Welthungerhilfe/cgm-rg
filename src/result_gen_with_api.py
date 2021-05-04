@@ -306,6 +306,7 @@ def main():
     result_endpoint = '/api/results'
     workflow_endpoint = '/api/workflows'
     person_detail_endpoint = '/api/persons/'
+    mod_scan_endpoint = '/api/scans/unprocessed?limit=1'
 
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
@@ -327,7 +328,8 @@ def main():
         post_file_endpoint,
         result_endpoint,
         workflow_endpoint,
-        person_detail_endpoint)
+        person_detail_endpoint,
+        mod_scan_endpoint)
 
     workflow = ProcessWorkflows(cgm_api)
 
