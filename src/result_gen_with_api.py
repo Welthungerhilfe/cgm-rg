@@ -107,11 +107,7 @@ class GetScanMetadata:
 
         return self.api.get_scan(self.scan_metadata_path)
 
-    def get_unprocessed_scans_for_scan_version_workflow_id(
-        self, 
-        scan_version, 
-        workflow_id
-        scan_metadata_path):
+    def get_unprocessed_scans_for_scan_version_workflow_id(self, scan_version, workflow_id, scan_metadata_path):
         """
         Gets unprocessed_scans from api and returns the no of scans
 
@@ -124,7 +120,8 @@ class GetScanMetadata:
         None
         """
 
-        return self.api.get_scan_for_scan_version_workflow_id(scan_version, workflow_id, scan_metadata_path)
+        return self.api.get_scan_for_scan_version_workflow_id(
+            scan_version, workflow_id, scan_metadata_path)
 
     def get_scan_metadata(self):
         with open(self.scan_metadata_path, 'r') as f:
@@ -139,6 +136,7 @@ class GetScanMetadata:
         scan_metadata = scan_metadata_obj['scans'][0]
 
         return scan_metadata
+
 
 class PrepareArtifacts:
     """
@@ -295,20 +293,23 @@ def main():
                         type=str,
                         help='Depthmap Image Workflow path')
 
-    parser.add_argument('--height_workflow_artifact_path',
-                        default="src/workflows/height-plaincnn-workflow-artifact.json",
-                        type=str,
-                        help='Height Workflow Artifact path')
+    parser.add_argument(
+        '--height_workflow_artifact_path',
+        default="src/workflows/height-plaincnn-workflow-artifact.json",
+        type=str,
+        help='Height Workflow Artifact path')
 
-    parser.add_argument('--height_depthmapmultiartifactlatefusion_workflow_path',
-                        default="src/workflows/height-depthmapmultiartifactlatefusion-workflow.json",
-                        type=str,
-                        help='Height Workflow depthmapmultiartifactlatefusion Artifact path')
+    parser.add_argument(
+        '--height_depthmapmultiartifactlatefusion_workflow_path',
+        default="src/workflows/height-depthmapmultiartifactlatefusion-workflow.json",
+        type=str,
+        help='Height Workflow depthmapmultiartifactlatefusion Artifact path')
 
-    parser.add_argument('--height_workflow_scan_path',
-                        default="src/workflows/height-plaincnn-workflow-scan.json",
-                        type=str,
-                        help='Height Workflow Scan path')
+    parser.add_argument(
+        '--height_workflow_scan_path',
+        default="src/workflows/height-plaincnn-workflow-scan.json",
+        type=str,
+        help='Height Workflow Scan path')
 
     parser.add_argument('--weight_workflow_artifact_path',
                         default="src/workflows/weight-workflow-artifact.json",
@@ -360,29 +361,36 @@ def main():
 
     get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
 
-
-    filterby_workflow_metadata = workflow.load_workflows(height_depthmapmultiartifactlatefusion_workflow_path)
+    filterby_workflow_metadata = workflow.load_workflows(
+        height_depthmapmultiartifactlatefusion_workflow_path)
     filterby_scan_version_val = 'v0.9'
 
-    filterby_workflow_name =  filterby_workflow_metadata['name']
+    filterby_workflow_name = filterby_workflow_metadata['name']
     filterby_workflow_version = filterby_workflow_metadata['version']
     print("Filter by workflow Name: ", filterby_workflow_name)
     print("Filter by workflow Version: ", filterby_workflow_version)
 
-    filterby_workflow_id_val = workflow.get_workflow_id(filterby_workflow_name, filterby_workflow_version)
+    filterby_workflow_id_val = workflow.get_workflow_id(
+        filterby_workflow_name, filterby_workflow_version)
 
     filterby_scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
-    filterby_scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
+    filterby_scan_metadata_path = os.path.join(
+        scan_parent_dir, filterby_scan_metadata_name)
 
     # Start cgm-rg for scan filtered by scan version and workflow id
     if get_scan_metadata.get_unprocessed_scans_for_scan_version_workflow_id(
-        filterby_scan_version_val, 
-        filterby_workflow_id_val, 
-        filterby_scan_metadata_path) > 0:
-        
-        print("Started cgm-rg for scan filtered by ", filterby_scan_version_val, " and ", filterby_workflow_id_val)
-        
-        scan_metadata = get_scan_metadata.get_scan_metadata_by_path(filterby_scan_metadata_path)
+            filterby_scan_version_val,
+            filterby_workflow_id_val,
+            filterby_scan_metadata_path) > 0:
+
+        print(
+            "Started cgm-rg for scan filtered by ",
+            filterby_scan_version_val,
+            " and ",
+            filterby_workflow_id_val)
+
+        scan_metadata = get_scan_metadata.get_scan_metadata_by_path(
+            filterby_scan_metadata_path)
 
         scan_version = scan_metadata['version']
         print("Scan Type Version: ", scan_version)

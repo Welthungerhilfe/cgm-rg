@@ -167,11 +167,14 @@ class ApiEndpoints:
             print("Response code : ", response.status_code)
             return 0
 
-    def get_scan_for_scan_version_workflow_id(self, scan_version, workflow_id, scan_path):
+    def get_scan_for_scan_version_workflow_id(
+            self, scan_version, workflow_id, scan_path):
         '''Get the scan metadata'''
         headers = self.prepare_header()
-        #TODO use scan_version and workflow id
-        response = requests.get(self.url + self.mod_scan_endpoint, headers=headers)
+        # TODO use scan_version and workflow id
+        response = requests.get(
+            self.url + self.mod_scan_endpoint,
+            headers=headers)
 
         if response.status_code == 200:
             content = response.json()
@@ -190,7 +193,8 @@ class ApiEndpoints:
     def get_person_details(self, person_id):
         headers = self.prepare_header()
         resposne = requests.get(
-            self.url + self.person_detail_endpoint + person_id + '/basic', headers=headers)
+            self.url + self.person_detail_endpoint + person_id + '/basic',
+            headers=headers)
 
         if resposne.status_code == 200:
             content = resposne.json()
