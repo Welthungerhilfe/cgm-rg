@@ -332,7 +332,7 @@ def main():
     result_endpoint = '/api/results'
     workflow_endpoint = '/api/workflows'
     person_detail_endpoint = '/api/persons/'
-    mod_scan_endpoint = '/api/scans/unprocessed?limit=1'
+    mod_scan_endpoint = '/api/scans?page=1&limit=1'
 
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
