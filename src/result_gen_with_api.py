@@ -109,15 +109,17 @@ class GetScanMetadata:
 
     def get_unprocessed_scans_for_scan_version_workflow_id(self, scan_version, workflow_id, scan_metadata_path):
         """
-        Gets unprocessed_scans from api and returns the no of scans
+        Gets unprocessed_scans from api filtered by scan verion type and workflow id and returns the no of scans
 
         Parameters
         ----------
-        None
+        scan_version : Scan Version of unprocessed scan
+        workflow_id : Workflow id of unprocessed scan
+        scan_metadata_path : Path to store the scan metadata
 
         Returns
         -------
-        None
+        Length of the unprocessed scan filtered by scan verion type and workflow id
         """
 
         return self.api.get_scan_for_scan_version_workflow_id(
