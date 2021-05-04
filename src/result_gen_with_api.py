@@ -386,6 +386,8 @@ def main():
 
         scan_version = scan_metadata['version']
         print("Scan Type Version: ", scan_version)
+        assert (scan_version == filterby_scan_version_val)
+
         workflow.get_list_of_worflows()
         data_processing = PrepareArtifacts(
             cgm_api, scan_metadata, scan_parent_dir)
