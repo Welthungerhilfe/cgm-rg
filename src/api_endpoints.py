@@ -167,6 +167,26 @@ class ApiEndpoints:
             print("Response code : ", response.status_code)
             return 0
 
+    def get_scan_for_scan_version_workflow_id(self, scan_version, workflow_id, scan_path):
+        '''Get the scan metadata'''
+        headers = self.prepare_header()
+        #TODO use scan_version and workflow id
+        response = requests.get(self.url + self.mod_scan_endpoint, headers=headers)
+
+        if response.status_code == 200:
+            content = response.json()
+            print("\nScan Details :")
+            pprint.pprint(content)
+
+            with open(scan_path, 'w') as f:
+                json.dump(content, f, indent=4)
+
+            print("Written scan metadata successfully to ", scan_path)
+            return len(content['scans'])
+        else:
+            print("Response code : ", response.status_code)
+            return 0
+
     def get_person_details(self, person_id):
         headers = self.prepare_header()
         resposne = requests.get(

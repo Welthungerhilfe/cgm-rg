@@ -107,6 +107,25 @@ class GetScanMetadata:
 
         return self.api.get_scan(self.scan_metadata_path)
 
+    def get_unprocessed_scans_for_scan_version_workflow_id(
+        self, 
+        scan_version, 
+        workflow_id
+        scan_metadata_path):
+        """
+        Gets unprocessed_scans from api and returns the no of scans
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
+        return self.api.get_scan_for_scan_version_workflow_id(scan_version, workflow_id, scan_metadata_path)
+
     def get_scan_metadata(self):
         with open(self.scan_metadata_path, 'r') as f:
             scan_metadata_obj = json.load(f)
