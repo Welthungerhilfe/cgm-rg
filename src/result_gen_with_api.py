@@ -247,44 +247,14 @@ def main():
                         type=str,
                         help='Parent directory in which scans will be stored')
 
-    parser.add_argument('--blur_workflow_path',
-                        default="src/workflows/blur-workflow.json",
-                        type=str,
-                        help='Blur Workflow path')
-    parser.add_argument('--standing_laying_workflow_path',
-                        default="src/workflows/standing_laying-workflow.json",
-                        type=str,
-                        help='Standing laying Workflow path')
-
-    parser.add_argument('--depthmap_img_workflow_path',
-                        default="src/workflows/depthmap-img-workflow.json",
-                        type=str,
-                        help='Depthmap Image Workflow path')
-
-    parser.add_argument('--height_workflow_artifact_path',
-                        default="src/workflows/height-plaincnn-workflow-artifact.json",
-                        type=str,
-                        help='Height Workflow Artifact path')
-
-    parser.add_argument('--height_depthmapmultiartifactlatefusion_workflow_path',
-                        default="src/workflows/height-depthmapmultiartifactlatefusion-workflow.json",
-                        type=str,
-                        help='Height Workflow depthmapmultiartifactlatefusion Artifact path')
-
-    parser.add_argument('--height_workflow_scan_path',
-                        default="src/workflows/height-plaincnn-workflow-scan.json",
-                        type=str,
-                        help='Height Workflow Scan path')
-
-    parser.add_argument('--weight_workflow_artifact_path',
-                        default="src/workflows/weight-workflow-artifact.json",
-                        type=str,
-                        help='Weight Workflow Artifact path')
-
-    parser.add_argument('--weight_workflow_scan_path',
-                        default="src/workflows/weight-workflow-scan.json",
-                        type=str,
-                        help='Weight Workflow Scan path')
+    parser.add_argument('--blur_workflow_path', default="src/workflows/blur-workflow.json")  # noqa: E501
+    parser.add_argument('--standing_laying_workflow_path', default="src/workflows/standing_laying-workflow.json")  # noqa: E501
+    parser.add_argument('--depthmap_img_workflow_path', default="src/workflows/depthmap-img-workflow.json")  # noqa: E501
+    parser.add_argument('--height_workflow_artifact_path', default="src/workflows/height-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
+    parser.add_argument('--height_depthmapmultiartifactlatefusion_workflow_path', default="src/workflows/height-depthmapmultiartifactlatefusion-workflow.json")  # noqa: E501
+    parser.add_argument('--height_workflow_scan_path', default="src/workflows/height-plaincnn-workflow-scan.json")  # noqa: E501
+    parser.add_argument('--weight_workflow_artifact_path', default="src/workflows/weight-workflow-artifact.json")  # noqa: E501
+    parser.add_argument('--weight_workflow_scan_path', default="src/workflows/weight-workflow-scan.json")  # noqa: E501
 
     args = parser.parse_args()
 
