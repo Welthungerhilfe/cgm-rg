@@ -54,6 +54,7 @@ if __name__ == "__main__":
     result_endpoint = '/api/results'
     workflow_endpoint = '/api/workflows'
     person_detail_endpoint = '/api/persons/'
+    mod_scan_endpoint = '/api/scans?page=1&limit=1'
 
     cgm_api = ApiEndpoints(
         url,
@@ -62,7 +63,8 @@ if __name__ == "__main__":
         post_file_endpoint,
         result_endpoint,
         workflow_endpoint,
-        person_detail_endpoint)
+        person_detail_endpoint,
+        mod_scan_endpoint)
 
     # blur_workflow_path = 'src/schema/blur-workflow.json'
     # blur_workflow_response_path = 'src/schema/blur-workflow-post.json'

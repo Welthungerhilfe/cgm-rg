@@ -169,15 +169,14 @@ class ApiEndpoints:
 
     def get_scan_for_scan_version_workflow_id(
             self, scan_version, workflow_id, scan_path):
-        '''Get the scan metadata'''
+
+        '''Get the scan metadata filtered by scan_version and workflow_id'''
         headers = self.prepare_header()
-        # TODO use scan_version and workflow id
-        mod_scan_endpoint = self.mod_scan_endpoint + '&scan_version=' + scan_version
-        # mod_scan_endpoint = self.mod_scan_endpoint + '&scan_version='+ scan_version + '&workflow=' + workflow_id
-        print("modified scan endpoint : ", mod_scan_endpoint)
+        # use scan_version and workflow id to get filtered scans
 
         response = requests.get(
-            self.url + mod_scan_endpoint,
+            self.url + self.mod_scan_endpoint,
+            params={'scan_version': scan_version, 'page': 1, 'limit': 1},
             headers=headers)
 
         if response.status_code == 200:
