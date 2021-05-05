@@ -120,7 +120,7 @@ class HeightFlow:
         sex = 'M' if self.person_details['sex'] == 'male' else 'F'
         age_in_days = age(self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
         class_lhfa = 'Not Found'
-        if MIN_HEIGHT < float(mean_prediction) <= MAX_HEIGHT and age_in_days <= MAX_AGE:
+        if MIN_HEIGHT < float(mean_prediction) <= MAX_HEIGHT and 0 < age_in_days <= MAX_AGE:
             zscore_lhfa = Calculator().zScore_lhfa(
                 age_in_days=str(age_in_days), sex=sex, height=mean_prediction)
             if zscore_lhfa < -3:
@@ -144,6 +144,68 @@ class HeightFlow:
 
         scan_level_height_result_bunch = self.scan_level_height_result_object(
             predictions, generated_timestamp, self.scan_workflow_obj)
+        scan_level_height_result_json = self.bunch_object_to_json_object(
+            scan_level_height_result_bunch)
+        if self.api.post_results(scan_level_height_result_json) == 201:
+            print(
+                "successfully post scan level height results: ",
+                scan_level_height_result_json)
+
+    def artifact_level_height_result_object_ensemble(self, predictions, generated_timestamp,stds):
+        """Prepare artifact level height result object."""
+        res = Bunch()
+        res.results = []
+        for artifact, prediction,std in zip(self.artifacts, predictions,stds):
+            height_result = Bunch()
+            height_result.id = f"{uuid.uuid4()}"
+            height_result.scan = self.scan_metadata['id']
+            height_result.workflow = self.artifact_workflow_obj["id"]
+            height_result.source_artifacts = [artifact['id']]
+            height_result.source_results = []
+            height_result.generated = generated_timestamp
+            result = {'height': str(prediction[0]),'uncertainty': str(std[0])}
+            height_result.data = result
+            res.results.append(height_result)
+
+        return res
+    
+    def scan_level_height_result_object_ensemble(self, predictions, generated_timestamp, workflow_obj,stds):
+        """Prepare scan level height result object"""
+        res = Bunch()
+        res.results = []
+        height_result = Bunch()
+        height_result.id = f"{uuid.uuid4()}"
+        height_result.scan = self.scan_metadata['id']
+        height_result.workflow = workflow_obj["id"]
+        height_result.source_artifacts = [
+            artifact['id'] for artifact in self.artifacts]
+        height_result.source_results = []
+        height_result.generated = generated_timestamp
+        mean_prediction = self.get_mean_scan_results(predictions)
+        mean_std = self.get_mean_scan_results(stds)
+        class_lhfa = self.zscore_lhfa(mean_prediction)
+        result = {'mean_height': mean_prediction,
+                  'Height Diagnosis': class_lhfa,
+                  'uncertainty':mean_std}
+        height_result.data = result
+
+        res.results.append(height_result)
+
+        return res
+    
+    def post_height_results_deep_ensemble(self,predictions,generated_timestamp,stds):
+        """Post the artifact and scan level height results to API"""
+        artifact_level_height_result_bunch = self.artifact_level_height_result_object_ensemble(
+            predictions, generated_timestamp,stds)
+        artifact_level_height_result_json = self.bunch_object_to_json_object(
+            artifact_level_height_result_bunch)
+        if self.api.post_results(artifact_level_height_result_json) == 201:
+            print(
+                "successfully post artifact level height results: ",
+                artifact_level_height_result_json)
+
+        scan_level_height_result_bunch = self.scan_level_height_result_object_ensemble(
+            predictions, generated_timestamp, self.scan_workflow_obj,stds)
         scan_level_height_result_json = self.bunch_object_to_json_object(
             scan_level_height_result_bunch)
         if self.api.post_results(scan_level_height_result_json) == 201:
