@@ -398,8 +398,8 @@ def main():
         scan_version = scan_metadata['version']
         print("Scan Version: ", scan_version)
         print("Filterby Scan Version: ", filterby_scan_version_val)
-        
-        try :
+
+        try:
             assert (scan_version == filterby_scan_version_val)
 
             data_processing = PrepareArtifacts(
@@ -428,7 +428,6 @@ def main():
         except Exception as e:
             print(e)
             print("Scan Version does not match")
-
 
     if get_scan_metadata.get_unprocessed_scans() > 0:
         print('----------------------------------------------------------------------------------------')
