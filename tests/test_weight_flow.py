@@ -35,7 +35,7 @@ def test_get_input_path():
 
     # Verify
     truth = 'app/scans/workflow.json'
-    assert result == truth
+    assert result == Path(truth)
 
     # Cleanup - none required
 
