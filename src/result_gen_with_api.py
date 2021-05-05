@@ -426,7 +426,10 @@ def main():
             try:
                 heightflow_mutliartifact.run_height_flow_depthmapmultiartifactlatefusion()
             except Exception as e:
+                print('---------------------------------')
                 print(e)
+                print("MultiArtifact Flow is not defined")
+        
         except Exception as e:
             print(e)
             print("Scan Version does not match")
