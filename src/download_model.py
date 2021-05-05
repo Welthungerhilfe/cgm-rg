@@ -87,8 +87,7 @@ def main():
             experiment_name='q1-ensemble-warmup',
             run_id=id,
             input_location=os.path.join('outputs', 'best_model.ckpt'),
-            output_location=REPO_DIR / 'models/deepensemble'/id
-        )
+            output_location=REPO_DIR / 'models/deepensemble'/id)
 
 
 if __name__ == "__main__":

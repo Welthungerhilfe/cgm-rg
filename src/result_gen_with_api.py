@@ -287,12 +287,12 @@ def main():
                         help='Height Workflow Scan path')
 
     parser.add_argument('--height_ensemble_workflow_artifact_path',
-                        default="src/workflows/height-ensemble-workflow-artifact.json",
+                        default="/app/src/workflows/height-ensemble-workflow-artifact.json",
                         type=str,
                         help='Deep Ensemble artifact path')
 
     parser.add_argument('--height_ensemble_workflow_scan_path',
-                        default="src/workflows/height-ensemble-workflow-scan.json",
+                        default="/app/src/workflows/height-ensemble-workflow-scan.json",
                         type=str,
                         help='Deep Ensemble scan path')
 
