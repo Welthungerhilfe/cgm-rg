@@ -10,6 +10,7 @@ from result_generation.blur import BlurFlow
 from result_generation.depthmap_image import DepthMapImgFlow
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.height.height_mutiartifact import HeightFlowMultiArtifact
+from result_generation.height.height_ensemble import HeightFlowDeepEnsemble
 from result_generation.standing import StandingLaying
 from result_generation.weight import WeightFlow
 
@@ -285,6 +286,16 @@ def main():
                         type=str,
                         help='Height Workflow Scan path')
 
+    parser.add_argument('--height_ensemble_workflow_artifact_path',
+                        default="src/workflows/height-ensemble-workflow-artifact.json",
+                        type=str,
+                        help='Deep Ensemble artifact path')
+
+    parser.add_argument('--height_ensemble_workflow_scan_path',
+                        default="src/workflows/height-ensemble-workflow-scan.json",
+                        type=str,
+                        help='Deep Ensemble scan path')
+
     parser.add_argument('--weight_workflow_artifact_path',
                         default="src/workflows/weight-workflow-artifact.json",
                         type=str,
@@ -313,6 +324,8 @@ def main():
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
+    height_ensemble_workflow_artifact_path = args.height_ensemble_workflow_artifact_path
+    height_ensemble_workflow_scan_path = args.height_ensemble_workflow_scan_path
     height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
@@ -387,6 +400,15 @@ def main():
             scan_parent_dir,
             scan_metadata,
             person_details)
+        heightflow_deepensemble = HeightFlowDeepEnsemble(
+            cgm_api,
+            workflow,
+            height_ensemble_workflow_artifact_path,
+            height_ensemble_workflow_scan_path,
+            depth_artifacts,
+            scan_parent_dir,
+            scan_metadata,
+            person_details)
         weightflow = WeightFlow(
             cgm_api,
             workflow,
@@ -427,6 +449,10 @@ def main():
         except Exception as e:
             print(e)
 
+        try:
+            heightflow_deepensemble.run_height_flow_deepensemble()
+        except Exception as e:
+            print (e)
 
 if __name__ == "__main__":
     main()
