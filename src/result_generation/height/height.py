@@ -112,7 +112,6 @@ class HeightFlow:
     def zscore_lhfa(self, mean_prediction):
         sex = 'M' if self.person_details['sex'] == 'male' else 'F'
         age_in_days = age(self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
-        class_lhfa = 'Not Found'
         if MIN_HEIGHT < float(mean_prediction) <= MAX_HEIGHT and age_in_days <= MAX_AGE:
             zscore_lhfa = Calculator().zScore_lhfa(
                 age_in_days=str(age_in_days), sex=sex, height=mean_prediction)
@@ -122,24 +121,19 @@ class HeightFlow:
                 class_lhfa = 'Moderately Stunted'
             else:
                 class_lhfa = 'Not Stunted'
+        else:
+            class_lhfa = 'Not Found'
         return class_lhfa
 
     def post_height_results(self, predictions, generated_timestamp):
         """Post the artifact and scan level height results to API"""
-        artifact_level_height_result_bunch = self.artifact_level_height_result_object(
-            predictions, generated_timestamp)
-        artifact_level_height_result_json = self.bunch_object_to_json_object(
-            artifact_level_height_result_bunch)
+        artifact_level_height_result_bunch = self.artifact_level_height_result_object(predictions, generated_timestamp)
+        artifact_level_height_result_json = self.bunch_object_to_json_object(artifact_level_height_result_bunch)
         if self.api.post_results(artifact_level_height_result_json) == 201:
-            print(
-                "successfully post artifact level height results: ",
-                artifact_level_height_result_json)
+            print("successfully post artifact level height results: ", artifact_level_height_result_json)
 
         scan_level_height_result_bunch = self.scan_level_height_result_object(
             predictions, generated_timestamp, self.scan_workflow_obj)
-        scan_level_height_result_json = self.bunch_object_to_json_object(
-            scan_level_height_result_bunch)
+        scan_level_height_result_json = self.bunch_object_to_json_object(scan_level_height_result_bunch)
         if self.api.post_results(scan_level_height_result_json) == 201:
-            print(
-                "successfully post scan level height results: ",
-                scan_level_height_result_json)
+            print("successfully post scan level height results: ", scan_level_height_result_json)
