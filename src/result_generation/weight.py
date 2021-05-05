@@ -22,8 +22,6 @@ class WeightFlow:
 
     Attributes
     ----------
-    api : object
-        object of ApiEndpoints class
     workflows : list
         list of registered workflows
     artifact_workflow_path : str
@@ -59,7 +57,7 @@ class WeightFlow:
 
     def __init__(
             self,
-            api,
+            api: "ApiEndpoints",
             workflows,
             artifact_workflow_path,
             scan_workflow_path,

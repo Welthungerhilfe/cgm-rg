@@ -19,8 +19,6 @@ class StandingLaying:
 
     Attributes
     ----------
-    api : object
-        object of ApiEndpoints class
     workflows : list
         list of registered workflows
     workflow_path : str
@@ -50,7 +48,7 @@ class StandingLaying:
 
     def __init__(
             self,
-            api,
+            api: "ApiEndpoints",
             workflows,
             workflow_path,
             artifacts,

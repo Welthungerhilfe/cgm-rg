@@ -48,21 +48,7 @@ if __name__ == "__main__":
     url = os.getenv('APP_URL', 'http://localhost:5001')
     print(f"App URL: {url}")
 
-    scan_endpoint = '/api/scans/unprocessed?limit=1'
-    get_file_endpoint = '/api/files/'
-    post_file_endpoint = '/api/files'
-    result_endpoint = '/api/results'
-    workflow_endpoint = '/api/workflows'
-    person_detail_endpoint = '/api/persons/'
-
-    cgm_api = ApiEndpoints(
-        url,
-        scan_endpoint,
-        get_file_endpoint,
-        post_file_endpoint,
-        result_endpoint,
-        workflow_endpoint,
-        person_detail_endpoint)
+    cgm_api = ApiEndpoints(url)
 
     # blur_workflow_path = 'src/schema/blur-workflow.json'
     # blur_workflow_response_path = 'src/schema/blur-workflow-post.json'

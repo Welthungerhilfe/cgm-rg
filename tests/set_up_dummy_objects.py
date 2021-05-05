@@ -59,14 +59,7 @@ def get_dummy_get_scan_metadata_object():
 
 
 def get_dummy_api_endpoint_object():
-    return ApiEndpoints(
-        set_up_dummy_variables.url,
-        set_up_dummy_variables.scan_endpoint,
-        set_up_dummy_variables.get_file_endpoint,
-        set_up_dummy_variables.post_file_endpoint,
-        set_up_dummy_variables.result_endpoint,
-        set_up_dummy_variables.workflow_endpoint,
-        set_up_dummy_variables.person_detail_endpoint)
+    return ApiEndpoints(set_up_dummy_variables.url)
 
 
 def get_dummy_prepare_artifacts_object():

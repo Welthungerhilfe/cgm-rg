@@ -8,6 +8,15 @@ import cv2
 import requests
 
 
+ENDPOINTS = dict(
+    SCANS='/api/scans/unprocessed?limit=1',
+    GET_FILES='/api/files/',
+    POST_FILES='/api/files?storage=result',
+    RESULTS='/api/results',
+    WORKFLOWS='/api/workflows',
+    PERSONS='/api/persons/',
+)
+
 class ApiEndpoints:
     def __init__(
             self,

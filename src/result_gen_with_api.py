@@ -18,11 +18,6 @@ class ProcessWorkflows:
     """
     A class to process all the workflows.
 
-    Attributes
-    ----------
-    api : object
-        object of ApiEndpoints class
-
     Methods
     -------
     get_list_of_worflows():
@@ -35,7 +30,7 @@ class ProcessWorkflows:
         Loads the workflow from given path
     """
 
-    def __init__(self, api):
+    def __init__(self, api: "ApiEndpoints"):
         # self.workflow_object = workflow_object
         self.api = api
 
@@ -64,8 +59,6 @@ class GetScanMetadata:
 
     Attributes
     ----------
-    api : object
-        object of ApiEndpoints class
     scan_metadata_path : str
         path to store scan metadata
 
@@ -78,7 +71,7 @@ class GetScanMetadata:
         Returns the scan metadata
     """
 
-    def __init__(self, api, scan_metadata_path):
+    def __init__(self, api: "ApiEndpoints", scan_metadata_path):
         """
         Constructs all the necessary attributes for the GetScanMetadata object.
 
@@ -121,8 +114,6 @@ class PrepareArtifacts:
 
     Attributes
     ----------
-    api : object
-        object of ApiEndpoints class
     scan_metadata : json
         metadata of the scan to run weight flow on
     scan_parent_dir : str
@@ -144,7 +135,7 @@ class PrepareArtifacts:
         Create directory to store downloaded artifacts.
     """
 
-    def __init__(self, api, scan_metadata, scan_parent_dir):
+    def __init__(self, api: "ApiEndpoints", scan_metadata, scan_parent_dir):
         self.api = api
         self.scan_metadata = scan_metadata
         self.format_wise_artifact = {}
@@ -300,13 +291,6 @@ def main():
     url = os.getenv('APP_URL', 'http://localhost:5001')
     print(f"App URL : {url}")
 
-    scan_endpoint = '/api/scans/unprocessed?limit=1'
-    get_file_endpoint = '/api/files/'
-    post_file_endpoint = '/api/files?storage=result'
-    result_endpoint = '/api/results'
-    workflow_endpoint = '/api/workflows'
-    person_detail_endpoint = '/api/persons/'
-
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
     standing_laying_workflow_path = args.standing_laying_workflow_path
@@ -320,14 +304,7 @@ def main():
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
 
-    cgm_api = ApiEndpoints(
-        url,
-        scan_endpoint,
-        get_file_endpoint,
-        post_file_endpoint,
-        result_endpoint,
-        workflow_endpoint,
-        person_detail_endpoint)
+    cgm_api = ApiEndpoints(url)
 
     workflow = ProcessWorkflows(cgm_api)
 
@@ -339,8 +316,7 @@ def main():
     scan_version = scan_metadata['version']
     print("Scan Type Version: ", scan_version)
     workflow.get_list_of_worflows()
-    data_processing = PrepareArtifacts(
-        cgm_api, scan_metadata, scan_parent_dir)
+    data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
     data_processing.process_scan_metadata()
     data_processing.create_scan_dir()
     data_processing.create_artifact_dir()
