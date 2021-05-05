@@ -333,99 +333,100 @@ def main():
 
     get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
 
-    if get_scan_metadata.get_unprocessed_scans() > 0:
-        scan_metadata = get_scan_metadata.get_scan_metadata()
-        scan_version = scan_metadata['version']
-        print("Scan Type Version: ", scan_version)
-        workflow.get_list_of_worflows()
-        data_processing = PrepareArtifacts(
-            cgm_api, scan_metadata, scan_parent_dir)
-        data_processing.process_scan_metadata()
-        data_processing.create_scan_dir()
-        data_processing.create_artifact_dir()
-        rgb_artifacts = data_processing.download_artifacts('img')
-        depth_artifacts = data_processing.download_artifacts('depth')
-        person_details = person(cgm_api, scan_metadata['person'])
+    if get_scan_metadata.get_unprocessed_scans() <= 0:
+        return
+    scan_metadata = get_scan_metadata.get_scan_metadata()
+    scan_version = scan_metadata['version']
+    print("Scan Type Version: ", scan_version)
+    workflow.get_list_of_worflows()
+    data_processing = PrepareArtifacts(
+        cgm_api, scan_metadata, scan_parent_dir)
+    data_processing.process_scan_metadata()
+    data_processing.create_scan_dir()
+    data_processing.create_artifact_dir()
+    rgb_artifacts = data_processing.download_artifacts('img')
+    depth_artifacts = data_processing.download_artifacts('depth')
+    person_details = person(cgm_api, scan_metadata['person'])
 
-        blurflow = BlurFlow(
-            cgm_api,
-            workflow,
-            blur_workflow_path,
-            rgb_artifacts,
-            scan_parent_dir,
-            scan_metadata,
-            scan_version)
-        standing_laying = StandingLaying(
-            cgm_api,
-            workflow,
-            standing_laying_workflow_path,
-            rgb_artifacts,
-            scan_parent_dir,
-            scan_metadata)
-        depthmap_img_flow = DepthMapImgFlow(
-            cgm_api,
-            workflow,
-            depthmap_img_workflow_path,
-            depth_artifacts,
-            scan_parent_dir,
-            scan_metadata)
-        heightflow_plaincnn = HeightFlowPlainCnn(
-            cgm_api,
-            workflow,
-            height_workflow_artifact_path,
-            height_workflow_scan_path,
-            depth_artifacts,
-            scan_parent_dir,
-            scan_metadata,
-            person_details)
-        heightflow_mutliartifact = HeightFlowMultiArtifact(
-            cgm_api,
-            workflow,
-            height_workflow_artifact_path,
-            height_depthmapmultiartifactlatefusion_workflow_path,
-            depth_artifacts,
-            scan_parent_dir,
-            scan_metadata,
-            person_details)
-        weightflow = WeightFlow(
-            cgm_api,
-            workflow,
-            weight_workflow_artifact_path,
-            weight_workflow_scan_path,
-            depth_artifacts,
-            scan_parent_dir,
-            scan_metadata,
-            person_details)
+    blurflow = BlurFlow(
+        cgm_api,
+        workflow,
+        blur_workflow_path,
+        rgb_artifacts,
+        scan_parent_dir,
+        scan_metadata,
+        scan_version)
+    standing_laying = StandingLaying(
+        cgm_api,
+        workflow,
+        standing_laying_workflow_path,
+        rgb_artifacts,
+        scan_parent_dir,
+        scan_metadata)
+    depthmap_img_flow = DepthMapImgFlow(
+        cgm_api,
+        workflow,
+        depthmap_img_workflow_path,
+        depth_artifacts,
+        scan_parent_dir,
+        scan_metadata)
+    heightflow_plaincnn = HeightFlowPlainCnn(
+        cgm_api,
+        workflow,
+        height_workflow_artifact_path,
+        height_workflow_scan_path,
+        depth_artifacts,
+        scan_parent_dir,
+        scan_metadata,
+        person_details)
+    heightflow_mutliartifact = HeightFlowMultiArtifact(
+        cgm_api,
+        workflow,
+        height_workflow_artifact_path,
+        height_depthmapmultiartifactlatefusion_workflow_path,
+        depth_artifacts,
+        scan_parent_dir,
+        scan_metadata,
+        person_details)
+    weightflow = WeightFlow(
+        cgm_api,
+        workflow,
+        weight_workflow_artifact_path,
+        weight_workflow_scan_path,
+        depth_artifacts,
+        scan_parent_dir,
+        scan_metadata,
+        person_details)
 
-        try:
-            blurflow.run_blur_flow()
-        except Exception as e:
-            print(e)
+    try:
+        blurflow.run_blur_flow()
+    except Exception as e:
+        print(e)
 
-        try:
-            depthmap_img_flow.run_depthmap_img_flow()
-        except Exception as e:
-            print(e)
+    try:
+        depthmap_img_flow.run_depthmap_img_flow()
+    except Exception as e:
+        print(e)
 
-        try:
-            standing_laying.run_standing_laying_flow()
-        except Exception as e:
-            print(e)
+    try:
+        standing_laying.run_standing_laying_flow()
+    except Exception as e:
+        print(e)
 
-        try:
-            heightflow_plaincnn.run_height_flow()
-        except Exception as e:
-            print(e)
+    try:
+        heightflow_plaincnn.run_height_flow()
+    except Exception as e:
+        print(e)
 
-        try:
-            heightflow_mutliartifact.run_height_flow_depthmapmultiartifactlatefusion()
-        except Exception as e:
-            print(e)
+    try:
+        heightflow_mutliartifact.run_height_flow_depthmapmultiartifactlatefusion()
+    except Exception as e:
+        print(e)
 
-        try:
-            weightflow.run_weight_flow()
-        except Exception as e:
-            print(e)
+    try:
+        weightflow.run_weight_flow()
+    except Exception as e:
+        print(e)
 
 
 if __name__ == "__main__":
