@@ -1,13 +1,13 @@
 import sys
 import pytest
-import pathlib
+from pathlib import Path
 
 from bunch import Bunch
 
 sys.path.append('./src')
 import set_up_dummy_objects
 
-CWD = pathlib.Path.cwd()
+CWD = Path.cwd()
 
 
 def test_bunch_object_to_json_object():
@@ -36,7 +36,7 @@ def test_get_input_path():
 
     # Verify
     truth = 'app/scans/workflow.json'
-    assert result == Path(truth)
+    assert Path(result) == Path(truth)
 
 
 @pytest.mark.skip(reason="need to work on this test")

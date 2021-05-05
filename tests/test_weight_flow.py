@@ -1,10 +1,13 @@
+from pathlib import Path
+from datetime import datetime
 import sys
 sys.path.append('./src')
+
 from bunch import Bunch
-import set_up_dummy_objects
 import numpy as np
+
 import utils.preprocessing as preprocessing
-from datetime import datetime
+import set_up_dummy_objects
 
 
 def test_bunch_object_to_json_object():
@@ -35,7 +38,7 @@ def test_get_input_path():
 
     # Verify
     truth = 'app/scans/workflow.json'
-    assert result == Path(truth)
+    assert Path(result) == Path(truth)
 
     # Cleanup - none required
 

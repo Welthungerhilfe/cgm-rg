@@ -1,13 +1,12 @@
 import sys
 from datetime import datetime
+from pathlib import Path
 
 import numpy as np
 from bunch import Bunch
-import set_up_dummy_objects
-
 
 sys.path.append('./src')  # noqa: E402
-
+import set_up_dummy_objects
 import utils.preprocessing as preprocessing
 
 
