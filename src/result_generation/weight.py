@@ -9,7 +9,7 @@ import numpy as np
 from bunch import Bunch
 from cgmzscore import Calculator
 
-from result_generation.utils import MAX_AGE, age
+from result_generation.utils import MAX_AGE, calculate_age
 
 sys.path.append(str(Path(__file__).parents[1]))
 import utils.inference as inference  # noqa: E402
@@ -161,7 +161,7 @@ class WeightFlow:
 
     def zscore_wfa(self, mean_prediction):
         sex = 'M' if self.person_details['sex'] == 'male' else 'F'
-        age_in_days = age(
+        age_in_days = calculate_age(
             self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
         class_wfa = 'Not Found'
         if age_in_days <= MAX_AGE:

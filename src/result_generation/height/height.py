@@ -7,7 +7,7 @@ import numpy as np
 from bunch import Bunch
 from cgmzscore import Calculator
 
-from result_generation.utils import MAX_AGE, MAX_HEIGHT, MIN_HEIGHT, age
+from result_generation.utils import MAX_AGE, MAX_HEIGHT, MIN_HEIGHT, calculate_age
 
 
 class HeightFlow:
@@ -65,7 +65,6 @@ class HeightFlow:
         """Convert given bunch object to json object"""
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
         json_object = json.loads(json_string)
-
         return json_object
 
     def get_input_path(self, directory, file_name):
@@ -111,7 +110,7 @@ class HeightFlow:
 
     def zscore_lhfa(self, mean_prediction):
         sex = 'M' if self.person_details['sex'] == 'male' else 'F'
-        age_in_days = age(self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
+        age_in_days = calculate_age(self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
         if MIN_HEIGHT < float(mean_prediction) <= MAX_HEIGHT and age_in_days <= MAX_AGE:
             zscore_lhfa = Calculator().zScore_lhfa(
                 age_in_days=str(age_in_days), sex=sex, height=mean_prediction)
