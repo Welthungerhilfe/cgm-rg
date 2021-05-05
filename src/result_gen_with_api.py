@@ -181,22 +181,9 @@ def person(api, person_id):
     return api.get_person_details(person_id)
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description='Please provide model_id and workflow paths.')
-
-    '''
-    parser.add_argument('--url',
-                        default="http://localhost:5001",
-                        type=str,
-                        help='API endpoint URL')
-    '''
-
-    parser.add_argument('--scan_parent_dir',
-                        default="data/scans/",
-                        type=str,
-                        help='Parent directory in which scans will be stored')
-
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--scan_parent_dir', default="data/scans/", help='Parent directory in which scans will be stored')  # noqa: E501
     parser.add_argument('--blur_workflow_path', default="src/workflows/blur-workflow.json")  # noqa: E501
     parser.add_argument('--standing_laying_workflow_path', default="src/workflows/standing_laying-workflow.json")  # noqa: E501
     parser.add_argument('--depthmap_img_workflow_path', default="src/workflows/depthmap-img-workflow.json")  # noqa: E501
@@ -205,12 +192,12 @@ def main():
     parser.add_argument('--height_workflow_scan_path', default="src/workflows/height-plaincnn-workflow-scan.json")  # noqa: E501
     parser.add_argument('--weight_workflow_artifact_path', default="src/workflows/weight-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--weight_workflow_scan_path', default="src/workflows/weight-workflow-scan.json")  # noqa: E501
-
     args = parser.parse_args()
+    return args
 
-    url = os.getenv('APP_URL', 'http://localhost:5001')
-    print(f"App URL : {url}")
 
+def main():
+    args = parse_args()
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
     standing_laying_workflow_path = args.standing_laying_workflow_path
@@ -224,6 +211,9 @@ def main():
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
 
+    # URL
+    url = os.getenv('APP_URL', 'http://localhost:5001')
+    print(f"App URL: {url}")
     cgm_api = ApiEndpoints(url)
 
     workflow = ProcessWorkflows(cgm_api)
