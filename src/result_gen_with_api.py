@@ -363,6 +363,7 @@ def main():
 
     get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
 
+
     workflow.get_list_of_worflows()
     filterby_workflow_metadata = workflow.load_workflows(
         height_depthmapmultiartifactlatefusion_workflow_path)
@@ -385,6 +386,7 @@ def main():
             filterby_scan_version_val,
             filterby_workflow_id_val,
             filterby_scan_metadata_path) > 0:
+
         print('-------------------------------------------------------------------------------------------')
         print(
             "Started cgm-rg for scan filtered by ",
@@ -396,6 +398,7 @@ def main():
             filterby_scan_metadata_path)
 
         scan_version = scan_metadata['version']
+
         print("Scan Version: ", scan_version)
         print("Filterby Scan Version: ", filterby_scan_version_val)
 

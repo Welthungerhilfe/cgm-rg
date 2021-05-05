@@ -169,9 +169,11 @@ class ApiEndpoints:
 
     def get_scan_for_scan_version_workflow_id(
             self, scan_version, workflow_id, scan_path):
+
         '''Get the scan metadata filtered by scan_version and workflow_id'''
         headers = self.prepare_header()
         # use scan_version and workflow id to get filtered scans
+
         mod_scan_endpoint = self.mod_scan_endpoint + '&scan_version=' + scan_version
         # mod_scan_endpoint = self.mod_scan_endpoint + '&scan_version='+ scan_version + '&workflow=' + workflow_id
         print("modified scan endpoint : ", mod_scan_endpoint)
