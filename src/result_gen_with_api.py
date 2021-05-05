@@ -15,38 +15,26 @@ from result_generation.weight import WeightFlow
 
 
 class ProcessWorkflows:
-    """
-    A class to process all the workflows.
-
-    Methods
-    -------
-    get_list_of_worflows():
-        Gets the list of workflows from api
-
-    get_workflow_id(workflow_name, workflow_version):
-        Gets the id of the workflow for given workflow name and version
-
-    load_workflows(workflow_path):
-        Loads the workflow from given path
-    """
+    """Process all the workflows"""
 
     def __init__(self, api: "ApiEndpoints"):
-        # self.workflow_object = workflow_object
         self.api = api
 
     def get_list_of_worflows(self):
+        """Get the list of workflows from api"""
         self.workflows = self.api.get_workflows()
 
     def get_workflow_id(self, workflow_name, workflow_version):
+        """Get the id of the workflow for given workflow name and version"""
         workflow_obj_with_id = list(
             filter(
                 lambda workflow: (
                     workflow['name'] == workflow_name and workflow['version'] == workflow_version),
                 self.workflows['workflows']))[0]
-
         return workflow_obj_with_id['id']
 
     def load_workflows(self, workflow_path):
+        """Load the workflow from given path"""
         with open(workflow_path, 'r') as f:
             workflow_obj = json.load(f)
 
@@ -54,48 +42,23 @@ class ProcessWorkflows:
 
 
 class GetScanMetadata:
-    """
-    A class to get and process scan metadata.
+    """Get and process scan metadata."""
 
-    Attributes
-    ----------
-    scan_metadata_path : str
-        path to store scan metadata
+    def __init__(self, api: "ApiEndpoints", scan_metadata_path: str):
+        """Construct all the necessary attributes for the GetScanMetadata object.
 
-    Methods
-    -------
-    get_unprocessed_scans():
-        Returns the no of scans in scan metadata.
-
-    get_scan_metadata():
-        Returns the scan metadata
-    """
-
-    def __init__(self, api: "ApiEndpoints", scan_metadata_path):
-        """
-        Constructs all the necessary attributes for the GetScanMetadata object.
-
-        Parameters
-        ----------
-            api : objects
-                object of api_endpoints class
-            scan_metadata_path : str
-                path to store scan metadata
+        Parameters:
+            api
+            scan_metadata_path: path to store scan metadata
         """
         self.api = api
         self.scan_metadata_path = scan_metadata_path
 
     def get_unprocessed_scans(self):
-        """
-        Gets unprocessed_scans from api and returns the no of scans
-
-        Parameters
-        ----------
-        None
+        """Get unprocessed_scans from api and returns the no of scans
 
         Returns
-        -------
-        None
+            the no of scans in scan metadata.
         """
 
         return self.api.get_scan(self.scan_metadata_path)
@@ -109,30 +72,13 @@ class GetScanMetadata:
 
 
 class PrepareArtifacts:
-    """
-    A class to prepare artifacts for result generation.
+    """Prepare artifacts for result generation.
 
     Attributes
-    ----------
-    scan_metadata : json
-        metadata of the scan to run weight flow on
-    scan_parent_dir : str
-        directory where scans are stored
-
-    Methods
-    -------
-    download_artifacts(input_format):
-        Download artifacts for the scan
-    check_artifact_format():
-        Checks the format of the artifact
-    add_artifacts_to_format_dictionary():
-        Sort artifacts according to input format
-    process_scan_metadata():
-        Process artifacts in a scan.
-    create_scan_dir():
-        Create directory to store artifacts in scan.
-    create_artifact_dir():
-        Create directory to store downloaded artifacts.
+        scan_metadata : json
+            metadata of the scan to run weight flow on
+        scan_parent_dir : str
+            directory where scans are stored
     """
 
     def __init__(self, api: "ApiEndpoints", scan_metadata, scan_parent_dir):
@@ -145,6 +91,7 @@ class PrepareArtifacts:
             self.scan_metadata['id'])
 
     def download_artifacts(self, input_format):
+        """Download artifacts for the scan"""
         print(f"\nDownloading Artifacts for { input_format } format")
         self.artifacts = []
 
@@ -167,23 +114,26 @@ class PrepareArtifacts:
         return self.artifacts
 
     def check_artifact_format(self, format):
+        """Check the format of the artifact"""
         if format in ['image/jpeg', 'rgb']:
             return 'img'
         elif format in ['application/zip', 'depth']:
             return 'depth'
 
     def add_artifacts_to_format_dictionary(self, format, artifact):
+        """Sort artifacts according to input format"""
         if format in self.format_wise_artifact:
             self.format_wise_artifact[format].append(artifact)
         else:
             self.format_wise_artifact[format] = [artifact]
 
     def process_scan_metadata(self):
-        '''
+        """Process artifacts in a scan.
+
         Process the scan object to get the list of jpeg id
         and artifact id return a dict of format as key and
         list of file id as values
-        '''
+        """
         artifact_list = self.scan_metadata['artifacts']
 
         for artifact in artifact_list:
@@ -200,7 +150,8 @@ class PrepareArtifacts:
         pprint.pprint(self.format_wise_artifact)
 
     def create_scan_dir(self):
-        '''
+        '''Create directory to store artifacts in scan.
+
         Create a scan dir and format wise dir inside scan dir
         in which all the artifacts will be downloaded
         .
@@ -219,11 +170,10 @@ class PrepareArtifacts:
         os.makedirs(self.scan_dir, exist_ok=True)
 
     def create_artifact_dir(self):
+        """Create directory to store downloaded artifacts"""
         for artifact_format in self.format_wise_artifact:
             os.makedirs(
-                os.path.join(
-                    self.scan_dir,
-                    artifact_format),
+                os.path.join(self.scan_dir,artifact_format),
                 exist_ok=True)
 
 
