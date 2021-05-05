@@ -23,25 +23,6 @@ class BlurFlow:
         directory where scans are stored
     scan_metadata : json
         metadata of the scan to run blur flow on
-
-    Methods
-    -------
-    bunch_object_to_json_object(bunch_object):
-        Converts given bunch object to json object.
-    get_input_path(directory, file_name):
-        Returns input path for given directory name and file name.
-    run_blur_flow():
-        Driver method for blur flow.
-    blur_artifacts():
-        Blurs the list of artifacts.
-    blur_face(source_path):
-        Runs face blur on given source_path.
-    post_blur_files():
-        Posts the blurred file to api.
-    prepare_result_object():
-        Prepares result object for results generated.
-    post_result_object():
-        Posts the result object to api.
     """
 
     def __init__(
@@ -71,20 +52,24 @@ class BlurFlow:
         self.scan_version = scan_version
 
     def bunch_object_to_json_object(self, bunch_object):
+        """Convert given bunch object to json object"""
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
         json_object = json.loads(json_string)
         return json_object
 
     def get_input_path(self, directory, file_name):
+        """Return input path for given directory name and file name"""
         return os.path.join(directory, file_name)
 
     def run_blur_flow(self):
+        """Driver method for blur flow"""
         self.blur_set_resize_factor()
         self.blur_artifacts()
         self.post_blur_files()
         self.post_result_object()
 
     def blur_artifacts(self):
+        """Blur the list of artifacts"""
         for artifact in self.artifacts:
             input_path = self.get_input_path(self.scan_directory, artifact['file'])
             print(f"input_path of image to perform blur: {input_path}\n")
@@ -132,7 +117,7 @@ class BlurFlow:
         return image
 
     def blur_face(self, source_path: str) -> bool:
-        """Blur image
+        """Run face blur on given source_path
 
         Returns:
             bool: True if blurred otherwise False
@@ -181,6 +166,7 @@ class BlurFlow:
         return rgb_image, True
 
     def post_blur_files(self):
+        """Post the blurred file to api"""
         for artifact in self.artifacts:
             blur_id_from_post_request, post_status = self.api.post_files(
                 artifact['blurred_image'])
@@ -190,6 +176,7 @@ class BlurFlow:
                     '%Y-%m-%dT%H:%M:%SZ')
 
     def prepare_result_object(self):
+        """Prepare result object for results generated"""
         res = Bunch()
         res.results = []
         for artifact in self.artifacts:
@@ -206,6 +193,7 @@ class BlurFlow:
         return res
 
     def post_result_object(self):
+        """Post the result object to api."""
         blur_result = self.prepare_result_object()
         blur_result_object = self.bunch_object_to_json_object(blur_result)
         if self.api.post_results(blur_result_object) == 201:
