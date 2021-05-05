@@ -429,7 +429,7 @@ def main():
                 print('---------------------------------')
                 print(e)
                 print("MultiArtifact Flow is not defined")
-        
+
         except Exception as e:
             print(e)
             print("Scan Version does not match")

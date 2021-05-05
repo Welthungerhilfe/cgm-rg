@@ -176,7 +176,7 @@ class ApiEndpoints:
 
         response = requests.get(
             self.url + self.mod_scan_endpoint,
-            params = {'scan_version': scan_version, 'page': 1, 'limit': 1},
+            params={'scan_version': scan_version, 'page': 1, 'limit': 1},
             headers=headers)
 
         if response.status_code == 200:
