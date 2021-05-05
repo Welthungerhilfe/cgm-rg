@@ -363,7 +363,6 @@ def main():
 
     get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
 
-
     workflow.get_list_of_worflows()
     filterby_workflow_metadata = workflow.load_workflows(
         height_depthmapmultiartifactlatefusion_workflow_path)
