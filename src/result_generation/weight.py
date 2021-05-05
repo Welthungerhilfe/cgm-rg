@@ -12,6 +12,7 @@ from cgmzscore import Calculator
 from result_generation.utils import MAX_AGE, calculate_age
 
 sys.path.append(str(Path(__file__).parents[1]))
+from api_endpoints import ApiEndpoints
 import utils.inference as inference  # noqa: E402
 import utils.preprocessing as preprocessing  # noqa: E402
 
@@ -57,7 +58,7 @@ class WeightFlow:
 
     def __init__(
             self,
-            api: "ApiEndpoints",
+            api: ApiEndpoints,
             workflows,
             artifact_workflow_path,
             scan_workflow_path,

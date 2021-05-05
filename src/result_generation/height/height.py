@@ -1,12 +1,14 @@
 import json
-import os
 import uuid
 from pathlib import Path
+import sys
 
 import numpy as np
 from bunch import Bunch
 from cgmzscore import Calculator
 
+sys.path.append(str(Path(__file__).parents[1]))
+from api_endpoints import ApiEndpoints
 from result_generation.utils import MAX_AGE, MAX_HEIGHT, MIN_HEIGHT, calculate_age
 
 
@@ -31,7 +33,7 @@ class HeightFlow:
 
     def __init__(
             self,
-            api: "ApiEndpoints",
+            api: ApiEndpoints,
             workflows,
             artifact_workflow_path,
             scan_workflow_path,
@@ -67,7 +69,7 @@ class HeightFlow:
 
     def get_input_path(self, directory, file_name):
         """Returns input path for given directory name and file name"""
-        return Path(directory) /file_name
+        return Path(directory) / file_name
 
     def get_mean_scan_results(self, predictions):
         """Return the average prediction from given list of predictions"""

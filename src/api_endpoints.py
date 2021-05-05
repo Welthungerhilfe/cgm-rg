@@ -17,6 +17,7 @@ ENDPOINTS = dict(
     PERSONS='/api/persons/',
 )
 
+
 class ApiEndpoints:
     def __init__(
             self,

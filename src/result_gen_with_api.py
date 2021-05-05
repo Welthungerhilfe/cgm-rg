@@ -17,7 +17,7 @@ from result_generation.weight import WeightFlow
 class ProcessWorkflows:
     """Process all the workflows"""
 
-    def __init__(self, api: "ApiEndpoints"):
+    def __init__(self, api: ApiEndpoints):
         self.api = api
 
     def get_list_of_worflows(self):
@@ -44,7 +44,7 @@ class ProcessWorkflows:
 class GetScanMetadata:
     """Get and process scan metadata."""
 
-    def __init__(self, api: "ApiEndpoints", scan_metadata_path: str):
+    def __init__(self, api: ApiEndpoints, scan_metadata_path: str):
         """Construct all the necessary attributes for the GetScanMetadata object.
 
         Parameters:
@@ -81,7 +81,7 @@ class PrepareArtifacts:
             directory where scans are stored
     """
 
-    def __init__(self, api: "ApiEndpoints", scan_metadata, scan_parent_dir):
+    def __init__(self, api: ApiEndpoints, scan_metadata, scan_parent_dir):
         self.api = api
         self.scan_metadata = scan_metadata
         self.format_wise_artifact = {}
@@ -172,9 +172,7 @@ class PrepareArtifacts:
     def create_artifact_dir(self):
         """Create directory to store downloaded artifacts"""
         for artifact_format in self.format_wise_artifact:
-            os.makedirs(
-                os.path.join(self.scan_dir,artifact_format),
-                exist_ok=True)
+            os.makedirs(os.path.join(self.scan_dir, artifact_format), exist_ok=True)
 
 
 def person(api, person_id):
