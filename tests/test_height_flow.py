@@ -12,9 +12,7 @@ import utils.preprocessing as preprocessing
 
 
 def test_bunch_object_to_json_object():
-    """
-    Test to check if we get json object
-    """
+    """Test to check if we get json object"""
     # Setup
     heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
     bunch_object = Bunch(a=1, b=2)
@@ -30,9 +28,7 @@ def test_bunch_object_to_json_object():
 
 
 def test_get_input_path():
-    """
-    Test to check if we get input path
-    """
+    """Test to check if we get input path"""
     # Setup
     heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
     directory = 'app/scans'
@@ -49,9 +45,7 @@ def test_get_input_path():
 
 
 def test_get_mean_scan_results():
-    """
-    Test to check if we get mean results
-    """
+    """Test to check if we get mean results"""
     # Setup
     heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
     a = np.array([[4], [6], [5], [7]])
@@ -65,9 +59,7 @@ def test_get_mean_scan_results():
 
 
 def test_process_depthmaps():
-    """
-    Test to check proper processing of depthmaps
-    """
+    """Test to check proper processing of depthmaps"""
     # Setup
     heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
 
@@ -75,14 +67,11 @@ def test_process_depthmaps():
     result = heightflow.process_depthmaps()
 
     # Verify
-
     assert isinstance(result, np.ndarray)
 
 
 def test_artifact_level_height_result_object():
-    """
-    Test creation of artifact level height object
-    """
+    """Test creation of artifact level height object"""
     # Setup
     heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
     predictions = np.random.uniform(70, 80, [26, 1])
@@ -99,9 +88,7 @@ def test_artifact_level_height_result_object():
 
 '''
 def test_scan_level_height_result_object():
-    """
-    Test creation of scan level height object
-    """
+    """Test creation of scan level height object"""
     # Setup
     heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
     predictions = np.random.uniform(70, 80, [26, 1])

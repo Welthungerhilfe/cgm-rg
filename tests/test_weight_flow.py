@@ -8,9 +8,7 @@ from datetime import datetime
 
 
 def test_bunch_object_to_json_object():
-    """
-    Test to check if we get json object
-    """
+    """Test to check if we get json object"""
     # Setup
     weightflow = set_up_dummy_objects.get_dummy_weight_flow_object()
     bunch_object = Bunch(a=1, b=2)
@@ -26,9 +24,7 @@ def test_bunch_object_to_json_object():
 
 
 def test_get_input_path():
-    """
-    Test to check if we get input path
-    """
+    """Test to check if we get input path"""
     # Setup
     weightflow = set_up_dummy_objects.get_dummy_weight_flow_object()
     directory = 'app/scans'
@@ -45,9 +41,7 @@ def test_get_input_path():
 
 
 def test_get_mean_scan_results():
-    """
-    Test to check if we get mean results
-    """
+    """Test to check if we get mean results"""
     # Setup
     weightflow = set_up_dummy_objects.get_dummy_weight_flow_object()
     a = np.array([[4], [6], [5], [7]])
@@ -61,9 +55,7 @@ def test_get_mean_scan_results():
 
 
 def test_process_depthmaps():
-    """
-    Test to check proper processing of depthmaps
-    """
+    """Test to check proper processing of depthmaps"""
     # Setup
     weightflow = set_up_dummy_objects.get_dummy_weight_flow_object()
 
@@ -76,9 +68,7 @@ def test_process_depthmaps():
 
 
 def test_artifact_level_weight_result_object():
-    """
-    Test creation of artifact level weight object
-    """
+    """Test creation of artifact level weight object"""
     # Setup
     weightflow = set_up_dummy_objects.get_dummy_weight_flow_object()
     predictions = np.random.uniform(70, 80, [26, 1])
@@ -94,9 +84,7 @@ def test_artifact_level_weight_result_object():
 
 '''
 def test_scan_level_weight_result_object():
-    """
-    Test creation of scan level weight object
-    """
+    """Test creation of scan level weight object"""
     # Setup
     weightflow = set_up_dummy_objects.get_dummy_weight_flow_object()
     predictions = np.random.uniform(70, 80, [26, 1])
