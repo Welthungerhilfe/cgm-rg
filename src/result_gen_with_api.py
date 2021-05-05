@@ -363,6 +363,7 @@ def main():
 
     get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
 
+    workflow.get_list_of_worflows()
     filterby_workflow_metadata = workflow.load_workflows(
         height_depthmapmultiartifactlatefusion_workflow_path)
     filterby_scan_version_val = 'v0.9'
@@ -384,7 +385,7 @@ def main():
             filterby_scan_version_val,
             filterby_workflow_id_val,
             filterby_scan_metadata_path) > 0:
-
+        print('-------------------------------------------------------------------------------------------')
         print(
             "Started cgm-rg for scan filtered by ",
             filterby_scan_version_val,
@@ -395,35 +396,42 @@ def main():
             filterby_scan_metadata_path)
 
         scan_version = scan_metadata['version']
-        print("Scan Type Version: ", scan_version)
-        assert (scan_version == filterby_scan_version_val)
+        print("Scan Version: ", scan_version)
+        print("Filterby Scan Version: ", filterby_scan_version_val)
+        
+        try :
+            assert (scan_version == filterby_scan_version_val)
 
-        workflow.get_list_of_worflows()
-        data_processing = PrepareArtifacts(
-            cgm_api, scan_metadata, scan_parent_dir)
-        data_processing.process_scan_metadata()
-        data_processing.create_scan_dir()
-        data_processing.create_artifact_dir()
-        rgb_artifacts = data_processing.download_artifacts('img')
-        depth_artifacts = data_processing.download_artifacts('depth')
-        person_details = person(cgm_api, scan_metadata['person'])
+            data_processing = PrepareArtifacts(
+                cgm_api, scan_metadata, scan_parent_dir)
+            data_processing.process_scan_metadata()
+            data_processing.create_scan_dir()
+            data_processing.create_artifact_dir()
+            rgb_artifacts = data_processing.download_artifacts('img')
+            depth_artifacts = data_processing.download_artifacts('depth')
+            person_details = person(cgm_api, scan_metadata['person'])
 
-        heightflow_mutliartifact = HeightFlowMultiArtifact(
-            cgm_api,
-            workflow,
-            height_workflow_artifact_path,
-            height_depthmapmultiartifactlatefusion_workflow_path,
-            depth_artifacts,
-            scan_parent_dir,
-            scan_metadata,
-            person_details)
+            heightflow_mutliartifact = HeightFlowMultiArtifact(
+                cgm_api,
+                workflow,
+                height_workflow_artifact_path,
+                height_depthmapmultiartifactlatefusion_workflow_path,
+                depth_artifacts,
+                scan_parent_dir,
+                scan_metadata,
+                person_details)
 
-        try:
-            heightflow_mutliartifact.run_height_flow_depthmapmultiartifactlatefusion()
+            try:
+                heightflow_mutliartifact.run_height_flow_depthmapmultiartifactlatefusion()
+            except Exception as e:
+                print(e)
         except Exception as e:
             print(e)
+            print("Scan Version does not match")
+
 
     if get_scan_metadata.get_unprocessed_scans() > 0:
+        print('----------------------------------------------------------------------------------------')
         print("Started normal process of cgm-rg with all the workflows")
         scan_metadata = get_scan_metadata.get_scan_metadata()
         scan_version = scan_metadata['version']
