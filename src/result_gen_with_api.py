@@ -234,7 +234,9 @@ def main():
     depth_artifacts = data_processing.download_artifacts('depth')
     person_details = person(cgm_api, scan_metadata['person'])
 
-    blurflow = BlurFlow(
+    flows = []
+
+    flow = BlurFlow(
         cgm_api,
         workflow,
         blur_workflow_path,
@@ -242,21 +244,27 @@ def main():
         scan_parent_dir,
         scan_metadata,
         scan_version)
-    standing_laying = StandingLaying(
+    flows.append(flow)
+
+    flow = StandingLaying(
         cgm_api,
         workflow,
         standing_laying_workflow_path,
         rgb_artifacts,
         scan_parent_dir,
         scan_metadata)
-    depthmap_img_flow = DepthMapImgFlow(
+    flows.append(flow)
+
+    flow = DepthMapImgFlow(
         cgm_api,
         workflow,
         depthmap_img_workflow_path,
         depth_artifacts,
         scan_parent_dir,
         scan_metadata)
-    heightflow_plaincnn = HeightFlowPlainCnn(
+    flows.append(flow)
+
+    flow = HeightFlowPlainCnn(
         cgm_api,
         workflow,
         height_workflow_artifact_path,
@@ -265,7 +273,9 @@ def main():
         scan_parent_dir,
         scan_metadata,
         person_details)
-    heightflow_mutliartifact = HeightFlowMultiArtifact(
+    flows.append(flow)
+
+    flow = HeightFlowMultiArtifact(
         cgm_api,
         workflow,
         height_workflow_artifact_path,
@@ -274,7 +284,9 @@ def main():
         scan_parent_dir,
         scan_metadata,
         person_details)
-    weightflow = WeightFlow(
+    flows.append(flow)
+
+    flow = WeightFlow(
         cgm_api,
         workflow,
         weight_workflow_artifact_path,
@@ -283,36 +295,13 @@ def main():
         scan_parent_dir,
         scan_metadata,
         person_details)
+    flows.append(flow)
 
-    try:
-        blurflow.run_blur_flow()
-    except Exception as e:
-        print(e)
-
-    try:
-        depthmap_img_flow.run_depthmap_img_flow()
-    except Exception as e:
-        print(e)
-
-    try:
-        standing_laying.run_standing_laying_flow()
-    except Exception as e:
-        print(e)
-
-    try:
-        heightflow_plaincnn.run_height_flow()
-    except Exception as e:
-        print(e)
-
-    try:
-        heightflow_mutliartifact.run_height_flow_depthmapmultiartifactlatefusion()
-    except Exception as e:
-        print(e)
-
-    try:
-        weightflow.run_weight_flow()
-    except Exception as e:
-        print(e)
+    for flow in flows:
+        try:
+            flow.run_flow()
+        except Exception as e:
+            print(e)
 
 
 if __name__ == "__main__":

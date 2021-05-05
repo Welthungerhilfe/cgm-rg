@@ -42,6 +42,11 @@ class DepthMapImgFlow:
             self.workflow_obj['name'], self.workflow_obj['version'])
         self.colormap = plt.get_cmap('inferno')
 
+    def run_flow(self):
+        self.depthmap_img_artifacts()
+        self.post_depthmap_image_files()
+        self.post_result_object()
+
     def get_input_path(self, directory, file_name):
         return os.path.join(directory, file_name)
 
@@ -66,11 +71,6 @@ class DepthMapImgFlow:
             scaled_depthmap = depthmap * 255.0
             if depthmap_status:
                 artifact['depthmap_img'] = scaled_depthmap
-
-    def run_depthmap_img_flow(self):
-        self.depthmap_img_artifacts()
-        self.post_depthmap_image_files()
-        self.post_result_object()
 
     def post_depthmap_image_files(self):
         for artifact in self.artifacts:

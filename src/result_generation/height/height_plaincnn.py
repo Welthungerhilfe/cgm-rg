@@ -12,7 +12,7 @@ import utils.preprocessing as preprocessing  # noqa: E402
 
 
 class HeightFlowPlainCnn(HeightFlow):
-    def run_height_flow(self):
+    def run_flow(self):
         depthmaps = self.process_depthmaps()
         height_predictions = inference.get_height_predictions_local(depthmaps)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')

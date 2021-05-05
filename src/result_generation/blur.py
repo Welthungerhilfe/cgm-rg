@@ -51,6 +51,13 @@ class BlurFlow:
             self.workflow_obj['name'], self.workflow_obj['version'])
         self.scan_version = scan_version
 
+    def run_flow(self):
+        """Driver method for blur flow"""
+        self.blur_set_resize_factor()
+        self.blur_artifacts()
+        self.post_blur_files()
+        self.post_result_object()
+
     def bunch_object_to_json_object(self, bunch_object):
         """Convert given bunch object to json object"""
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
@@ -60,13 +67,6 @@ class BlurFlow:
     def get_input_path(self, directory, file_name):
         """Return input path for given directory name and file name"""
         return os.path.join(directory, file_name)
-
-    def run_blur_flow(self):
-        """Driver method for blur flow"""
-        self.blur_set_resize_factor()
-        self.blur_artifacts()
-        self.post_blur_files()
-        self.post_result_object()
 
     def blur_artifacts(self):
         """Blur the list of artifacts"""

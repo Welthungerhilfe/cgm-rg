@@ -70,6 +70,11 @@ class StandingLaying:
         self.workflow_obj['id'] = self.workflows.get_workflow_id(
             self.workflow_obj['name'], self.workflow_obj['version'])
 
+    def run_flow(self):
+        prediction = self.standing_laying_artifacts()
+        generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        self.post_result_object(prediction, generated_timestamp)
+
     def bunch_object_to_json_object(self, bunch_object):
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
         json_object = json.loads(json_string)
@@ -77,11 +82,6 @@ class StandingLaying:
 
     def get_input_path(self, directory, file_name):
         return os.path.join(directory, file_name)
-
-    def run_standing_laying_flow(self):
-        prediction = self.standing_laying_artifacts()
-        generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-        self.post_result_object(prediction, generated_timestamp)
 
     def standing_laying_artifacts(self):
         predictions = []
