@@ -17,7 +17,7 @@ class HeightFlowDeepEnsemble(HeightFlow):
         depthmaps = self.process_depthmaps()
         prediction_list_one = []
         model_paths = glob.glob(
-            '/Users/prajwalsingh/cgm-rg/models/deepensemble/*')
+            '/app/models/deepensemble/*')
         for model_index, model_path in enumerate(model_paths):
             prediction_list_one += [
                 inference.get_ensemble_height_predictions_local(model_path, depthmaps)]
