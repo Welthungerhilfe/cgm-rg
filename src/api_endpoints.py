@@ -4,37 +4,30 @@ import os
 import pprint
 import uuid
 
+from bunch import Bunch
 import cv2
 import requests
 
 
-ENDPOINTS = dict(
+ENDPOINTS = Bunch(dict(
     SCANS='/api/scans/unprocessed?limit=1',
     GET_FILES='/api/files/',
     POST_FILES='/api/files?storage=result',
     RESULTS='/api/results',
     WORKFLOWS='/api/workflows',
     PERSONS='/api/persons/',
-)
+))
 
 
 class ApiEndpoints:
-    def __init__(
-            self,
-            url,
-            scan_endpoint,
-            get_file_endpoint,
-            post_file_endpoint,
-            result_endpoint,
-            workflow_endpoint,
-            person_detail_endpoint):
+    def __init__(self, url):
         self.url = url
-        self.scan_endpoint = scan_endpoint
-        self.get_file_endpoint = get_file_endpoint
-        self.post_file_endpoint = post_file_endpoint
-        self.result_endpoint = result_endpoint
-        self.workflow_endpoint = workflow_endpoint
-        self.person_detail_endpoint = person_detail_endpoint
+        self.scan_endpoint = ENDPOINTS.SCANS
+        self.get_file_endpoint = ENDPOINTS.GET_FILES
+        self.post_file_endpoint = ENDPOINTS.POST_FILES
+        self.result_endpoint = ENDPOINTS.RESULTS
+        self.workflow_endpoint = ENDPOINTS.WORKFLOWS
+        self.person_detail_endpoint = ENDPOINTS.PERSONS
         self.headers = {}
         self.x_api_key = os.getenv("API_KEY", None)
 
