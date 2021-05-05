@@ -78,42 +78,35 @@ class HeightFlow:
 
     def artifact_level_height_result_object(self, predictions, generated_timestamp):
         """Prepare artifact level height result object."""
-        res = Bunch()
-        res.results = []
+        res = Bunch(dict(results=[]))
         for artifact, prediction in zip(self.artifacts, predictions):
-            height_result = Bunch()
-            height_result.id = f"{uuid.uuid4()}"
-            height_result.scan = self.scan_metadata['id']
-            height_result.workflow = self.artifact_workflow_obj["id"]
-            height_result.source_artifacts = [artifact['id']]
-            height_result.source_results = []
-            height_result.generated = generated_timestamp
-            result = {'height': str(prediction[0])}
-            height_result.data = result
+            height_result = Bunch(dict(
+                id=str(uuid.uuid4()),
+                scan=self.scan_metadata['id'],
+                workflow=self.artifact_workflow_obj["id"],
+                source_artifacts=[artifact['id']],
+                source_results=[],
+                generated=generated_timestamp,
+                data={'height': str(prediction[0])},
+            ))
             res.results.append(height_result)
-
         return res
 
     def scan_level_height_result_object(self, predictions, generated_timestamp, workflow_obj):
         """Prepare scan level height result object"""
-        res = Bunch()
-        res.results = []
-        height_result = Bunch()
-        height_result.id = f"{uuid.uuid4()}"
-        height_result.scan = self.scan_metadata['id']
-        height_result.workflow = workflow_obj["id"]
-        height_result.source_artifacts = [
-            artifact['id'] for artifact in self.artifacts]
-        height_result.source_results = []
-        height_result.generated = generated_timestamp
+        res = Bunch(dict(results=[]))
+        height_result = Bunch(dict(
+            id=f"{uuid.uuid4()}",
+            scan=self.scan_metadata['id'],
+            workflow=workflow_obj["id"],
+            source_artifacts=[artifact['id'] for artifact in self.artifacts],
+            source_results=[],
+            generated=generated_timestamp,
+        ))
         mean_prediction = self.get_mean_scan_results(predictions)
         class_lhfa = self.zscore_lhfa(mean_prediction)
-        result = {'mean_height': mean_prediction,
-                  'Height Diagnosis': class_lhfa}
-        height_result.data = result
-
+        height_result.data = {'mean_height': mean_prediction, 'Height Diagnosis': class_lhfa}
         res.results.append(height_result)
-
         return res
 
     def zscore_lhfa(self, mean_prediction):
