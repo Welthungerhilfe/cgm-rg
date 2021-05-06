@@ -1,0 +1,11 @@
+{
+    "name": "rgbd-plaincnn-height-5kscans-mean",
+    "version": "run-01_01",
+    "result_format": "dict",
+    "result_binding": "scan",
+    "data":{
+        "input_format":"application/zip",
+        "image_input_format":"image/jpeg",
+        "model":"2021q2-rgbd-plaincnn-height-5kscans"
+    }
+}

@@ -1,5 +1,6 @@
 import zipfile
 from typing import Tuple
+import cv2
 
 import numpy as np
 import tensorflow as tf
@@ -26,7 +27,7 @@ def load_depth(fpath: str) -> Tuple[bytes, int, int, float, float]:
 
     with zipfile.ZipFile(fpath) as z:
         with z.open('data') as f:
-            # Example for a first_line: '180x135_0.001_7_0.57045287_-0.0057296_0.0022602521_0.82130724_-0.059177425_0.0024800065_0.030834956'
+            # Example for a first_line: '180x135_0.001_7_0.57045287_-0.0057296_0.0022602521_0.82130724_-0.059177425_0.0024800065_0.030834956'  # noqa :E501
             first_line = f.readline().decode().strip()
 
             file_header = first_line.split("_")
@@ -41,7 +42,7 @@ def load_depth(fpath: str) -> Tuple[bytes, int, int, float, float]:
     return depth_data, width, height, depth_scale, max_confidence
 
 
-def parse_depth(tx: int, ty: int, data: bytes, depth_scale: float, width: int) -> float:
+def parse_depth(tx: int, ty: int, data: bytes, depth_scale: float, width: int) -> float:  # noqa :E501
     assert isinstance(tx, int)
     assert isinstance(ty, int)
 
@@ -52,13 +53,13 @@ def parse_depth(tx: int, ty: int, data: bytes, depth_scale: float, width: int) -
     return depth
 
 
-def prepare_depthmap(data: bytes, width: int, height: int, depth_scale: float) -> np.array:
+def prepare_depthmap(data: bytes, width: int, height: int, depth_scale: float) -> np.array:  # noqa :E501
     """Convert bytes array into np.array"""
     output = np.zeros((width, height, 1))
     for cx in range(width):
         for cy in range(height):
             # depth data scaled to be visible
-            output[cx][height - cy - 1] = parse_depth(cx, cy, data, depth_scale, width)
+            output[cx][height - cy - 1] = parse_depth(cx, cy, data, depth_scale, width)  # noqa :E501
     arr = np.array(output, dtype='float32')
     return arr.reshape(width, height)
 
@@ -73,6 +74,12 @@ def preprocess(depthmap):
     depthmap = resize(depthmap, (IMAGE_TARGET_HEIGHT, IMAGE_TARGET_WIDTH))
     depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
     return depthmap
+
+
+def preprocess_image(image):
+    resize_image = cv2.resize(image, (IMAGE_TARGET_WIDTH, IMAGE_TARGET_HEIGHT))
+    resize_image = resize_image / 255
+    return resize_image
 
 
 def get_depthmaps(fpaths):
@@ -97,7 +104,7 @@ def standing_laying_data_preprocessing(source_path):
     return img
 
 
-def sample_systematic_from_artifacts(artifacts: list, n_artifacts: int) -> list:
+def sample_systematic_from_artifacts(artifacts: list, n_artifacts: int) -> list:  # noqa :E501
     """
     Code reference from cgm-ml
     https://github.com/Welthungerhilfe/cgm-ml/blob/main/src/common/model_utils/preprocessing_multiartifact_python.py#L89
