@@ -1,0 +1,12 @@
+{
+    "name": "rgbd-plaincnn-height-5kscans",
+    "version": "run-01_01",
+    "result_format": "dict",
+    "result_binding": "artifact",
+    "data":{
+        "input_format":"application/zip",
+        "image_input_format":"image/jpeg",
+        "model":"2021q2-rgbd-plaincnn-height-5kscans"
+    }
+}
+

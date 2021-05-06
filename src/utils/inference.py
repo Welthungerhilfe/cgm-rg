@@ -23,43 +23,45 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 # TODO load the weights of passed model and generate results for passed
 # pointclouds
 
-# try:
-#     height_model = load_model(
-#         '/app/models/height/outputs/best_model.ckpt/', compile=False)
-# except OSError as error:
-#     print(error)
-#     print("Not able to load the Height model")
-# except Exception as e:
-#     print(e)
-
-# try:
-#     depthmapmultiartifactlatefusion_height_model = load_model(
-#         '/app/models/depthmapmultiartifactlatefusion/outputs/best_model.ckpt', compile=False)
-# except OSError as error:
-#     print(error)
-#     print("Not able to load the depthmapmultiartifactlatefusion Height model")
-# except Exception as e:
-#     print(e)
-
-# try:
-#     weight_model = load_model(
-#         '/app/models/weight/outputs/best_model.ckpt/', compile=False)
-# except OSError as error:
-#     print(error)
-#     print("Not able to load the Weight model")
-# except Exception as e:
-#     print(e)
-
-# try:
-#     standing_laying = load_model('/app/models/Standing_laying/best_model.h5')
-# except OSError as error:
-#     print(error)
-#     print("Not able to load the Standind Laying model")
-# except Exception as e:
-#     print(e)
+try:
+    height_model = load_model(
+        '/app/models/height/outputs/best_model.ckpt/', compile=False)
+except OSError as error:
+    print(error)
+    print("Not able to load the Height model")
+except Exception as e:
+    print(e)
 
 try:
-    height_rgbd_model = load_model('/app/models/height_rgbd/outputs/best_model.ckpt',compile=False)
+    depthmapmultiartifactlatefusion_height_model = load_model(
+        '/app/models/depthmapmultiartifactlatefusion/outputs/best_model.ckpt',
+        compile=False)
+except OSError as error:
+    print(error)
+    print("Not able to load the depthmapmultiartifactlatefusion Height model")
+except Exception as e:
+    print(e)
+
+try:
+    weight_model = load_model(
+        '/app/models/weight/outputs/best_model.ckpt/', compile=False)
+except OSError as error:
+    print(error)
+    print("Not able to load the Weight model")
+except Exception as e:
+    print(e)
+
+try:
+    standing_laying = load_model('/app/models/Standing_laying/best_model.h5')
+except OSError as error:
+    print(error)
+    print("Not able to load the Standind Laying model")
+except Exception as e:
+    print(e)
+
+try:
+    height_rgbd_model = load_model(
+        '/app/models/height_rgbd/outputs/best_model.ckpt', compile=False)
 except OSError as error:
     print(error)
     print("Not able to load the rgbd model")
@@ -67,20 +69,21 @@ except Exception as e:
     print(e)
 
 
-# def get_height_predictions_local(numpy_array):
-#     return height_model.predict(numpy_array)
+def get_height_predictions_local(numpy_array):
+    return height_model.predict(numpy_array)
 
 
-# def get_weight_predictions_local(numpy_array):
-#     return weight_model.predict(numpy_array)
+def get_weight_predictions_local(numpy_array):
+    return weight_model.predict(numpy_array)
 
 
-# def get_standing_laying_prediction_local(numpy_array):
-#     return standing_laying.predict(numpy_array)
+def get_standing_laying_prediction_local(numpy_array):
+    return standing_laying.predict(numpy_array)
 
 
-# def get_depthmapmultiartifactlatefusion_height_predictions_local(numpy_array):
-#     return depthmapmultiartifactlatefusion_height_model.predict(numpy_array)
+def get_depthmapmultiartifactlatefusion_height_predictions_local(numpy_array):
+    return depthmapmultiartifactlatefusion_height_model.predict(numpy_array)
+
 
 def get_height_rgbd_prediction_local(numpy_array):
     return height_rgbd_model.predict(numpy_array)

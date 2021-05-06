@@ -8,7 +8,7 @@ from azureml.core.model import Model
 REPO_DIR = Path(__file__).parents[1].absolute()
 
 
-def download_model(ws, experiment_name, run_id, input_location, output_location):
+def download_model(ws, experiment_name, run_id, input_location, output_location):  # noqa :E501
     """Download the pretrained model
 
     Args:
@@ -45,7 +45,6 @@ def main():
         auth=sp
     )
 
-
     # Downlaod model for standing/laying
     standing_laying = Model(ws, name='standing_laying_classifier')
     standing_laying.download(target_dir=REPO_DIR / 'models')
@@ -54,31 +53,30 @@ def main():
     # Downlaod model for height
     download_model(ws=ws,
                    experiment_name='q3-depthmap-plaincnn-height-95k',
-                   run_id='q3-depthmap-plaincnn-height-95k_1610709896_ef7f755d',
+                   run_id='q3-depthmap-plaincnn-height-95k_1610709896_ef7f755d',  # noqa :E501
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/height')
 
     # Downlaod model for  weight
     download_model(ws=ws,
                    experiment_name='q4-depthmap-plaincnn-weight-95k',
-                   run_id='q4-depthmap-plaincnn-weight-95k_1611336518_642a9c58',
+                   run_id='q4-depthmap-plaincnn-weight-95k_1611336518_642a9c58',  # noqa :E501
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/weight')
 
     # Download M-CNN Model for height
     download_model(ws=ws,
-                   experiment_name='q3-depthmapmultiartifactlatefusion-plaincnn-height-95',
-                   run_id='q3-depthmapmultiartifactlatefusion-plaincnn-height-95k_1614177517_ecd7b6e2',
+                   experiment_name='q3-depthmapmultiartifactlatefusion-plaincnn-height-95',  # noqa :E501
+                   run_id='q3-depthmapmultiartifactlatefusion-plaincnn-height-95k_1614177517_ecd7b6e2',  # noqa :E501
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
-                   output_location=REPO_DIR / 'models/depthmapmultiartifactlatefusion')
+                   output_location=REPO_DIR / 'models/depthmapmultiartifactlatefusion')  # noqa :E501
 
     # Downlaod model for RGBD
     download_model(ws=ws,
                    experiment_name='2021q2-rgbd-plaincnn-height-5kscans',
-                   run_id='2021q2-rgbd-plaincnn-height-5kscans_1616835920_c469620e',
+                   run_id='2021q2-rgbd-plaincnn-height-5kscans_1616835920_c469620e',  # noqa :E501
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/height_rgbd')
-
 
 
 if __name__ == "__main__":
