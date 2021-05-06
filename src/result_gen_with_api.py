@@ -386,7 +386,7 @@ def main():
 
     workflow.get_list_of_worflows()
     filterby_workflow_metadata = workflow.load_workflows(
-        height_depthmapmultiartifactlatefusion_workflow_path)
+        height_rgbd_workflow_scan_path)
     filterby_scan_version_val = 'v0.9'
 
     filterby_workflow_name = filterby_workflow_metadata['name']
@@ -434,22 +434,23 @@ def main():
             depth_artifacts = data_processing.download_artifacts('depth')
             person_details = person(cgm_api, scan_metadata['person'])
 
-            heightflow_mutliartifact = HeightFlowMultiArtifact(
+            rgbdflow = HeightFlowRGBD(
                 cgm_api,
                 workflow,
-                height_workflow_artifact_path,
-                height_depthmapmultiartifactlatefusion_workflow_path,
+                height_rgbd_workflow_artifact_path,
+                height_rgbd_workflow_scan_path,
                 depth_artifacts,
+                rgb_artifacts,
                 scan_parent_dir,
                 scan_metadata,
                 person_details)
 
             try:
-                heightflow_mutliartifact.run_height_flow_depthmapmultiartifactlatefusion()
+                rgbdflow.run_rgbd_height_flow()
             except Exception as e:
                 print('---------------------------------')
                 print(e)
-                print("MultiArtifact Flow is not defined")
+                print("RGBD Flow is not defined")
 
         except Exception as e:
             print(e)

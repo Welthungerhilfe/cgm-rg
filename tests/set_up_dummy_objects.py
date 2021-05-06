@@ -35,6 +35,7 @@ def get_dummy_height_flow_object(mock_some_fn):
         'src/workflows/height-plaincnn-workflow-artifact.json',
         'src/workflows/height-plaincnn-workflow-scan.json',
         set_up_dummy_variables.depth_artifacts,
+        set_up_dummy_variables.rgb_artifacts,
         set_up_dummy_variables.scan_parent_dir,
         set_up_dummy_variables.scan_metadata,
         set_up_dummy_variables.person_details)
