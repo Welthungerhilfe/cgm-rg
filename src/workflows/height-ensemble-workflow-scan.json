@@ -1,0 +1,11 @@
+{
+    "name": "q1-ensemble-warmup-mean",
+    "version": "run-01_01",
+    "result_format": "dict",
+    "result_binding": "scan",
+    "data": {
+        "input_format": "application/zip",
+        "model": "q1-ensemble-warmup"
+    },
+    "eligible": true
+}
