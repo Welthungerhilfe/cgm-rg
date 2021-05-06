@@ -15,18 +15,17 @@ import utils.preprocessing as preprocessing  # noqa: E402
 class HeightFlowDeepEnsemble(HeightFlow):
     def run_height_flow_deepensemble(self):
         depthmaps = self.process_depthmaps()
-        prediction_list_one = []
+        prediction_list = []
         model_paths = glob.glob('/app/models/deepensemble/*')
         for model_index, model_path in enumerate(model_paths):
-            prediction_list_one += [
+            prediction_list += [
                 inference.get_ensemble_height_predictions_local(model_path, depthmaps)]
-        prediction_list_one = np.array(prediction_list_one)
-        std = np.std(prediction_list_one, axis=0)
-        prediction_list_one = np.mean(prediction_list_one, axis=0)
-        # print(prediction_list_one)
+        prediction_list = np.array(prediction_list)
+        std = np.std(prediction_list, axis=0)
+        prediction_list = np.mean(prediction_list, axis=0)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         self.post_height_results_deep_ensemble(
-            prediction_list_one, generated_timestamp, std)
+            prediction_list, generated_timestamp, std)
 
     def process_depthmaps(self):
         depthmaps = []
