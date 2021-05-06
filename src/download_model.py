@@ -45,6 +45,7 @@ def main():
         auth=sp
     )
 
+
     # Downlaod model for standing/laying
     standing_laying = Model(ws, name='standing_laying_classifier')
     standing_laying.download(target_dir=REPO_DIR / 'models')
@@ -70,6 +71,14 @@ def main():
                    run_id='q3-depthmapmultiartifactlatefusion-plaincnn-height-95k_1614177517_ecd7b6e2',
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/depthmapmultiartifactlatefusion')
+
+    # Downlaod model for RGBD
+    download_model(ws=ws,
+                   experiment_name='2021q2-rgbd-plaincnn-height-5kscans',
+                   run_id='2021q2-rgbd-plaincnn-height-5kscans_1616835920_c469620e',
+                   input_location=os.path.join('outputs', 'best_model.ckpt'),
+                   output_location=REPO_DIR / 'models/height_rgbd')
+
 
 
 if __name__ == "__main__":

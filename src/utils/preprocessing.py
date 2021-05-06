@@ -1,5 +1,6 @@
 import zipfile
 from typing import Tuple
+import cv2
 
 import numpy as np
 import tensorflow as tf
@@ -8,7 +9,6 @@ from skimage.transform import resize
 IMAGE_TARGET_HEIGHT = 240
 IMAGE_TARGET_WIDTH = 180
 NORMALIZATION_VALUE = 7.5
-
 
 def load_depth(fpath: str) -> Tuple[bytes, int, int, float, float]:
     """Take ZIP file and extract depth and metadata
@@ -73,6 +73,11 @@ def preprocess(depthmap):
     depthmap = resize(depthmap, (IMAGE_TARGET_HEIGHT, IMAGE_TARGET_WIDTH))
     depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
     return depthmap
+
+def preprocess_image(image):
+    resize_image = cv2.resize(image,(IMAGE_TARGET_WIDTH,IMAGE_TARGET_HEIGHT)) 
+    resize_image = resize_image/255
+    return resize_image
 
 
 def get_depthmaps(fpaths):

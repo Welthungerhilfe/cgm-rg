@@ -12,7 +12,7 @@ from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.height.height_mutiartifact import HeightFlowMultiArtifact
 from result_generation.standing import StandingLaying
 from result_generation.weight import WeightFlow
-
+from result_generation.height.height_rgbd import HeightFlowRGBD 
 
 class ProcessWorkflows:
     """
@@ -295,6 +295,16 @@ def main():
                         type=str,
                         help='Weight Workflow Scan path')
 
+    parser.add_argument('--height_rgbd_workflow_artifact_path',
+                        default="/app/src/workflows/height-rgbd-workflow-artifact.json",
+                        type=str,
+                        help='Height rgbd Workflow Artifact path')
+
+    parser.add_argument('--height_rgbd_workflow_scan_path',
+                        default="/app/src/workflows/height-rgbd-workflow-scan.json",
+                        type=str,
+                        help='Height rgbd Workflow Scan path')
+
     args = parser.parse_args()
 
     url = os.getenv('APP_URL', 'http://localhost:5001')
@@ -316,6 +326,8 @@ def main():
     height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
+    height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
+    height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
@@ -375,6 +387,7 @@ def main():
             height_workflow_artifact_path,
             height_workflow_scan_path,
             depth_artifacts,
+            rgb_artifacts,
             scan_parent_dir,
             scan_metadata,
             person_details)
@@ -384,6 +397,7 @@ def main():
             height_workflow_artifact_path,
             height_depthmapmultiartifactlatefusion_workflow_path,
             depth_artifacts,
+            rgb_artifacts,
             scan_parent_dir,
             scan_metadata,
             person_details)
@@ -393,6 +407,16 @@ def main():
             weight_workflow_artifact_path,
             weight_workflow_scan_path,
             depth_artifacts,
+            scan_parent_dir,
+            scan_metadata,
+            person_details)
+        rgbdflow = HeightFlowRGBD(
+            cgm_api,
+            workflow,
+            height_rgbd_workflow_artifact_path,
+            height_rgbd_workflow_scan_path,
+            depth_artifacts,
+            rgb_artifacts,
             scan_parent_dir,
             scan_metadata,
             person_details)
@@ -424,6 +448,11 @@ def main():
 
         try:
             weightflow.run_weight_flow()
+        except Exception as e:
+            print(e)
+
+        try:
+            rgbdflow.run_rgbd_height_flow()
         except Exception as e:
             print(e)
 
