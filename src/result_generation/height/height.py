@@ -47,25 +47,27 @@ class HeightFlow:
         self.image_artifacts = image_artifacts
         self.artifact_workflow_path = artifact_workflow_path
         self.scan_workflow_path = scan_workflow_path
-        self.artifact_workflow_obj = self.workflows.load_workflows(self.artifact_workflow_path)
-        self.scan_workflow_obj = self.workflows.load_workflows(self.scan_workflow_path)
+        self.artifact_workflow_obj = self.workflows.load_workflows(
+            self.artifact_workflow_path)
+        self.scan_workflow_obj = self.workflows.load_workflows(
+            self.scan_workflow_path)
         self.scan_metadata = scan_metadata
         self.person_details = person_details
         self.scan_parent_dir = scan_parent_dir
-        if self.artifact_workflow_obj["data"]["input_format"] == 'application/zip':
+        if self.artifact_workflow_obj["data"]["input_format"] == 'application/zip':  # noqa :E501
             self.depth_input_format = 'depth'
         self.scan_directory = os.path.join(
             self.scan_parent_dir,
             self.scan_metadata['id'],
             self.depth_input_format)
-        if self.artifact_workflow_obj["data"]["image_input_format"] == 'image/jpeg':
-            self.image_input_format ='img'
+        if self.artifact_workflow_obj["data"]["image_input_format"] == 'image/jpeg':  # noqa :E501
+            self.image_input_format = 'img'
         self.scan_image_directory = os.path.join(
             self.scan_parent_dir,
             self.scan_metadata['id'],
             self.image_input_format)
         self.artifact_workflow_obj['id'] = self.workflows.get_workflow_id(
-            self.artifact_workflow_obj['name'], self.artifact_workflow_obj['version'])
+            self.artifact_workflow_obj['name'], self.artifact_workflow_obj['version'])  # noqa :E501
         self.scan_workflow_obj['id'] = self.workflows.get_workflow_id(
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
 
@@ -84,7 +86,7 @@ class HeightFlow:
         """Return the average prediction from given list of predictions"""
         return str(np.mean(predictions))
 
-    def artifact_level_height_result_object(self, predictions, generated_timestamp):
+    def artifact_level_height_result_object(self, predictions, generated_timestamp):  # noqa :E501
         """Prepare artifact level height result object."""
         res = Bunch()
         res.results = []
@@ -102,7 +104,7 @@ class HeightFlow:
 
         return res
 
-    def scan_level_height_result_object(self, predictions, generated_timestamp, workflow_obj):
+    def scan_level_height_result_object(self, predictions, generated_timestamp, workflow_obj):  # noqa :E501
         """Prepare scan level height result object"""
         res = Bunch()
         res.results = []
@@ -126,9 +128,10 @@ class HeightFlow:
 
     def zscore_lhfa(self, mean_prediction):
         sex = 'M' if self.person_details['sex'] == 'male' else 'F'
-        age_in_days = age(self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
+        age_in_days = age(
+            self.person_details['date_of_birth'], self.scan_metadata['scan_start'])  # noqa :E501
         class_lhfa = 'Not Found'
-        if MIN_HEIGHT < float(mean_prediction) <= MAX_HEIGHT and age_in_days <= MAX_AGE:
+        if MIN_HEIGHT < float(mean_prediction) <= MAX_HEIGHT and age_in_days <= MAX_AGE:  # noqa :E501
             zscore_lhfa = Calculator().zScore_lhfa(
                 age_in_days=str(age_in_days), sex=sex, height=mean_prediction)
             if zscore_lhfa < -3:
@@ -141,7 +144,7 @@ class HeightFlow:
 
     def post_height_results(self, predictions, generated_timestamp):
         """Post the artifact and scan level height results to API"""
-        artifact_level_height_result_bunch = self.artifact_level_height_result_object(
+        artifact_level_height_result_bunch = self.artifact_level_height_result_object(  # noqa :E501
             predictions, generated_timestamp)
         artifact_level_height_result_json = self.bunch_object_to_json_object(
             artifact_level_height_result_bunch)
