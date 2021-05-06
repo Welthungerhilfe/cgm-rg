@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 import cv2
 import tensorflow as tf
+import os
 
 import numpy as np
 
@@ -11,7 +12,7 @@ from result_generation.height.height import HeightFlow
 sys.path.append(str(Path(__file__).parents[1]))
 import utils.inference as inference  # noqa: E402
 import utils.preprocessing as preprocessing  # noqa: E402
- 
+
 
 class HeightFlowRGBD(HeightFlow):
     def run_rgbd_height_flow(self):
@@ -23,7 +24,7 @@ class HeightFlowRGBD(HeightFlow):
 
     def process_rgbd(self):
         rgbd_scan = []
-        scan_image_directory =os.path.join(
+        scan_image_directory = os.path.join(
             self.scan_parent_dir,
             self.scan_metadata['id'],
             'img')
