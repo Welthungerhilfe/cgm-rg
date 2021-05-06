@@ -60,12 +60,6 @@ class HeightFlow:
             self.scan_parent_dir,
             self.scan_metadata['id'],
             self.depth_input_format)
-        if self.artifact_workflow_obj["data"]["image_input_format"] == 'image/jpeg':  # noqa :E501
-            self.image_input_format = 'img'
-        self.scan_image_directory = os.path.join(
-            self.scan_parent_dir,
-            self.scan_metadata['id'],
-            self.image_input_format)
         self.artifact_workflow_obj['id'] = self.workflows.get_workflow_id(
             self.artifact_workflow_obj['name'], self.artifact_workflow_obj['version'])  # noqa :E501
         self.scan_workflow_obj['id'] = self.workflows.get_workflow_id(

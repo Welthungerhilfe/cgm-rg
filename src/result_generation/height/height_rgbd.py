@@ -11,7 +11,7 @@ from result_generation.height.height import HeightFlow
 sys.path.append(str(Path(__file__).parents[1]))
 import utils.inference as inference  # noqa: E402
 import utils.preprocessing as preprocessing  # noqa: E402
-
+ 
 
 class HeightFlowRGBD(HeightFlow):
     def run_rgbd_height_flow(self):
@@ -23,6 +23,10 @@ class HeightFlowRGBD(HeightFlow):
 
     def process_rgbd(self):
         rgbd_scan = []
+        scan_image_directory =os.path.join(
+            self.scan_parent_dir,
+            self.scan_metadata['id'],
+            'img')
         for artifact in self.artifacts:
             input_path = self.get_input_path(
                 self.scan_directory, artifact['file'])
@@ -31,7 +35,7 @@ class HeightFlowRGBD(HeightFlow):
                 iter(item for item in self.image_artifacts if item['order'] == img_id), None)  # noqa :E501
             if result_image_dict:  # noqa :E501
                 image_input_path = self.get_input_path(
-                    self.scan_image_directory, result_image_dict['file'])
+                    scan_image_directory, result_image_dict['file'])
             else:
                 print("No RGB found for order:", img_id)
                 continue
