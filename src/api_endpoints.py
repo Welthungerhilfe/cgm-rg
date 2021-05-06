@@ -17,7 +17,8 @@ class ApiEndpoints:
             post_file_endpoint,
             result_endpoint,
             workflow_endpoint,
-            person_detail_endpoint):
+            person_detail_endpoint,
+            mod_scan_endpoint):
         self.url = url
         self.scan_endpoint = scan_endpoint
         self.get_file_endpoint = get_file_endpoint
@@ -25,6 +26,7 @@ class ApiEndpoints:
         self.result_endpoint = result_endpoint
         self.workflow_endpoint = workflow_endpoint
         self.person_detail_endpoint = person_detail_endpoint
+        self.mod_scan_endpoint = mod_scan_endpoint
         self.headers = {}
         self.x_api_key = os.getenv("API_KEY", None)
 
@@ -165,10 +167,37 @@ class ApiEndpoints:
             print("Response code : ", response.status_code)
             return 0
 
+    def get_scan_for_scan_version_workflow_id(
+            self, scan_version, workflow_id, scan_path):
+
+        '''Get the scan metadata filtered by scan_version and workflow_id'''
+        headers = self.prepare_header()
+        # use scan_version and workflow id to get filtered scans
+
+        response = requests.get(
+            self.url + self.mod_scan_endpoint,
+            params={'scan_version': scan_version, 'page': 1, 'limit': 1},
+            headers=headers)
+
+        if response.status_code == 200:
+            content = response.json()
+            print("\nScan Details :")
+            pprint.pprint(content)
+
+            with open(scan_path, 'w') as f:
+                json.dump(content, f, indent=4)
+
+            print("Written scan metadata successfully to ", scan_path)
+            return len(content['scans'])
+        else:
+            print("Response code : ", response.status_code)
+            return 0
+
     def get_person_details(self, person_id):
         headers = self.prepare_header()
         resposne = requests.get(
-            self.url + self.person_detail_endpoint + person_id + '/basic', headers=headers)
+            self.url + self.person_detail_endpoint + person_id + '/basic',
+            headers=headers)
 
         if resposne.status_code == 200:
             content = resposne.json()

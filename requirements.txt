@@ -19,3 +19,4 @@ requests
 pyntcloud==0.0.1
 cgmzscore
 mock==4.0.3
+glob2

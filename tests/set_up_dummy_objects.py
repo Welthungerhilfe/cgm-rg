@@ -66,7 +66,8 @@ def get_dummy_api_endpoint_object():
         set_up_dummy_variables.post_file_endpoint,
         set_up_dummy_variables.result_endpoint,
         set_up_dummy_variables.workflow_endpoint,
-        set_up_dummy_variables.person_detail_endpoint)
+        set_up_dummy_variables.person_detail_endpoint,
+        set_up_dummy_variables.scan_endpoint)
 
 
 def get_dummy_prepare_artifacts_object():

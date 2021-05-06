@@ -87,3 +87,9 @@ def get_depthmapmultiartifactlatefusion_height_predictions_local(numpy_array):
 
 def get_height_rgbd_prediction_local(numpy_array):
     return height_rgbd_model.predict(numpy_array)
+
+def get_ensemble_height_predictions_local(model_path, numpy_array):
+    model_path += '/outputs/best_model.ckpt/'
+    model = load_model(model_path, compile=False)
+    return model.predict(numpy_array)
+
