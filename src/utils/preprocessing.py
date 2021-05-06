@@ -59,7 +59,7 @@ def prepare_depthmap(data: bytes, width: int, height: int, depth_scale: float) -
     for cx in range(width):
         for cy in range(height):
             # depth data scaled to be visible
-            output[cx][height - cy - 1] = parse_depth(cx, cy, data, depth_scale, width) # noqa :E501
+            output[cx][height - cy - 1] = parse_depth(cx, cy, data, depth_scale, width)  # noqa :E501
     arr = np.array(output, dtype='float32')
     return arr.reshape(width, height)
 

@@ -296,9 +296,9 @@ def main():
                         help='Depthmap Image Workflow path')
 
     parser.add_argument('--height_workflow_artifact_path',
-        default="src/workflows/height-plaincnn-workflow-artifact.json",
-        type=str,
-        help='Height Workflow Artifact path')
+                        default="src/workflows/height-plaincnn-workflow-artifact.json",
+                        type=str,
+                        help='Height Workflow Artifact path')
 
     parser.add_argument(
         '--height_depthmapmultiartifactlatefusion_workflow_path',
@@ -307,9 +307,9 @@ def main():
         help='Height Workflow depthmapmultiartifactlatefusion Artifact path')
 
     parser.add_argument('--height_workflow_scan_path',
-        default="src/workflows/height-plaincnn-workflow-scan.json",
-        type=str,
-        help='Height Workflow Scan path')
+                        default="src/workflows/height-plaincnn-workflow-scan.json",
+                        type=str,
+                        help='Height Workflow Scan path')
 
     parser.add_argument('--height_ensemble_workflow_artifact_path',
                         default="/app/src/workflows/height-ensemble-workflow-artifact.json",
@@ -576,11 +576,11 @@ def main():
             rgbdflow.run_rgbd_height_flow()
         except Exception as e:
             print(e)
-            
+
         try:
-          heightflow_deepensemble.run_height_flow_deepensemble()
+            heightflow_deepensemble.run_height_flow_deepensemble()
         except Exception as e:
-          print(e)
+            print(e)
 
 
 if __name__ == "__main__":
