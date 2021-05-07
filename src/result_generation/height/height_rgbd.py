@@ -33,8 +33,8 @@ class HeightFlowRGBD(HeightFlow):
                 self.scan_directory, artifact['file'])
             img_id = artifact['order']
             result_image_dict = next(
-                iter(item for item in self.image_artifacts if item['order'] == img_id), None)  # noqa :E501
-            if result_image_dict:  # noqa :E501
+                iter(item for item in self.image_artifacts if item['order'] == img_id), None)
+            if result_image_dict:
                 image_input_path = self.get_input_path(
                     scan_image_directory, result_image_dict['file'])
             else:
@@ -42,8 +42,8 @@ class HeightFlowRGBD(HeightFlow):
                 continue
             image = cv2.imread(image_input_path)
             image = preprocessing.preprocess_image(image)
-            data, width, height, depth_scale, _max_confidence = preprocessing.load_depth(    # noqa :E501
-                input_path)  # noqa :E501
+            data, width, height, depth_scale, _max_confidence = preprocessing.load_depth(
+                input_path)
             depthmap = preprocessing.prepare_depthmap(
                 data, width, height, depth_scale)
             depthmap = preprocessing.preprocess(depthmap)
@@ -51,6 +51,6 @@ class HeightFlowRGBD(HeightFlow):
             rgbd_data = tf.image.resize(
                 rgbd_data, (preprocessing.IMAGE_TARGET_HEIGHT,
                             preprocessing.IMAGE_TARGET_WIDTH))
-            rgbd_scan.append(rgbd_data)  # noqa :E501
+            rgbd_scan.append(rgbd_data)
         rgbd_scan = np.array(rgbd_scan)
         return rgbd_scan

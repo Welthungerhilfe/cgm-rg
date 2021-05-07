@@ -47,7 +47,7 @@ class ProcessWorkflows:
     def get_workflow_id(self, workflow_name, workflow_version):
         workflow_obj_with_id = list(
             filter(lambda workflow: (
-                workflow['name'] == workflow_name and workflow['version'] == workflow_version),  # noqa :E501
+                workflow['name'] == workflow_name and workflow['version'] == workflow_version),
                 self.workflows['workflows']))[0]
         return workflow_obj_with_id['id']
 
@@ -332,12 +332,12 @@ def main():
                         help='Weight Workflow Scan path')
 
     parser.add_argument('--height_rgbd_workflow_artifact_path',
-                        default="/app/src/workflows/height-rgbd-workflow-artifact.json",  # noqa :E501
+                        default="/app/src/workflows/height-rgbd-workflow-artifact.json",
                         type=str,
                         help='Height rgbd Workflow Artifact path')
 
     parser.add_argument('--height_rgbd_workflow_scan_path',
-                        default="/app/src/workflows/height-rgbd-workflow-scan.json",  # noqa :E501
+                        default="/app/src/workflows/height-rgbd-workflow-scan.json",
                         type=str,
                         help='Height rgbd Workflow Scan path')
 
@@ -365,7 +365,7 @@ def main():
     height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
-    height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path  # noqa :E501
+    height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
     height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
@@ -381,8 +381,8 @@ def main():
         person_detail_endpoint,
         mod_scan_endpoint)
 
-    workflow = ProcessWorkflows(cgm_api)  # noqa :E501
-    get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)  # noqa :E501
+    workflow = ProcessWorkflows(cgm_api)
+    get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
 
     workflow.get_list_of_worflows()
     filterby_workflow_metadata = workflow.load_workflows(
@@ -564,7 +564,7 @@ def main():
             print(e)
 
         try:
-            heightflow_mutliartifact.run_height_flow_depthmapmultiartifactlatefusion()  # noqa :E501
+            heightflow_mutliartifact.run_height_flow_depthmapmultiartifactlatefusion()
         except Exception as e:
             print(e)
 
