@@ -204,7 +204,7 @@ class PrepareArtifacts:
 def person(api, person_id):
     return api.get_person_details(person_id)
 
-  
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--scan_parent_dir', default="data/scans/", help='Parent directory in which scans will be stored')  # noqa: E501
@@ -214,8 +214,8 @@ def parse_args():
     parser.add_argument('--height_workflow_artifact_path', default="src/workflows/height-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
     parser.add_argument('--height_depthmapmultiartifactlatefusion_workflow_path', default="src/workflows/height-depthmapmultiartifactlatefusion-workflow.json")  # noqa: E501
     parser.add_argument('--height_workflow_scan_path', default="src/workflows/height-plaincnn-workflow-scan.json")  # noqa: E501
-    parser.add_argument('--height_ensemble_workflow_artifact_path', default="/app/src/workflows/height-ensemble-workflow-artifact.json")
-    parser.add_argument('--height_ensemble_workflow_scan_path', default="/app/src/workflows/height-ensemble-workflow-scan.json")
+    parser.add_argument('--height_ensemble_workflow_artifact_path', default="/app/src/workflows/height-ensemble-workflow-artifact.json")  # noqa: E501
+    parser.add_argument('--height_ensemble_workflow_scan_path', default="/app/src/workflows/height-ensemble-workflow-scan.json")  # noqa: E501
     parser.add_argument('--weight_workflow_artifact_path', default="src/workflows/weight-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--weight_workflow_scan_path', default="src/workflows/weight-workflow-scan.json")  # noqa: E501
     parser.add_argument('--height_rgbd_workflow_artifact_path', default="/app/src/workflows/height-rgbd-workflow-artifact.json")  # noqa :E501
@@ -257,7 +257,8 @@ def main():
     scan_version = scan_metadata['version']
     print("Scan Type Version: ", scan_version)
     workflow.get_list_of_worflows()
-data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
+
+    data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
     data_processing.process_scan_metadata()
     data_processing.create_scan_dir()
     data_processing.create_artifact_dir()
