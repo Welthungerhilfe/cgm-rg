@@ -1,6 +1,6 @@
 import sys
 
-import set_up_dummy_variables
+import set_up_dummy_variables as sdv
 sys.path.append('./src')  # noqa: E402
 from api_endpoints import ApiEndpoints
 from mock import patch
@@ -20,10 +20,10 @@ def get_dummy_blur_flow_object(mock_some_fn):
         get_dummy_api_endpoint_object(),
         get_dummy_process_workflows_object(),
         'src/workflows/blur-workflow.json',
-        set_up_dummy_variables.rgb_artifacts,
-        set_up_dummy_variables.scan_parent_dir,
-        set_up_dummy_variables.scan_metadata,
-        set_up_dummy_variables.scan_version)
+        sdv.rgb_artifacts,
+        sdv.scan_parent_dir,
+        sdv.scan_metadata,
+        sdv.scan_version)
 
 
 @patch.object(ProcessWorkflows, 'get_workflow_id')
@@ -34,11 +34,11 @@ def get_dummy_height_flow_object(mock_some_fn):
         get_dummy_process_workflows_object(),
         'src/workflows/height-plaincnn-workflow-artifact.json',
         'src/workflows/height-plaincnn-workflow-scan.json',
-        set_up_dummy_variables.depth_artifacts,
-        set_up_dummy_variables.rgb_artifacts,
-        set_up_dummy_variables.scan_parent_dir,
-        set_up_dummy_variables.scan_metadata,
-        set_up_dummy_variables.person_details)
+        sdv.depth_artifacts,
+        sdv.rgb_artifacts,
+        sdv.scan_parent_dir,
+        sdv.scan_metadata,
+        sdv.person_details)
 
 
 @patch.object(ProcessWorkflows, 'get_workflow_id')
@@ -49,10 +49,10 @@ def get_dummy_weight_flow_object(mock_some_fn):
         get_dummy_process_workflows_object(),
         'src/workflows/weight-workflow-artifact.json',
         'src/workflows/weight-workflow-scan.json',
-        set_up_dummy_variables.depth_artifacts,
-        set_up_dummy_variables.scan_parent_dir,
-        set_up_dummy_variables.scan_metadata,
-        set_up_dummy_variables.person_details)
+        sdv.depth_artifacts,
+        sdv.scan_parent_dir,
+        sdv.scan_metadata,
+        sdv.person_details)
 
 
 def get_dummy_get_scan_metadata_object():
@@ -60,15 +60,7 @@ def get_dummy_get_scan_metadata_object():
 
 
 def get_dummy_api_endpoint_object():
-    return ApiEndpoints(
-        set_up_dummy_variables.url,
-        set_up_dummy_variables.scan_endpoint,
-        set_up_dummy_variables.get_file_endpoint,
-        set_up_dummy_variables.post_file_endpoint,
-        set_up_dummy_variables.result_endpoint,
-        set_up_dummy_variables.workflow_endpoint,
-        set_up_dummy_variables.person_detail_endpoint,
-        set_up_dummy_variables.scan_endpoint)
+    return ApiEndpoints(sdv.url)
 
 
 def get_dummy_prepare_artifacts_object():

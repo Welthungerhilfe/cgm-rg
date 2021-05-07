@@ -9,9 +9,10 @@ import numpy as np
 from bunch import Bunch
 from cgmzscore import Calculator
 
-from result_generation.utils import MAX_AGE, age
+from result_generation.utils import MAX_AGE, calculate_age
 
 sys.path.append(str(Path(__file__).parents[1]))
+from api_endpoints import ApiEndpoints
 import utils.inference as inference  # noqa: E402
 import utils.preprocessing as preprocessing  # noqa: E402
 
@@ -22,8 +23,6 @@ class WeightFlow:
 
     Attributes
     ----------
-    api : object
-        object of ApiEndpoints class
     workflows : list
         list of registered workflows
     artifact_workflow_path : str
@@ -59,7 +58,7 @@ class WeightFlow:
 
     def __init__(
             self,
-            api,
+            api: ApiEndpoints,
             workflows,
             artifact_workflow_path,
             scan_workflow_path,
@@ -90,6 +89,12 @@ class WeightFlow:
         self.scan_workflow_obj['id'] = self.workflows.get_workflow_id(
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
 
+    def run_flow(self):
+        depthmaps = self.process_depthmaps()
+        weight_predictions = inference.get_weight_predictions_local(depthmaps)
+        generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        self.post_weight_results(weight_predictions, generated_timestamp)
+
     def bunch_object_to_json_object(self, bunch_object):
         json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
         json_object = json.loads(json_string)
@@ -115,12 +120,6 @@ class WeightFlow:
 
         depthmaps = np.array(depthmaps)
         return depthmaps
-
-    def run_weight_flow(self):
-        depthmaps = self.process_depthmaps()
-        weight_predictions = inference.get_weight_predictions_local(depthmaps)
-        generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-        self.post_weight_results(weight_predictions, generated_timestamp)
 
     def artifact_level_weight_result_object(
             self, predictions, generated_timestamp):
@@ -161,7 +160,7 @@ class WeightFlow:
 
     def zscore_wfa(self, mean_prediction):
         sex = 'M' if self.person_details['sex'] == 'male' else 'F'
-        age_in_days = age(
+        age_in_days = calculate_age(
             self.person_details['date_of_birth'], self.scan_metadata['scan_start'])
         class_wfa = 'Not Found'
         if age_in_days <= MAX_AGE:
