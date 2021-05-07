@@ -14,6 +14,20 @@ import utils.preprocessing as preprocessing  # noqa: E402
 
 
 class HeightFlowMultiArtifact(HeightFlow):
+    def run_flow(self):
+        depthmap = self.process_depthmaps_depthmapmultiartifactlatefusion()
+        depthmap = self.create_multiartifact_sample(depthmap)
+        height_predictions = inference.get_depthmapmultiartifactlatefusion_height_predictions_local(
+            depthmap)
+        generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        scan_depthmapmultiartifactlatefusion_level_height_result_bunch = self.scan_level_height_result_object(
+            height_predictions, generated_timestamp, self.scan_workflow_obj)
+        scan_depthmapmultiartifactlatefusion_level_height_result_json = self.bunch_object_to_json_object(
+            scan_depthmapmultiartifactlatefusion_level_height_result_bunch)
+        if self.api.post_results(scan_depthmapmultiartifactlatefusion_level_height_result_json) == 201:
+            print(
+                "successfully posted scan step level depthmapmultiartifactlatefusion height results: ",
+                scan_depthmapmultiartifactlatefusion_level_height_result_json)
 
     def process_depthmaps_depthmapmultiartifactlatefusion(self):
         depthmaps_file = [self.get_input_path(self.scan_directory, artifact['file'])
@@ -34,18 +48,3 @@ class HeightFlowMultiArtifact(HeightFlow):
 
         depthmaps = tf.stack([depthmaps])
         return depthmaps
-
-    def run_height_flow_depthmapmultiartifactlatefusion(self):
-        depthmap = self.process_depthmaps_depthmapmultiartifactlatefusion()
-        depthmap = self.create_multiartifact_sample(depthmap)
-        height_predictions = inference.get_depthmapmultiartifactlatefusion_height_predictions_local(
-            depthmap)
-        generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-        scan_depthmapmultiartifactlatefusion_level_height_result_bunch = self.scan_level_height_result_object(
-            height_predictions, generated_timestamp, self.scan_workflow_obj)
-        scan_depthmapmultiartifactlatefusion_level_height_result_json = self.bunch_object_to_json_object(
-            scan_depthmapmultiartifactlatefusion_level_height_result_bunch)
-        if self.api.post_results(scan_depthmapmultiartifactlatefusion_level_height_result_json) == 201:
-            print(
-                "successfully posted scan step level depthmapmultiartifactlatefusion height results: ",
-                scan_depthmapmultiartifactlatefusion_level_height_result_json)
