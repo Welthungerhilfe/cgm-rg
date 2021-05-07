@@ -10,8 +10,10 @@ from result_generation.blur import BlurFlow
 from result_generation.depthmap_image import DepthMapImgFlow
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.height.height_mutiartifact import HeightFlowMultiArtifact
+from result_generation.height.height_ensemble import HeightFlowDeepEnsemble
 from result_generation.standing import StandingLaying
 from result_generation.weight import WeightFlow
+from result_generation.height.height_rgbd import HeightFlowRGBD
 
 
 class ProcessWorkflows:
@@ -27,9 +29,8 @@ class ProcessWorkflows:
     def get_workflow_id(self, workflow_name, workflow_version):
         """Get the id of the workflow for given workflow name and version"""
         workflow_obj_with_id = list(
-            filter(
-                lambda workflow: (
-                    workflow['name'] == workflow_name and workflow['version'] == workflow_version),
+            filter(lambda workflow: (
+                workflow['name'] == workflow_name and workflow['version'] == workflow_version),  # noqa :E501
                 self.workflows['workflows']))[0]
         return workflow_obj_with_id['id']
 
@@ -213,8 +214,12 @@ def parse_args():
     parser.add_argument('--height_workflow_artifact_path', default="src/workflows/height-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
     parser.add_argument('--height_depthmapmultiartifactlatefusion_workflow_path', default="src/workflows/height-depthmapmultiartifactlatefusion-workflow.json")  # noqa: E501
     parser.add_argument('--height_workflow_scan_path', default="src/workflows/height-plaincnn-workflow-scan.json")  # noqa: E501
+    parser.add_argument('--height_ensemble_workflow_artifact_path', default="/app/src/workflows/height-ensemble-workflow-artifact.json")
+    parser.add_argument('--height_ensemble_workflow_scan_path', default="/app/src/workflows/height-ensemble-workflow-scan.json")
     parser.add_argument('--weight_workflow_artifact_path', default="src/workflows/weight-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--weight_workflow_scan_path', default="src/workflows/weight-workflow-scan.json")  # noqa: E501
+    parser.add_argument('--height_rgbd_workflow_artifact_path', default="/app/src/workflows/height-rgbd-workflow-artifact.json")  # noqa :E501
+    parser.add_argument('--height_rgbd_workflow_scan_path', default="/app/src/workflows/height-rgbd-workflow-scan.json")  # noqa: E501
     args = parser.parse_args()
     return args
 
@@ -227,9 +232,13 @@ def main():
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
+    height_ensemble_workflow_artifact_path = args.height_ensemble_workflow_artifact_path
+    height_ensemble_workflow_scan_path = args.height_ensemble_workflow_scan_path
     height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
+    height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path  # noqa :E501
+    height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
@@ -239,9 +248,8 @@ def main():
     print(f"App URL: {url}")
     cgm_api = ApiEndpoints(url)
 
-    workflow = ProcessWorkflows(cgm_api)
-
-    get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
+    workflow = ProcessWorkflows(cgm_api)  # noqa :E501
+    get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)  # noqa :E501
 
     if get_scan_metadata.get_unprocessed_scans() <= 0:
         return
@@ -293,6 +301,7 @@ def main():
         height_workflow_artifact_path,
         height_workflow_scan_path,
         depth_artifacts,
+        rgb_artifacts,
         scan_parent_dir,
         scan_metadata,
         person_details)
@@ -303,6 +312,18 @@ def main():
         workflow,
         height_workflow_artifact_path,
         height_depthmapmultiartifactlatefusion_workflow_path,
+        depth_artifacts,
+        rgb_artifacts,
+        scan_parent_dir,
+        scan_metadata,
+        person_details)
+    flows.append(flow)
+
+    flow = HeightFlowDeepEnsemble(
+        cgm_api,
+        workflow,
+        height_ensemble_workflow_artifact_path,
+        height_ensemble_workflow_scan_path,
         depth_artifacts,
         scan_parent_dir,
         scan_metadata,
@@ -315,6 +336,18 @@ def main():
         weight_workflow_artifact_path,
         weight_workflow_scan_path,
         depth_artifacts,
+        scan_parent_dir,
+        scan_metadata,
+        person_details)
+    flows.append(flow)
+
+    flow = HeightFlowRGBD(
+        cgm_api,
+        workflow,
+        height_rgbd_workflow_artifact_path,
+        height_rgbd_workflow_scan_path,
+        depth_artifacts,
+        rgb_artifacts,
         scan_parent_dir,
         scan_metadata,
         person_details)

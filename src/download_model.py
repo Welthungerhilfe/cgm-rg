@@ -7,8 +7,19 @@ from azureml.core.model import Model
 
 REPO_DIR = Path(__file__).parents[1].absolute()
 
+ENSEMBLE_RUN_IDS = ['q1-ensemble-warmup_1610544610_eb44bfe2', 'q1-ensemble-warmup_1610547587_7ca932c3',
+                    'q1-ensemble-warmup_1610547669_5b789bd1', 'q1-ensemble-warmup_1610547705_f2141d0f']
+'''
+'q1-ensemble-warmup_1610547744_d2b42ce5', 'q1-ensemble-warmup_1610547780_2f000a25',
+'q1-ensemble-warmup_1610547816_c3f815df', 'q1-ensemble-warmup_1610547892_8ee6ff49',
+'q1-ensemble-warmup_1610547928_b9519b6a', 'q1-ensemble-warmup_1610547986_ad0186b8',
+'q1-ensemble-warmup_1610548023_99ac6060', 'q1-ensemble-warmup_1610548064_afefd4e4',
+'q1-ensemble-warmup_1610548106_69993d24', 'q1-ensemble-warmup_1610548137_a8c52d63',
+'q1-ensemble-warmup_1610548168_914ce1f6', 'q1-ensemble-warmup_1610548209_9692a253'
+'''
 
-def download_model(ws, experiment_name, run_id, input_location, output_location):
+
+def download_model(ws, experiment_name, run_id, input_location, output_location):  # noqa :E501
     """Download the pretrained model
 
     Args:
@@ -53,23 +64,39 @@ def main():
     # Downlaod model for height
     download_model(ws=ws,
                    experiment_name='q3-depthmap-plaincnn-height-95k',
-                   run_id='q3-depthmap-plaincnn-height-95k_1610709896_ef7f755d',
+                   run_id='q3-depthmap-plaincnn-height-95k_1610709896_ef7f755d',  # noqa :E501
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/height')
 
     # Downlaod model for  weight
     download_model(ws=ws,
                    experiment_name='q4-depthmap-plaincnn-weight-95k',
-                   run_id='q4-depthmap-plaincnn-weight-95k_1611336518_642a9c58',
+                   run_id='q4-depthmap-plaincnn-weight-95k_1611336518_642a9c58',  # noqa :E501
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/weight')
 
     # Download M-CNN Model for height
     download_model(ws=ws,
-                   experiment_name='q3-depthmapmultiartifactlatefusion-plaincnn-height-95',
-                   run_id='q3-depthmapmultiartifactlatefusion-plaincnn-height-95k_1614177517_ecd7b6e2',
+                   experiment_name='q3-depthmapmultiartifactlatefusion-plaincnn-height-95',  # noqa :E501
+                   run_id='q3-depthmapmultiartifactlatefusion-plaincnn-height-95k_1614177517_ecd7b6e2',  # noqa :E501
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
-                   output_location=REPO_DIR / 'models/depthmapmultiartifactlatefusion')
+                   output_location=REPO_DIR / 'models/depthmapmultiartifactlatefusion')  # noqa :E501
+
+    # Downlaod model for RGBD
+    download_model(ws=ws,
+                   experiment_name='2021q2-rgbd-plaincnn-height-5kscans',
+                   run_id='2021q2-rgbd-plaincnn-height-5kscans_1616835920_c469620e',  # noqa :E501
+                   input_location=os.path.join('outputs', 'best_model.ckpt'),
+                   output_location=REPO_DIR / 'models/height_rgbd')
+
+    for id in ENSEMBLE_RUN_IDS:
+        print(f"Downloading run {id}")
+        download_model(
+            ws=ws,
+            experiment_name='q1-ensemble-warmup',
+            run_id=id,
+            input_location=os.path.join('outputs', 'best_model.ckpt'),
+            output_location=REPO_DIR / 'models/deepensemble' / id)
 
 
 if __name__ == "__main__":
