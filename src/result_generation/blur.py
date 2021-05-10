@@ -32,27 +32,23 @@ class BlurFlow:
 
     def __init__(
             self,
-            api: ApiEndpoints,
-            workflows,
+            resultGeneration,
             workflow_path,
             artifacts,
             scan_parent_dir,
-            scan_metadata,
             scan_version):
-        self.api = api
-        self.workflows = workflows
+        self.resultGeneration = resultGeneration
         self.artifacts = artifacts
         self.workflow_path = workflow_path
-        self.workflow_obj = self.workflows.load_workflows(self.workflow_path)
-        self.scan_metadata = scan_metadata
+        self.workflow_obj = self.resultGeneration.workflows.load_workflows(self.workflow_path)
         self.scan_parent_dir = scan_parent_dir
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.blur_input_format = 'img'
         self.scan_directory = os.path.join(
             self.scan_parent_dir,
-            self.scan_metadata['id'],
+            self.resultGeneration.scan_metadata['id'],
             self.blur_input_format)
-        self.workflow_obj['id'] = self.workflows.get_workflow_id(
+        self.workflow_obj['id'] = self.resultGeneration.workflows.get_workflow_id(
             self.workflow_obj['name'], self.workflow_obj['version'])
         self.scan_version = scan_version
 
@@ -187,7 +183,7 @@ class BlurFlow:
         for artifact in self.artifacts:
             blur_result = Bunch()
             blur_result.id = f"{uuid.uuid4()}"
-            blur_result.scan = self.scan_metadata['id']
+            blur_result.scan = self.resultGeneration.scan_metadata['id']
             blur_result.workflow = self.workflow_obj["id"]
             blur_result.source_artifacts = [artifact['id']]
             blur_result.source_results = []
