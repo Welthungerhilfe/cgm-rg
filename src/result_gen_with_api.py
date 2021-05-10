@@ -270,13 +270,12 @@ def main():
 
     flows = []
 
-    result_generation = ResultGeneration(cgm_api, workflow, scan_metadata)
+    result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, scan_parent_dir)
 
     flow = BlurFlow(
         result_generation,
         blur_workflow_path,
         rgb_artifacts,
-        scan_parent_dir,
         scan_version)
     flows.append(flow)
 
@@ -287,70 +286,52 @@ def main():
     flows.append(flow)
 
     flow = DepthMapImgFlow(
-        cgm_api,
-        workflow,
+        result_generation,
         depthmap_img_workflow_path,
-        depth_artifacts,
-        scan_parent_dir,
-        scan_metadata)
+        depth_artifacts)
     flows.append(flow)
 
     flow = HeightFlowPlainCnn(
-        cgm_api,
-        workflow,
+        result_generation,
         height_workflow_artifact_path,
         height_workflow_scan_path,
         depth_artifacts,
         rgb_artifacts,
-        scan_parent_dir,
-        scan_metadata,
         person_details)
     flows.append(flow)
 
     flow = HeightFlowMultiArtifact(
-        cgm_api,
-        workflow,
+        result_generation,
         height_workflow_artifact_path,
         height_depthmapmultiartifactlatefusion_workflow_path,
         depth_artifacts,
         rgb_artifacts,
-        scan_parent_dir,
-        scan_metadata,
         person_details)
     flows.append(flow)
 
     flow = HeightFlowDeepEnsemble(
-        cgm_api,
-        workflow,
+        result_generation,
         height_ensemble_workflow_artifact_path,
         height_ensemble_workflow_scan_path,
         depth_artifacts,
         rgb_artifacts,
-        scan_parent_dir,
-        scan_metadata,
         person_details)
     flows.append(flow)
 
     flow = WeightFlow(
-        cgm_api,
-        workflow,
+        result_generation,
         weight_workflow_artifact_path,
         weight_workflow_scan_path,
         depth_artifacts,
-        scan_parent_dir,
-        scan_metadata,
         person_details)
     flows.append(flow)
 
     flow = HeightFlowRGBD(
-        cgm_api,
-        workflow,
+        result_generation,
         height_rgbd_workflow_artifact_path,
         height_rgbd_workflow_scan_path,
         depth_artifacts,
         rgb_artifacts,
-        scan_parent_dir,
-        scan_metadata,
         person_details)
     flows.append(flow)
 
