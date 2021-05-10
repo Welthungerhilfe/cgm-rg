@@ -10,22 +10,6 @@ import set_up_dummy_objects
 import utils.preprocessing as preprocessing
 
 
-def test_bunch_object_to_json_object():
-    """Test to check if we get json object"""
-    # Setup
-    heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
-    bunch_object = Bunch(a=1, b=2)
-    # Exercise
-    result = heightflow.bunch_object_to_json_object(bunch_object)
-
-    # Verify
-    truth = {'a': 1, 'b': 2}
-    assert result == truth
-    assert isinstance(truth, dict)
-
-    # Cleanup - none required
-
-
 def test_get_input_path():
     """Test to check if we get input path"""
     # Setup

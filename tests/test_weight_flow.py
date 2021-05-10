@@ -10,22 +10,6 @@ import utils.preprocessing as preprocessing
 import set_up_dummy_objects
 
 
-def test_bunch_object_to_json_object():
-    """Test to check if we get json object"""
-    # Setup
-    weightflow = set_up_dummy_objects.get_dummy_weight_flow_object()
-    bunch_object = Bunch(a=1, b=2)
-    # Exercise
-    result = weightflow.bunch_object_to_json_object(bunch_object)
-
-    # Verify
-    truth = {'a': 1, 'b': 2}
-    assert result == truth
-    assert isinstance(truth, dict)
-
-    # Cleanup - none required
-
-
 def test_get_input_path():
     """Test to check if we get input path"""
     # Setup
