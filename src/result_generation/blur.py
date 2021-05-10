@@ -1,8 +1,6 @@
 import os
 import uuid
 from datetime import datetime
-from pathlib import Path
-import sys
 
 import cv2
 import face_recognition
