@@ -70,19 +70,11 @@ class StandingLaying:
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         self.post_result_object(prediction, generated_timestamp)
 
-    def bunch_object_to_json_object(self, bunch_object):
-        json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
-        json_object = json.loads(json_string)
-        return json_object
-
-    def get_input_path(self, directory, file_name):
-        return os.path.join(directory, file_name)
-
     def standing_laying_artifacts(self):
         predictions = []
         for i, artifact in enumerate(self.artifacts):
 
-            input_path = self.get_input_path(
+            input_path = self.result_generation.get_input_path(
                 self.scan_directory, artifact['file'])
 
             print("input_path of image to perform standing laying: ", input_path)
@@ -113,7 +105,7 @@ class StandingLaying:
     def post_result_object(self, prediction, generated_timestamp):
         standing_laying_result = self.prepare_result_object(
             prediction, generated_timestamp)
-        standing_laying_result_object = self.bunch_object_to_json_object(
+        standing_laying_result_object = self.result_generation.bunch_object_to_json_object(
             standing_laying_result)
         if self.result_generation.api.post_results(standing_laying_result_object) == 201:
             print("successfully post Standing laying results: ",
