@@ -24,7 +24,7 @@ class HeightFlowMultiArtifact(HeightFlow):
             height_predictions, generated_timestamp, self.scan_workflow_obj)
         scan_depthmapmultiartifactlatefusion_level_height_result_json = self.bunch_object_to_json_object(
             scan_depthmapmultiartifactlatefusion_level_height_result_bunch)
-        if self.api.post_results(scan_depthmapmultiartifactlatefusion_level_height_result_json) == 201:
+        if self.result_generation.api.post_results(scan_depthmapmultiartifactlatefusion_level_height_result_json) == 201:
             print(
                 "successfully posted scan step level depthmapmultiartifactlatefusion height results: ",
                 scan_depthmapmultiartifactlatefusion_level_height_result_json)
