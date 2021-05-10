@@ -12,16 +12,10 @@ class BlurFlow:
 
     Attributes
     ----------
-    workflows : list
-        list of registered workflows
     workflow_path : str
         path of the workflow file for face blurring
     artifacts : list
         list of artifacts to run blur flow on
-    scan_parent_dir : str
-        directory where scans are stored
-    scan_metadata : json
-        metadata of the scan to run blur flow on
     """
 
     def __init__(

@@ -18,23 +18,13 @@ class StandingLaying:
 
     Attributes
     ----------
-    workflows : list
-        list of registered workflows
     workflow_path : str
         path of the workflow file for standing_laying
     artifacts : list
         list of artifacts to run standing_laying flow on
-    scan_parent_dir : str
-        directory where scans are stored
-    scan_metadata : json
-        metadata of the scan to run standing_laying flow on
 
     Methods
     -------
-    bunch_object_to_json_object(bunch_object):
-        Converts given bunch object to json object.
-    get_input_path(directory, file_name):
-        Returns input path for given directory name and file name.
     run_standing_laying_flow():
         Driver method for Standing laying flow.
     standing_laying_artifacts():

@@ -15,18 +15,12 @@ class HeightFlow:
 
     Attributes
     ----------
-    workflows: list
-        list of registered workflows
     artifact_workflow_path: str
         path of the workflow file for artifact level height results
     scan_workflow_path: json
         path of the workflow file for scan level height results
     artifacts: list
         list of artifacts to run heigth flow on
-    scan_parent_dir: str
-        directory where scans are stored
-    scan_metadata: json
-        metadata of the scan to run height flow on
     """
 
     def __init__(

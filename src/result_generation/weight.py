@@ -21,25 +21,15 @@ class WeightFlow:
 
     Attributes
     ----------
-    workflows : list
-        list of registered workflows
     artifact_workflow_path : str
         path of the workflow file for artifact level weight results
     scan_workflow_path : json
         path of the workflow file for scan level weight results
     artifacts : list
         list of artifacts to run weigth flow on
-    scan_parent_dir : str
-        directory where scans are stored
-    scan_metadata : json
-        metadata of the scan to run weight flow on
 
     Methods
     -------
-    bunch_object_to_json_object(bunch_object):
-        Converts given bunch object to json object.
-    get_input_path(directory, file_name):
-        Returns input path for given directory name and file name.
     get_mean_scan_results(predictions):
         Returns the average prediction from given list of predictions.
     process_depthmaps():
