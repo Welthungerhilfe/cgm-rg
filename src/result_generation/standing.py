@@ -49,26 +49,20 @@ class StandingLaying:
 
     def __init__(
             self,
-            api: ApiEndpoints,
-            workflows,
+            result_generation,
             workflow_path,
-            artifacts,
-            scan_parent_dir,
-            scan_metadata):
-        self.api = api
-        self.workflows = workflows
+            artifacts,):
+        self.result_generation = result_generation
         self.artifacts = artifacts
         self.workflow_path = workflow_path
-        self.workflow_obj = self.workflows.load_workflows(self.workflow_path)
-        self.scan_metadata = scan_metadata
-        self.scan_parent_dir = scan_parent_dir
+        self.workflow_obj = self.result_generation.workflows.load_workflows(self.workflow_path)
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.standing_laying_input_format = 'img'
         self.scan_directory = os.path.join(
-            self.scan_parent_dir,
-            self.scan_metadata['id'],
+            self.result_generation.scan_parent_dir,
+            self.result_generation.scan_metadata['id'],
             self.standing_laying_input_format)
-        self.workflow_obj['id'] = self.workflows.get_workflow_id(
+        self.workflow_obj['id'] = self.result_generation.workflows.get_workflow_id(
             self.workflow_obj['name'], self.workflow_obj['version'])
 
     def run_flow(self):
@@ -105,7 +99,7 @@ class StandingLaying:
         for artifact, prediction in zip(self.artifacts, prediction):
             standing_laying_result = Bunch()
             standing_laying_result.id = f"{uuid.uuid4()}"
-            standing_laying_result.scan = self.scan_metadata['id']
+            standing_laying_result.scan = self.result_generation.scan_metadata['id']
             standing_laying_result.workflow = self.workflow_obj["id"]
             standing_laying_result.source_artifacts = [artifact['id']]
             standing_laying_result.source_results = []
@@ -121,6 +115,6 @@ class StandingLaying:
             prediction, generated_timestamp)
         standing_laying_result_object = self.bunch_object_to_json_object(
             standing_laying_result)
-        if self.api.post_results(standing_laying_result_object) == 201:
+        if self.result_generation.api.post_results(standing_laying_result_object) == 201:
             print("successfully post Standing laying results: ",
                   standing_laying_result_object)
