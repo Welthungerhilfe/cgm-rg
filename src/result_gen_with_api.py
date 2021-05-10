@@ -270,10 +270,10 @@ def main():
 
     flows = []
 
-    resultGeneration = ResultGeneration(cgm_api, workflow, scan_metadata)
+    result_generation = ResultGeneration(cgm_api, workflow, scan_metadata)
 
     flow = BlurFlow(
-        resultGeneration,
+        result_generation,
         blur_workflow_path,
         rgb_artifacts,
         scan_parent_dir,
@@ -281,12 +281,9 @@ def main():
     flows.append(flow)
 
     flow = StandingLaying(
-        cgm_api,
-        workflow,
+        result_generation,
         standing_laying_workflow_path,
-        rgb_artifacts,
-        scan_parent_dir,
-        scan_metadata)
+        rgb_artifacts)
     flows.append(flow)
 
     flow = DepthMapImgFlow(
