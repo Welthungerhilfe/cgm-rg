@@ -41,14 +41,6 @@ class DepthMapImgFlow:
         self.post_depthmap_image_files()
         self.post_result_object()
 
-    def get_input_path(self, directory, file_name):
-        return os.path.join(directory, file_name)
-
-    def bunch_object_to_json_object(self, bunch_object):
-        json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
-        json_object = json.loads(json_string)
-        return json_object
-
     def preprocess_depthmap(self, input_path):
         data, width, height, depthScale, _max_confidence = preprocessing.load_depth(input_path)
 
@@ -60,7 +52,7 @@ class DepthMapImgFlow:
 
     def depthmap_img_artifacts(self):
         for artifact in self.artifacts:
-            input_path = self.get_input_path(self.scan_directory, artifact['file'])
+            input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             depthmap, depthmap_status = self.preprocess_depthmap(input_path)
             scaled_depthmap = depthmap * 255.0
             if depthmap_status:
@@ -93,7 +85,7 @@ class DepthMapImgFlow:
 
     def post_result_object(self):
         depthmap_img_result = self.prepare_result_object()
-        depthmap_img_result_object = self.bunch_object_to_json_object(
+        depthmap_img_result_object = self.result_generation.bunch_object_to_json_object(
             depthmap_img_result)
         if self.result_generation.api.post_results(depthmap_img_result_object) == 201:
             print(
