@@ -7,6 +7,7 @@ import uuid
 
 from api_endpoints import ApiEndpoints
 from result_generation.blur import BlurFlow
+from result_generation.result_generation import ResultGeneration
 from result_generation.depthmap_image import DepthMapImgFlow
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.height.height_mutiartifact import HeightFlowMultiArtifact
@@ -214,12 +215,14 @@ def parse_args():
     parser.add_argument('--height_workflow_artifact_path', default="src/workflows/height-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
     parser.add_argument('--height_depthmapmultiartifactlatefusion_workflow_path', default="src/workflows/height-depthmapmultiartifactlatefusion-workflow.json")  # noqa: E501
     parser.add_argument('--height_workflow_scan_path', default="src/workflows/height-plaincnn-workflow-scan.json")  # noqa: E501
-    parser.add_argument('--height_ensemble_workflow_artifact_path', default="/app/src/workflows/height-ensemble-workflow-artifact.json")
-    parser.add_argument('--height_ensemble_workflow_scan_path', default="/app/src/workflows/height-ensemble-workflow-scan.json")
+    parser.add_argument('--height_ensemble_workflow_artifact_path',
+                        default="src/workflows/height-ensemble-workflow-artifact.json")
+    parser.add_argument('--height_ensemble_workflow_scan_path',
+                        default="src/workflows/height-ensemble-workflow-scan.json")
     parser.add_argument('--weight_workflow_artifact_path', default="src/workflows/weight-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--weight_workflow_scan_path', default="src/workflows/weight-workflow-scan.json")  # noqa: E501
-    parser.add_argument('--height_rgbd_workflow_artifact_path', default="/app/src/workflows/height-rgbd-workflow-artifact.json")  # noqa :E501
-    parser.add_argument('--height_rgbd_workflow_scan_path', default="/app/src/workflows/height-rgbd-workflow-scan.json")  # noqa: E501
+    parser.add_argument('--height_rgbd_workflow_artifact_path', default="src/workflows/height-rgbd-workflow-artifact.json")  # noqa :E501
+    parser.add_argument('--height_rgbd_workflow_scan_path', default="src/workflows/height-rgbd-workflow-scan.json")  # noqa: E501
     args = parser.parse_args()
     return args
 
@@ -267,13 +270,13 @@ def main():
 
     flows = []
 
+    resultGeneration = ResultGeneration(cgm_api, workflow, scan_metadata)
+
     flow = BlurFlow(
-        cgm_api,
-        workflow,
+        resultGeneration,
         blur_workflow_path,
         rgb_artifacts,
         scan_parent_dir,
-        scan_metadata,
         scan_version)
     flows.append(flow)
 
@@ -325,6 +328,7 @@ def main():
         height_ensemble_workflow_artifact_path,
         height_ensemble_workflow_scan_path,
         depth_artifacts,
+        rgb_artifacts,
         scan_parent_dir,
         scan_metadata,
         person_details)
