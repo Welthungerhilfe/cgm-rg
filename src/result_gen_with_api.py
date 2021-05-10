@@ -31,7 +31,7 @@ class ProcessWorkflows:
         """Get the id of the workflow for given workflow name and version"""
         workflow_obj_with_id = list(
             filter(lambda workflow: (
-                workflow['name'] == workflow_name and workflow['version'] == workflow_version),  # noqa :E501
+                workflow['name'] == workflow_name and workflow['version'] == workflow_version),
                 self.workflows['workflows']))[0]
         return workflow_obj_with_id['id']
 
@@ -215,10 +215,8 @@ def parse_args():
     parser.add_argument('--height_workflow_artifact_path', default="src/workflows/height-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
     parser.add_argument('--height_depthmapmultiartifactlatefusion_workflow_path', default="src/workflows/height-depthmapmultiartifactlatefusion-workflow.json")  # noqa: E501
     parser.add_argument('--height_workflow_scan_path', default="src/workflows/height-plaincnn-workflow-scan.json")  # noqa: E501
-    parser.add_argument('--height_ensemble_workflow_artifact_path',
-                        default="src/workflows/height-ensemble-workflow-artifact.json")
-    parser.add_argument('--height_ensemble_workflow_scan_path',
-                        default="src/workflows/height-ensemble-workflow-scan.json")
+    parser.add_argument('--height_ensemble_workflow_artifact_path', default="/app/src/workflows/height-ensemble-workflow-artifact.json")  # noqa: E501
+    parser.add_argument('--height_ensemble_workflow_scan_path', default="/app/src/workflows/height-ensemble-workflow-scan.json")  # noqa: E501
     parser.add_argument('--weight_workflow_artifact_path', default="src/workflows/weight-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--weight_workflow_scan_path', default="src/workflows/weight-workflow-scan.json")  # noqa: E501
     parser.add_argument('--height_rgbd_workflow_artifact_path', default="src/workflows/height-rgbd-workflow-artifact.json")  # noqa :E501
@@ -240,7 +238,7 @@ def main():
     height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
-    height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path  # noqa :E501
+    height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
     height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
@@ -251,8 +249,8 @@ def main():
     print(f"App URL: {url}")
     cgm_api = ApiEndpoints(url)
 
-    workflow = ProcessWorkflows(cgm_api)  # noqa :E501
-    get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)  # noqa :E501
+    workflow = ProcessWorkflows(cgm_api)
+    get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
 
     if get_scan_metadata.get_unprocessed_scans() <= 0:
         return
@@ -260,6 +258,7 @@ def main():
     scan_version = scan_metadata['version']
     print("Scan Type Version: ", scan_version)
     workflow.get_list_of_worflows()
+
     data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
     data_processing.process_scan_metadata()
     data_processing.create_scan_dir()
