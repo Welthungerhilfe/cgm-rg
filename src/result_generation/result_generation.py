@@ -13,10 +13,12 @@ class ResultGeneration:
             self,
             api: ApiEndpoints,
             workflows,
-            scan_metadata):
+            scan_metadata,
+            scan_parent_dir):
         self.api = api
         self.workflows = workflows
         self.scan_metadata = scan_metadata
+        self.scan_parent_dir = scan_parent_dir
 
     def bunch_object_to_json_object(self, bunch_object):
         """Convert given bunch object to json object"""

@@ -31,17 +31,15 @@ class BlurFlow:
             resultGeneration,
             workflow_path,
             artifacts,
-            scan_parent_dir,
             scan_version):
         self.resultGeneration = resultGeneration
         self.artifacts = artifacts
         self.workflow_path = workflow_path
         self.workflow_obj = self.resultGeneration.workflows.load_workflows(self.workflow_path)
-        self.scan_parent_dir = scan_parent_dir
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.blur_input_format = 'img'
         self.scan_directory = os.path.join(
-            self.scan_parent_dir,
+            self.resultGeneration.scan_parent_dir,
             self.resultGeneration.scan_metadata['id'],
             self.blur_input_format)
         self.workflow_obj['id'] = self.resultGeneration.workflows.get_workflow_id(
