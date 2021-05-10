@@ -59,7 +59,7 @@ class HeightFlow:
             self.depth_input_format = 'depth'
             self.scan_directory = Path(self.scan_parent_dir) / self.scan_metadata['id'] / self.depth_input_format
         self.artifact_workflow_obj['id'] = self.workflows.get_workflow_id(
-            self.artifact_workflow_obj['name'], self.artifact_workflow_obj['version'])  # noqa :E501
+            self.artifact_workflow_obj['name'], self.artifact_workflow_obj['version'])
         self.scan_workflow_obj['id'] = self.workflows.get_workflow_id(
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
 
@@ -77,7 +77,7 @@ class HeightFlow:
         """Return the average prediction from given list of predictions"""
         return str(np.mean(predictions))
 
-    def artifact_level_height_result_object(self, predictions, generated_timestamp):  # noqa :E501
+    def artifact_level_height_result_object(self, predictions, generated_timestamp):
         """Prepare artifact level height result object."""
         res = Bunch(dict(results=[]))
         for artifact, prediction in zip(self.artifacts, predictions):
@@ -93,7 +93,7 @@ class HeightFlow:
             res.results.append(height_result)
         return res
 
-    def scan_level_height_result_object(self, predictions, generated_timestamp, workflow_obj):  # noqa :E501
+    def scan_level_height_result_object(self, predictions, generated_timestamp, workflow_obj):
         """Prepare scan level height result object"""
         res = Bunch(dict(results=[]))
         height_result = Bunch(dict(
