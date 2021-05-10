@@ -1,16 +1,10 @@
 import json
-import uuid
 from pathlib import Path
 import sys
 import os
 
-import numpy as np
-from bunch import Bunch
-from cgmzscore import Calculator
-
 sys.path.append(str(Path(__file__).parents[1]))
 from api_endpoints import ApiEndpoints
-from result_generation.utils import MAX_AGE, MAX_HEIGHT, MIN_HEIGHT, calculate_age
 
 
 class ResultGeneration:

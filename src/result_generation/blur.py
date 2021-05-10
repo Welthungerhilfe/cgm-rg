@@ -1,4 +1,3 @@
-import json
 import os
 import uuid
 from datetime import datetime
@@ -8,9 +7,6 @@ import sys
 import cv2
 import face_recognition
 from bunch import Bunch
-
-sys.path.append(str(Path(__file__).parents[1]))
-from api_endpoints import ApiEndpoints
 
 
 class BlurFlow:
