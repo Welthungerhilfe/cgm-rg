@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 import uuid
@@ -9,7 +8,6 @@ import numpy as np
 from bunch import Bunch
 
 sys.path.append(str(Path(__file__).parents[1]))
-from api_endpoints import ApiEndpoints
 import utils.inference as inference  # noqa: E402
 import utils.preprocessing as preprocessing  # noqa: E402
 
