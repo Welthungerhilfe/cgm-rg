@@ -179,5 +179,5 @@ class BlurFlow:
         """Post the result object to api."""
         blur_result = self.prepare_result_object()
         blur_result_object = self.result_generation.bunch_object_to_json_object(blur_result)
-        if self.api.post_results(blur_result_object) == 201:
+        if self.result_generation.api.post_results(blur_result_object) == 201:
             print("successfully post blur results: ", blur_result_object)
