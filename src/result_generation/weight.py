@@ -89,22 +89,13 @@ class WeightFlow:
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         self.post_weight_results(weight_predictions, generated_timestamp)
 
-    def bunch_object_to_json_object(self, bunch_object):
-        json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
-        json_object = json.loads(json_string)
-
-        return json_object
-
-    def get_input_path(self, directory, file_name):
-        return os.path.join(directory, file_name)
-
     def get_mean_scan_results(self, predictions):
         return str(np.mean(predictions))
 
     def process_depthmaps(self):
         depthmaps = []
         for artifact in self.artifacts:
-            input_path = self.get_input_path(self.scan_directory, artifact['file'])
+            input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             data, width, height, depthScale, _max_confidence = preprocessing.load_depth(input_path)
             depthmap = preprocessing.prepare_depthmap(data, width, height, depthScale)
             depthmap = preprocessing.preprocess(depthmap)
@@ -168,7 +159,7 @@ class WeightFlow:
     def post_weight_results(self, predictions, generated_timestamp):
         artifact_level_weight_result_bunch = self.artifact_level_weight_result_object(
             predictions, generated_timestamp)
-        artifact_level_weight_result_json = self.bunch_object_to_json_object(
+        artifact_level_weight_result_json = self.result_generation.bunch_object_to_json_object(
             artifact_level_weight_result_bunch)
         if self.result_generation.api.post_results(artifact_level_weight_result_json) == 201:
             print(
@@ -177,7 +168,7 @@ class WeightFlow:
 
         scan_level_weight_result_bunch = self.scan_level_weight_result_object(
             predictions, generated_timestamp)
-        scan_level_weight_result_json = self.bunch_object_to_json_object(
+        scan_level_weight_result_json = self.result_generation.bunch_object_to_json_object(
             scan_level_weight_result_bunch)
         if self.result_generation.api.post_results(scan_level_weight_result_json) == 201:
             print(
