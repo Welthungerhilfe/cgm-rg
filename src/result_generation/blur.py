@@ -145,7 +145,7 @@ class BlurFlow:
     def post_blur_files(self):
         """Post the blurred file to api"""
         for artifact in self.artifacts:
-            blur_id_from_post_request, post_status = self.api.post_files(
+            blur_id_from_post_request, post_status = self.result_generation.api.post_files(
                 artifact['blurred_image'])
             if post_status == 201:
                 artifact['blur_id_from_post_request'] = blur_id_from_post_request
