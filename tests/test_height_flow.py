@@ -7,7 +7,6 @@ from bunch import Bunch
 
 sys.path.append('./src')  # noqa: E402
 import set_up_dummy_objects
-import utils.preprocessing as preprocessing
 
 
 def test_get_input_path():
