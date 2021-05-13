@@ -39,7 +39,7 @@ class HeightFlowRGBD(HeightFlow):
             else:
                 print("No RGB found for order:", img_id)
                 continue
-            image = cv2.imread(image_input_path)
+            image = cv2.imread(str(image_input_path))  # cv2.imread gives error when reading from posix path
             image = preprocessing.preprocess_image(image)
             data, width, height, depth_scale, _max_confidence = preprocessing.load_depth(
                 input_path)
