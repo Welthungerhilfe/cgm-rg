@@ -9,6 +9,7 @@ CWD = pathlib.Path.cwd()
 WIDTH = 240
 HEIGHT = 180
 
+
 def test_load_depth_hugh():
     # Setup
     depth_file = CWD.joinpath('tests', 'static_files', 'be1faf54-69c7-11eb-984b-a3ffd42e7b5a', 'depth', 'bd67cd9e-69c7-11eb-984b-77ac9d2b4986')
