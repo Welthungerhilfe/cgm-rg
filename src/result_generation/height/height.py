@@ -38,14 +38,14 @@ class HeightFlow:
             artifact_workflow_path,
             scan_workflow_path,
             artifacts,
-            image_artifacts,
             scan_parent_dir: str,
             scan_metadata,
-            person_details):
+            person_details,
+            image_artifacts=None):
         self.api = api
         self.workflows = workflows
         self.artifacts = artifacts
-        self.image_artifacts = image_artifacts
+        self.image_artifacts = [] if image_artifacts is None else image_artifacts
         self.artifact_workflow_path = artifact_workflow_path
         self.scan_workflow_path = scan_workflow_path
         self.artifact_workflow_obj = self.workflows.load_workflows(
