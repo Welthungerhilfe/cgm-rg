@@ -15,10 +15,9 @@ import utils.preprocessing as preprocessing  # noqa: E402
 
 
 class HeightFlowRGBD(HeightFlow):
-    def run_rgbd_height_flow(self):
+    def run_flow(self):
         rgbd_scans = self.process_rgbd()
-        height_predictions = inference.get_height_rgbd_prediction_local(
-            rgbd_scans)
+        height_predictions = inference.get_height_rgbd_prediction_local(rgbd_scans)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         self.post_height_results(height_predictions, generated_timestamp)
 
