@@ -16,7 +16,7 @@ ENDPOINTS = Bunch(dict(
     RESULTS='/api/results',
     WORKFLOWS='/api/workflows',
     PERSONS='/api/persons/',
-    MOD_SCAN='/api/scans?page=1&limit=1',
+    MOD_SCAN='/api/scans',
 ))
 
 
