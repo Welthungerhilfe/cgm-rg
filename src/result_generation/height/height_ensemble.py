@@ -13,7 +13,7 @@ import utils.preprocessing as preprocessing  # noqa: E402
 
 
 class HeightFlowDeepEnsemble(HeightFlow):
-    def run_height_flow_deepensemble(self):
+    def run_flow(self):
         depthmaps = self.process_depthmaps()
         model_paths = glob.glob('/app/models/deepensemble/*')
 
