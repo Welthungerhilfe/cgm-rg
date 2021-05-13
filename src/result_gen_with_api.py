@@ -340,7 +340,7 @@ def main():
         person_details)
     flows.append(flow)
 
-    if scan_version in ['v0.9']: #TODO update this with better logic
+    if scan_version in ['v0.9']:  # TODO update this with better logic
         flow = HeightFlowRGBD(
             cgm_api,
             workflow,
