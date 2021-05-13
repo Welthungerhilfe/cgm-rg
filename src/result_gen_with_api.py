@@ -13,6 +13,7 @@ from result_generation.height.height_mutiartifact import HeightFlowMultiArtifact
 from result_generation.height.height_ensemble import HeightFlowDeepEnsemble
 from result_generation.standing import StandingLaying
 from result_generation.weight import WeightFlow
+from result_generation.height.height_rgbd import HeightFlowRGBD
 
 
 class ProcessWorkflows:
@@ -236,6 +237,8 @@ def main():
     height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
+    height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
+    height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
@@ -336,6 +339,19 @@ def main():
         scan_metadata,
         person_details)
     flows.append(flow)
+
+    if scan_version in ['v0.9']: #TODO update this with better logic
+        flow = HeightFlowRGBD(
+            cgm_api,
+            workflow,
+            height_rgbd_workflow_artifact_path,
+            height_rgbd_workflow_scan_path,
+            depth_artifacts,
+            rgb_artifacts,
+            scan_parent_dir,
+            scan_metadata,
+            person_details)
+        flows.append(flow)
 
     for flow in flows:
         try:
