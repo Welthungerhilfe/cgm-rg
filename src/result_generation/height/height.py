@@ -4,6 +4,7 @@ import sys
 
 from bunch import Bunch
 from cgmzscore import Calculator
+from fastcore.basics import store_attr
 
 sys.path.append(str(Path(__file__).parents[1]))
 from result_generation.utils import MAX_AGE, MAX_HEIGHT, MIN_HEIGHT, calculate_age
@@ -30,16 +31,12 @@ class HeightFlow:
             artifacts,
             person_details,
             image_artifacts=None):
-        self.result_generation = result_generation
-        self.artifacts = artifacts
+        store_attr('result_generation,artifact_workflow_path,scan_workflow_path,artifacts,person_details', self)
         self.image_artifacts = [] if image_artifacts is None else image_artifacts
-        self.artifact_workflow_path = artifact_workflow_path
-        self.scan_workflow_path = scan_workflow_path
         self.artifact_workflow_obj = self.result_generation.workflows.load_workflows(
             self.artifact_workflow_path)
         self.scan_workflow_obj = self.result_generation.workflows.load_workflows(
             self.scan_workflow_path)
-        self.person_details = person_details
         if self.artifact_workflow_obj["data"]["input_format"] == 'application/zip':
             self.depth_input_format = 'depth'
             self.scan_directory = Path(self.result_generation.scan_parent_dir) / \
