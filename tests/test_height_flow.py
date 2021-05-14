@@ -10,37 +10,6 @@ import set_up_dummy_objects
 import utils.preprocessing as preprocessing
 
 
-def test_get_input_path():
-    """Test to check if we get input path"""
-    # Setup
-    heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
-    directory = 'app/scans'
-    filename = 'workflow.json'
-
-    # Exercise
-    result = heightflow.get_input_path(directory, filename)
-
-    # Verify
-    truth = 'app/scans/workflow.json'
-    assert result == Path(truth)
-
-    # Cleanup - none required
-
-
-def test_get_mean_scan_results():
-    """Test to check if we get mean results"""
-    # Setup
-    heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
-    a = np.array([[4], [6], [5], [7]])
-
-    # Exercise
-    result = heightflow.get_mean_scan_results(a)
-
-    # Verify
-    truth = str(5.5)
-    assert result == truth
-
-
 def test_process_depthmaps():
     """Test to check proper processing of depthmaps"""
     # Setup
