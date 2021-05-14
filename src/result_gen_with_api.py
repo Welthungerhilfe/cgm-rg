@@ -218,8 +218,8 @@ def parse_args():
     parser.add_argument('--height_ensemble_workflow_scan_path', default="/app/src/workflows/height-ensemble-workflow-scan.json")  # noqa: E501
     parser.add_argument('--weight_workflow_artifact_path', default="src/workflows/weight-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--weight_workflow_scan_path', default="src/workflows/weight-workflow-scan.json")  # noqa: E501
-    parser.add_argument('--height_rgbd_workflow_artifact_path', default="src/workflows/height-rgbd-workflow-artifact.json")  # noqa :E501
-    parser.add_argument('--height_rgbd_workflow_scan_path', default="src/workflows/height-rgbd-workflow-scan.json")  # noqa: E501
+    parser.add_argument('--height_rgbd_workflow_artifact_path', default="app/src/workflows/height-rgbd-workflow-artifact.json")  # noqa :E501
+    parser.add_argument('--height_rgbd_workflow_scan_path', default="app/src/workflows/height-rgbd-workflow-scan.json")  # noqa: E501
     args = parser.parse_args()
     return args
 
@@ -312,7 +312,6 @@ def main():
         height_ensemble_workflow_artifact_path,
         height_ensemble_workflow_scan_path,
         depth_artifacts,
-        rgb_artifacts,
         person_details)
     flows.append(flow)
 
