@@ -29,11 +29,11 @@ class HeightFlow:
             artifact_workflow_path,
             scan_workflow_path,
             artifacts,
-            image_artifacts,
-            person_details):
+            person_details,
+            image_artifacts=None):
         self.result_generation = result_generation
         self.artifacts = artifacts
-        self.image_artifacts = image_artifacts
+        self.image_artifacts = [] if image_artifacts is None else image_artifacts
         self.artifact_workflow_path = artifact_workflow_path
         self.scan_workflow_path = scan_workflow_path
         self.artifact_workflow_obj = self.result_generation.workflows.load_workflows(
