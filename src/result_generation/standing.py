@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 from bunch import Bunch
+from fastcore.basics import store_attr
 
 sys.path.append(str(Path(__file__).parents[1]))
 import utils.inference as inference  # noqa: E402
@@ -40,9 +41,7 @@ class StandingLaying:
             result_generation,
             workflow_path,
             artifacts,):
-        self.result_generation = result_generation
-        self.artifacts = artifacts
-        self.workflow_path = workflow_path
+        store_attr('result_generation, workflow_path, artifacts', self)
         self.workflow_obj = self.result_generation.workflows.load_workflows(self.workflow_path)
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.standing_laying_input_format = 'img'

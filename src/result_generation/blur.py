@@ -5,6 +5,7 @@ from datetime import datetime
 import cv2
 import face_recognition
 from bunch import Bunch
+from fastcore.basics import store_attr
 
 
 class BlurFlow:
@@ -24,9 +25,7 @@ class BlurFlow:
             workflow_path,
             artifacts,
             scan_version):
-        self.result_generation = result_generation
-        self.artifacts = artifacts
-        self.workflow_path = workflow_path
+        store_attr('result_generation,artifacts,workflow_path,artifacts,scan_version', self)
         self.workflow_obj = self.result_generation.workflows.load_workflows(self.workflow_path)
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.blur_input_format = 'img'

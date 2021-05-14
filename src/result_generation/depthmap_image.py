@@ -6,6 +6,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 from bunch import Bunch
+from fastcore.basics import store_attr
+
 
 sys.path.append(str(Path(__file__).parents[1]))
 import utils.preprocessing as preprocessing  # noqa: E402
@@ -21,9 +23,7 @@ class DepthMapImgFlow:
             result_generation,
             workflow_path,
             artifacts):
-        self.result_generation = result_generation
-        self.artifacts = artifacts
-        self.workflow_path = workflow_path
+        store_attr('result_generation, workflow_path, artifacts', self)
         self.workflow_obj = self.result_generation.workflows.load_workflows(self.workflow_path)
         if self.workflow_obj["data"]["input_format"] == 'application/zip':
             self.depth_input_format = 'depth'

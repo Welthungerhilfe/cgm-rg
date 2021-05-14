@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 from bunch import Bunch
 from cgmzscore import Calculator
+from fastcore.basics import store_attr
 
 from result_generation.utils import MAX_AGE, calculate_age
 
@@ -49,15 +50,11 @@ class WeightFlow:
             scan_workflow_path,
             artifacts,
             person_details):
-        self.result_generation = result_generation
-        self.artifacts = artifacts
-        self.artifact_workflow_path = artifact_workflow_path
-        self.scan_workflow_path = scan_workflow_path
+        store_attr('result_generation,artifact_workflow_path,scan_workflow_path,artifacts,person_details', self)
         self.artifact_workflow_obj = self.result_generation.workflows.load_workflows(
             self.artifact_workflow_path)
         self.scan_workflow_obj = self.result_generation.workflows.load_workflows(
             self.scan_workflow_path)
-        self.person_details = person_details
         if self.artifact_workflow_obj["data"]["input_format"] == 'application/zip':
             self.depth_input_format = 'depth'
         self.scan_directory = os.path.join(
