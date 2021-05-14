@@ -2,7 +2,6 @@ import uuid
 from pathlib import Path
 import sys
 
-import numpy as np
 from bunch import Bunch
 from cgmzscore import Calculator
 
