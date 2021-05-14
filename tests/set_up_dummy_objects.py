@@ -32,12 +32,7 @@ def get_dummy_height_flow_object(mock_some_fn):
         'src/workflows/height-plaincnn-workflow-artifact.json',
         'src/workflows/height-plaincnn-workflow-scan.json',
         sdv.depth_artifacts,
-        << << << < HEAD
         sdv.rgb_artifacts,
-        == == == =
-        sdv.scan_parent_dir,
-        sdv.scan_metadata,
-        >>>>>> > 3bca47072cf6d470ca5fe9d6b3bfb77b4f4df768
         sdv.person_details)
 
 
