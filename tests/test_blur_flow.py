@@ -10,21 +10,6 @@ import set_up_dummy_objects
 CWD = Path.cwd()
 
 
-def test_get_input_path():
-    """Test to check if we get input path"""
-    # Setup
-    blurflow = set_up_dummy_objects.get_dummy_blur_flow_object()
-    directory = 'app/scans'
-    filename = 'workflow.json'
-
-    # Exercise
-    result = blurflow.get_input_path(directory, filename)
-
-    # Verify
-    truth = 'app/scans/workflow.json'
-    assert Path(result) == Path(truth)
-
-
 @pytest.mark.skip(reason="need to work on this test")
 def test_blur_face_file_not_exists():
     """Test to check if face blur works if given path is not present"""
