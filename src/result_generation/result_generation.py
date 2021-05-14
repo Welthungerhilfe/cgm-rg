@@ -1,7 +1,8 @@
 import json
-from pathlib import Path
 import sys
-import os
+from pathlib import Path
+
+import numpy as np
 
 sys.path.append(str(Path(__file__).parents[1]))
 from api_endpoints import ApiEndpoints
@@ -28,4 +29,7 @@ class ResultGeneration:
 
     def get_input_path(self, directory, file_name):
         """Return input path for given directory name and file name"""
-        return os.path.join(directory, file_name)
+        return Path(directory) / file_name
+
+    def get_mean_scan_results(self, predictions):
+        return str(np.mean(predictions))
