@@ -50,10 +50,6 @@ class HeightFlow:
         self.scan_workflow_obj['id'] = self.result_generation.workflows.get_workflow_id(
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
 
-    def get_mean_scan_results(self, predictions):
-        """Return the average prediction from given list of predictions"""
-        return str(np.mean(predictions))
-
     def artifact_level_height_result_object(self, predictions, generated_timestamp):
         """Prepare artifact level height result object."""
         res = Bunch(dict(results=[]))
@@ -81,7 +77,7 @@ class HeightFlow:
             source_results=[],
             generated=generated_timestamp,
         ))
-        mean_prediction = self.get_mean_scan_results(predictions)
+        mean_prediction = self.result_generation.get_mean_scan_results(predictions)
         class_lhfa = self.zscore_lhfa(mean_prediction)
         height_result.data = {'mean_height': mean_prediction, 'Height Diagnosis': class_lhfa}
         res.results.append(height_result)
@@ -149,8 +145,8 @@ class HeightFlow:
             artifact['id'] for artifact in self.artifacts]
         height_result.source_results = []
         height_result.generated = generated_timestamp
-        mean_prediction = self.get_mean_scan_results(predictions)
-        mean_std = self.get_mean_scan_results(stds)
+        mean_prediction = self.result_generation.get_mean_scan_results(predictions)
+        mean_std = self.result_generation.get_mean_scan_results(stds)
         class_lhfa = self.zscore_lhfa(mean_prediction)
         result = {'mean_height': mean_prediction,
                   'Height Diagnosis': class_lhfa,
