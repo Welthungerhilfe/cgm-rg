@@ -30,8 +30,6 @@ class WeightFlow:
 
     Methods
     -------
-    get_mean_scan_results(predictions):
-        Returns the average prediction from given list of predictions.
     process_depthmaps():
         Loads the list of depthmaps in scan as numpy array.
     run_weight_flow():
@@ -77,9 +75,6 @@ class WeightFlow:
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         self.post_weight_results(weight_predictions, generated_timestamp)
 
-    def get_mean_scan_results(self, predictions):
-        return str(np.mean(predictions))
-
     def process_depthmaps(self):
         depthmaps = []
         for artifact in self.artifacts:
@@ -120,7 +115,7 @@ class WeightFlow:
         weight_result.source_artifacts = [artifact['id'] for artifact in self.artifacts]
         weight_result.source_results = []
         weight_result.generated = generated_timestamp
-        mean_prediction = self.get_mean_scan_results(predictions)
+        mean_prediction = self.result_generation.get_mean_scan_results(predictions)
         class_wfa = self.zscore_wfa(mean_prediction)
         result = {'mean_weight': mean_prediction, 'Weight Diagnosis': class_wfa}
         weight_result.data = result
