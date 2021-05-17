@@ -14,7 +14,7 @@ import utils.preprocessing as preprocessing  # noqa: E402
 
 class HeightFlowDeepEnsemble(HeightFlow):
     def run_flow(self):
-        depthmaps = self.process_depthmaps()
+        depthmaps = preprocessing.process_depthmaps(self.artifacts, self.scan_directory, self.result_generation)
         model_paths = glob.glob('/app/models/deepensemble/*')
 
         prediction_list = []
@@ -42,14 +42,3 @@ class HeightFlowDeepEnsemble(HeightFlow):
             scan_level_height_result_bunch)
         if self.result_generation.api.post_results(scan_level_height_result_json) == 201:
             print("successfully post scan level height results: ", scan_level_height_result_json)
-
-    def process_depthmaps(self):
-        depthmaps = []
-        for artifact in self.artifacts:
-            input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
-            data, width, height, depth_scale, _max_confidence = preprocessing.load_depth(input_path)
-            depthmap = preprocessing.prepare_depthmap(data, width, height, depth_scale)
-            depthmap = preprocessing.preprocess(depthmap)
-            depthmaps.append(depthmap)
-        depthmaps = np.array(depthmaps)
-        return depthmaps

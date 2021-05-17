@@ -13,18 +13,7 @@ import utils.preprocessing as preprocessing  # noqa: E402
 
 class HeightFlowPlainCnn(HeightFlow):
     def run_flow(self):
-        depthmaps = self.process_depthmaps()
+        depthmaps = preprocessing.process_depthmaps(self.artifacts, self.scan_directory, self.result_generation)
         height_predictions = inference.get_height_predictions_local(depthmaps)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         self.post_height_results(height_predictions, generated_timestamp)
-
-    def process_depthmaps(self):
-        depthmaps = []
-        for artifact in self.artifacts:
-            input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
-            data, width, height, depth_scale, _max_confidence = preprocessing.load_depth(input_path)
-            depthmap = preprocessing.prepare_depthmap(data, width, height, depth_scale)
-            depthmap = preprocessing.preprocess(depthmap)
-            depthmaps.append(depthmap)
-        depthmaps = np.array(depthmaps)
-        return depthmaps

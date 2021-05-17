@@ -1,24 +1,23 @@
 from datetime import datetime
 import sys
-sys.path.append('./src')
 
 from bunch import Bunch
 import numpy as np
 
+sys.path.append('./src')
 import set_up_dummy_objects
+import utils.preprocessing as preprocessing  # noqa: E402
 
 
 def test_process_depthmaps():
     """Test to check proper processing of depthmaps"""
     # Setup
-    weightflow = set_up_dummy_objects.get_dummy_weight_flow_object()
+    flow = set_up_dummy_objects.get_dummy_weight_flow_object()
 
     # Exercise
-    result = weightflow.process_depthmaps()
-
+    depthmaps = preprocessing.process_depthmaps(flow.artifacts, flow.scan_directory, flow.result_generation)
     # Verify
-
-    assert isinstance(result, np.ndarray)
+    assert isinstance(depthmaps, np.ndarray)
 
 
 def test_artifact_level_result():
@@ -32,7 +31,6 @@ def test_artifact_level_result():
     result = weightflow.artifact_level_result(predictions, generated_timestamp)
 
     # Verify
-
     assert isinstance(result, Bunch)
 
 

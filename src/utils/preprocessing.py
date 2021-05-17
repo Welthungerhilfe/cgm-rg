@@ -11,6 +11,19 @@ IMAGE_TARGET_WIDTH = 180
 NORMALIZATION_VALUE = 7.5
 
 
+def process_depthmaps(artifacts, scan_directory, result_generation):
+    """Load the list of depthmaps in scan as numpy array"""
+    depthmaps = []
+    for artifact in artifacts:
+        input_path = result_generation.get_input_path(scan_directory, artifact['file'])
+        data, width, height, depth_scale, _max_confidence = load_depth(input_path)
+        depthmap = prepare_depthmap(data, width, height, depth_scale)
+        depthmap = preprocess(depthmap)
+        depthmaps.append(depthmap)
+    depthmaps = np.array(depthmaps)
+    return depthmaps
+
+
 def load_depth(fpath: str) -> Tuple[bytes, int, int, float, float]:
     """Take ZIP file and extract depth and metadata
 
