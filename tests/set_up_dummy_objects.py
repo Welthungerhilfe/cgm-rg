@@ -1,6 +1,6 @@
 import sys
 
-import set_up_dummy_variables as sdv
+import set_up_dummy_variables #as sdv
 sys.path.append('./src')  # noqa: E402
 from api_endpoints import ApiEndpoints
 from mock import patch
@@ -10,9 +10,8 @@ from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.weight import WeightFlow
 from result_generation.result_generation import ResultGeneration
 
-# @patch('workflows.get_workflow_id')
-# @patch('BlurFlow.get_workflow_id', return_value="44af5600-69d2-11eb-9498-8ffe0e3b2017")
 
+sdv = set_up_dummy_variables.create_dummy_vars()
 
 @patch.object(ProcessWorkflows, 'get_workflow_id')
 def get_dummy_blur_flow_object(mock_some_fn):
