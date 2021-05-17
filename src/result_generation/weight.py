@@ -73,7 +73,7 @@ class WeightFlow:
             res.results.append(result)
         return res
 
-    def scan_level_weight_result_object(self, predictions, generated_timestamp):
+    def scan_level_result(self, predictions, generated_timestamp):
         """Prepare scan level weight result object"""
         res = Bunch(dict(results=[]))
         result = Bunch(dict(
@@ -114,7 +114,7 @@ class WeightFlow:
         if self.result_generation.api.post_results(artifact_level_weight_result_json) == 201:
             print("successfully post artifact level weight results: ", artifact_level_weight_result_json)
 
-        scan_level_weight_result_bunch = self.scan_level_weight_result_object(predictions, generated_timestamp)
+        scan_level_weight_result_bunch = self.scan_level_result(predictions, generated_timestamp)
         scan_level_weight_result_json = self.result_generation.bunch_object_to_json_object(
             scan_level_weight_result_bunch)
         if self.result_generation.api.post_results(scan_level_weight_result_json) == 201:
