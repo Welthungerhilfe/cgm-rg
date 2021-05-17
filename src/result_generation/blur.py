@@ -155,7 +155,7 @@ class BlurFlow:
         """Prepare result object for results generated"""
         res = Bunch(dict(results=[]))
         for artifact in self.artifacts:
-            blur_result = Bunch(dict(
+            result = Bunch(dict(
                 id=f"{uuid.uuid4()}",
                 scan=self.result_generation.scan_metadata['id'],
                 workflow=self.workflow_obj["id"],
@@ -164,13 +164,13 @@ class BlurFlow:
                 file=artifact['blur_id_from_post_request'],
                 generated=artifact['generated_timestamp'],
             ))
-            res.results.append(blur_result)
+            res.results.append(result)
 
         return res
 
     def post_result_object(self):
         """Post the result object to the API"""
-        blur_result = self.prepare_result_object()
-        blur_result_object = self.result_generation.bunch_object_to_json_object(blur_result)
-        if self.result_generation.api.post_results(blur_result_object) == 201:
-            print("successfully post blur results: ", blur_result_object)
+        res = self.prepare_result_object()
+        res_object = self.result_generation.bunch_object_to_json_object(res)
+        if self.result_generation.api.post_results(res_object) == 201:
+            print("successfully post blur results: ", res_object)

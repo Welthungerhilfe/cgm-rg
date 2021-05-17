@@ -66,7 +66,7 @@ class DepthMapImgFlow:
     def prepare_result_object(self):
         res = Bunch(dict(results=[]))
         for artifact in self.artifacts:
-            depthmap_img_result = Bunch(dict(
+            result = Bunch(dict(
                 id=f"{uuid.uuid4()}",
                 scan=self.result_generation.scan_metadata['id'],
                 workflow=self.workflow_obj["id"],
@@ -75,12 +75,11 @@ class DepthMapImgFlow:
                 file=artifact['depthmap_img_id_from_post_request'],
                 generated=artifact['generated_timestamp'],
             ))
-            res.results.append(depthmap_img_result)
+            res.results.append(result)
         return res
 
     def post_result_object(self):
-        depthmap_img_result = self.prepare_result_object()
-        depthmap_img_result_object = self.result_generation.bunch_object_to_json_object(
-            depthmap_img_result)
-        if self.result_generation.api.post_results(depthmap_img_result_object) == 201:
-            print("successfully post Depthmap Image results: ", depthmap_img_result_object)
+        res = self.prepare_result_object()
+        res_object = self.result_generation.bunch_object_to_json_object(res)
+        if self.result_generation.api.post_results(res_object) == 201:
+            print("successfully post Depthmap Image results: ", res_object)

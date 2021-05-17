@@ -71,7 +71,7 @@ class StandingLaying:
     def prepare_result_object(self, prediction, generated_timestamp):
         res = Bunch(dict(results=[]))
         for artifact, prediction in zip(self.artifacts, prediction):
-            standing_laying_result = Bunch(dict(
+            result = Bunch(dict(
                 id=f"{uuid.uuid4()}",
                 scan=self.result_generation.scan_metadata['id'],
                 workflow=self.workflow_obj["id"],
@@ -80,11 +80,11 @@ class StandingLaying:
                 generated=generated_timestamp,
                 data={'standing': str(prediction[0])},
             ))
-            res.results.append(standing_laying_result)
+            res.results.append(result)
         return res
 
     def post_result_object(self, prediction, generated_timestamp):
-        standing_laying_result = self.prepare_result_object(prediction, generated_timestamp)
-        standing_laying_result_object = self.result_generation.bunch_object_to_json_object(standing_laying_result)
-        if self.result_generation.api.post_results(standing_laying_result_object) == 201:
-            print("successfully post Standing laying results: ", standing_laying_result_object)
+        res = self.prepare_result_object(prediction, generated_timestamp)
+        res_object = self.result_generation.bunch_object_to_json_object(res)
+        if self.result_generation.api.post_results(res_object) == 201:
+            print("successfully post Standing laying results: ", res_object)
