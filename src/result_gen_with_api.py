@@ -297,14 +297,13 @@ def main():
             depth_artifacts = data_processing.download_artifacts('depth')
             person_details = person(cgm_api, scan_metadata['person'])
 
+            result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, scan_parent_dir)
+
             rgbdflow = HeightFlowRGBD(
-                cgm_api,
-                workflow,
+                result_generation,
                 height_rgbd_workflow_artifact_path,
                 height_rgbd_workflow_scan_path,
                 depth_artifacts,
-                scan_parent_dir,
-                scan_metadata,
                 person_details,
                 rgb_artifacts)
 
