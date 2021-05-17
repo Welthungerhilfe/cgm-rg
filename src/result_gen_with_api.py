@@ -256,19 +256,16 @@ def main():
     # logic to initiate rgbd workflow for v0.9 starts here
 
     workflow.get_list_of_worflows()
-    filterby_workflow_metadata = workflow.load_workflows(
-        height_rgbd_workflow_scan_path)
+    filterby_workflow_metadata = workflow.load_workflows(height_rgbd_workflow_scan_path)
     filterby_scan_version_val = 'v0.9'
 
     filterby_workflow_name = filterby_workflow_metadata['name']
     filterby_workflow_version = filterby_workflow_metadata['version']
     print("Filter by workflow Name: ", filterby_workflow_name)
     print("Filter by workflow Version: ", filterby_workflow_version)
-    filterby_workflow_id_val = workflow.get_workflow_id(
-        filterby_workflow_name, filterby_workflow_version)
+    filterby_workflow_id_val = workflow.get_workflow_id(filterby_workflow_name, filterby_workflow_version)
     filterby_scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
-    filterby_scan_metadata_path = os.path.join(
-        scan_parent_dir, filterby_scan_metadata_name)
+    filterby_scan_metadata_path = os.path.join(scan_parent_dir, filterby_scan_metadata_name)
     # Start cgm-rg for scan filtered by scan version and workflow id
 
     if get_scan_metadata.get_unprocessed_scans_for_scan_version_workflow_id(
@@ -276,14 +273,8 @@ def main():
             filterby_workflow_id_val,
             filterby_scan_metadata_path) > 0:
 
-        print('-------------------------------------------------------------------------------------------')
-        print(
-            "Started cgm-rg for scan filtered by ",
-            filterby_scan_version_val,
-            " and ",
-            filterby_workflow_id_val)
-        scan_metadata = get_scan_metadata.get_scan_metadata_by_path(
-            filterby_scan_metadata_path)
+        print(f"{'-'*5}\nStarted cgm-rg for scan filtered by {filterby_scan_version_val} and {filterby_workflow_id_val}")
+        scan_metadata = get_scan_metadata.get_scan_metadata_by_path(filterby_scan_metadata_path)
         scan_version = scan_metadata['version']
         print("Scan Version: ", scan_version)
         print("Filterby Scan Version: ", filterby_scan_version_val)
