@@ -20,7 +20,7 @@ def test_process_depthmaps():
     assert isinstance(result, np.ndarray)
 
 
-def test_artifact_level_height_result_object():
+def test_artifact_level_result():
     """Test creation of artifact level height object"""
     # Setup
     heightflow = set_up_dummy_objects.get_dummy_height_flow_object()
@@ -28,7 +28,7 @@ def test_artifact_level_height_result_object():
     generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
     # Exercise
-    result = heightflow.artifact_level_height_result_object(
+    result = heightflow.artifact_level_result(
         predictions, generated_timestamp)
 
     # Verify

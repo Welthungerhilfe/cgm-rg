@@ -21,7 +21,7 @@ def test_process_depthmaps():
     assert isinstance(result, np.ndarray)
 
 
-def test_artifact_level_weight_result_object():
+def test_artifact_level_result():
     """Test creation of artifact level weight object"""
     # Setup
     weightflow = set_up_dummy_objects.get_dummy_weight_flow_object()
@@ -29,7 +29,7 @@ def test_artifact_level_weight_result_object():
     generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
     # Exercise
-    result = weightflow.artifact_level_weight_result_object(predictions, generated_timestamp)
+    result = weightflow.artifact_level_result(predictions, generated_timestamp)
 
     # Verify
 
@@ -37,7 +37,7 @@ def test_artifact_level_weight_result_object():
 
 
 '''
-def test_scan_level_weight_result_object():
+def test_scan_level_result():
     """Test creation of scan level weight object"""
     # Setup
     weightflow = set_up_dummy_objects.get_dummy_weight_flow_object()
@@ -45,7 +45,7 @@ def test_scan_level_weight_result_object():
     generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
     # Exercise
-    result = weightflow.scan_level_weight_result_object(predictions, generated_timestamp)
+    result = weightflow.scan_level_result(predictions, generated_timestamp)
 
     # Verify
 
