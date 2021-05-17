@@ -14,33 +14,12 @@ import utils.preprocessing as preprocessing  # noqa: E402
 
 
 class StandingLaying:
-    """
-    A class to handle standing/laying results generation.
-
-    Attributes
-    ----------
-    workflow_path : str
-        path of the workflow file for standing_laying
-    artifacts : list
-        list of artifacts to run standing_laying flow on
-
-    Methods
-    -------
-    run_standing_laying_flow():
-        Driver method for Standing laying flow.
-    standing_laying_artifacts():
-        Give prediction of standing/laying to the list of artifacts.
-    prepare_result_object(predictions, generated_timestamp):
-        Prepares result object for results generated.
-    post_result_object(predictions, generated_timestamp):
-        Posts the result object to api.
-    """
-
+    """A class to handle standing/laying results generation"""
     def __init__(
             self,
             result_generation,
             workflow_path,
-            artifacts,):
+            artifacts):
         store_attr('result_generation, workflow_path, artifacts', self)
         self.workflow_obj = self.result_generation.workflows.load_workflows(self.workflow_path)
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
@@ -58,6 +37,7 @@ class StandingLaying:
         self.post_result_object(prediction, generated_timestamp)
 
     def standing_laying_artifacts(self):
+        """Give prediction of standing/laying to the list of artifacts"""
         predictions = []
         for i, artifact in enumerate(self.artifacts):
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
@@ -69,6 +49,7 @@ class StandingLaying:
         return predictions
 
     def prepare_result_object(self, prediction, generated_timestamp):
+        """Prepare result object for results generated"""
         res = Bunch(dict(results=[]))
         for artifact, prediction in zip(self.artifacts, prediction):
             result = Bunch(dict(
@@ -84,6 +65,7 @@ class StandingLaying:
         return res
 
     def post_result_object(self, prediction, generated_timestamp):
+        """Post the result object to the API"""
         res = self.prepare_result_object(prediction, generated_timestamp)
         res_object = self.result_generation.bunch_object_to_json_object(res)
         if self.result_generation.api.post_results(res_object) == 201:
