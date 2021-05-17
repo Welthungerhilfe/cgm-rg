@@ -60,12 +60,8 @@ class StandingLaying:
     def standing_laying_artifacts(self):
         predictions = []
         for i, artifact in enumerate(self.artifacts):
-
-            input_path = self.result_generation.get_input_path(
-                self.scan_directory, artifact['file'])
-
+            input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             print("input_path of image to perform standing laying: ", input_path)
-
             img = preprocessing.standing_laying_data_preprocessing(input_path)
             prediction = inference.get_standing_laying_prediction_local(img)
             predictions.append(prediction)
@@ -85,14 +81,10 @@ class StandingLaying:
                 data={'standing': str(prediction[0])},
             ))
             res.results.append(standing_laying_result)
-
         return res
 
     def post_result_object(self, prediction, generated_timestamp):
-        standing_laying_result = self.prepare_result_object(
-            prediction, generated_timestamp)
-        standing_laying_result_object = self.result_generation.bunch_object_to_json_object(
-            standing_laying_result)
+        standing_laying_result = self.prepare_result_object(prediction, generated_timestamp)
+        standing_laying_result_object = self.result_generation.bunch_object_to_json_object(standing_laying_result)
         if self.result_generation.api.post_results(standing_laying_result_object) == 201:
-            print("successfully post Standing laying results: ",
-                  standing_laying_result_object)
+            print("successfully post Standing laying results: ", standing_laying_result_object)

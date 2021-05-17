@@ -270,15 +270,16 @@ def main():
             filterby_workflow_id_val,
             filterby_scan_metadata_path) > 0:
 
-        print(f"{'-'*5}\nStarted cgm-rg for scan filtered by {filterby_scan_version_val} and {filterby_workflow_id_val}")
+        print(
+            f"{'-'*92}\nStarted cgm-rg for scan filtered by {filterby_scan_version_val} and {filterby_workflow_id_val}"
+        )
         scan_metadata = get_scan_metadata.get_scan_metadata_by_path(filterby_scan_metadata_path)
         scan_version = scan_metadata['version']
         print("Scan Version: ", scan_version)
         print("Filterby Scan Version: ", filterby_scan_version_val)
         try:
             assert (scan_version == filterby_scan_version_val)
-            data_processing = PrepareArtifacts(
-                cgm_api, scan_metadata, scan_parent_dir)
+            data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
             data_processing.process_scan_metadata()
             data_processing.create_scan_dir()
             data_processing.create_artifact_dir()

@@ -83,6 +83,4 @@ class DepthMapImgFlow:
         depthmap_img_result_object = self.result_generation.bunch_object_to_json_object(
             depthmap_img_result)
         if self.result_generation.api.post_results(depthmap_img_result_object) == 201:
-            print(
-                "successfully post Depthmap Image results: ",
-                depthmap_img_result_object)
+            print("successfully post Depthmap Image results: ", depthmap_img_result_object)

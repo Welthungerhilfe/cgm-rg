@@ -119,8 +119,7 @@ class WeightFlow:
             self.person_details['date_of_birth'], self.result_generation.scan_metadata['scan_start'])
         class_wfa = 'Not Found'
         if age_in_days <= MAX_AGE:
-            zscore_wfa = Calculator().zScore_lhfa(
-                age_in_days=str(age_in_days), sex=sex, height=mean_prediction)
+            zscore_wfa = Calculator().zScore_lhfa(age_in_days=str(age_in_days), sex=sex, height=mean_prediction)
             if zscore_wfa < -3:
                 class_wfa = 'Severly Under-weight'
             elif zscore_wfa < -2:
@@ -130,20 +129,14 @@ class WeightFlow:
         return class_wfa
 
     def post_weight_results(self, predictions, generated_timestamp):
-        artifact_level_weight_result_bunch = self.artifact_level_weight_result_object(
-            predictions, generated_timestamp)
+        artifact_level_weight_result_bunch = self.artifact_level_weight_result_object(predictions, generated_timestamp)
         artifact_level_weight_result_json = self.result_generation.bunch_object_to_json_object(
             artifact_level_weight_result_bunch)
         if self.result_generation.api.post_results(artifact_level_weight_result_json) == 201:
-            print(
-                "successfully post artifact level weight results: ",
-                artifact_level_weight_result_json)
+            print("successfully post artifact level weight results: ", artifact_level_weight_result_json)
 
-        scan_level_weight_result_bunch = self.scan_level_weight_result_object(
-            predictions, generated_timestamp)
+        scan_level_weight_result_bunch = self.scan_level_weight_result_object(predictions, generated_timestamp)
         scan_level_weight_result_json = self.result_generation.bunch_object_to_json_object(
             scan_level_weight_result_bunch)
         if self.result_generation.api.post_results(scan_level_weight_result_json) == 201:
-            print(
-                "successfully post scan level weight results: ",
-                scan_level_weight_result_json)
+            print("successfully post scan level weight results: ", scan_level_weight_result_json)
