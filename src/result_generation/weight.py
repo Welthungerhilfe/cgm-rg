@@ -83,40 +83,35 @@ class WeightFlow:
         depthmaps = np.array(depthmaps)
         return depthmaps
 
-    def artifact_level_weight_result_object(
-            self, predictions, generated_timestamp):
-        res = Bunch()
-        res.results = []
+    def artifact_level_weight_result_object(self, predictions, generated_timestamp):
+        res = Bunch(dict(results=[]))
         for artifact, prediction in zip(self.artifacts, predictions):
-            weight_result = Bunch()
-            weight_result.id = f"{uuid.uuid4()}"
-            weight_result.scan = self.result_generation.scan_metadata['id']
-            weight_result.workflow = self.artifact_workflow_obj["id"]
-            weight_result.source_artifacts = [artifact['id']]
-            weight_result.source_results = []
-            weight_result.generated = generated_timestamp
-            result = {'weight': str(prediction[0])}
-            weight_result.data = result
+            weight_result = Bunch(dict(
+                id=f"{uuid.uuid4()}",
+                scan=self.result_generation.scan_metadata['id'],
+                workflow=self.artifact_workflow_obj["id"],
+                source_artifacts=[artifact['id']],
+                source_results=[],
+                generated=generated_timestamp,
+                data={'weight': str(prediction[0])},
+            ))
             res.results.append(weight_result)
-
         return res
 
-    def scan_level_weight_result_object(
-            self, predictions, generated_timestamp):
-        res = Bunch()
-        res.results = []
-        weight_result = Bunch()
-        weight_result.id = f"{uuid.uuid4()}"
-        weight_result.scan = self.result_generation.scan_metadata['id']
-        weight_result.workflow = self.scan_workflow_obj["id"]
-        weight_result.source_artifacts = [artifact['id'] for artifact in self.artifacts]
-        weight_result.source_results = []
-        weight_result.generated = generated_timestamp
+    def scan_level_weight_result_object(self, predictions, generated_timestamp):
+        res = Bunch(dict(results=[]))
+        weight_result = Bunch(dict(
+            id=f"{uuid.uuid4()}",
+            scan=self.result_generation.scan_metadata['id'],
+            workflow=self.scan_workflow_obj["id"],
+            source_artifacts=[artifact['id'] for artifact in self.artifacts],
+            source_results=[],
+            generated=generated_timestamp,
+        ))
         mean_prediction = self.result_generation.get_mean_scan_results(predictions)
         class_wfa = self.zscore_wfa(mean_prediction)
         result = {'mean_weight': mean_prediction, 'Weight Diagnosis': class_wfa}
         weight_result.data = result
-
         res.results.append(weight_result)
         return res
 

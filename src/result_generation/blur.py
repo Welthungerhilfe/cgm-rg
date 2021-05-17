@@ -153,17 +153,17 @@ class BlurFlow:
 
     def prepare_result_object(self):
         """Prepare result object for results generated"""
-        res = Bunch()
-        res.results = []
+        res = Bunch(dict(results=[]))
         for artifact in self.artifacts:
-            blur_result = Bunch()
-            blur_result.id = f"{uuid.uuid4()}"
-            blur_result.scan = self.result_generation.scan_metadata['id']
-            blur_result.workflow = self.workflow_obj["id"]
-            blur_result.source_artifacts = [artifact['id']]
-            blur_result.source_results = []
-            blur_result.file = artifact['blur_id_from_post_request']
-            blur_result.generated = artifact['generated_timestamp']
+            blur_result = Bunch(dict(
+                id=f"{uuid.uuid4()}",
+                scan=self.result_generation.scan_metadata['id'],
+                workflow=self.workflow_obj["id"],
+                source_artifacts=[artifact['id']],
+                source_results=[],
+                file=artifact['blur_id_from_post_request'],
+                generated=artifact['generated_timestamp'],
+            ))
             res.results.append(blur_result)
 
         return res

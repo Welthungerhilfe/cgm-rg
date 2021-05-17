@@ -73,18 +73,17 @@ class StandingLaying:
         return predictions
 
     def prepare_result_object(self, prediction, generated_timestamp):
-        res = Bunch()
-        res.results = []
+        res = Bunch(dict(results=[]))
         for artifact, prediction in zip(self.artifacts, prediction):
-            standing_laying_result = Bunch()
-            standing_laying_result.id = f"{uuid.uuid4()}"
-            standing_laying_result.scan = self.result_generation.scan_metadata['id']
-            standing_laying_result.workflow = self.workflow_obj["id"]
-            standing_laying_result.source_artifacts = [artifact['id']]
-            standing_laying_result.source_results = []
-            standing_laying_result.generated = generated_timestamp
-            result = {'standing': str(prediction[0])}
-            standing_laying_result.data = result
+            standing_laying_result = Bunch(dict(
+                id=f"{uuid.uuid4()}",
+                scan=self.result_generation.scan_metadata['id'],
+                workflow=self.workflow_obj["id"],
+                source_artifacts=[artifact['id']],
+                source_results=[],
+                generated=generated_timestamp,
+                data={'standing': str(prediction[0])},
+            ))
             res.results.append(standing_laying_result)
 
         return res
