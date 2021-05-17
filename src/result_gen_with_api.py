@@ -393,13 +393,10 @@ def main():
 
     if scan_version in ['v0.9']:  # TODO update this with better logic
         flow = HeightFlowRGBD(
-            cgm_api,
-            workflow,
+            result_generation,
             height_rgbd_workflow_artifact_path,
             height_rgbd_workflow_scan_path,
             depth_artifacts,
-            scan_parent_dir,
-            scan_metadata,
             person_details,
             rgb_artifacts)
         flows.append(flow)
