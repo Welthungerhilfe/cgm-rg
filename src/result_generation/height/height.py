@@ -137,19 +137,3 @@ class HeightFlow:
         result.data = result
         res.results.append(result)
         return res
-
-    def post_height_results_deep_ensemble(self, predictions, generated_timestamp, stds):
-        """Post the artifact and scan level height results to API"""
-        artifact_level_height_result_bunch = self.artifact_level_result_ensemble(
-            predictions, generated_timestamp, stds)
-        artifact_level_height_result_json = self.result_generation.bunch_object_to_json_object(
-            artifact_level_height_result_bunch)
-        if self.result_generation.api.post_results(artifact_level_height_result_json) == 201:
-            print("successfully post artifact level height results: ", artifact_level_height_result_json)
-
-        scan_level_height_result_bunch = self.scan_level_result(
-            predictions, generated_timestamp, self.scan_workflow_obj, stds)
-        scan_level_height_result_json = self.result_generation.bunch_object_to_json_object(
-            scan_level_height_result_bunch)
-        if self.result_generation.api.post_results(scan_level_height_result_json) == 201:
-            print("successfully post scan level height results: ", scan_level_height_result_json)
