@@ -14,9 +14,7 @@ import utils.preprocessing as preprocessing  # noqa: E402
 
 
 class DepthMapImgFlow:
-    """
-    A class to visualise depthmap image in result generation
-    """
+    """A class to visualise depthmap image in result generation"""
 
     def __init__(
             self,
@@ -63,8 +61,7 @@ class DepthMapImgFlow:
                 artifact['depthmap_img'])
             if post_status == 201:
                 artifact['depthmap_img_id_from_post_request'] = depthmap_img_id_from_post_request
-                artifact['generated_timestamp'] = datetime.now().strftime(
-                    '%Y-%m-%dT%H:%M:%SZ')
+                artifact['generated_timestamp'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def prepare_result_object(self):
         res = Bunch()

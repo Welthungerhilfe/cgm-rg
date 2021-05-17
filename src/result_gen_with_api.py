@@ -80,8 +80,7 @@ class GetScanMetadata:
         Length of the unprocessed scan filtered by scan verion type and workflow id
         """
 
-        return self.api.get_scan_for_scan_version_workflow_id(
-            scan_version, workflow_id, scan_metadata_path)
+        return self.api.get_scan_for_scan_version_workflow_id(scan_version, workflow_id, scan_metadata_path)
 
     def get_scan_metadata(self):
         with open(self.scan_metadata_path, 'r') as f:
@@ -113,9 +112,7 @@ class PrepareArtifacts:
         self.scan_metadata = scan_metadata
         self.format_wise_artifact = {}
         self.scan_parent_dir = scan_parent_dir
-        self.scan_dir = os.path.join(
-            self.scan_parent_dir,
-            self.scan_metadata['id'])
+        self.scan_dir = os.path.join(self.scan_parent_dir, self.scan_metadata['id'])
 
     def download_artifacts(self, input_format):
         """Download artifacts for the scan"""
@@ -126,15 +123,13 @@ class PrepareArtifacts:
             mod_artifact = copy.deepcopy(artifact)
 
             print("\nDownloading Artifact Name: ", mod_artifact["file"])
-            status_code = self.api.get_files(
-                mod_artifact["file"], os.path.join(
-                    self.scan_dir, input_format))
+            status_code = self.api.get_files(mod_artifact["file"], os.path.join(self.scan_dir, input_format))
             # status_code = get_files_mockup(mod_artifact["file"], format_dir)
             if status_code == 200:
                 mod_artifact['download_status'] = True
                 self.artifacts.append(mod_artifact)
 
-        print(f"\nBelow Artifacts for { input_format } workflow")
+        print(f"\nBelow Artifacts for {input_format} workflow")
         print(self.artifacts)
         print("\nDownload Artifact for completed")
 
@@ -146,6 +141,8 @@ class PrepareArtifacts:
             return 'img'
         elif format in ['application/zip', 'depth']:
             return 'depth'
+        else:
+            raise NameError(f"Unknown format {format}")
 
     def add_artifacts_to_format_dictionary(self, format, artifact):
         """Sort artifacts according to input format"""
