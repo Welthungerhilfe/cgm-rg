@@ -35,14 +35,12 @@ class ApiEndpoints:
 
     def prepare_header(self):
         headers = copy.deepcopy(self.headers)
-
         if self.x_api_key:
             headers['X-API-Key'] = self.x_api_key
-
         return headers
 
     def get_files(self, file_id, save_dir):
-        '''Get the files from api using file id'''
+        """Get the files from api using file id"""
         endpoint = self.url + self.get_file_endpoint
 
         headers = self.prepare_header()
@@ -57,7 +55,7 @@ class ApiEndpoints:
         return response.status_code
 
     def post_files_using_path(self, file_path, type_):
-        '''Post the files using the path of the file'''
+        """Post the files using the path of the file"""
         headers = self.prepare_header()
         headers['content_type'] = 'multipart/form-data'  # status_code 201
         # headers['content-type'] = 'multipart/form-data'  # status_code 400
@@ -65,9 +63,10 @@ class ApiEndpoints:
 
         endpoint = self.url + self.post_file_endpoint
 
-        files = {}
-        files['file'] = (open(file_path, 'rb'), type_)
-        files['filename'] = file_path.split('/')[-1]
+        files = {
+            'file': (open(file_path, 'rb'), type_),
+            'filename': file_path.split('/')[-1],
+        }
 
         print('\nFile name to post : ', files['filename'])
 
@@ -79,14 +78,14 @@ class ApiEndpoints:
         return file_id, response.status_code
 
     def post_files(self, bin_file):
-        '''
+        """
         Post the file result produced such as blur directly
         without saving it to a location to avoid I/O overhead
-        '''
+        """
         headers = self.prepare_header()
-        headers['content_type'] = 'multipart/form-data'    # status_code 201
-        # headers['content-type'] = 'multipart/form-data'     # status_code 400
-        # headers['Content-Type'] = 'multipart/form-data'     # status_code 400
+        headers['content_type'] = 'multipart/form-data'  # status_code 201
+        # headers['content-type'] = 'multipart/form-data'  # status_code 400
+        # headers['Content-Type'] = 'multipart/form-data'  # status_code 400
 
         endpoint = self.url + self.post_file_endpoint
 
@@ -96,14 +95,8 @@ class ApiEndpoints:
 
         files = {
             'file': bin_file,
-            'filename': 'test.jpg'
+            'filename': 'test.jpg',  # 'test.PNG'
         }
-        '''
-        files = {
-            'file': bin_file,
-            'filename': 'test.PNG'
-        }
-        '''
 
         response = requests.post(endpoint, files=files, headers=headers)
         file_id = response.content.decode('utf-8')
@@ -114,21 +107,14 @@ class ApiEndpoints:
         return file_id, response.status_code
 
     def post_results(self, result_json_obj):
-        '''Post the result object produced while Result Generation using POST /results'''
-        headers = self.prepare_header()
+        """Post the result object produced while Result Generation using POST /results"""
         endpoint = self.url + self.result_endpoint
-
-        response = requests.post(
-            endpoint,
-            json=result_json_obj,
-            headers=headers)
-
+        response = requests.post(endpoint, json=result_json_obj, headers=self.prepare_header())
         print("Status of post result response: ", response.status_code)
-
         return response.status_code
 
     def post_workflow_and_save_response(self, workflow_obj):
-        '''Post the workflow and saves the response'''
+        """Post the workflow and saves the response"""
         print("Workflow Post Object: ")
         pprint.pprint(workflow_obj)
 
@@ -138,7 +124,7 @@ class ApiEndpoints:
         print("Workflow Post response")
         print("Status code: ", response.status_code)
 
-        if response.status_code in [201, 200]:
+        if response.status_code in [200, 201]:
             content = response.json()
             # content['data'] = workflow_obj["data"]
             pprint.pprint(content)
@@ -148,11 +134,11 @@ class ApiEndpoints:
         return response
 
     def post_workflow(self, workflow_path):
-        '''Mockup of Post the workflows using POST /files'''
+        """Mockup of Post the workflows using POST /files"""
         return str(uuid.uuid4()), 200
 
     def get_scan(self, scan_path):
-        '''Get the scan metadata'''
+        """Get the scan metadata"""
         headers = self.prepare_header()
         response = requests.get(self.url + self.scan_endpoint, headers=headers)
 
@@ -170,10 +156,8 @@ class ApiEndpoints:
             print("Response code : ", response.status_code)
             return 0
 
-    def get_scan_for_scan_version_workflow_id(
-            self, scan_version, workflow_id, scan_path):
-
-        '''Get the scan metadata filtered by scan_version and workflow_id'''
+    def get_scan_for_scan_version_workflow_id(self, scan_version, workflow_id, scan_path):
+        """Get the scan metadata filtered by scan_version and workflow_id"""
         headers = self.prepare_header()
         # use scan_version and workflow id to get filtered scans
 
@@ -215,10 +199,9 @@ class ApiEndpoints:
         return content
 
     def get_workflows(self):
-        '''Get all registerd workflows'''
+        """Get all registerd workflows"""
         headers = self.prepare_header()
-        response = requests.get(
-            self.url + self.workflow_endpoint, headers=headers)
+        response = requests.get(self.url + self.workflow_endpoint, headers=headers)
         return response.json()
 
 

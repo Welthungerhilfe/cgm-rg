@@ -6,19 +6,14 @@ from api_endpoints import ApiEndpoints
 
 
 def get_list_of_files(source_folder):
-    '''
-    Get list of json files in a folder
-    '''
+    """Get list of json files in a folder"""
     glob_search_path = os.path.join(source_folder, "*.json")
     json_paths = glob.glob(glob_search_path)
-
     return json_paths
 
 
 def upsert_workflows(json_paths, workflows, cgm_api):
-
-    workflows = {
-        f"{workflow['name']} {workflow['version']}": workflow for workflow in workflows['workflows']}
+    workflows = {f"{workflow['name']} {workflow['version']}": workflow for workflow in workflows['workflows']}
 
     for path in json_paths:
         with open(path, 'r') as f:
@@ -49,13 +44,7 @@ if __name__ == "__main__":
     print(f"App URL: {url}")
 
     cgm_api = ApiEndpoints(url)
-
-    # blur_workflow_path = 'src/schema/blur-workflow.json'
-    # blur_workflow_response_path = 'src/schema/blur-workflow-post.json'
-
     workflow_paths = 'src/workflows'
     json_paths = get_list_of_files(workflow_paths)
-
     workflows = cgm_api.get_workflows()
-
     upsert_workflows(json_paths, workflows, cgm_api)

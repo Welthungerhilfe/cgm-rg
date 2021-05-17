@@ -35,8 +35,7 @@ def download_model(ws, experiment_name, run_id, input_location, output_location)
     if input_location.endswith(".h5"):
         run.download_file(input_location, output_location)
     elif input_location.endswith(".ckpt"):
-        run.download_files(prefix=input_location,
-                           output_directory=output_location)
+        run.download_files(prefix=input_location, output_directory=output_location)
     else:
         raise NameError(f"{input_location}'s path extension not supported")
     print("Successfully downloaded model")
