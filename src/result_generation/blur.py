@@ -100,7 +100,7 @@ class BlurFlow:
         """
         # Read the image.
         assert os.path.exists(source_path), f"{source_path} does not exist"
-        rgb_image = cv2.imread(source_path)
+        rgb_image = cv2.imread(str(source_path))
 
         image = self.blur_img_transformation_using_scan_version(rgb_image)
 
