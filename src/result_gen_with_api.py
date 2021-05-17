@@ -44,7 +44,7 @@ class ProcessWorkflows:
 
 
 class GetScanMetadata:
-    """Get and process scan metadata."""
+    """Get and process scan metadata"""
 
     def __init__(self, api: ApiEndpoints, scan_metadata_path: str):
         """Construct all the necessary attributes for the GetScanMetadata object.
@@ -80,8 +80,7 @@ class GetScanMetadata:
         Length of the unprocessed scan filtered by scan verion type and workflow id
         """
 
-        return self.api.get_scan_for_scan_version_workflow_id(
-            scan_version, workflow_id, scan_metadata_path)
+        return self.api.get_scan_for_scan_version_workflow_id(scan_version, workflow_id, scan_metadata_path)
 
     def get_scan_metadata(self):
         with open(self.scan_metadata_path, 'r') as f:
@@ -113,9 +112,7 @@ class PrepareArtifacts:
         self.scan_metadata = scan_metadata
         self.format_wise_artifact = {}
         self.scan_parent_dir = scan_parent_dir
-        self.scan_dir = os.path.join(
-            self.scan_parent_dir,
-            self.scan_metadata['id'])
+        self.scan_dir = os.path.join(self.scan_parent_dir, self.scan_metadata['id'])
 
     def download_artifacts(self, input_format):
         """Download artifacts for the scan"""
@@ -126,15 +123,13 @@ class PrepareArtifacts:
             mod_artifact = copy.deepcopy(artifact)
 
             print("\nDownloading Artifact Name: ", mod_artifact["file"])
-            status_code = self.api.get_files(
-                mod_artifact["file"], os.path.join(
-                    self.scan_dir, input_format))
+            status_code = self.api.get_files(mod_artifact["file"], os.path.join(self.scan_dir, input_format))
             # status_code = get_files_mockup(mod_artifact["file"], format_dir)
             if status_code == 200:
                 mod_artifact['download_status'] = True
                 self.artifacts.append(mod_artifact)
 
-        print(f"\nBelow Artifacts for { input_format } workflow")
+        print(f"\nBelow Artifacts for {input_format} workflow")
         print(self.artifacts)
         print("\nDownload Artifact for completed")
 
@@ -146,6 +141,8 @@ class PrepareArtifacts:
             return 'img'
         elif format in ['application/zip', 'depth']:
             return 'depth'
+        else:
+            raise NameError(f"Unknown format {format}")
 
     def add_artifacts_to_format_dictionary(self, format, artifact):
         """Sort artifacts according to input format"""
@@ -208,19 +205,20 @@ def person(api, person_id):
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    workflow_dir = 'src/workflows'
     parser.add_argument('--scan_parent_dir', default="data/scans/", help='Parent directory in which scans will be stored')  # noqa: E501
-    parser.add_argument('--blur_workflow_path', default="src/workflows/blur-workflow.json")  # noqa: E501
-    parser.add_argument('--standing_laying_workflow_path', default="src/workflows/standing_laying-workflow.json")  # noqa: E501
-    parser.add_argument('--depthmap_img_workflow_path', default="src/workflows/depthmap-img-workflow.json")  # noqa: E501
-    parser.add_argument('--height_workflow_artifact_path', default="src/workflows/height-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
-    parser.add_argument('--height_depthmapmultiartifactlatefusion_workflow_path', default="src/workflows/height-depthmapmultiartifactlatefusion-workflow.json")  # noqa: E501
-    parser.add_argument('--height_workflow_scan_path', default="src/workflows/height-plaincnn-workflow-scan.json")  # noqa: E501
+    parser.add_argument('--blur_workflow_path', default=f"{workflow_dir}/blur-workflow.json")  # noqa: E501
+    parser.add_argument('--standing_laying_workflow_path', default=f"{workflow_dir}/standing_laying-workflow.json")  # noqa: E501
+    parser.add_argument('--depthmap_img_workflow_path', default=f"{workflow_dir}/depthmap-img-workflow.json")  # noqa: E501
+    parser.add_argument('--height_workflow_artifact_path', default=f"{workflow_dir}/height-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
+    parser.add_argument('--height_depthmapmultiartifactlatefusion_workflow_path', default=f"{workflow_dir}/height-depthmapmultiartifactlatefusion-workflow.json")  # noqa: E501
+    parser.add_argument('--height_workflow_scan_path', default=f"{workflow_dir}/height-plaincnn-workflow-scan.json")  # noqa: E501
     parser.add_argument('--height_ensemble_workflow_artifact_path', default="/app/src/workflows/height-ensemble-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--height_ensemble_workflow_scan_path', default="/app/src/workflows/height-ensemble-workflow-scan.json")  # noqa: E501
-    parser.add_argument('--weight_workflow_artifact_path', default="src/workflows/weight-workflow-artifact.json")  # noqa: E501
-    parser.add_argument('--weight_workflow_scan_path', default="src/workflows/weight-workflow-scan.json")  # noqa: E501
-    parser.add_argument('--height_rgbd_workflow_artifact_path', default="/app/src/workflows/height-rgbd-workflow-artifact.json")  # noqa :E501
-    parser.add_argument('--height_rgbd_workflow_scan_path', default="/app/src/workflows/height-rgbd-workflow-scan.json")  # noqa: E501
+    parser.add_argument('--weight_workflow_artifact_path', default=f"{workflow_dir}/weight-workflow-artifact.json")  # noqa: E501
+    parser.add_argument('--weight_workflow_scan_path', default=f"{workflow_dir}/weight-workflow-scan.json")  # noqa: E501
+    parser.add_argument('--height_rgbd_workflow_artifact_path', default=f"{workflow_dir}/height-rgbd-workflow-artifact.json")  # noqa: E501
+    parser.add_argument('--height_rgbd_workflow_scan_path', default=f"{workflow_dir}/height-rgbd-workflow-scan.json")  # noqa: E501
     args = parser.parse_args()
     return args
 
@@ -255,19 +253,16 @@ def main():
     # logic to initiate rgbd workflow for v0.9 starts here
 
     workflow.get_list_of_worflows()
-    filterby_workflow_metadata = workflow.load_workflows(
-        height_rgbd_workflow_scan_path)
+    filterby_workflow_metadata = workflow.load_workflows(height_rgbd_workflow_scan_path)
     filterby_scan_version_val = 'v0.9'
 
     filterby_workflow_name = filterby_workflow_metadata['name']
     filterby_workflow_version = filterby_workflow_metadata['version']
     print("Filter by workflow Name: ", filterby_workflow_name)
     print("Filter by workflow Version: ", filterby_workflow_version)
-    filterby_workflow_id_val = workflow.get_workflow_id(
-        filterby_workflow_name, filterby_workflow_version)
+    filterby_workflow_id_val = workflow.get_workflow_id(filterby_workflow_name, filterby_workflow_version)
     filterby_scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
-    filterby_scan_metadata_path = os.path.join(
-        scan_parent_dir, filterby_scan_metadata_name)
+    filterby_scan_metadata_path = os.path.join(scan_parent_dir, filterby_scan_metadata_name)
     # Start cgm-rg for scan filtered by scan version and workflow id
 
     if get_scan_metadata.get_unprocessed_scans_for_scan_version_workflow_id(
@@ -275,21 +270,16 @@ def main():
             filterby_workflow_id_val,
             filterby_scan_metadata_path) > 0:
 
-        print('-------------------------------------------------------------------------------------------')
         print(
-            "Started cgm-rg for scan filtered by ",
-            filterby_scan_version_val,
-            " and ",
-            filterby_workflow_id_val)
-        scan_metadata = get_scan_metadata.get_scan_metadata_by_path(
-            filterby_scan_metadata_path)
+            f"{'-'*92}\nStarted cgm-rg for scan filtered by {filterby_scan_version_val} and {filterby_workflow_id_val}"
+        )
+        scan_metadata = get_scan_metadata.get_scan_metadata_by_path(filterby_scan_metadata_path)
         scan_version = scan_metadata['version']
         print("Scan Version: ", scan_version)
         print("Filterby Scan Version: ", filterby_scan_version_val)
         try:
             assert (scan_version == filterby_scan_version_val)
-            data_processing = PrepareArtifacts(
-                cgm_api, scan_metadata, scan_parent_dir)
+            data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
             data_processing.process_scan_metadata()
             data_processing.create_scan_dir()
             data_processing.create_artifact_dir()

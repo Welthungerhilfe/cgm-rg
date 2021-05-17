@@ -14,9 +14,7 @@ import utils.preprocessing as preprocessing  # noqa: E402
 
 
 class DepthMapImgFlow:
-    """
-    A class to visualise depthmap image in result generation
-    """
+    """A class to visualise depthmap image in result generation"""
 
     def __init__(
             self,
@@ -63,23 +61,21 @@ class DepthMapImgFlow:
                 artifact['depthmap_img'])
             if post_status == 201:
                 artifact['depthmap_img_id_from_post_request'] = depthmap_img_id_from_post_request
-                artifact['generated_timestamp'] = datetime.now().strftime(
-                    '%Y-%m-%dT%H:%M:%SZ')
+                artifact['generated_timestamp'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def prepare_result_object(self):
-        res = Bunch()
-        res.results = []
+        res = Bunch(dict(results=[]))
         for artifact in self.artifacts:
-            depthmap_img_result = Bunch()
-            depthmap_img_result.id = f"{uuid.uuid4()}"
-            depthmap_img_result.scan = self.result_generation.scan_metadata['id']
-            depthmap_img_result.workflow = self.workflow_obj["id"]
-            depthmap_img_result.source_artifacts = [artifact['id']]
-            depthmap_img_result.source_results = []
-            depthmap_img_result.file = artifact['depthmap_img_id_from_post_request']
-            depthmap_img_result.generated = artifact['generated_timestamp']
+            depthmap_img_result = Bunch(dict(
+                id=f"{uuid.uuid4()}",
+                scan=self.result_generation.scan_metadata['id'],
+                workflow=self.workflow_obj["id"],
+                source_artifacts=[artifact['id']],
+                source_results=[],
+                file=artifact['depthmap_img_id_from_post_request'],
+                generated=artifact['generated_timestamp'],
+            ))
             res.results.append(depthmap_img_result)
-
         return res
 
     def post_result_object(self):
@@ -87,6 +83,4 @@ class DepthMapImgFlow:
         depthmap_img_result_object = self.result_generation.bunch_object_to_json_object(
             depthmap_img_result)
         if self.result_generation.api.post_results(depthmap_img_result_object) == 201:
-            print(
-                "successfully post Depthmap Image results: ",
-                depthmap_img_result_object)
+            print("successfully post Depthmap Image results: ", depthmap_img_result_object)

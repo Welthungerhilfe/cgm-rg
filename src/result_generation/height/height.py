@@ -47,7 +47,7 @@ class HeightFlow:
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
 
     def artifact_level_height_result_object(self, predictions, generated_timestamp):
-        """Prepare artifact level height result object."""
+        """Prepare artifact level height result object"""
         res = Bunch(dict(results=[]))
         for artifact, prediction in zip(self.artifacts, predictions):
             height_result = Bunch(dict(
@@ -97,7 +97,7 @@ class HeightFlow:
         return class_lhfa
 
     def post_height_results(self, predictions, generated_timestamp):
-        """Post the artifact and scan level height results to API"""
+        """Post the artifact and scan level height results to the API"""
         artifact_level_height_result_bunch = self.artifact_level_height_result_object(predictions, generated_timestamp)
         artifact_level_height_result_json = self.result_generation.bunch_object_to_json_object(
             artifact_level_height_result_bunch)
@@ -112,9 +112,8 @@ class HeightFlow:
             print("successfully post scan level height results: ", scan_level_height_result_json)
 
     def artifact_level_height_result_object_ensemble(self, predictions, generated_timestamp, stds):
-        """Prepare artifact level height result object."""
-        res = Bunch()
-        res.results = []
+        """Prepare artifact level height result object"""
+        res = Bunch(dict(results=[]))
         for artifact, prediction, std in zip(self.artifacts, predictions, stds):
             height_result = Bunch()
             height_result.id = f"{uuid.uuid4()}"
@@ -131,16 +130,15 @@ class HeightFlow:
 
     def scan_level_height_result_object_ensemble(self, predictions, generated_timestamp, workflow_obj, stds):
         """Prepare scan level height result object"""
-        res = Bunch()
-        res.results = []
-        height_result = Bunch()
-        height_result.id = f"{uuid.uuid4()}"
-        height_result.scan = self.result_generation.scan_metadata['id']
-        height_result.workflow = workflow_obj["id"]
-        height_result.source_artifacts = [
-            artifact['id'] for artifact in self.artifacts]
-        height_result.source_results = []
-        height_result.generated = generated_timestamp
+        res = Bunch(dict(results=[]))
+        height_result = Bunch(dict(
+            id=f"{uuid.uuid4()}",
+            scan=self.result_generation.scan_metadata['id'],
+            workflow=workflow_obj["id"],
+            source_artifacts=[artifact['id'] for artifact in self.artifacts],
+            source_results=[],
+            generated=generated_timestamp,
+        ))
         mean_prediction = self.result_generation.get_mean_scan_results(predictions)
         mean_std = self.result_generation.get_mean_scan_results(stds)
         class_lhfa = self.zscore_lhfa(mean_prediction)
