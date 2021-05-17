@@ -50,8 +50,8 @@ class WeightFlow:
         depthmaps = []
         for artifact in self.artifacts:
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
-            data, width, height, depthScale, _max_confidence = preprocessing.load_depth(input_path)
-            depthmap = preprocessing.prepare_depthmap(data, width, height, depthScale)
+            data, width, height, depth_scale, _max_confidence = preprocessing.load_depth(input_path)
+            depthmap = preprocessing.prepare_depthmap(data, width, height, depth_scale)
             depthmap = preprocessing.preprocess(depthmap)
             depthmaps.append(depthmap)
         depthmaps = np.array(depthmaps)

@@ -15,7 +15,7 @@ def test_load_depth_hugh():
     depth_file = CWD.joinpath('tests', 'static_files', 'be1faf54-69c7-11eb-984b-a3ffd42e7b5a', 'depth', 'bd67cd9e-69c7-11eb-984b-77ac9d2b4986')
 
     # Exercise
-    data, width, height, depthScale, max_confidence = preprocessing.load_depth(depth_file)
+    data, width, height, depth_scale, max_confidence = preprocessing.load_depth(depth_file)
 
     # Verify
     assert isinstance(data, bytes)

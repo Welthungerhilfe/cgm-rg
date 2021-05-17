@@ -85,8 +85,8 @@ def preprocess_image(image):
 def get_depthmaps(fpaths):
     depthmaps = []
     for fpath in fpaths:
-        data, width, height, depthScale, _ = load_depth(fpath)
-        depthmap = prepare_depthmap(data, width, height, depthScale)
+        data, width, height, depth_scale, _ = load_depth(fpath)
+        depthmap = prepare_depthmap(data, width, height, depth_scale)
         depthmap = preprocess(depthmap)
         depthmaps.append(depthmap)
 

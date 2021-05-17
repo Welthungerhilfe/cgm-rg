@@ -39,7 +39,6 @@ class ProcessWorkflows:
         """Load the workflow from given path"""
         with open(workflow_path, 'r') as f:
             workflow_obj = json.load(f)
-
         return workflow_obj
 
 
