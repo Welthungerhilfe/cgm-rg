@@ -173,7 +173,7 @@ class PrepareArtifacts:
         pprint.pprint(self.format_wise_artifact)
 
     def create_scan_dir(self):
-        '''Create directory to store artifacts in scan.
+        """Create directory to store artifacts in scan.
 
         Create a scan dir and format wise dir inside scan dir
         in which all the artifacts will be downloaded
@@ -189,7 +189,7 @@ class PrepareArtifacts:
                 └── img
                     ├── 5850e04c-33e1-11eb-af63-4f5622046249
                     └── 5850e04c-33e1-11eb-af63-4f5622046249_blur.jpg
-        '''
+        """
         os.makedirs(self.scan_dir, exist_ok=True)
 
     def create_artifact_dir(self):
