@@ -47,7 +47,7 @@ class HeightFlow:
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
 
     def artifact_level_height_result_object(self, predictions, generated_timestamp):
-        """Prepare artifact level height result object."""
+        """Prepare artifact level height result object"""
         res = Bunch(dict(results=[]))
         for artifact, prediction in zip(self.artifacts, predictions):
             height_result = Bunch(dict(
@@ -97,7 +97,7 @@ class HeightFlow:
         return class_lhfa
 
     def post_height_results(self, predictions, generated_timestamp):
-        """Post the artifact and scan level height results to API"""
+        """Post the artifact and scan level height results to the API"""
         artifact_level_height_result_bunch = self.artifact_level_height_result_object(predictions, generated_timestamp)
         artifact_level_height_result_json = self.result_generation.bunch_object_to_json_object(
             artifact_level_height_result_bunch)

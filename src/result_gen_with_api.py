@@ -44,7 +44,7 @@ class ProcessWorkflows:
 
 
 class GetScanMetadata:
-    """Get and process scan metadata."""
+    """Get and process scan metadata"""
 
     def __init__(self, api: ApiEndpoints, scan_metadata_path: str):
         """Construct all the necessary attributes for the GetScanMetadata object.

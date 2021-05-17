@@ -142,7 +142,7 @@ class BlurFlow:
         return rgb_image, True
 
     def post_blur_files(self):
-        """Post the blurred file to api"""
+        """Post the blurred file to the API"""
         for artifact in self.artifacts:
             blur_id_from_post_request, post_status = self.result_generation.api.post_files(
                 artifact['blurred_image'])
@@ -169,7 +169,7 @@ class BlurFlow:
         return res
 
     def post_result_object(self):
-        """Post the result object to api."""
+        """Post the result object to the API"""
         blur_result = self.prepare_result_object()
         blur_result_object = self.result_generation.bunch_object_to_json_object(blur_result)
         if self.result_generation.api.post_results(blur_result_object) == 201:
