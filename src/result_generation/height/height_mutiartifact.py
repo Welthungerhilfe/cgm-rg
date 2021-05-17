@@ -22,15 +22,15 @@ class HeightFlowMultiArtifact(HeightFlow):
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         scan_depthmapmultiartifactlatefusion_level_height_result_bunch = self.scan_level_height_result_object(
             height_predictions, generated_timestamp, self.scan_workflow_obj)
-        scan_depthmapmultiartifactlatefusion_level_height_result_json = self.bunch_object_to_json_object(
+        scan_depthmapmultiartifactlatefusion_level_height_result_json = self.result_generation.bunch_object_to_json_object(
             scan_depthmapmultiartifactlatefusion_level_height_result_bunch)
-        if self.api.post_results(scan_depthmapmultiartifactlatefusion_level_height_result_json) == 201:
+        if self.result_generation.api.post_results(scan_depthmapmultiartifactlatefusion_level_height_result_json) == 201:
             print(
                 "successfully posted scan step level depthmapmultiartifactlatefusion height results: ",
                 scan_depthmapmultiartifactlatefusion_level_height_result_json)
 
     def process_depthmaps_depthmapmultiartifactlatefusion(self):
-        depthmaps_file = [self.get_input_path(self.scan_directory, artifact['file'])
+        depthmaps_file = [self.result_generation.get_input_path(self.scan_directory, artifact['file'])
                           for artifact in self.artifacts]
         scans = [depthmaps_file]
         samples = list(

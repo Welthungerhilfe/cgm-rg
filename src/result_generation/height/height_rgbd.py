@@ -24,17 +24,17 @@ class HeightFlowRGBD(HeightFlow):
     def process_rgbd(self):
         rgbd_scan = []
         scan_image_directory = os.path.join(
-            self.scan_parent_dir,
-            self.scan_metadata['id'],
+            self.result_generation.scan_parent_dir,
+            self.result_generation.scan_metadata['id'],
             'img')
         for artifact in self.artifacts:
-            input_path = self.get_input_path(
+            input_path = self.result_generation.get_input_path(
                 self.scan_directory, artifact['file'])
             img_id = artifact['order']
             result_image_dict = next(
                 iter(item for item in self.image_artifacts if item['order'] == img_id), None)
             if result_image_dict:
-                image_input_path = self.get_input_path(
+                image_input_path = self.result_generation.get_input_path(
                     scan_image_directory, result_image_dict['file'])
             else:
                 print("No RGB found for order:", img_id)

@@ -1,16 +1,11 @@
-import json
 import os
 import uuid
 from datetime import datetime
-from pathlib import Path
-import sys
 
 import cv2
 import face_recognition
 from bunch import Bunch
-
-sys.path.append(str(Path(__file__).parents[1]))
-from api_endpoints import ApiEndpoints
+from fastcore.basics import store_attr
 
 
 class BlurFlow:
@@ -18,41 +13,27 @@ class BlurFlow:
 
     Attributes
     ----------
-    workflows : list
-        list of registered workflows
     workflow_path : str
         path of the workflow file for face blurring
     artifacts : list
         list of artifacts to run blur flow on
-    scan_parent_dir : str
-        directory where scans are stored
-    scan_metadata : json
-        metadata of the scan to run blur flow on
     """
 
     def __init__(
             self,
-            api: ApiEndpoints,
-            workflows,
+            result_generation,
             workflow_path,
             artifacts,
-            scan_parent_dir,
-            scan_metadata,
             scan_version):
-        self.api = api
-        self.workflows = workflows
-        self.artifacts = artifacts
-        self.workflow_path = workflow_path
-        self.workflow_obj = self.workflows.load_workflows(self.workflow_path)
-        self.scan_metadata = scan_metadata
-        self.scan_parent_dir = scan_parent_dir
+        store_attr('result_generation,artifacts,workflow_path,artifacts,scan_version', self)
+        self.workflow_obj = self.result_generation.workflows.load_workflows(self.workflow_path)
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.blur_input_format = 'img'
         self.scan_directory = os.path.join(
-            self.scan_parent_dir,
-            self.scan_metadata['id'],
+            self.result_generation.scan_parent_dir,
+            self.result_generation.scan_metadata['id'],
             self.blur_input_format)
-        self.workflow_obj['id'] = self.workflows.get_workflow_id(
+        self.workflow_obj['id'] = self.result_generation.workflows.get_workflow_id(
             self.workflow_obj['name'], self.workflow_obj['version'])
         self.scan_version = scan_version
 
@@ -63,20 +44,10 @@ class BlurFlow:
         self.post_blur_files()
         self.post_result_object()
 
-    def bunch_object_to_json_object(self, bunch_object):
-        """Convert given bunch object to json object"""
-        json_string = json.dumps(bunch_object, indent=2, separators=(',', ':'))
-        json_object = json.loads(json_string)
-        return json_object
-
-    def get_input_path(self, directory, file_name):
-        """Return input path for given directory name and file name"""
-        return os.path.join(directory, file_name)
-
     def blur_artifacts(self):
         """Blur the list of artifacts"""
         for artifact in self.artifacts:
-            input_path = self.get_input_path(self.scan_directory, artifact['file'])
+            input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             print(f"input_path of image to perform blur: {input_path}\n")
             blur_img_binary, blur_status = self.blur_face(input_path)
             if blur_status:
@@ -129,7 +100,7 @@ class BlurFlow:
         """
         # Read the image.
         assert os.path.exists(source_path), f"{source_path} does not exist"
-        rgb_image = cv2.imread(source_path)
+        rgb_image = cv2.imread(str(source_path))
 
         image = self.blur_img_transformation_using_scan_version(rgb_image)
 
@@ -173,7 +144,7 @@ class BlurFlow:
     def post_blur_files(self):
         """Post the blurred file to api"""
         for artifact in self.artifacts:
-            blur_id_from_post_request, post_status = self.api.post_files(
+            blur_id_from_post_request, post_status = self.result_generation.api.post_files(
                 artifact['blurred_image'])
             if post_status == 201:
                 artifact['blur_id_from_post_request'] = blur_id_from_post_request
@@ -187,7 +158,7 @@ class BlurFlow:
         for artifact in self.artifacts:
             blur_result = Bunch()
             blur_result.id = f"{uuid.uuid4()}"
-            blur_result.scan = self.scan_metadata['id']
+            blur_result.scan = self.result_generation.scan_metadata['id']
             blur_result.workflow = self.workflow_obj["id"]
             blur_result.source_artifacts = [artifact['id']]
             blur_result.source_results = []
@@ -200,6 +171,6 @@ class BlurFlow:
     def post_result_object(self):
         """Post the result object to api."""
         blur_result = self.prepare_result_object()
-        blur_result_object = self.bunch_object_to_json_object(blur_result)
-        if self.api.post_results(blur_result_object) == 201:
+        blur_result_object = self.result_generation.bunch_object_to_json_object(blur_result)
+        if self.result_generation.api.post_results(blur_result_object) == 201:
             print("successfully post blur results: ", blur_result_object)

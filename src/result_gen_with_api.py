@@ -7,6 +7,7 @@ import uuid
 
 from api_endpoints import ApiEndpoints
 from result_generation.blur import BlurFlow
+from result_generation.result_generation import ResultGeneration
 from result_generation.depthmap_image import DepthMapImgFlow
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.height.height_mutiartifact import HeightFlowMultiArtifact
@@ -296,14 +297,13 @@ def main():
             depth_artifacts = data_processing.download_artifacts('depth')
             person_details = person(cgm_api, scan_metadata['person'])
 
+            result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, scan_parent_dir)
+
             rgbdflow = HeightFlowRGBD(
-                cgm_api,
-                workflow,
+                result_generation,
                 height_rgbd_workflow_artifact_path,
                 height_rgbd_workflow_scan_path,
                 depth_artifacts,
-                scan_parent_dir,
-                scan_metadata,
                 person_details,
                 rgb_artifacts)
 
@@ -337,87 +337,65 @@ def main():
 
     flows = []
 
+    result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, scan_parent_dir)
+
     flow = BlurFlow(
-        cgm_api,
-        workflow,
+        result_generation,
         blur_workflow_path,
         rgb_artifacts,
-        scan_parent_dir,
-        scan_metadata,
         scan_version)
     flows.append(flow)
 
     flow = StandingLaying(
-        cgm_api,
-        workflow,
+        result_generation,
         standing_laying_workflow_path,
-        rgb_artifacts,
-        scan_parent_dir,
-        scan_metadata)
+        rgb_artifacts)
     flows.append(flow)
 
     flow = DepthMapImgFlow(
-        cgm_api,
-        workflow,
+        result_generation,
         depthmap_img_workflow_path,
-        depth_artifacts,
-        scan_parent_dir,
-        scan_metadata)
+        depth_artifacts)
     flows.append(flow)
 
     flow = HeightFlowPlainCnn(
-        cgm_api,
-        workflow,
+        result_generation,
         height_workflow_artifact_path,
         height_workflow_scan_path,
         depth_artifacts,
-        scan_parent_dir,
-        scan_metadata,
         person_details)
     flows.append(flow)
 
     flow = HeightFlowMultiArtifact(
-        cgm_api,
-        workflow,
+        result_generation,
         height_workflow_artifact_path,
         height_depthmapmultiartifactlatefusion_workflow_path,
         depth_artifacts,
-        scan_parent_dir,
-        scan_metadata,
         person_details)
     flows.append(flow)
 
     flow = HeightFlowDeepEnsemble(
-        cgm_api,
-        workflow,
+        result_generation,
         height_ensemble_workflow_artifact_path,
         height_ensemble_workflow_scan_path,
         depth_artifacts,
-        scan_parent_dir,
-        scan_metadata,
         person_details)
     flows.append(flow)
 
     flow = WeightFlow(
-        cgm_api,
-        workflow,
+        result_generation,
         weight_workflow_artifact_path,
         weight_workflow_scan_path,
         depth_artifacts,
-        scan_parent_dir,
-        scan_metadata,
         person_details)
     flows.append(flow)
 
     if scan_version in ['v0.9']:  # TODO update this with better logic
         flow = HeightFlowRGBD(
-            cgm_api,
-            workflow,
+            result_generation,
             height_rgbd_workflow_artifact_path,
             height_rgbd_workflow_scan_path,
             depth_artifacts,
-            scan_parent_dir,
-            scan_metadata,
             person_details,
             rgb_artifacts)
         flows.append(flow)
