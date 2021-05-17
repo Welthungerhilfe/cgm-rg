@@ -11,6 +11,7 @@ def load_json(json_path):
 
 CWD = Path.cwd()
 
+
 def create_dummy_vars():
     person_details = {'age_estimated': False,
                       'date_of_birth': '2020-11-12',

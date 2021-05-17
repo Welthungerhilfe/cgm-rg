@@ -1,6 +1,6 @@
 import sys
 
-import set_up_dummy_variables #as sdv
+import set_up_dummy_variables
 sys.path.append('./src')  # noqa: E402
 from api_endpoints import ApiEndpoints
 from mock import patch
@@ -12,6 +12,7 @@ from result_generation.result_generation import ResultGeneration
 
 
 sdv = set_up_dummy_variables.create_dummy_vars()
+
 
 @patch.object(ProcessWorkflows, 'get_workflow_id')
 def get_dummy_blur_flow_object(mock_some_fn):

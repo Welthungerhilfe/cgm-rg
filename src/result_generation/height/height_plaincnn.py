@@ -2,8 +2,6 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-import numpy as np
-
 from result_generation.height.height import HeightFlow
 
 sys.path.append(str(Path(__file__).parents[1]))
