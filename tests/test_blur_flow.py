@@ -2,8 +2,6 @@ import sys
 import pytest
 from pathlib import Path
 
-from bunch import Bunch
-
 sys.path.append('./src')
 import set_up_dummy_objects
 

@@ -1,6 +1,5 @@
 import sys
 from datetime import datetime
-from pathlib import Path
 
 import numpy as np
 from bunch import Bunch

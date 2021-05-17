@@ -8,6 +8,8 @@ max_line_length = 120
 import_order_style = appnexus
 application_package_names = src
 exclude =
+    data/
+    ci/
     .git,
     __pycache__,
     .ipynb_checkpoints,
