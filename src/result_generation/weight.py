@@ -57,7 +57,7 @@ class WeightFlow:
         depthmaps = np.array(depthmaps)
         return depthmaps
 
-    def artifact_level_weight_result_object(self, predictions, generated_timestamp):
+    def artifact_level_result(self, predictions, generated_timestamp):
         """Prepare artifact level weight result object"""
         res = Bunch(dict(results=[]))
         for artifact, prediction in zip(self.artifacts, predictions):
@@ -108,7 +108,7 @@ class WeightFlow:
 
     def post_weight_results(self, predictions, generated_timestamp):
         """Post the artifact and scan level weight results to the API"""
-        artifact_level_weight_result_bunch = self.artifact_level_weight_result_object(predictions, generated_timestamp)
+        artifact_level_weight_result_bunch = self.artifact_level_result(predictions, generated_timestamp)
         artifact_level_weight_result_json = self.result_generation.bunch_object_to_json_object(
             artifact_level_weight_result_bunch)
         if self.result_generation.api.post_results(artifact_level_weight_result_json) == 201:
