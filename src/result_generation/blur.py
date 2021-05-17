@@ -9,16 +9,7 @@ from fastcore.basics import store_attr
 
 
 class BlurFlow:
-    """Face blur results generation
-
-    Attributes
-    ----------
-    workflow_path : str
-        path of the workflow file for face blurring
-    artifacts : list
-        list of artifacts to run blur flow on
-    """
-
+    """Face blur results generation"""
     def __init__(
             self,
             result_generation,

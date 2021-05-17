@@ -15,7 +15,6 @@ import utils.preprocessing as preprocessing  # noqa: E402
 
 class DepthMapImgFlow:
     """A class to visualise depthmap image in result generation"""
-
     def __init__(
             self,
             result_generation,

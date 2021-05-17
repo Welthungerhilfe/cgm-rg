@@ -11,18 +11,7 @@ from result_generation.utils import MAX_AGE, MAX_HEIGHT, MIN_HEIGHT, calculate_a
 
 
 class HeightFlow:
-    """Handle height results generation.
-
-    Attributes
-    ----------
-    artifact_workflow_path: str
-        path of the workflow file for artifact level height results
-    scan_workflow_path: json
-        path of the workflow file for scan level height results
-    artifacts: list
-        list of artifacts to run heigth flow on
-    """
-
+    """Handle height results generation"""
     def __init__(
             self,
             result_generation,
