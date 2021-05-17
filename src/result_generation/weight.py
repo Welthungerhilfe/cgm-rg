@@ -17,32 +17,7 @@ import utils.preprocessing as preprocessing  # noqa: E402
 
 
 class WeightFlow:
-    """
-    A class to handle weight results generation.
-
-    Attributes
-    ----------
-    artifact_workflow_path : str
-        path of the workflow file for artifact level weight results
-    scan_workflow_path : json
-        path of the workflow file for scan level weight results
-    artifacts : list
-        list of artifacts to run weigth flow on
-
-    Methods
-    -------
-    process_depthmaps():
-        Loads the list of depthmaps in scan as numpy array.
-    run_weight_flow():
-        Driver method for weight flow.
-    artifact_level_weight_result_object(predictions, generated_timestamp):
-        Prepares artifact level weight result object.
-    scan_level_weight_result_object(predictions, generated_timestamp):
-        Prepares scan level weight result object.
-    post_weight_results(predictions, generated_timestamp):
-        Posts the artifact and scan level weight results to api.
-    """
-
+    """A class to handle weight results generation"""
     def __init__(
             self,
             result_generation,
@@ -71,6 +46,7 @@ class WeightFlow:
         self.post_weight_results(weight_predictions, generated_timestamp)
 
     def process_depthmaps(self):
+        """Load the list of depthmaps in scan as numpy array"""
         depthmaps = []
         for artifact in self.artifacts:
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
@@ -82,6 +58,7 @@ class WeightFlow:
         return depthmaps
 
     def artifact_level_weight_result_object(self, predictions, generated_timestamp):
+        """Prepare artifact level weight result object"""
         res = Bunch(dict(results=[]))
         for artifact, prediction in zip(self.artifacts, predictions):
             result = Bunch(dict(
@@ -97,6 +74,7 @@ class WeightFlow:
         return res
 
     def scan_level_weight_result_object(self, predictions, generated_timestamp):
+        """Prepare scan level weight result object"""
         res = Bunch(dict(results=[]))
         result = Bunch(dict(
             id=f"{uuid.uuid4()}",
@@ -129,6 +107,7 @@ class WeightFlow:
         return class_wfa
 
     def post_weight_results(self, predictions, generated_timestamp):
+        """Post the artifact and scan level weight results to the API"""
         artifact_level_weight_result_bunch = self.artifact_level_weight_result_object(predictions, generated_timestamp)
         artifact_level_weight_result_json = self.result_generation.bunch_object_to_json_object(
             artifact_level_weight_result_bunch)
