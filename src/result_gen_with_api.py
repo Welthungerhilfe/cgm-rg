@@ -204,7 +204,7 @@ def person(api, person_id):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    workflow_dir = 'src/workflows'
+    workflow_dir = '/app/src/workflows'
     parser.add_argument('--scan_parent_dir', default="data/scans/", help='Parent directory in which scans will be stored')  # noqa: E501
     parser.add_argument('--blur_workflow_path', default=f"{workflow_dir}/blur-workflow.json")  # noqa: E501
     parser.add_argument('--standing_laying_workflow_path', default=f"{workflow_dir}/standing_laying-workflow.json")  # noqa: E501
