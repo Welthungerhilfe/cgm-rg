@@ -1,5 +1,5 @@
 import json
-import pathlib
+from pathlib import Path
 
 
 def load_json(json_path):
@@ -8,7 +8,7 @@ def load_json(json_path):
     return json_obj
 
 
-CWD = pathlib.Path.cwd()
+CWD = Path.cwd()
 
 person_details = {'age_estimated': False,
                   'date_of_birth': '2020-11-12',

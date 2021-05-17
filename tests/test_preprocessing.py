@@ -1,11 +1,11 @@
-import pathlib
+from pathlib import Path
 import pickle
 import sys
 
 sys.path.append('./src')
 from utils import preprocessing
 
-CWD = pathlib.Path.cwd()
+CWD = Path.cwd()
 WIDTH = 240
 HEIGHT = 180
 

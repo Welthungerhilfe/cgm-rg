@@ -1,10 +1,10 @@
 from pathlib import Path
 import sys
-sys.path.append('./src')
 
 from bunch import Bunch
 import numpy as np
 
+sys.path.append('./src')
 import set_up_dummy_objects
 
 
