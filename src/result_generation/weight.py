@@ -4,7 +4,6 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
-import numpy as np
 from bunch import Bunch
 from cgmzscore import Calculator
 from fastcore.basics import store_attr
@@ -40,22 +39,10 @@ class WeightFlow:
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
 
     def run_flow(self):
-        depthmaps = self.process_depthmaps()
+        depthmaps = preprocessing.process_depthmaps(self.artifacts, self.scan_directory, self.result_generation)
         weight_predictions = inference.get_weight_predictions_local(depthmaps)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         self.post_weight_results(weight_predictions, generated_timestamp)
-
-    def process_depthmaps(self):
-        """Load the list of depthmaps in scan as numpy array"""
-        depthmaps = []
-        for artifact in self.artifacts:
-            input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
-            data, width, height, depthScale, _max_confidence = preprocessing.load_depth(input_path)
-            depthmap = preprocessing.prepare_depthmap(data, width, height, depthScale)
-            depthmap = preprocessing.preprocess(depthmap)
-            depthmaps.append(depthmap)
-        depthmaps = np.array(depthmaps)
-        return depthmaps
 
     def artifact_level_result(self, predictions, generated_timestamp):
         """Prepare artifact level weight result object"""
