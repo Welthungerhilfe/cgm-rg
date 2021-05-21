@@ -1,6 +1,14 @@
 pool:
   vmImage: ubuntu-latest
 
+trigger:
+  branches:
+    include:
+      - '*'
+  tags:
+    include:
+      - 'v*'
+
 variables:
   - group: cgm-rg
   - name: DOCKER_CACHE_DIR
@@ -20,18 +28,30 @@ parameters:
 #      - naunam
 
 stages:
-  - stage: Setup_and_Verify
+  - stage: Setup
     jobs:
-      - job: Setup_and_Verify
+      - job: Variables
+        displayName: Setup pipeline variables
+        variables:
+          isRelease: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
         steps:
-          - task: CmdLine@2
-            name: VariableSetup
-            displayName: Parse Version
-            inputs:
-              script: |
-                set -e
-                git_hash=$(git rev-parse HEAD)
-                echo "##vso[task.setvariable variable=TAG;isOutput=true]$git_hash"
+          - script: |
+              set -e
+              if [ "$(isRelease)" == 'True' ]
+              then
+                # Read version from version file
+                tag=$(head -n 1 VERSION)
+              else
+                # For feature commits tag containers with Git hash
+                tag=$(git rev-parse HEAD)
+              fi
+              echo "##vso[task.setvariable variable=TAG;isOutput=true]$tag"
+            displayName: Parse Docker tag
+
+  - stage: Verify
+    jobs:
+      - job: Verify
+        steps:
           - task: Cache@2
             displayName: Cache Python dependencies
             inputs:
@@ -66,13 +86,43 @@ stages:
               testResultsFormat: 'JUnit'
               testResultsFiles: '**/TEST-*.xml'
               failTaskOnFailedTests: true
+
+  - stage: Version
+    displayName: Tag & bump version
+    dependsOn: Verify
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - job:
+        displayName: Update version number
+        condition: ne(variables['Build.Reason'], 'Manual')
+        steps:
+          - checkout: self
+            fetchDepth: 1
+            persistCredentials: true
+          - script: pip install bump2version
+            displayName: Install bump2version
+          - script: |
+              set -e
+              # Setup Git
+              git config --global user.email "noreply@childgrowthmonitor.org"
+              git config --global user.name "CGM CI"
+              # Tag current commit
+              CURR_VERSION=$(head -n 1 VERSION)
+              git tag -a "v$CURR_VERSION" -m "Result Generation version $CURR_VERSION"
+              # Bump PATCH version
+              bumpversion --commit patch
+              # Push tag and bumped version
+              git push --follow-tags origin HEAD:main
+            displayName: Tag and bump version
+
   - stage: Build
-    displayName: Build Docker image
-    dependsOn: Setup_and_Verify
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+    dependsOn:
+      - Setup
+      - Verify
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
     variables:
       - name: TAG
-        value: $[stageDependencies.Setup_and_Verify.Setup_and_Verify.outputs['VariableSetup.TAG']]
+        value: $[stageDependencies.Setup.Variables.outputs['VariableSetup.TAG']]
     jobs:
       - job: Build
         displayName: Build Docker image
@@ -93,17 +143,16 @@ stages:
             condition: not(canceled())
           - publish: $(DOCKER_CACHE_DIR)
             artifact: DockerCache
+
   - ${{ each env in parameters.var_groups }}:
     - stage: Deploy_${{ replace(env, '-', '_') }}
       displayName: Deploy ${{ env }}
-      dependsOn:
-        - Setup_and_Verify
-        - Build
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+      dependsOn: Build
+      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
       variables:
         - group: cgm-rg-${{ env }}-ci
         - name: TAG
-          value: $[stageDependencies.Setup_and_Verify.Setup_and_Verify.outputs['VariableSetup.TAG']]
+          value: $[stageDependencies.Setup.Variables.outputs['VariableSetup.TAG']]
       jobs:
         - deployment: Deploy_Container_Instance
           displayName: "Container Instance deployment ${{ env }}"
@@ -117,13 +166,11 @@ stages:
                       source: current
                       artifact: DockerCache
                       path: $(DOCKER_CACHE_DIR)
-                  - task: CmdLine@2
+                  - script: |
+                      set -e
+                      docker image load -i $(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)
+                      docker tag "$(IMAGE_REPOSITORY):$(TAG)" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
                     displayName: Load and Tag image
-                    inputs:
-                      script: |
-                        set -e
-                        docker image load -i $(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)
-                        docker tag "$(IMAGE_REPOSITORY):$(TAG)" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
                   - task: AzureCLI@2
                     displayName: Push to target ACR
                     inputs:
@@ -132,12 +179,13 @@ stages:
                       scriptLocation: inlineScript
                       inlineScript: |
                         set -e
-
+                        # Login to ACR
                         az acr login --name $(TARGET_REGISTRY)
-
+                        # Push Docker image
                         IMAGE="$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
                         docker push "$IMAGE"
                   - script: sudo snap install yq
+                    displayName: Install yq utility
                   - task: AzureCLI@2
                     displayName: Update Container Instance
                     inputs:
@@ -158,7 +206,6 @@ stages:
                         IMAGE="$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
                         export IMAGE
                         yq eval '.properties.containers[0].properties.image = strenv(IMAGE)' "$TMP_CONF_FILE" -i
-
 
                         # Insert registry credentials
                         REGISTRY_CREDENTIALS=$(az acr credential show --name "$TARGET_REGISTRY")
