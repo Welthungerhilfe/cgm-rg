@@ -25,3 +25,24 @@ Please go through wiki pages for [detailed setup of local development](https://g
 | feature | The master branch tracks released code only. The only commits to master are merges from release branches and hotfix branches.                                                                                                                                                                       |
 
 For more detailed explaination, please go through [branch policy document](https://github.com/Welthungerhilfe/cgm-rg/wiki/Branch-Policy)
+
+## Versioning
+This project is versioned according to CGM [versioning rules](https://dev.azure.com/cgmorg/ChildGrowthMonitor/_wiki/wikis/ChildGrowthMonitor.wiki/185/Versioning-Release-management). The version of the project
+can be found in `VERSION`. The CI pipeline tags and pushes a patch version update automatically
+after a merge to the `main` branch.
+
+The following utility scripts can be used to manipulate the version (requires [bump2version](https://pypi.org/project/bump2version/)):
+```shell
+# install bump2version
+pip install bump2version
+
+# Get the current version
+head -n 1 VERSION
+
+# Bump minor version (use major or patch to bump respective parts)
+bumpversion minor
+
+# Set a specific version. The `patch` argument does not affect the verions but is required.
+bumpversion --new-version <version> patch
+```
+These utility command do not commit or tag the repository.
