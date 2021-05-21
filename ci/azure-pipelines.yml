@@ -46,6 +46,7 @@ stages:
                 tag=$(git rev-parse HEAD)
               fi
               echo "##vso[task.setvariable variable=TAG;isOutput=true]$tag"
+            name: ParseTag
             displayName: Parse Docker tag
 
   - stage: Verify
@@ -122,7 +123,7 @@ stages:
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
     variables:
       - name: TAG
-        value: $[stageDependencies.Setup.Variables.outputs['VariableSetup.TAG']]
+        value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
     jobs:
       - job: Build
         displayName: Build Docker image
@@ -152,7 +153,7 @@ stages:
       variables:
         - group: cgm-rg-${{ env }}-ci
         - name: TAG
-          value: $[stageDependencies.Setup.Variables.outputs['VariableSetup.TAG']]
+          value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
       jobs:
         - deployment: Deploy_Container_Instance
           displayName: "Container Instance deployment ${{ env }}"
