@@ -215,8 +215,6 @@ def parse_args():
     parser.add_argument('--height_ensemble_workflow_scan_path', default="/app/src/workflows/height-ensemble-workflow-scan.json")  # noqa: E501
     parser.add_argument('--weight_workflow_artifact_path', default=f"{workflow_dir}/weight-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--weight_workflow_scan_path', default=f"{workflow_dir}/weight-workflow-scan.json")  # noqa: E501
-    parser.add_argument('--height_rgbd_workflow_artifact_path', default=f"{workflow_dir}/height-rgbd-workflow-artifact.json")  # noqa: E501
-    parser.add_argument('--height_rgbd_workflow_scan_path', default=f"{workflow_dir}/height-rgbd-workflow-scan.json")  # noqa: E501
     args = parser.parse_args()
     return args
 
@@ -234,8 +232,7 @@ def main():
     height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
-    height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
-    height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
+    
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
