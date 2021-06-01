@@ -232,7 +232,6 @@ def main():
     height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
-    
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
@@ -244,7 +243,6 @@ def main():
 
     workflow = ProcessWorkflows(cgm_api)
     get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
-
 
     if get_scan_metadata.get_unprocessed_scans() <= 0:
         return
