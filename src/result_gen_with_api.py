@@ -14,7 +14,6 @@ from result_generation.height.height_multiartifact import HeightFlowMultiArtifac
 from result_generation.height.height_ensemble import HeightFlowDeepEnsemble
 from result_generation.standing import StandingLaying
 from result_generation.weight import WeightFlow
-from result_generation.height.height_rgbd import HeightFlowRGBD
 
 
 class ProcessWorkflows:
