@@ -88,14 +88,14 @@ def main():
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/height_rgbd')
 
-    for id in ENSEMBLE_RUN_IDS:
-        print(f"Downloading run {id}")
-        download_model(
-            ws=ws,
-            experiment_name='q1-ensemble-warmup',
-            run_id=id,
-            input_location=os.path.join('outputs', 'best_model.ckpt'),
-            output_location=REPO_DIR / 'models/deepensemble' / id)
+    # for id in ENSEMBLE_RUN_IDS:
+    #     print(f"Downloading run {id}")
+    #     download_model(
+    #         ws=ws,
+    #         experiment_name='q1-ensemble-warmup',
+    #         run_id=id,
+    #         input_location=os.path.join('outputs', 'best_model.ckpt'),
+    #         output_location=REPO_DIR / 'models/deepensemble' / id)
 
 
 if __name__ == "__main__":
