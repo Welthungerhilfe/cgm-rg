@@ -58,8 +58,6 @@ class ApiEndpoints:
         """Post the files using the path of the file"""
         headers = self.prepare_header()
         headers['content_type'] = 'multipart/form-data'  # status_code 201
-        # headers['content-type'] = 'multipart/form-data'  # status_code 400
-        # headers['Content-Type'] = 'multipart/form-data'   # status_code 400
 
         endpoint = self.url + self.post_file_endpoint
 
@@ -84,25 +82,21 @@ class ApiEndpoints:
         """
         headers = self.prepare_header()
         headers['content_type'] = 'multipart/form-data'  # status_code 201
-        # headers['content-type'] = 'multipart/form-data'  # status_code 400
-        # headers['Content-Type'] = 'multipart/form-data'  # status_code 400
 
         endpoint = self.url + self.post_file_endpoint
 
         _, bin_file = cv2.imencode('.JPEG', bin_file)
-        # _, bin_file = cv2.imencode('.PNG', bin_file)
         bin_file = bin_file.tostring()
 
         files = {
             'file': bin_file,
-            'filename': 'test.jpg',  # 'test.PNG'
+            'filename': 'test.jpg',
         }
 
         response = requests.post(endpoint, files=files, headers=headers)
         file_id = response.content.decode('utf-8')
 
-        # print("File Id from post of test.jpg: ", file_id)
-        print("File Id from post of test.PNG: ", file_id)
+        print("File Id from post of test.jpg: ", file_id)
 
         return file_id, response.status_code
 
@@ -126,11 +120,8 @@ class ApiEndpoints:
 
         if response.status_code in [200, 201]:
             content = response.json()
-            # content['data'] = workflow_obj["data"]
             pprint.pprint(content)
 
-            # with open(response_path, 'w') as f:
-            #     json.dump(content, f)
         return response
 
     def post_workflow(self, workflow_path):

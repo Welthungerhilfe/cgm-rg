@@ -11,10 +11,9 @@ from result_generation.result_generation import ResultGeneration
 from result_generation.depthmap_image import DepthMapImgFlow
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.height.height_multiartifact import HeightFlowMultiArtifact
-from result_generation.height.height_ensemble import HeightFlowDeepEnsemble
+# from result_generation.height.height_ensemble import HeightFlowDeepEnsemble
 from result_generation.standing import StandingLaying
 from result_generation.weight import WeightFlow
-from result_generation.height.height_rgbd import HeightFlowRGBD
 
 
 class ProcessWorkflows:
@@ -212,12 +211,10 @@ def parse_args():
     parser.add_argument('--height_workflow_artifact_path', default=f"{workflow_dir}/height-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
     parser.add_argument('--height_depthmapmultiartifactlatefusion_workflow_path', default=f"{workflow_dir}/height-depthmapmultiartifactlatefusion-workflow.json")  # noqa: E501
     parser.add_argument('--height_workflow_scan_path', default=f"{workflow_dir}/height-plaincnn-workflow-scan.json")  # noqa: E501
-    parser.add_argument('--height_ensemble_workflow_artifact_path', default="/app/src/workflows/height-ensemble-workflow-artifact.json")  # noqa: E501
-    parser.add_argument('--height_ensemble_workflow_scan_path', default="/app/src/workflows/height-ensemble-workflow-scan.json")  # noqa: E501
+    # parser.add_argument('--height_ensemble_workflow_artifact_path', default="/app/src/workflows/height-ensemble-workflow-artifact.json")  # noqa: E501
+    # parser.add_argument('--height_ensemble_workflow_scan_path', default="/app/src/workflows/height-ensemble-workflow-scan.json")  # noqa: E501
     parser.add_argument('--weight_workflow_artifact_path', default=f"{workflow_dir}/weight-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--weight_workflow_scan_path', default=f"{workflow_dir}/weight-workflow-scan.json")  # noqa: E501
-    parser.add_argument('--height_rgbd_workflow_artifact_path', default=f"{workflow_dir}/height-rgbd-workflow-artifact.json")  # noqa: E501
-    parser.add_argument('--height_rgbd_workflow_scan_path', default=f"{workflow_dir}/height-rgbd-workflow-scan.json")  # noqa: E501
     args = parser.parse_args()
     return args
 
@@ -230,13 +227,11 @@ def main():
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
-    height_ensemble_workflow_artifact_path = args.height_ensemble_workflow_artifact_path
-    height_ensemble_workflow_scan_path = args.height_ensemble_workflow_scan_path
+    # height_ensemble_workflow_artifact_path = args.height_ensemble_workflow_artifact_path
+    # height_ensemble_workflow_scan_path = args.height_ensemble_workflow_scan_path
     height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
-    height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
-    height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
@@ -248,66 +243,6 @@ def main():
 
     workflow = ProcessWorkflows(cgm_api)
     get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
-
-    # logic to initiate rgbd workflow for v0.9 starts here
-
-    workflow.get_list_of_worflows()
-    filterby_workflow_metadata = workflow.load_workflows(height_rgbd_workflow_scan_path)
-    filterby_scan_version_val = 'v0.9'
-
-    filterby_workflow_name = filterby_workflow_metadata['name']
-    filterby_workflow_version = filterby_workflow_metadata['version']
-    print("Filter by workflow Name: ", filterby_workflow_name)
-    print("Filter by workflow Version: ", filterby_workflow_version)
-    filterby_workflow_id_val = workflow.get_workflow_id(filterby_workflow_name, filterby_workflow_version)
-    filterby_scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
-    filterby_scan_metadata_path = os.path.join(scan_parent_dir, filterby_scan_metadata_name)
-    # Start cgm-rg for scan filtered by scan version and workflow id
-
-    if get_scan_metadata.get_unprocessed_scans_for_scan_version_workflow_id(
-            filterby_scan_version_val,
-            filterby_workflow_id_val,
-            filterby_scan_metadata_path) > 0:
-
-        print(
-            f"{'-'*92}\nStarted cgm-rg for scan filtered by {filterby_scan_version_val} and {filterby_workflow_id_val}"
-        )
-        scan_metadata = get_scan_metadata.get_scan_metadata_by_path(filterby_scan_metadata_path)
-        scan_version = scan_metadata['version']
-        print("Scan Version: ", scan_version)
-        print("Filterby Scan Version: ", filterby_scan_version_val)
-        try:
-            assert (scan_version == filterby_scan_version_val)
-            data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
-            data_processing.process_scan_metadata()
-            data_processing.create_scan_dir()
-            data_processing.create_artifact_dir()
-            rgb_artifacts = data_processing.download_artifacts('img')
-            depth_artifacts = data_processing.download_artifacts('depth')
-            person_details = person(cgm_api, scan_metadata['person'])
-
-            result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, scan_parent_dir)
-
-            rgbdflow = HeightFlowRGBD(
-                result_generation,
-                height_rgbd_workflow_artifact_path,
-                height_rgbd_workflow_scan_path,
-                depth_artifacts,
-                person_details,
-                rgb_artifacts)
-
-            try:
-                rgbdflow.run_flow()
-            except Exception as e:
-                print('---------------------------------')
-                print(e)
-                print("RGBD Flow is not defined")
-
-        except Exception as e:
-            print(e)
-            print("Scan Version does not match")
-
-    # logic to initiate rgbd workflow for v0.9 ends here
 
     if get_scan_metadata.get_unprocessed_scans() <= 0:
         return
@@ -363,13 +298,13 @@ def main():
         person_details)
     flows.append(flow)
 
-    flow = HeightFlowDeepEnsemble(
-        result_generation,
-        height_ensemble_workflow_artifact_path,
-        height_ensemble_workflow_scan_path,
-        depth_artifacts,
-        person_details)
-    flows.append(flow)
+    # flow = HeightFlowDeepEnsemble(
+    #     result_generation,
+    #     height_ensemble_workflow_artifact_path,
+    #     height_ensemble_workflow_scan_path,
+    #     depth_artifacts,
+    #     person_details)
+    # flows.append(flow)
 
     flow = WeightFlow(
         result_generation,
@@ -378,16 +313,6 @@ def main():
         depth_artifacts,
         person_details)
     flows.append(flow)
-
-    if scan_version in ['v0.9']:  # TODO update this with better logic
-        flow = HeightFlowRGBD(
-            result_generation,
-            height_rgbd_workflow_artifact_path,
-            height_rgbd_workflow_scan_path,
-            depth_artifacts,
-            person_details,
-            rgb_artifacts)
-        flows.append(flow)
 
     for flow in flows:
         try:
