@@ -11,7 +11,7 @@ from result_generation.result_generation import ResultGeneration
 from result_generation.depthmap_image import DepthMapImgFlow
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.height.height_multiartifact import HeightFlowMultiArtifact
-from result_generation.height.height_ensemble import HeightFlowDeepEnsemble
+# from result_generation.height.height_ensemble import HeightFlowDeepEnsemble
 from result_generation.standing import StandingLaying
 from result_generation.weight import WeightFlow
 
@@ -211,8 +211,8 @@ def parse_args():
     parser.add_argument('--height_workflow_artifact_path', default=f"{workflow_dir}/height-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
     parser.add_argument('--height_depthmapmultiartifactlatefusion_workflow_path', default=f"{workflow_dir}/height-depthmapmultiartifactlatefusion-workflow.json")  # noqa: E501
     parser.add_argument('--height_workflow_scan_path', default=f"{workflow_dir}/height-plaincnn-workflow-scan.json")  # noqa: E501
-    parser.add_argument('--height_ensemble_workflow_artifact_path', default="/app/src/workflows/height-ensemble-workflow-artifact.json")  # noqa: E501
-    parser.add_argument('--height_ensemble_workflow_scan_path', default="/app/src/workflows/height-ensemble-workflow-scan.json")  # noqa: E501
+    # parser.add_argument('--height_ensemble_workflow_artifact_path', default="/app/src/workflows/height-ensemble-workflow-artifact.json")  # noqa: E501
+    # parser.add_argument('--height_ensemble_workflow_scan_path', default="/app/src/workflows/height-ensemble-workflow-scan.json")  # noqa: E501
     parser.add_argument('--weight_workflow_artifact_path', default=f"{workflow_dir}/weight-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--weight_workflow_scan_path', default=f"{workflow_dir}/weight-workflow-scan.json")  # noqa: E501
     args = parser.parse_args()
@@ -227,8 +227,8 @@ def main():
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
-    height_ensemble_workflow_artifact_path = args.height_ensemble_workflow_artifact_path
-    height_ensemble_workflow_scan_path = args.height_ensemble_workflow_scan_path
+    # height_ensemble_workflow_artifact_path = args.height_ensemble_workflow_artifact_path
+    # height_ensemble_workflow_scan_path = args.height_ensemble_workflow_scan_path
     height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
@@ -298,13 +298,13 @@ def main():
         person_details)
     flows.append(flow)
 
-    flow = HeightFlowDeepEnsemble(
-        result_generation,
-        height_ensemble_workflow_artifact_path,
-        height_ensemble_workflow_scan_path,
-        depth_artifacts,
-        person_details)
-    flows.append(flow)
+    # flow = HeightFlowDeepEnsemble(
+    #     result_generation,
+    #     height_ensemble_workflow_artifact_path,
+    #     height_ensemble_workflow_scan_path,
+    #     depth_artifacts,
+    #     person_details)
+    # flows.append(flow)
 
     flow = WeightFlow(
         result_generation,
