@@ -7,16 +7,17 @@ from datetime import datetime
 from fastcore.basics import store_attr
 
 resize_factor_for_scan_version = {
-    "v0.1":3,
-    "v0.2":3,
-    "v0.4":3,
-    "v0.5":3,
-    "v0.6":3,
-    "v0.7":4,
-    "v0.8":1,
-    "v0.9":1,
-    "v1.0":1,
+    "v0.1": 3,
+    "v0.2": 3,
+    "v0.4": 3,
+    "v0.5": 3,
+    "v0.6": 3,
+    "v0.7": 4,
+    "v0.8": 1,
+    "v0.9": 1,
+    "v1.0": 1,
 }
+
 
 class BlurFlow:
     """Face blur results generation"""
@@ -61,7 +62,7 @@ class BlurFlow:
             # Default Resize factor to 1
             print("New Scan Version Type")
             self.resize_factor = 1
-        
+
         print("resize_factor is ", self.resize_factor)
         print("scan_version is ", self.scan_version)
 
