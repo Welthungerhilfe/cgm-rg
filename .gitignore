@@ -127,3 +127,9 @@ venv.bak/
 
 # os
 .DS_Store
+
+
+../.amlignore
+../.amlignore.amltmp
+.amlignore
+.amlignore.amltmp
