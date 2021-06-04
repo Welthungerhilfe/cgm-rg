@@ -157,11 +157,10 @@ stages:
           value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
       jobs:
         - deployment: Deploy_Container_Instance
-          variables:
-          - name: TAG
-            value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
           displayName: "Container Instance deployment ${{ env }}"
           environment: cgm-rg-${{ env }}-env
+          variables:
+            isRelease: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
           strategy:
             runOnce:
               deploy:
@@ -174,10 +173,19 @@ stages:
                   - script: |
                       set -e
                       echo $(TAG)
-                      echo $TAG
+                      
+                      if [ "$(isRelease)" == 'True' ]
+                      then
+                        # Read version from version file
+                        tag=$(head -n 1 VERSION)
+                      else
+                        # For feature commits tag containers with Git hash
+                        tag=$(git rev-parse HEAD)
+
+                      echo $tag
                       docker image load -i $(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)
-                      echo $(IMAGE_REPOSITORY):$(TAG)
-                      docker tag "$(IMAGE_REPOSITORY):$(TAG)" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
+                      echo $(IMAGE_REPOSITORY):$(tag)
+                      docker tag "$(IMAGE_REPOSITORY):$(tag)" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(tag)"
                     displayName: Load and Tag image
                   - task: AzureCLI@2
                     displayName: Push to target ACR
