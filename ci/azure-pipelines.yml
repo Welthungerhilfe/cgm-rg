@@ -45,7 +45,8 @@ stages:
                 # For feature commits tag containers with Git hash
                 tag=$(git rev-parse HEAD)
               fi
-              echo $tag
+              echo "$tag"
+              echo tag
               echo $(tag)
               echo "##vso[task.setvariable variable=TAG;isOutput=true]$tag"
             name: ParseTag
