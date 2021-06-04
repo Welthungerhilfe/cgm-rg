@@ -173,7 +173,7 @@ stages:
                       path: $(DOCKER_CACHE_DIR)
                   - script: |
                       set -e
-                      echo $(TAG)
+                      echo "$(TAG)"
                       
                       if [ "$(isRelease)" == 'True' ]
                       then
@@ -182,10 +182,10 @@ stages:
                       else
                         # For feature commits tag containers with Git hash
                         tag=$(git rev-parse HEAD)
-
+                      fi
                       echo "$tag"
                       docker image load -i $(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)
-                      echo $(IMAGE_REPOSITORY):"$tag"
+                      echo "$(IMAGE_REPOSITORY):$tag"
                       docker tag "$(IMAGE_REPOSITORY):$tag" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$tag"
                     displayName: Load and Tag image
                   - task: AzureCLI@2
