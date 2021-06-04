@@ -149,7 +149,7 @@ stages:
     - stage: Deploy_${{ replace(env, '-', '_') }}
       displayName: Deploy ${{ env }}
       dependsOn: Build
-      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+      # condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
       variables:
         - group: cgm-rg-${{ env }}-ci
         - name: TAG
@@ -169,7 +169,10 @@ stages:
                       path: $(DOCKER_CACHE_DIR)
                   - script: |
                       set -e
+                      echo $(TAG)
+                      echo $TAG
                       docker image load -i $(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)
+                      echo $(IMAGE_REPOSITORY):$(TAG)
                       docker tag "$(IMAGE_REPOSITORY):$(TAG)" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
                     displayName: Load and Tag image
                   - task: AzureCLI@2
