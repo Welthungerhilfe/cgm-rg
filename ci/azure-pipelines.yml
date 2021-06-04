@@ -139,6 +139,7 @@ stages:
                 $(TAG)
           - script: |
               set -e
+              echo $(TAG)
               mkdir -p $(DOCKER_CACHE_DIR)
               docker image save --output "$(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)" $(IMAGE_REPOSITORY)
             condition: not(canceled())
@@ -156,6 +157,9 @@ stages:
           value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
       jobs:
         - deployment: Deploy_Container_Instance
+          variables:
+          - name: TAG
+            value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
           displayName: "Container Instance deployment ${{ env }}"
           environment: cgm-rg-${{ env }}-env
           strategy:
