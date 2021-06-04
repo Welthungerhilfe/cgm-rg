@@ -184,8 +184,8 @@ stages:
 
                       echo $tag
                       docker image load -i $(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)
-                      echo $(IMAGE_REPOSITORY):$(tag)
-                      docker tag "$(IMAGE_REPOSITORY):$(tag)" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(tag)"
+                      echo $(IMAGE_REPOSITORY):$tag
+                      docker tag "$(IMAGE_REPOSITORY):$tag" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$tag"
                     displayName: Load and Tag image
                   - task: AzureCLI@2
                     displayName: Push to target ACR
