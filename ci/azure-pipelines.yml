@@ -120,7 +120,7 @@ stages:
     dependsOn:
       - Setup
       - Verify
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+    # condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
     variables:
       - name: TAG
         value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
