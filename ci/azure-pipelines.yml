@@ -17,6 +17,8 @@ variables:
     value: image.tar
   - name: VENV_CACHE_DIR
     value: $(Pipeline.Workspace)/.venv
+  - name: System.Debug
+    value: 'true'
 
 parameters:
   - name: var_groups
