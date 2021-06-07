@@ -17,6 +17,8 @@ variables:
     value: image.tar
   - name: VENV_CACHE_DIR
     value: $(Pipeline.Workspace)/.venv
+  - name: System.Debug
+    value: 'true'
 
 parameters:
   - name: var_groups
@@ -45,6 +47,7 @@ stages:
                 # For feature commits tag containers with Git hash
                 tag=$(git rev-parse HEAD)
               fi
+              echo "##[debug] tag: $tag"
               echo "##vso[task.setvariable variable=TAG;isOutput=true]$tag"
             name: ParseTag
             displayName: Parse Docker tag
@@ -139,6 +142,8 @@ stages:
                 $(TAG)
           - script: |
               set -e
+              echo $(TAG)
+              echo "##[debug] TAG: $(TAG)"
               mkdir -p $(DOCKER_CACHE_DIR)
               docker image save --output "$(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)" $(IMAGE_REPOSITORY)
             condition: not(canceled())
@@ -148,7 +153,9 @@ stages:
   - ${{ each env in parameters.var_groups }}:
     - stage: Deploy_${{ replace(env, '-', '_') }}
       displayName: Deploy ${{ env }}
-      dependsOn: Build
+      dependsOn: 
+        - Setup
+        - Build
       condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
       variables:
         - group: cgm-rg-${{ env }}-ci
@@ -158,6 +165,8 @@ stages:
         - deployment: Deploy_Container_Instance
           displayName: "Container Instance deployment ${{ env }}"
           environment: cgm-rg-${{ env }}-env
+          variables:
+            isRelease: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
           strategy:
             runOnce:
               deploy:
@@ -168,9 +177,18 @@ stages:
                       artifact: DockerCache
                       path: $(DOCKER_CACHE_DIR)
                   - script: |
+                      # echo all variables for debug
+                      echo "##[debug] TAG: $(TAG)"
+                      echo "##[debug] isRelease: $(isRelease)"
+                      echo "##[debug] DOCKER_CACHE_DIR: $(DOCKER_CACHE_DIR)"
+                      echo "##[debug] DOCKER_CACHE_IMG_FILE: $(DOCKER_CACHE_IMG_FILE)"
+                      echo "##[debug] IMAGE_REPOSITORY: $(IMAGE_REPOSITORY)"
+                      echo "##[debug] TARGET_REGISTRY: $(TARGET_REGISTRY)"
+
                       set -e
                       docker image load -i $(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)
-                      docker tag "$(IMAGE_REPOSITORY):$(TAG)" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
+                      echo "##[debug] IMAGE_REPOSITORY:tag : $(IMAGE_REPOSITORY):$TAG"
+                      docker tag "$(IMAGE_REPOSITORY):$TAG" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$TAG"
                     displayName: Load and Tag image
                   - task: AzureCLI@2
                     displayName: Push to target ACR
@@ -195,7 +213,8 @@ stages:
                       scriptLocation: inlineScript
                       inlineScript: |
                         set -e
-
+                        
+                        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
                         # Export current setup -> modify and use as input for in-place update
                         TMP_CONF_FILE=rg-ci-conf.yaml
                         az container export \
