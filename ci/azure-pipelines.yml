@@ -174,8 +174,15 @@ stages:
                       artifact: DockerCache
                       path: $(DOCKER_CACHE_DIR)
                   - script: |
+                      # echo all variables for debug
+                      echo "##[debug] TAG: $(TAG)"
+                      echo "##[debug] isRelease: $(isRelease)"
+                      echo "##[debug] DOCKER_CACHE_DIR: $(DOCKER_CACHE_DIR)"
+                      echo "##[debug] DOCKER_CACHE_IMG_FILE: $(DOCKER_CACHE_IMG_FILE)"
+                      echo "##[debug] IMAGE_REPOSITORY: $(IMAGE_REPOSITORY)"
+                      echo "##[debug] TARGET_REGISTRY: $(TARGET_REGISTRY)"
+
                       set -e
-                      echo "$(TAG)"
                       
                       if [ "$(isRelease)" == 'True' ]
                       then
@@ -185,9 +192,9 @@ stages:
                         # For feature commits tag containers with Git hash
                         tag=$(git rev-parse HEAD)
                       fi
-                      echo "$tag"
+                      echo "##[debug] $tag"
                       docker image load -i $(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)
-                      echo "$(IMAGE_REPOSITORY):$tag"
+                      echo "##[debug] IMAGE_REPOSITORY:tag : $(IMAGE_REPOSITORY):$tag"
                       docker tag "$(IMAGE_REPOSITORY):$tag" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$tag"
                     displayName: Load and Tag image
                   - task: AzureCLI@2
