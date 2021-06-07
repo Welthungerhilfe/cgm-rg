@@ -157,7 +157,8 @@ stages:
       # condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
       variables:
         - group: cgm-rg-${{ env }}-ci
-        - TAG: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
+        - name: TAG
+          value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
       jobs:
         - deployment: Deploy_Container_Instance
           displayName: "Container Instance deployment ${{ env }}"
