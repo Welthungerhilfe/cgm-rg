@@ -213,7 +213,8 @@ stages:
                       scriptLocation: inlineScript
                       inlineScript: |
                         set -e
-
+                        
+                        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
                         # Export current setup -> modify and use as input for in-place update
                         TMP_CONF_FILE=rg-ci-conf.yaml
                         az container export \
