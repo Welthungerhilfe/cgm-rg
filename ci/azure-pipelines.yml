@@ -47,7 +47,7 @@ stages:
                 # For feature commits tag containers with Git hash
                 tag=$(git rev-parse HEAD)
               fi
-              echo "$tag"
+              echo "##[debug] tag: $tag"
               echo "##vso[task.setvariable variable=TAG;isOutput=true]$tag"
             name: ParseTag
             displayName: Parse Docker tag
@@ -143,6 +143,7 @@ stages:
           - script: |
               set -e
               echo $(TAG)
+              echo "##[debug] TAG: $(TAG)"
               mkdir -p $(DOCKER_CACHE_DIR)
               docker image save --output "$(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)" $(IMAGE_REPOSITORY)
             condition: not(canceled())
@@ -156,8 +157,7 @@ stages:
       # condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
       variables:
         - group: cgm-rg-${{ env }}-ci
-        - name: TAG
-          value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
+        - TAG: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
       jobs:
         - deployment: Deploy_Container_Instance
           displayName: "Container Instance deployment ${{ env }}"
