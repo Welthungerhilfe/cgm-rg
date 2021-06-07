@@ -268,40 +268,40 @@ def main():
 
     result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, scan_parent_dir)
 
-    flow = BlurFlow(
-        result_generation,
-        blur_workflow_path,
-        rgb_artifacts,
-        scan_version)
-    flows.append(flow)
+    # flow = BlurFlow(
+    #     result_generation,
+    #     blur_workflow_path,
+    #     rgb_artifacts,
+    #     scan_version)
+    # flows.append(flow)
 
-    flow = StandingLaying(
-        result_generation,
-        standing_laying_workflow_path,
-        rgb_artifacts)
-    flows.append(flow)
+    # flow = StandingLaying(
+    #     result_generation,
+    #     standing_laying_workflow_path,
+    #     rgb_artifacts)
+    # flows.append(flow)
 
-    flow = DepthMapImgFlow(
-        result_generation,
-        depthmap_img_workflow_path,
-        depth_artifacts)
-    flows.append(flow)
+    # flow = DepthMapImgFlow(
+    #     result_generation,
+    #     depthmap_img_workflow_path,
+    #     depth_artifacts)
+    # flows.append(flow)
 
-    flow = HeightFlowPlainCnn(
-        result_generation,
-        height_workflow_artifact_path,
-        height_workflow_scan_path,
-        depth_artifacts,
-        person_details)
-    flows.append(flow)
+    # flow = HeightFlowPlainCnn(
+    #     result_generation,
+    #     height_workflow_artifact_path,
+    #     height_workflow_scan_path,
+    #     depth_artifacts,
+    #     person_details)
+    # flows.append(flow)
 
-    flow = HeightFlowMultiArtifact(
-        result_generation,
-        height_workflow_artifact_path,
-        height_depthmapmultiartifactlatefusion_workflow_path,
-        depth_artifacts,
-        person_details)
-    flows.append(flow)
+    # flow = HeightFlowMultiArtifact(
+    #     result_generation,
+    #     height_workflow_artifact_path,
+    #     height_depthmapmultiartifactlatefusion_workflow_path,
+    #     depth_artifacts,
+    #     person_details)
+    # flows.append(flow)
 
     # flow = HeightFlowDeepEnsemble(
     #     result_generation,
@@ -311,13 +311,13 @@ def main():
     #     person_details)
     # flows.append(flow)
 
-    flow = WeightFlow(
-        result_generation,
-        weight_workflow_artifact_path,
-        weight_workflow_scan_path,
-        depth_artifacts,
-        person_details)
-    flows.append(flow)
+    # flow = WeightFlow(
+    #     result_generation,
+    #     weight_workflow_artifact_path,
+    #     weight_workflow_scan_path,
+    #     depth_artifacts,
+    #     person_details)
+    # flows.append(flow)
 
     flow = HeightFlowRGBD(
             result_generation,
