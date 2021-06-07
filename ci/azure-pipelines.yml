@@ -153,7 +153,9 @@ stages:
   - ${{ each env in parameters.var_groups }}:
     - stage: Deploy_${{ replace(env, '-', '_') }}
       displayName: Deploy ${{ env }}
-      dependsOn: Build
+      dependsOn: 
+        - Setup
+        - Build
       # condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
       variables:
         - group: cgm-rg-${{ env }}-ci
@@ -184,19 +186,9 @@ stages:
                       echo "##[debug] TARGET_REGISTRY: $(TARGET_REGISTRY)"
 
                       set -e
-                      
-                      if [ "$(isRelease)" == 'True' ]
-                      then
-                        # Read version from version file
-                        tag=$(head -n 1 VERSION)
-                      else
-                        # For feature commits tag containers with Git hash
-                        tag=$(git rev-parse HEAD)
-                      fi
-                      echo "##[debug] $tag"
                       docker image load -i $(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)
-                      echo "##[debug] IMAGE_REPOSITORY:tag : $(IMAGE_REPOSITORY):$tag"
-                      docker tag "$(IMAGE_REPOSITORY):$tag" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$tag"
+                      echo "##[debug] IMAGE_REPOSITORY:tag : $(IMAGE_REPOSITORY):$TAG"
+                      docker tag "$(IMAGE_REPOSITORY):$TAG" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$TAG"
                     displayName: Load and Tag image
                   - task: AzureCLI@2
                     displayName: Push to target ACR
