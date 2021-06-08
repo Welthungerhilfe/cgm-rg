@@ -1,7 +1,5 @@
-src/data/scans/*
+src/data/**
 test-output.xml
-
-*.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
