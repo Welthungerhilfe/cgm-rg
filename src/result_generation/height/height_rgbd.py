@@ -30,34 +30,36 @@ class HeightFlowRGBD(HeightFlow):
             self.result_generation.scan_metadata['id'],
             'img')
         image_order_ids = []
-        order_ids=[image_order_ids.append(artifact['order']) for artifact in self.image_artifacts]
+        for image_artifacts in self.image_artifacts:
+            image_order_ids.append(image_artifacts['order']
+
         for artifact in self.artifacts:
-            input_path = self.result_generation.get_input_path(
+            input_path=self.result_generation.get_input_path(
                 self.scan_directory, artifact['file'])
-            depth_order = artifact['order']
-            closest_order_id = preprocessing.find_corresponding_image(image_order_ids,depth_order)
+            depth_order=artifact['order']
+            closest_order_id=preprocessing.find_corresponding_image(image_order_ids, depth_order)
 
             # closest_order_id = min(image_order_ids, key=lambda order:abs(order-img_id))
-            result_image_dict = next(
+            result_image_dict=next(
                 iter(item for item in self.image_artifacts if item['order'] == closest_order_id), None)
             if result_image_dict:
-                image_input_path = self.result_generation.get_input_path(
+                image_input_path=self.result_generation.get_input_path(
                     scan_image_directory, result_image_dict['file'])
             else:
-                print("No RGB found for order:", img_id)
+                print("No RGB found for order:", depth_order)
                 continue
-            raw_image = cv2.imread(str(image_input_path))  # cv2.imread gives error when reading from posix path
-            rot_image = cv2.rotate(raw_image, cv2.ROTATE_90_CLOCKWISE)
-            image = preprocessing.preprocess_image(rot_image)
-            data, width, height, depth_scale, _max_confidence = preprocessing.load_depth(
+            raw_image=cv2.imread(str(image_input_path))  # cv2.imread gives error when reading from posix path
+            rot_image=cv2.rotate(raw_image, cv2.ROTATE_90_CLOCKWISE)
+            image=preprocessing.preprocess_image(rot_image)
+            data, width, height, depth_scale, _max_confidence=preprocessing.load_depth(
                 input_path)
-            depthmap = preprocessing.prepare_depthmap(
+            depthmap=preprocessing.prepare_depthmap(
                 data, width, height, depth_scale)
-            depthmap = preprocessing.preprocess(depthmap)
-            rgbd_data = tf.concat([image, depthmap], axis=2)
-            rgbd_data = tf.image.resize(
+            depthmap=preprocessing.preprocess(depthmap)
+            rgbd_data=tf.concat([image, depthmap], axis=2)
+            rgbd_data=tf.image.resize(
                 rgbd_data, (preprocessing.IMAGE_TARGET_HEIGHT,
                             preprocessing.IMAGE_TARGET_WIDTH))
             rgbd_scan.append(rgbd_data)
-        rgbd_scan = np.array(rgbd_scan)
+        rgbd_scan=np.array(rgbd_scan)
         return rgbd_scan
