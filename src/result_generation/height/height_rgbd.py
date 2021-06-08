@@ -14,7 +14,7 @@ sys.path.append(str(Path(__file__).parents[1]))
 import utils.inference as inference  # noqa: E402
 import utils.preprocessing as preprocessing  # noqa: E402
 
-ORDER_DIFFERENCE_ALLOWED =3 
+ORDER_DIFFERENCE_ALLOWED = 3
 
 
 class HeightFlowRGBD(HeightFlow):
@@ -30,15 +30,18 @@ class HeightFlowRGBD(HeightFlow):
             self.result_generation.scan_parent_dir,
             self.result_generation.scan_metadata['id'],
             'img')
+
         image_order_ids = []
-        order_ids=[image_order_ids.append(artifact['order']) for artifact in self.image_artifacts]
+        for image_artifact in self.image_artifacts:
+            image_order_ids.append(image_artifact['order'])
+
+        print("image order_idss", image_order_ids)
         for artifact in self.artifacts:
             input_path = self.result_generation.get_input_path(
                 self.scan_directory, artifact['file'])
             depth_id = artifact['order']
-            closest_order_id = preprocessing.find_corresponding_image(image_order_ids,depth_id)
-            print("closest order:",closest_order_id)
-            if abs(closest_order_id-depth_id) >= ORDER_DIFFERENCE_ALLOWED:
+            closest_order_id = preprocessing.find_corresponding_image(image_order_ids, depth_id)
+            if abs(closest_order_id - depth_id) >= ORDER_DIFFERENCE_ALLOWED:
                 logging.info("No corresponding image artifact found for the depthmap")
                 continue
             # closest_order_id = min(image_order_ids, key=lambda order:abs(order-img_id))
@@ -48,7 +51,7 @@ class HeightFlowRGBD(HeightFlow):
                 image_input_path = self.result_generation.get_input_path(
                     scan_image_directory, result_image_dict['file'])
             else:
-                logging.info("No RGB found for order:", img_id)
+                logging.info("No RGB found for order:", depth_id)
                 continue
             image = cv2.imread(str(image_input_path))  # cv2.imread gives error when reading from posix path
             image = preprocessing.preprocess_image(image)
