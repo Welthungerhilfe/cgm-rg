@@ -320,12 +320,12 @@ def main():
     flows.append(flow)
 
     flow = HeightFlowRGBD(
-            result_generation,
-            height_rgbd_workflow_artifact_path,
-            height_rgbd_workflow_scan_path,
-            depth_artifacts,
-            person_details,
-            rgb_artifacts)
+        result_generation,
+        height_rgbd_workflow_artifact_path,
+        height_rgbd_workflow_scan_path,
+        depth_artifacts,
+        person_details,
+        rgb_artifacts)
     flows.append(flow)
 
     for flow in flows:
