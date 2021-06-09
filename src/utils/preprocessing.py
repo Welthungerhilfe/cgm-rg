@@ -129,3 +129,11 @@ def sample_systematic_from_artifacts(artifacts: list, n_artifacts: int) -> list:
     selected_artifacts = [artifacts[i] for i in indexes_to_select]
     assert len(selected_artifacts) == n_artifacts, str(artifacts)
     return selected_artifacts
+
+
+def find_corresponding_image(image_order_ids, depth_id):
+    """
+    Code to find corresponding image for the given depthmap on the basis of order
+    """
+    closest_order_id = min(image_order_ids, key=lambda order: abs(order - depth_id))
+    return closest_order_id
