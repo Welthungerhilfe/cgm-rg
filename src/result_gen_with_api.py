@@ -14,6 +14,7 @@ from result_generation.height.height_multiartifact import HeightFlowMultiArtifac
 # from result_generation.height.height_ensemble import HeightFlowDeepEnsemble
 from result_generation.standing import StandingLaying
 from result_generation.weight import WeightFlow
+from result_generation.height.height_rgbd import HeightFlowRGBD
 
 
 class ProcessWorkflows:
@@ -215,6 +216,8 @@ def parse_args():
     # parser.add_argument('--height_ensemble_workflow_scan_path', default="/app/src/workflows/height-ensemble-workflow-scan.json")  # noqa: E501
     parser.add_argument('--weight_workflow_artifact_path', default=f"{workflow_dir}/weight-workflow-artifact-run_05.json")  # noqa: E501
     parser.add_argument('--weight_workflow_scan_path', default=f"{workflow_dir}/weight-workflow-scan-run_05.json")  # noqa: E501
+    parser.add_argument('--height_rgbd_workflow_artifact_path', default=f"{workflow_dir}/height-rgbd-workflow-artifact.json")  # noqa: E501
+    parser.add_argument('--height_rgbd_workflow_scan_path', default=f"{workflow_dir}/height-rgbd-workflow-scan.json")  # noqa: E501
     args = parser.parse_args()
     return args
 
@@ -232,6 +235,8 @@ def main():
     height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
+    height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
+    height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
@@ -312,6 +317,15 @@ def main():
         weight_workflow_scan_path,
         depth_artifacts,
         person_details)
+    flows.append(flow)
+
+    flow = HeightFlowRGBD(
+        result_generation,
+        height_rgbd_workflow_artifact_path,
+        height_rgbd_workflow_scan_path,
+        depth_artifacts,
+        person_details,
+        rgb_artifacts)
     flows.append(flow)
 
     for flow in flows:
