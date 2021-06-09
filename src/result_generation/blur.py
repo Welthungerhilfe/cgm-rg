@@ -1,11 +1,22 @@
 import os
-import uuid
-from datetime import datetime
-
 import cv2
+import uuid
 import face_recognition
 from bunch import Bunch
+from datetime import datetime
 from fastcore.basics import store_attr
+
+resize_factor_for_scan_version = {
+    "v0.1": 3,
+    "v0.2": 3,
+    "v0.4": 3,
+    "v0.5": 3,
+    "v0.6": 3,
+    "v0.7": 4,
+    "v0.8": 1,
+    "v0.9": 1,
+    "v1.0": 1,
+}
 
 
 class BlurFlow:
@@ -45,24 +56,15 @@ class BlurFlow:
                 artifact['blurred_image'] = blur_img_binary
 
     def blur_set_resize_factor(self):
-        if self.scan_version in ["v0.1", "v0.2", "v0.4", "v0.5", "v0.6"]:
-            self.resize_factor = 3
-            print("resize_factor is ", self.resize_factor)
-            print("scan_version is ", self.scan_version)
-        elif self.scan_version in ["v0.7"]:
-            self.resize_factor = 4
-            print("resize_factor is ", self.resize_factor)
-            print("scan_version is ", self.scan_version)
-        elif self.scan_version in ["v0.8", "v0.9", "v1.0"]:
-            self.resize_factor = 1
-            print("resize_factor is ", self.resize_factor)
-            print("scan_version is ", self.scan_version)
+        if self.scan_version in resize_factor_for_scan_version:
+            self.resize_factor = resize_factor_for_scan_version[self.scan_version]
         else:
             # Default Resize factor to 1
             print("New Scan Version Type")
             self.resize_factor = 1
-            print("Default resize_factor is ", self.resize_factor)
-            print("scan_version is ", self.scan_version)
+
+        print("resize_factor is ", self.resize_factor)
+        print("scan_version is ", self.scan_version)
 
     def blur_img_transformation_using_scan_version(self, rgb_image):
         if self.scan_version in ["v0.7"]:
@@ -74,12 +76,12 @@ class BlurFlow:
         # print("scan_version is ", self.scan_version)
         image = rgb_image[:, :, ::-1]  # RGB -> BGR for OpenCV
 
-        if self.scan_version in ["v0.1", "v0.2", "v0.4", "v0.5", "v0.6", "v0.7", "v0.8", "v0.9", "v1.0"]:
-            # The images are provided in 90degrees turned. Here we rotate 90degress to
-            # the right.
-            image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
-            print("scan_version is ", self.scan_version)
-            print("swapped image axis")
+        # if self.scan_version in ["v0.1", "v0.2", "v0.4", "v0.5", "v0.6", "v0.7", "v0.8", "v0.9", "v1.0"]:
+        # The images are provided in 90degrees turned. Here we rotate 90degress to
+        # the right.
+        image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+        print("scan_version is ", self.scan_version)
+        print("swapped image axis")
 
         return image
 

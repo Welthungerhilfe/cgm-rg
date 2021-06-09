@@ -70,7 +70,7 @@ def main():
     # Downlaod model for  weight
     download_model(ws=ws,
                    experiment_name='q4-depthmap-plaincnn-weight-95k',
-                   run_id='q4-depthmap-plaincnn-weight-95k_1611336518_642a9c58',
+                   run_id='q4-depthmap-plaincnn-weight-95k_1616424204_63e3c1b8',
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/weight')
 

@@ -1,7 +1,5 @@
-src/data/scans/*
+src/data/**
 test-output.xml
-
-*.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -127,3 +125,9 @@ venv.bak/
 
 # os
 .DS_Store
+
+
+../.amlignore
+../.amlignore.amltmp
+.amlignore
+.amlignore.amltmp
