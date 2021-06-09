@@ -73,8 +73,7 @@ class WeightFlow:
         ))
         mean_prediction = self.result_generation.get_mean_scan_results(predictions)
         class_wfa = self.zscore_wfa(mean_prediction)
-        result = {'mean_weight': mean_prediction, 'Weight Diagnosis': class_wfa}
-        result.data = result
+        result.data = {'mean_weight': mean_prediction, 'Weight Diagnosis': class_wfa}
         res.results.append(result)
         return res
 
