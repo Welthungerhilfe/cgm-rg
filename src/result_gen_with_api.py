@@ -280,9 +280,7 @@ def run_retroactive_flow():
                 flow.run_flow()
             except Exception as e:
                 print(e)
-        
         queue_service.delete_message(queue_name, message.id, message.pop_receipt)
-
 
 
 def main():
