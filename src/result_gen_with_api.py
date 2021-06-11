@@ -173,12 +173,21 @@ def run_retroactive_flow():
     cgm_api = ApiEndpoints(url)
     workflow = ProcessWorkflows(cgm_api)
     workflow.get_list_of_worflows()
-    queue_service = QueueService(connection_string=connect_str)
-    messages = queue_service.get_messages(queue_name, num_messages=1, visibility_timeout=5 * 60)
+    try:
+        queue_service = QueueService(connection_string=connect_str)
+    except Exception as e:
+        print("Error: ", e)
+        return
+
+    messages = queue_service.get_messages(queue_name, num_messages=1, visibility_timeout=1)
     print("Length of messages : ", len(messages))
+    print("messages : ", messages)
 
     for message in messages:
-        original_msg = base64.b64decode(message.content)
+        encoded_msg = message.content
+
+        print("message.content : ", encoded_msg)
+        original_msg = base64.b64decode(encoded_msg)
         print("message : ", original_msg)
 
         scan_metadata_with_workflow_obj = json.loads(original_msg)
@@ -264,15 +273,16 @@ def run_retroactive_flow():
                 rgb_artifacts)
         else:
             workflow_matched = False
-            print("workflow id does not match with any of the workflow id")
+            print("Workflow id does not match with any of the id of registered Workflow")
 
         if workflow_matched:
             try:
                 flow.run_flow()
             except Exception as e:
                 print(e)
-
+        
         queue_service.delete_message(queue_name, message.id, message.pop_receipt)
+
 
 
 def main():
