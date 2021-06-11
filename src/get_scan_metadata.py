@@ -1,6 +1,7 @@
 import json
 from api_endpoints import ApiEndpoints
 
+
 class GetScanMetadata:
     """Get and process scan metadata"""
 

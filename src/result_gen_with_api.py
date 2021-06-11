@@ -1,14 +1,9 @@
 import argparse
-import copy
+import base64
 import json
 import os
-import pprint
 import uuid
-from pathlib import Path
-from azure.storage.queue import (
-        QueueService,
-        QueueMessageFormat
-)
+from azure.storage.queue import QueueService
 
 from api_endpoints import ApiEndpoints
 from get_scan_metadata import GetScanMetadata
@@ -45,6 +40,7 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+
 def run_normal_flow():
     args = parse_args()
     scan_parent_dir = args.scan_parent_dir
@@ -70,7 +66,6 @@ def run_normal_flow():
     workflow = ProcessWorkflows(cgm_api)
     get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
 
-    
     if get_scan_metadata.get_unprocessed_scans() <= 0:
         return
 
@@ -143,7 +138,6 @@ def run_normal_flow():
         rgb_artifacts)
     flows.append(flow)
 
-    
     for flow in flows:
         try:
             flow.run_flow()
@@ -154,7 +148,7 @@ def run_normal_flow():
 def run_retroactive_flow():
 
     args = parse_args()
-    scan_parent_dir = args.scan_parent_dir
+    # scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
     standing_laying_workflow_path = args.standing_laying_workflow_path
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
@@ -180,11 +174,10 @@ def run_retroactive_flow():
     workflow = ProcessWorkflows(cgm_api)
     workflow.get_list_of_worflows()
     queue_service = QueueService(connection_string=connect_str)
-    messages = queue_service.get_messages(queue_name, num_messages=1, visibility_timeout=5*60)
+    messages = queue_service.get_messages(queue_name, num_messages=1, visibility_timeout=5 * 60)
     print("Length of messages : ", len(messages))
 
     for message in messages:
-        encoded_msg = message.content
         original_msg = base64.b64decode(message.content)
         print("message : ", original_msg)
 
@@ -199,7 +192,7 @@ def run_retroactive_flow():
         workflow_id = scan_metadata_with_workflow_obj['workflow_id']
         print("Workflow ID : ", workflow_id)
 
-        data_processing = PrepareArtifacts(cgm_api, scan_metadata, retroactive_scan_dir)    
+        data_processing = PrepareArtifacts(cgm_api, scan_metadata, retroactive_scan_dir)
         data_processing.process_scan_metadata()
         data_processing.create_scan_dir()
         data_processing.create_artifact_dir()
@@ -241,7 +234,6 @@ def run_retroactive_flow():
                 height_workflow_scan_path,
                 depth_artifacts,
                 person_details)
-            flows.append(flow)
 
         elif workflow.match_workflows(height_depthmapmultiartifactlatefusion_workflow_path, workflow_id):
             print("HeightFlowMultiArtifact")
@@ -260,6 +252,7 @@ def run_retroactive_flow():
                 weight_workflow_scan_path,
                 depth_artifacts,
                 person_details)
+
         elif workflow.match_workflows(height_rgbd_workflow_scan_path, workflow_id):
             print("HeightFlowRGBD")
             flow = HeightFlowRGBD(
@@ -282,11 +275,9 @@ def run_retroactive_flow():
         queue_service.delete_message(queue_name, message.id, message.pop_receipt)
 
 
-
 def main():
     run_normal_flow()
     run_retroactive_flow()
-
 
 
 if __name__ == "__main__":
