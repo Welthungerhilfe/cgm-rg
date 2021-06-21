@@ -26,8 +26,8 @@ parameters:
     default:
       - sandbox
       - demo-qa
-#      - inbmz
-#      - naunam
+      - inbmz
+      - naunam
 
 stages:
   - stage: Setup
