@@ -184,10 +184,10 @@ def run_retroactive_flow():
     print("messages : ", messages)
 
     for message in messages:
-        encoded_msg = message.content
+        encoded_msg = message.content[2:-1].encode('utf-8')
 
         print("message.content : ", encoded_msg)
-        original_msg = base64.b64decode(encoded_msg)
+        original_msg = base64.b64decode(encoded_msg).decode('utf-8', "ignore")
         print("message : ", original_msg)
 
         scan_metadata_with_workflow_obj = json.loads(original_msg)
@@ -285,7 +285,7 @@ def run_retroactive_flow():
 
 def main():
     run_normal_flow()
-    # run_retroactive_flow()
+    run_retroactive_flow()
 
 
 if __name__ == "__main__":
