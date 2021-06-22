@@ -284,7 +284,7 @@ def run_retroactive_flow():
 
 
 def main():
-    # run_normal_flow()
+    run_normal_flow()
     run_retroactive_flow()
 
 
