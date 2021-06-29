@@ -21,6 +21,7 @@ resize_factor_for_scan_version = {
 
 class BlurFlow:
     """Face blur results generation"""
+
     def __init__(
             self,
             result_generation,
@@ -134,7 +135,7 @@ class BlurFlow:
 
         # logging.info(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
         print(f"{len(face_locations)} face locations found and blurred for path: {source_path}\n")
-        return rgb_image, True ,faces_detected
+        return rgb_image, True, faces_detected
 
     def post_blur_files(self):
         """Post the blurred file to the API"""
@@ -158,7 +159,7 @@ class BlurFlow:
                 source_results=[],
                 file=artifact['blur_id_from_post_request'],
                 generated=artifact['generated_timestamp'],
-                data = {'faces_detected': str( artifact['faces_detected'])},
+                data={'faces_detected': str(artifact['faces_detected'])},
             ))
             res.results.append(result)
 
