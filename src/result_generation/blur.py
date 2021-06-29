@@ -21,6 +21,7 @@ resize_factor_for_scan_version = {
 
 class BlurFlow:
     """Face blur results generation"""
+
     def __init__(
             self,
             result_generation,
@@ -51,9 +52,10 @@ class BlurFlow:
         for artifact in self.artifacts:
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             print(f"input_path of image to perform blur: {input_path}\n")
-            blur_img_binary, blur_status = self.blur_face(input_path)
+            blur_img_binary, blur_status, faces_detected = self.blur_face(input_path)
             if blur_status:
                 artifact['blurred_image'] = blur_img_binary
+                artifact['faces_detected'] = faces_detected
 
     def blur_set_resize_factor(self):
         if self.scan_version in resize_factor_for_scan_version:
@@ -82,7 +84,6 @@ class BlurFlow:
         image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
         print("scan_version is ", self.scan_version)
         print("swapped image axis")
-
         return image
 
     def blur_face(self, source_path: str) -> bool:
@@ -103,6 +104,8 @@ class BlurFlow:
 
         # Find face locations.
         face_locations = face_recognition.face_locations(small_image, model="cnn")
+
+        faces_detected = len(face_locations)
 
         # Blur the image.
         for top, right, bottom, left in face_locations:
@@ -132,7 +135,7 @@ class BlurFlow:
 
         # logging.info(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
         print(f"{len(face_locations)} face locations found and blurred for path: {source_path}\n")
-        return rgb_image, True
+        return rgb_image, True, faces_detected
 
     def post_blur_files(self):
         """Post the blurred file to the API"""
@@ -156,6 +159,7 @@ class BlurFlow:
                 source_results=[],
                 file=artifact['blur_id_from_post_request'],
                 generated=artifact['generated_timestamp'],
+                data={'faces_detected': str(artifact['faces_detected'])},
             ))
             res.results.append(result)
 
