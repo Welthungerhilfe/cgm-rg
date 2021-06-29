@@ -55,7 +55,6 @@ class BlurFlow:
             if blur_status:
                 artifact['blurred_image'] = blur_img_binary
                 artifact['faces_detected'] = faces_detected
-                print("No. of faces detected:", artifact['faces_detected'])
 
     def blur_set_resize_factor(self):
         if self.scan_version in resize_factor_for_scan_version:
@@ -84,7 +83,6 @@ class BlurFlow:
         image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
         print("scan_version is ", self.scan_version)
         print("swapped image axis")
-
         return image
 
     def blur_face(self, source_path: str) -> bool:
@@ -160,6 +158,7 @@ class BlurFlow:
                 source_results=[],
                 file=artifact['blur_id_from_post_request'],
                 generated=artifact['generated_timestamp'],
+                data = {'faces_detected': str( artifact['faces_detected'])},
             ))
             res.results.append(result)
 
