@@ -21,3 +21,4 @@ cgmzscore
 mock==4.0.3
 glob2
 fastcore
+azure-storage-queue==2.1.0
