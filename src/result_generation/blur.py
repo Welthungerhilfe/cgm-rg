@@ -197,4 +197,4 @@ class BlurFlow:
         faces_res = self.prepare_faces_result_object()
         faces_res_object = self.result_generation.bunch_object_to_json_object(faces_res)
         if self.result_generation.api.post_results(faces_res_object) == 201:
-            print("successfully post faces detected results: ",  faces_res_object)
+            print("successfully post faces detected results: ", faces_res_object)
