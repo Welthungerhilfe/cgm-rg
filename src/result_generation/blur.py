@@ -26,18 +26,24 @@ class BlurFlow:
             self,
             result_generation,
             workflow_path,
+            workflow_faces_path,
             artifacts,
             scan_version):
-        store_attr('result_generation,artifacts,workflow_path,artifacts,scan_version', self)
+        store_attr('result_generation,artifacts,workflow_path,workflow_faces_path,artifacts,scan_version', self)
         self.workflow_obj = self.result_generation.workflows.load_workflows(self.workflow_path)
+        self.workflow_faces_obj = self.result_generation.workflows.load_workflows(self.workflow_faces_path)
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.blur_input_format = 'img'
         self.scan_directory = os.path.join(
             self.result_generation.scan_parent_dir,
             self.result_generation.scan_metadata['id'],
             self.blur_input_format)
+
         self.workflow_obj['id'] = self.result_generation.workflows.get_workflow_id(
             self.workflow_obj['name'], self.workflow_obj['version'])
+        self.workflow_faces_obj['id'] = self.result_generation.workflows.get_workflow_id(
+            self.workflow_faces_obj['name'], self.workflow_faces_obj['version'])
+
         self.scan_version = scan_version
 
     def run_flow(self):
@@ -159,6 +165,22 @@ class BlurFlow:
                 source_results=[],
                 file=artifact['blur_id_from_post_request'],
                 generated=artifact['generated_timestamp'],
+            ))
+            res.results.append(result)
+
+        return res
+
+    def prepare_faces_result_object(self):
+        """Prepare result object for results generated"""
+        res = Bunch(dict(results=[]))
+        for artifact in self.artifacts:
+            result = Bunch(dict(
+                id=f"{uuid.uuid4()}",
+                scan=self.result_generation.scan_metadata['id'],
+                workflow=self.workflow_faces_obj['id'],
+                source_artifacts=[artifact['id']],
+                source_results=[],
+                generated=artifact['generated_timestamp'],
                 data={'faces_detected': str(artifact['faces_detected'])},
             ))
             res.results.append(result)
@@ -171,3 +193,8 @@ class BlurFlow:
         res_object = self.result_generation.bunch_object_to_json_object(res)
         if self.result_generation.api.post_results(res_object) == 201:
             print("successfully post blur results: ", res_object)
+
+        faces_res = self.prepare_faces_result_object()
+        faces_res_object = self.result_generation.bunch_object_to_json_object(faces_res)
+        if self.result_generation.api.post_results(faces_res_object) == 201:
+            print("successfully post faces detected results: ", faces_res_object)
