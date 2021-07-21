@@ -1,10 +1,13 @@
 import os
 import cv2
 import uuid
+import logging
 import face_recognition
+import numpy as np
 from bunch import Bunch
 from datetime import datetime
 from fastcore.basics import store_attr
+
 
 resize_factor_for_scan_version = {
     "v0.1": 3,
@@ -18,6 +21,30 @@ resize_factor_for_scan_version = {
     "v1.0": 1,
 }
 
+FRONT_SCANS = [100,200]
+BACK_SCANS = [102,202]
+ROTATED_SCANS = [101,201]
+
+def front_scan_inference(faces_detected):
+    """ provide the model assumpition for front scan"""
+    num_of_faces = np.array(faces_detected)
+    if np.any((num_of_faces == 0)) :
+        return f"inaccurate"
+    else:
+        return f"accurate"
+
+def back_scan_inference(faces_detected):
+    """ provide the model assumpition for back scan"""
+    num_of_faces = np.array(faces_detected)
+    if np.all(num_of_faces == 0):
+        return f"accurate"
+    else:
+        return f"inaccurate"
+
+def rotated_scan_inference():
+    """ provide the model assumpition for 360 scan"""
+    return f"unsure"
+
 
 class BlurFlow:
     """Face blur results generation"""
@@ -27,11 +54,14 @@ class BlurFlow:
             result_generation,
             workflow_path,
             workflow_faces_path,
+            blur_worklfow_scan_path,
             artifacts,
+            scan_step,
             scan_version):
-        store_attr('result_generation,artifacts,workflow_path,workflow_faces_path,artifacts,scan_version', self)
+        store_attr('result_generation,artifacts,workflow_path,workflow_faces_path,blur_worklfow_scan_path,artifacts,scan_step,scan_version', self)
         self.workflow_obj = self.result_generation.workflows.load_workflows(self.workflow_path)
         self.workflow_faces_obj = self.result_generation.workflows.load_workflows(self.workflow_faces_path)
+        self.blur_workflow_scan_obj = self.result_generation.workflows.load_workflows(self.blur_worklfow_scan_path)
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.blur_input_format = 'img'
         self.scan_directory = os.path.join(
@@ -43,7 +73,10 @@ class BlurFlow:
             self.workflow_obj['name'], self.workflow_obj['version'])
         self.workflow_faces_obj['id'] = self.result_generation.workflows.get_workflow_id(
             self.workflow_faces_obj['name'], self.workflow_faces_obj['version'])
+        self.blur_workflow_scan_obj['id'] = self.result_generation.workflows.get_workflow_id(
+            self.blur_workflow_scan_obj['name'], self.blur_workflow_scan_obj['version'])
 
+        self.scan_step = scan_step
         self.scan_version = scan_version
 
     def run_flow(self):
@@ -55,6 +88,7 @@ class BlurFlow:
 
     def blur_artifacts(self):
         """Blur the list of artifacts"""
+        self.scan_level_faces = []
         for artifact in self.artifacts:
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             print(f"input_path of image to perform blur: {input_path}\n")
@@ -62,6 +96,7 @@ class BlurFlow:
             if blur_status:
                 artifact['blurred_image'] = blur_img_binary
                 artifact['faces_detected'] = faces_detected
+                self.scan_level_faces.append(faces_detected)
 
     def blur_set_resize_factor(self):
         if self.scan_version in resize_factor_for_scan_version:
@@ -101,6 +136,7 @@ class BlurFlow:
         # Read the image.
         assert os.path.exists(source_path), f"{source_path} does not exist"
         rgb_image = cv2.imread(str(source_path))
+        print("image_size:", rgb_image.shape)
 
         image = self.blur_img_transformation_using_scan_version(rgb_image)
 
@@ -184,7 +220,6 @@ class BlurFlow:
                 data={'faces_detected': str(artifact['faces_detected'])},
             ))
             res.results.append(result)
-
         return res
 
     def post_result_object(self):
@@ -198,3 +233,44 @@ class BlurFlow:
         faces_res_object = self.result_generation.bunch_object_to_json_object(faces_res)
         if self.result_generation.api.post_results(faces_res_object) == 201:
             print("successfully post faces detected results: ", faces_res_object)
+
+
+        scan_level_assumption = self.blur_scan_level_result()
+        scan_level_assumption_object = self.result_generation.bunch_object_to_json_object(scan_level_assumption)
+        if self.result_generation.api.post_results(scan_level_assumption_object) == 201:
+            print("successfully post scan level results: ", scan_level_assumption_object)
+
+    def get_scan_results(self,scan_step, scan_level_faces):
+        if scan_step in FRONT_SCANS:
+            assumption = front_scan_inference(scan_level_faces)
+        elif scan_step in BACK_SCANS:
+            assumption = back_scan_inference(scan_level_faces)
+        elif scan_step in ROTATED_SCANS:
+            assumption = rotated_scan_inference()
+        else:
+            logging.info("unknown scan_step %",scan_level_faces)
+        return assumption
+
+    def blur_scan_level_result(self):
+        """Prepare scan level blur result object"""
+        res = Bunch(dict(results=[]))
+        result = Bunch(dict(
+            id=f"{uuid.uuid4()}",
+            scan=self.result_generation.scan_metadata['id'],
+            workflow=self.blur_workflow_scan_obj["id"],
+            source_artifacts=[artifact['id'] for artifact in self.artifacts],
+            source_results=[],
+            generated=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
+        ))
+        print("res object prepared")
+        assumption = self.get_scan_results(self.scan_step,self.scan_level_faces)
+        print("assumpition:",assumption)
+        result.data = {'model_prediction': assumption}
+        res.results.append(result)
+        return res
+        
+
+
+
+
+
