@@ -21,29 +21,35 @@ resize_factor_for_scan_version = {
     "v1.0": 1,
 }
 
-FRONT_SCANS = [100,200]
-BACK_SCANS = [102,202]
-ROTATED_SCANS = [101,201]
+FRONT_SCANS = [100, 200]
+BACK_SCANS = [102, 202]
+ROTATED_SCANS = [101, 201]
+
 
 def front_scan_inference(faces_detected):
     """ provide the model assumpition for front scan"""
     num_of_faces = np.array(faces_detected)
-    if np.any((num_of_faces == 0)) :
-        return f"inaccurate"
+    if np.any((num_of_faces == 0)):
+        prediction = 'inaccurate'
     else:
-        return f"accurate"
+        prediction = 'accurate'
+    return f"{prediction}"
+
 
 def back_scan_inference(faces_detected):
     """ provide the model assumpition for back scan"""
     num_of_faces = np.array(faces_detected)
     if np.all(num_of_faces == 0):
-        return f"accurate"
+        prediction = 'accurate'
     else:
-        return f"inaccurate"
+        prediction = 'inaccurate'
+    return f"{prediction}"
+
 
 def rotated_scan_inference():
     """ provide the model assumpition for 360 scan"""
-    return f"unsure"
+    prediction = 'unsure'
+    return f"{prediction}"
 
 
 class BlurFlow:
@@ -234,13 +240,12 @@ class BlurFlow:
         if self.result_generation.api.post_results(faces_res_object) == 201:
             print("successfully post faces detected results: ", faces_res_object)
 
-
         scan_level_assumption = self.blur_scan_level_result()
         scan_level_assumption_object = self.result_generation.bunch_object_to_json_object(scan_level_assumption)
         if self.result_generation.api.post_results(scan_level_assumption_object) == 201:
             print("successfully post scan level results: ", scan_level_assumption_object)
 
-    def get_scan_results(self,scan_step, scan_level_faces):
+    def get_scan_results(self, scan_step, scan_level_faces):
         if scan_step in FRONT_SCANS:
             assumption = front_scan_inference(scan_level_faces)
         elif scan_step in BACK_SCANS:
@@ -248,7 +253,7 @@ class BlurFlow:
         elif scan_step in ROTATED_SCANS:
             assumption = rotated_scan_inference()
         else:
-            logging.info("unknown scan_step %",scan_level_faces)
+            logging.info("unknown scan_step %", scan_level_faces)
         return assumption
 
     def blur_scan_level_result(self):
@@ -262,15 +267,7 @@ class BlurFlow:
             source_results=[],
             generated=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
         ))
-        print("res object prepared")
-        assumption = self.get_scan_results(self.scan_step,self.scan_level_faces)
-        print("assumpition:",assumption)
+        assumption = self.get_scan_results(self.scan_step, self.scan_level_faces)
         result.data = {'model_prediction': assumption}
         res.results.append(result)
         return res
-        
-
-
-
-
-
