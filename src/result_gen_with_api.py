@@ -29,6 +29,7 @@ def parse_args():
     parser.add_argument('--scan_parent_dir', default="data/scans/", help='Parent directory in which scans will be stored')  # noqa: E501
     parser.add_argument('--blur_faces_workflow_path', default=f"{workflow_dir}/blur-faces-worklows.json")  # noqa: E501
     parser.add_argument('--blur_workflow_path', default=f"{workflow_dir}/blur-workflow.json")  # noqa: E501
+    parser.add_argument('--blur_worklfow_scan_path', default=f"{workflow_dir}/blur-workflow-scan.json")  # noqa: E501
     parser.add_argument('--standing_laying_workflow_path', default=f"{workflow_dir}/standing_laying-workflow.json")  # noqa: E501
     parser.add_argument('--depthmap_img_workflow_path', default=f"{workflow_dir}/depthmap-img-workflow.json")  # noqa: E501
     parser.add_argument('--height_workflow_artifact_path', default=f"{workflow_dir}/height-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
@@ -47,6 +48,7 @@ def run_normal_flow():
     scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
     blur_faces_workflow_path = args.blur_faces_workflow_path
+    blur_worklfow_scan_path = args.blur_worklfow_scan_path
     standing_laying_workflow_path = args.standing_laying_workflow_path
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
@@ -74,6 +76,7 @@ def run_normal_flow():
     scan_metadata = get_scan_metadata.get_scan_metadata()
     scan_version = scan_metadata['version']
     print("Scan Type Version: ", scan_version)
+    scan_step = scan_metadata['type']
     workflow.get_list_of_worflows()
 
     data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
@@ -92,7 +95,9 @@ def run_normal_flow():
         result_generation,
         blur_workflow_path,
         blur_faces_workflow_path,
+        blur_worklfow_scan_path,
         rgb_artifacts,
+        scan_step,
         scan_version)
     flows.append(flow)
 
@@ -154,6 +159,7 @@ def run_retroactive_flow():
     # scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
     blur_faces_workflow_path = args.blur_faces_workflow_path
+    blur_worklfow_scan_path = args.blur_worklfow_scan_path
     standing_laying_workflow_path = args.standing_laying_workflow_path
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
@@ -223,6 +229,7 @@ def run_retroactive_flow():
                 result_generation,
                 blur_workflow_path,
                 blur_faces_workflow_path,
+                blur_worklfow_scan_path,
                 rgb_artifacts,
                 scan_version)
 

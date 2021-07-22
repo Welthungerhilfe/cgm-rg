@@ -1,0 +1,11 @@
+{
+    "name": "face_detection_scan",
+    "version": "1.0.0",
+    "result_format": "dict",
+    "result_binding": "scan",
+    "data":{
+        "input_format":"application/zip",
+        "model":"face_recognition"
+    },
+    "eligible": false
+}
