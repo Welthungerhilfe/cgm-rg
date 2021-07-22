@@ -21,7 +21,9 @@ def get_dummy_blur_flow_object(mock_some_fn):
         get_dummy_result_generation_object_for_subclass(),
         'src/workflows/blur-workflow.json',
         'src/workflows/blur-faces-worklows.json',
+        'src/workflows/blur-workflow-scan.json',
         sdv.rgb_artifacts,
+        sdv.scan_step,
         sdv.scan_version)
 
 
