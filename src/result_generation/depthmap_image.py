@@ -41,7 +41,7 @@ class DepthMapImgFlow:
         data, width, height, depth_scale, _max_confidence = preprocessing.load_depth(input_path)
 
         depthmap = preprocessing.prepare_depthmap(data, width, height, depth_scale)
-        depthmap  = depthmap /2.0
+        depthmap = depthmap / 2.0
 
         # depthmap = preprocessing.preprocess(depthmap)
         # depthmap = depthmap.reshape((depthmap.shape[0], depthmap.shape[1], 1))
