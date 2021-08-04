@@ -8,6 +8,10 @@ import matplotlib.pyplot as plt
 from bunch import Bunch
 from fastcore.basics import store_attr
 
+import log
+
+
+logger = log.setup_custom_logger(__name__)
 
 sys.path.append(str(Path(__file__).parents[1]))
 import utils.preprocessing as preprocessing  # noqa: E402
@@ -82,4 +86,4 @@ class DepthMapImgFlow:
         res = self.prepare_result_object()
         res_object = self.result_generation.bunch_object_to_json_object(res)
         if self.result_generation.api.post_results(res_object) == 201:
-            print("successfully post Depthmap Image results: ", res_object)
+            logger.info("%s %s", "Successfully post Depthmap Image results:", res_object)
