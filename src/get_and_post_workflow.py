@@ -3,10 +3,12 @@ import json
 import os
 import logging
 
+import log
 from api_endpoints import ApiEndpoints
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+
+logger = log.setup_custom_logger(__name__)
+
 
 def get_list_of_files(source_folder):
     """Get list of json files in a folder"""
@@ -25,7 +27,7 @@ def upsert_workflows(json_paths, workflows, cgm_api):
         response = cgm_api.post_workflow_and_save_response(workflow_obj)
         status_code = response.status_code
         if status_code == 201:
-            logger.info("%s %s %s %s",
+            logger.info("%s %s %s %s", 
                 "successfully registered workflow for name", workflow_obj['name'], "and version", workflow_obj['version'])
 
         elif status_code == 200:
@@ -46,7 +48,6 @@ def upsert_workflows(json_paths, workflows, cgm_api):
 if __name__ == "__main__":
     url = os.getenv('APP_URL', 'http://localhost:5001')
     logger.info("%s %s","App URL:", url)
-
     cgm_api = ApiEndpoints(url)
     workflow_paths = 'src/workflows'
     json_paths = get_list_of_files(workflow_paths)
