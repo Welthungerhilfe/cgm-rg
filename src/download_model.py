@@ -1,9 +1,13 @@
 import os
+import logging
 from pathlib import Path
 
 from azureml.core import Experiment, Run, Workspace
 from azureml.core.authentication import ServicePrincipalAuthentication
 from azureml.core.model import Model
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 REPO_DIR = Path(__file__).parents[1].absolute()
 
@@ -38,7 +42,7 @@ def download_model(ws, experiment_name, run_id, input_location, output_location)
         run.download_files(prefix=input_location, output_directory=output_location)
     else:
         raise NameError(f"{input_location}'s path extension not supported")
-    print("Successfully downloaded model")
+    logger.info("%s %s", "Successfully downloaded model for experiment ", experiment_name)
 
 
 def main():
@@ -58,7 +62,7 @@ def main():
     # Downlaod model for standing/laying
     standing_laying = Model(ws, name='standing_laying_classifier')
     standing_laying.download(target_dir=REPO_DIR / 'models')
-    print("Model Succesfully downloaded")
+    logger.info("Standing Laying Model Succesfully downloaded")
 
     # Downlaod model for height
     download_model(ws=ws,
