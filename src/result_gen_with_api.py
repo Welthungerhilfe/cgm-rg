@@ -6,6 +6,7 @@ import os
 import uuid
 from azure.storage.queue import QueueService
 
+import log
 from api_endpoints import ApiEndpoints
 from get_scan_metadata import GetScanMetadata
 from process_workflows import ProcessWorkflows
@@ -20,9 +21,7 @@ from result_generation.weight import WeightFlow
 from result_generation.height.height_rgbd import HeightFlowRGBD
 
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
+logger = log.setup_custom_logger(__name__)
 
 def person(api, person_id):
     return api.get_person_details(person_id)
@@ -67,7 +66,7 @@ def run_normal_flow():
 
     # URL
     url = os.getenv('APP_URL', 'http://localhost:5001')
-    print(f"App URL: {url}")
+    logger.info("%s %s", "App URL:", url)
     cgm_api = ApiEndpoints(url)
 
     workflow = ProcessWorkflows(cgm_api)
@@ -78,7 +77,7 @@ def run_normal_flow():
 
     scan_metadata = get_scan_metadata.get_scan_metadata()
     scan_version = scan_metadata['version']
-    print("Scan Type Version: ", scan_version)
+    logger.info("%s %s", "Scan Type Version:", scan_version)
     workflow.get_list_of_worflows()
 
     data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
@@ -150,7 +149,7 @@ def run_normal_flow():
         try:
             flow.run_flow()
         except Exception as e:
-            print(e)
+            logger.exception("Exception in Run Flow")
 
 
 def run_retroactive_flow():
@@ -175,7 +174,7 @@ def run_retroactive_flow():
     connect_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
     # URL
     url = os.getenv('APP_URL', 'http://localhost:5001')
-    logger.info("%s %s","App URL:", url)
+    logger.info("%s %s", "App URL:", url)
     queue_name = "retroactive-scan-process"
     retroactive_scan_dir = '/api/data/retroactive_scans/'
 
@@ -185,7 +184,7 @@ def run_retroactive_flow():
     try:
         queue_service = QueueService(connection_string=connect_str)
     except Exception as e:
-        print("Error: ", e)
+        logger.exception("Error in Queue Service")
         return
 
     messages = queue_service.get_messages(queue_name, num_messages=1, visibility_timeout=1)
@@ -287,8 +286,8 @@ def run_retroactive_flow():
         if workflow_matched:
             try:
                 flow.run_flow()
-            except Exception as e:
-                logger.error(e)
+            except Exception:
+                logger.exception("Error in Run Flow")
         queue_service.delete_message(queue_name, message.id, message.pop_receipt)
 
 
