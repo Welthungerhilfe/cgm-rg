@@ -1,5 +1,5 @@
 import sys
-import logging
+# import logging
 from datetime import datetime
 from pathlib import Path
 import cv2
@@ -13,7 +13,10 @@ from result_generation.height.height import HeightFlow
 sys.path.append(str(Path(__file__).parents[1]))
 import utils.inference as inference  # noqa: E402
 import utils.preprocessing as preprocessing  # noqa: E402
+import log
 
+
+logger = log.setup_custom_logger(__name__)
 ORDER_DIFFERENCE_ALLOWED = 3
 
 
@@ -41,7 +44,7 @@ class HeightFlowRGBD(HeightFlow):
             depth_id = artifact['order']
             closest_order_id = preprocessing.find_corresponding_image(image_order_ids, depth_id)
             if abs(closest_order_id - depth_id) >= ORDER_DIFFERENCE_ALLOWED:
-                logging.info("No corresponding image artifact found for the depthmap")
+                logger.info("No corresponding image artifact found for the depthmap")
                 continue
             result_image_dict = next(
                 iter(item for item in self.image_artifacts if item['order'] == closest_order_id), None)
@@ -49,7 +52,7 @@ class HeightFlowRGBD(HeightFlow):
                 image_input_path = self.result_generation.get_input_path(
                     scan_image_directory, result_image_dict['file'])
             else:
-                logging.info("No RGB found for order:", depth_id)
+                logger.info("%s %s", "No RGB found for order:", depth_id)
                 continue
             raw_image = cv2.imread(str(image_input_path))  # cv2.imread gives error when reading from posix path
             rot_image = cv2.rotate(raw_image, cv2.ROTATE_90_CLOCKWISE)
