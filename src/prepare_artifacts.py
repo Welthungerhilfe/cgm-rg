@@ -3,10 +3,10 @@ import logging
 import os
 import pprint
 from api_endpoints import ApiEndpoints
+import log
 
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger = log.setup_custom_logger(__name__)
 
 class PrepareArtifacts:
     """Prepare artifacts for result generation.
