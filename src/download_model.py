@@ -1,13 +1,13 @@
 import os
-import logging
 from pathlib import Path
-
 from azureml.core import Experiment, Run, Workspace
 from azureml.core.authentication import ServicePrincipalAuthentication
 from azureml.core.model import Model
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+import log
+
+
+logger = log.setup_custom_logger(__name__)
 
 REPO_DIR = Path(__file__).parents[1].absolute()
 
@@ -103,4 +103,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        logger.exception("Error in Downloading Models")
