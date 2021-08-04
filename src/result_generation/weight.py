@@ -13,7 +13,10 @@ from result_generation.utils import MAX_AGE, calculate_age
 sys.path.append(str(Path(__file__).parents[1]))
 import utils.inference as inference  # noqa: E402
 import utils.preprocessing as preprocessing  # noqa: E402
+import log
 
+
+logger = log.setup_custom_logger(__name__)
 
 class WeightFlow:
     """A class to handle weight results generation"""
@@ -98,10 +101,10 @@ class WeightFlow:
         artifact_level_weight_result_json = self.result_generation.bunch_object_to_json_object(
             artifact_level_weight_result_bunch)
         if self.result_generation.api.post_results(artifact_level_weight_result_json) == 201:
-            print("successfully post artifact level weight results: ", artifact_level_weight_result_json)
+            logger.info("%s %s", "successfully post artifact level weight results:", artifact_level_weight_result_json)
 
         scan_level_weight_result_bunch = self.scan_level_result(predictions, generated_timestamp)
         scan_level_weight_result_json = self.result_generation.bunch_object_to_json_object(
             scan_level_weight_result_bunch)
         if self.result_generation.api.post_results(scan_level_weight_result_json) == 201:
-            print("successfully post scan level weight results: ", scan_level_weight_result_json)
+            logger.info("%s %s", "successfully post scan level weight results:", scan_level_weight_result_json)
