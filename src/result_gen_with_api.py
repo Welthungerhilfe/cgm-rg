@@ -1,7 +1,6 @@
 import argparse
 import base64
 import json
-from logging import log
 import os
 import uuid
 from azure.storage.queue import QueueService
@@ -149,7 +148,7 @@ def run_normal_flow():
     for flow in flows:
         try:
             flow.run_flow()
-        except Exception as e:
+        except Exception:
             logger.exception("Exception in Run Flow")
 
 
@@ -184,7 +183,7 @@ def run_retroactive_flow():
     workflow.get_list_of_worflows()
     try:
         queue_service = QueueService(connection_string=connect_str)
-    except Exception as e:
+    except Exception:
         logger.exception("Error in Queue Service")
         return
 
