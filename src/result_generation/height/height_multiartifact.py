@@ -16,6 +16,7 @@ import log
 
 logger = log.setup_custom_logger(__name__)
 
+
 class HeightFlowMultiArtifact(HeightFlow):
     def run_flow(self):
         depthmap = self.process_depthmaps_depthmapmultiartifactlatefusion()
@@ -27,10 +28,11 @@ class HeightFlowMultiArtifact(HeightFlow):
             height_predictions, generated_timestamp, self.scan_workflow_obj)
         scan_depthmapmultiartifactlatefusion_level_height_result_json = self.result_generation.bunch_object_to_json_object(
             scan_depthmapmultiartifactlatefusion_level_height_result_bunch)
-        if self.result_generation.api.post_results(scan_depthmapmultiartifactlatefusion_level_height_result_json) == 201:
+        if self.result_generation.api.post_results(
+                scan_depthmapmultiartifactlatefusion_level_height_result_json) == 201:
             logger.info("%s %s",
-                "successfully posted scan step level depthmapmultiartifactlatefusion height results: ",
-                scan_depthmapmultiartifactlatefusion_level_height_result_json)
+                        "successfully posted scan step level depthmapmultiartifactlatefusion height results: ",
+                        scan_depthmapmultiartifactlatefusion_level_height_result_json)
 
     def process_depthmaps_depthmapmultiartifactlatefusion(self):
         depthmaps_file = [self.result_generation.get_input_path(self.scan_directory, artifact['file'])

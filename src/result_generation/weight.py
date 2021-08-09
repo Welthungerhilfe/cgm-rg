@@ -18,8 +18,10 @@ import log
 
 logger = log.setup_custom_logger(__name__)
 
+
 class WeightFlow:
     """A class to handle weight results generation"""
+
     def __init__(
             self,
             result_generation,

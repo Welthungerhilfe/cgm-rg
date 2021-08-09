@@ -23,6 +23,7 @@ from result_generation.height.height_rgbd import HeightFlowRGBD
 
 logger = log.setup_custom_logger(__name__)
 
+
 def person(api, person_id):
     return api.get_person_details(person_id)
 
@@ -188,13 +189,13 @@ def run_retroactive_flow():
         return
 
     messages = queue_service.get_messages(queue_name, num_messages=1, visibility_timeout=1)
-    logger.info("%s %s","Length of messages :", len(messages))
+    logger.info("%s %s", "Length of messages :", len(messages))
     logger.info("%s %s", "messages :", messages)
 
     for message in messages:
         encoded_msg = message.content[2:-1].encode('utf-8')
 
-        logger.info("%s %s","message.content :", encoded_msg)
+        logger.info("%s %s", "message.content :", encoded_msg)
         original_msg = base64.b64decode(encoded_msg).decode('utf-8', "ignore")
         logger.info("%s %s", "message :", original_msg)
 

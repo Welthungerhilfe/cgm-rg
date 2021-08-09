@@ -13,8 +13,10 @@ import log
 
 logger = log.setup_custom_logger(__name__)
 
+
 class HeightFlow:
     """Handle height results generation"""
+
     def __init__(
             self,
             result_generation,

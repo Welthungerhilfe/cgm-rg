@@ -3,6 +3,7 @@ from pathlib import Path
 
 REPO_DIR = Path(__file__).parents[1].absolute()
 
+
 def setup_custom_logger(name):
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s - %(pathname)s: line %(lineno)d')
 
@@ -19,4 +20,3 @@ def setup_custom_logger(name):
     logger.addHandler(fh)
 
     return logger
-
