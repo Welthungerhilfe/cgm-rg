@@ -10,7 +10,7 @@ def setup_custom_logger(name):
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)
 
-    fh = logging.FileHandler(REPO_DIR / 'log' / 'rg_with_api.log')
+    fh = logging.FileHandler(REPO_DIR / 'rg_with_api.log')
     fh.setFormatter(formatter)
     # fh.setLevel(logging.INFO)
 
