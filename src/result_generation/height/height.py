@@ -8,10 +8,15 @@ from fastcore.basics import store_attr
 
 sys.path.append(str(Path(__file__).parents[1]))
 from result_generation.utils import MAX_AGE, MAX_HEIGHT, MIN_HEIGHT, calculate_age
+import log
+
+
+logger = log.setup_custom_logger(__name__)
 
 
 class HeightFlow:
     """Handle height results generation"""
+
     def __init__(
             self,
             result_generation,
@@ -91,14 +96,14 @@ class HeightFlow:
         artifact_level_height_result_json = self.result_generation.bunch_object_to_json_object(
             artifact_level_height_result_bunch)
         if self.result_generation.api.post_results(artifact_level_height_result_json) == 201:
-            print("successfully post artifact level height results: ", artifact_level_height_result_json)
+            logger.info("%s %s", "successfully post artifact level height results:", artifact_level_height_result_json)
 
         scan_level_height_result_bunch = self.scan_level_height_result_object(
             predictions, generated_timestamp, self.scan_workflow_obj)
         scan_level_height_result_json = self.result_generation.bunch_object_to_json_object(
             scan_level_height_result_bunch)
         if self.result_generation.api.post_results(scan_level_height_result_json) == 201:
-            print("successfully post scan level height results: ", scan_level_height_result_json)
+            logger.info("%s %s", "successfully post scan level height results:", scan_level_height_result_json)
 
     def artifact_level_result_ensemble(self, predictions, generated_timestamp, stds):
         """Prepare artifact level height result object"""

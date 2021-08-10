@@ -1,5 +1,6 @@
 import copy
 import json
+import logging
 import os
 import pprint
 import uuid
@@ -7,6 +8,10 @@ import uuid
 from bunch import Bunch
 import cv2
 import requests
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 ENDPOINTS = Bunch(dict(
@@ -45,7 +50,7 @@ class ApiEndpoints:
 
         headers = self.prepare_header()
         response = requests.get(endpoint + file_id, headers=headers)
-        print("\nStatus code: ", response.status_code)
+        logger.info("%s %s", "Status code:", response.status_code)
 
         file_path = os.path.join(save_dir, file_id)
 
@@ -66,12 +71,10 @@ class ApiEndpoints:
             'filename': file_path.split('/')[-1],
         }
 
-        print('\nFile name to post : ', files['filename'])
-
+        logger.info("%s %s", "File name to post :", files['filename'])
         response = requests.post(endpoint, files=files, headers=headers)
         file_id = response.content.decode('utf-8')
-
-        print("\nFile Id from post of test.jpg: ", file_id)
+        logger.info("%s %s", "File Id from post of test.jpg:", file_id)
 
         return file_id, response.status_code
 
@@ -95,8 +98,7 @@ class ApiEndpoints:
 
         response = requests.post(endpoint, files=files, headers=headers)
         file_id = response.content.decode('utf-8')
-
-        print("File Id from post of test.jpg: ", file_id)
+        logger.info("%s %s", "File Id from post of test.jpg:", file_id)
 
         return file_id, response.status_code
 
@@ -104,23 +106,23 @@ class ApiEndpoints:
         """Post the result object produced while Result Generation using POST /results"""
         endpoint = self.url + self.result_endpoint
         response = requests.post(endpoint, json=result_json_obj, headers=self.prepare_header())
-        print("Status of post result response: ", response.status_code)
+        logger.info("%s %s", "Status of post result response:", response.status_code)
         return response.status_code
 
     def post_workflow_and_save_response(self, workflow_obj):
         """Post the workflow and saves the response"""
-        print("Workflow Post Object: ")
-        pprint.pprint(workflow_obj)
+        logger.info("Workflow Post Object:")
+        logger.info(pprint.pformat(workflow_obj))
 
         headers = self.prepare_header()
         endpoint = self.url + self.workflow_endpoint
         response = requests.post(endpoint, json=workflow_obj, headers=headers)
-        print("Workflow Post response")
-        print("Status code: ", response.status_code)
+        logger.info("Workflow Post response")
+        logger.info("%s %s", "Status code:", response.status_code)
 
         if response.status_code in [200, 201]:
             content = response.json()
-            pprint.pprint(content)
+            logger.info(pprint.pformat(content))
 
         return response
 
@@ -135,16 +137,16 @@ class ApiEndpoints:
 
         if response.status_code == 200:
             content = response.json()
-            print("\nScan Details :")
-            pprint.pprint(content)
+            logger.info("Scan Details :")
+            logger.info(pprint.pformat(content))
 
             with open(scan_path, 'w') as f:
                 json.dump(content, f, indent=4)
 
-            print("Written scan metadata successfully to ", scan_path)
+            logger.info("%s %s", "Written scan metadata successfully to", scan_path)
             return len(content['scans'])
         else:
-            print("Response code : ", response.status_code)
+            logger.info("%s %s", "Response code :", response.status_code)
             return 0
 
     def get_scan_for_scan_version_workflow_id(self, scan_version, workflow_id, scan_path):
@@ -165,16 +167,16 @@ class ApiEndpoints:
 
         if response.status_code == 200:
             content = response.json()
-            print("\nScan Details :")
-            pprint.pprint(content)
+            logger.info("Scan Details :")
+            logger.info(pprint.pformat(content))
 
             with open(scan_path, 'w') as f:
                 json.dump(content, f, indent=4)
 
-            print("Written scan metadata successfully to ", scan_path)
+            logger.info("%s %s", "Written scan metadata successfully to", scan_path)
             return len(content['scans'])
         else:
-            print("Response code : ", response.status_code)
+            logger.info("%s %s", "Response code :", response.status_code)
             return 0
 
     def get_person_details(self, person_id):
@@ -185,8 +187,8 @@ class ApiEndpoints:
 
         if resposne.status_code == 200:
             content = resposne.json()
-            print("\n Person Details :")
-            pprint.pprint(content)
+            logger.info("Person Details :")
+            logger.info(pprint.pprint(content))
         return content
 
     def get_workflows(self):

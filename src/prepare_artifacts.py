@@ -2,6 +2,10 @@ import copy
 import os
 import pprint
 from api_endpoints import ApiEndpoints
+import log
+
+
+logger = log.setup_custom_logger(__name__)
 
 
 class PrepareArtifacts:
@@ -20,26 +24,26 @@ class PrepareArtifacts:
         self.format_wise_artifact = {}
         self.scan_parent_dir = scan_parent_dir
         self.scan_dir = os.path.join(self.scan_parent_dir, self.scan_metadata['id'])
-        print("Parent Scan Dir: ", self.scan_dir)
+        logger.info("%s %s", "Parent Scan Dir:", self.scan_dir)
 
     def download_artifacts(self, input_format):
         """Download artifacts for the scan"""
-        print(f"\nDownloading Artifacts for { input_format } format")
+        logger.info("%s %s %s", "Downloading Artifacts for", input_format, "format")
         self.artifacts = []
 
         for i, artifact in enumerate(self.format_wise_artifact[input_format]):
             mod_artifact = copy.deepcopy(artifact)
 
-            print("\nDownloading Artifact Name: ", mod_artifact["file"])
+            logger.info("%s %s", "Downloading Artifact Name:", mod_artifact["file"])
             status_code = self.api.get_files(mod_artifact["file"], os.path.join(self.scan_dir, input_format))
             # status_code = get_files_mockup(mod_artifact["file"], format_dir)
             if status_code == 200:
                 mod_artifact['download_status'] = True
                 self.artifacts.append(mod_artifact)
 
-        print(f"\nBelow Artifacts for {input_format} workflow")
-        print(self.artifacts)
-        print("\nDownload Artifact for completed")
+        logger.info("%s %s %s", "Below Artifacts for", input_format, "workflow")
+        logger.info(self.artifacts)
+        logger.info("Download Artifact for completed")
 
         return self.artifacts
 
@@ -78,8 +82,8 @@ class PrepareArtifacts:
             self.add_artifacts_to_format_dictionary(
                 mod_artifact['format'], mod_artifact)
 
-        print("\nPrepared format wise Artifact:")
-        pprint.pprint(self.format_wise_artifact)
+        logger.info("Prepared format wise Artifact:")
+        logger.info(pprint.pformat(self.format_wise_artifact))
 
     def create_scan_dir(self):
         """Create directory to store artifacts in scan.

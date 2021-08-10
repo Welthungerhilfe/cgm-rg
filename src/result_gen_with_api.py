@@ -5,6 +5,7 @@ import os
 import uuid
 from azure.storage.queue import QueueService
 
+import log
 from api_endpoints import ApiEndpoints
 from get_scan_metadata import GetScanMetadata
 from process_workflows import ProcessWorkflows
@@ -17,6 +18,9 @@ from result_generation.height.height_multiartifact import HeightFlowMultiArtifac
 from result_generation.standing import StandingLaying
 from result_generation.weight import WeightFlow
 from result_generation.height.height_rgbd import HeightFlowRGBD
+
+
+logger = log.setup_custom_logger(__name__)
 
 
 def person(api, person_id):
@@ -62,7 +66,7 @@ def run_normal_flow():
 
     # URL
     url = os.getenv('APP_URL', 'http://localhost:5001')
-    print(f"App URL: {url}")
+    logger.info("%s %s", "App URL:", url)
     cgm_api = ApiEndpoints(url)
 
     workflow = ProcessWorkflows(cgm_api)
@@ -73,7 +77,7 @@ def run_normal_flow():
 
     scan_metadata = get_scan_metadata.get_scan_metadata()
     scan_version = scan_metadata['version']
-    print("Scan Type Version: ", scan_version)
+    logger.info("%s %s", "Scan Type Version:", scan_version)
     workflow.get_list_of_worflows()
 
     data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
@@ -144,8 +148,8 @@ def run_normal_flow():
     for flow in flows:
         try:
             flow.run_flow()
-        except Exception as e:
-            print(e)
+        except Exception:
+            logger.exception("Exception in Run Flow")
 
 
 def run_retroactive_flow():
@@ -164,13 +168,13 @@ def run_retroactive_flow():
     height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
     height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
 
-    print("Started Retroactive Flow")
+    logger.info("Started Retroactive Flow")
     # Retrieve the connection string from an environment
     # variable named AZURE_STORAGE_CONNECTION_STRING
     connect_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
     # URL
     url = os.getenv('APP_URL', 'http://localhost:5001')
-    print(f"App URL: {url}")
+    logger.info("%s %s", "App URL:", url)
     queue_name = "retroactive-scan-process"
     retroactive_scan_dir = '/api/data/retroactive_scans/'
 
@@ -179,31 +183,30 @@ def run_retroactive_flow():
     workflow.get_list_of_worflows()
     try:
         queue_service = QueueService(connection_string=connect_str)
-    except Exception as e:
-        print("Error: ", e)
+    except Exception:
+        logger.exception("Error in Queue Service")
         return
 
     messages = queue_service.get_messages(queue_name, num_messages=1, visibility_timeout=1)
-    print("Length of messages : ", len(messages))
-    print("messages : ", messages)
+    logger.info("%s %s", "Length of messages :", len(messages))
+    logger.info("%s %s", "messages :", messages)
 
     for message in messages:
         encoded_msg = message.content[2:-1].encode('utf-8')
 
-        print("message.content : ", encoded_msg)
+        logger.info("%s %s", "message.content :", encoded_msg)
         original_msg = base64.b64decode(encoded_msg).decode('utf-8', "ignore")
-        print("message : ", original_msg)
+        logger.info("%s %s", "message :", original_msg)
 
         scan_metadata_with_workflow_obj = json.loads(original_msg)
-        print("Scan Metadata with Workflow")
-        print(scan_metadata_with_workflow_obj)
+        logger.info("%s %s", "Scan Metadata with Workflow", scan_metadata_with_workflow_obj)
 
         scan_metadata = scan_metadata_with_workflow_obj['scans'][0]
         scan_version = scan_metadata['version']
-        print("Scan Type Version: ", scan_version)
+        logger.info("%s %s", "Scan Type Version:", scan_version)
 
         workflow_id = scan_metadata_with_workflow_obj['workflow_id']
-        print("Workflow ID : ", workflow_id)
+        logger.info("%s %s", "Workflow ID :", workflow_id)
 
         data_processing = PrepareArtifacts(cgm_api, scan_metadata, retroactive_scan_dir)
         data_processing.process_scan_metadata()
@@ -218,7 +221,7 @@ def run_retroactive_flow():
         workflow_matched = True
 
         if workflow.match_workflows(blur_workflow_path, workflow_id):
-            print("BlurFlow")
+            logger.info("Matched with BlurFlow")
             flow = BlurFlow(
                 result_generation,
                 blur_workflow_path,
@@ -227,21 +230,21 @@ def run_retroactive_flow():
                 scan_version)
 
         elif workflow.match_workflows(standing_laying_workflow_path, workflow_id):
-            print("StandingLaying")
+            logger.info("Matched with StandingLaying")
             flow = StandingLaying(
                 result_generation,
                 standing_laying_workflow_path,
                 rgb_artifacts)
 
         elif workflow.match_workflows(depthmap_img_workflow_path, workflow_id):
-            print("DepthMapImgFlow")
+            logger.info("Matched with DepthMapImgFlow")
             flow = DepthMapImgFlow(
                 result_generation,
                 depthmap_img_workflow_path,
                 depth_artifacts)
 
         elif workflow.match_workflows(height_workflow_scan_path, workflow_id):
-            print("HeightFlowPlainCnn")
+            logger.info("Matched with HeightFlowPlainCnn")
             flow = HeightFlowPlainCnn(
                 result_generation,
                 height_workflow_artifact_path,
@@ -250,7 +253,7 @@ def run_retroactive_flow():
                 person_details)
 
         elif workflow.match_workflows(height_depthmapmultiartifactlatefusion_workflow_path, workflow_id):
-            print("HeightFlowMultiArtifact")
+            logger.info("Matched with HeightFlowMultiArtifact")
             flow = HeightFlowMultiArtifact(
                 result_generation,
                 height_workflow_artifact_path,
@@ -259,7 +262,7 @@ def run_retroactive_flow():
                 person_details)
 
         elif workflow.match_workflows(weight_workflow_scan_path, workflow_id):
-            print("WeightFlow")
+            logger.info("Matched with WeightFlow")
             flow = WeightFlow(
                 result_generation,
                 weight_workflow_artifact_path,
@@ -268,7 +271,7 @@ def run_retroactive_flow():
                 person_details)
 
         elif workflow.match_workflows(height_rgbd_workflow_scan_path, workflow_id):
-            print("HeightFlowRGBD")
+            logger.info("Matched with HeightFlowRGBD")
             flow = HeightFlowRGBD(
                 result_generation,
                 height_rgbd_workflow_artifact_path,
@@ -278,13 +281,13 @@ def run_retroactive_flow():
                 rgb_artifacts)
         else:
             workflow_matched = False
-            print("Workflow id does not match with any of the id of registered Workflow")
+            logger.info("Workflow id does not match with any of the id of registered Workflow")
 
         if workflow_matched:
             try:
                 flow.run_flow()
-            except Exception as e:
-                print(e)
+            except Exception:
+                logger.exception("Error in Run Flow")
         queue_service.delete_message(queue_name, message.id, message.pop_receipt)
 
 

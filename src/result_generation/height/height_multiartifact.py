@@ -11,6 +11,10 @@ from result_generation.height.height import HeightFlow
 sys.path.append(str(Path(__file__).parents[1]))
 import utils.inference as inference  # noqa: E402
 import utils.preprocessing as preprocessing  # noqa: E402
+import log
+
+
+logger = log.setup_custom_logger(__name__)
 
 
 class HeightFlowMultiArtifact(HeightFlow):
@@ -24,10 +28,11 @@ class HeightFlowMultiArtifact(HeightFlow):
             height_predictions, generated_timestamp, self.scan_workflow_obj)
         scan_depthmapmultiartifactlatefusion_level_height_result_json = self.result_generation.bunch_object_to_json_object(
             scan_depthmapmultiartifactlatefusion_level_height_result_bunch)
-        if self.result_generation.api.post_results(scan_depthmapmultiartifactlatefusion_level_height_result_json) == 201:
-            print(
-                "successfully posted scan step level depthmapmultiartifactlatefusion height results: ",
-                scan_depthmapmultiartifactlatefusion_level_height_result_json)
+        if self.result_generation.api.post_results(
+                scan_depthmapmultiartifactlatefusion_level_height_result_json) == 201:
+            logger.info("%s %s",
+                        "successfully posted scan step level depthmapmultiartifactlatefusion height results: ",
+                        scan_depthmapmultiartifactlatefusion_level_height_result_json)
 
     def process_depthmaps_depthmapmultiartifactlatefusion(self):
         depthmaps_file = [self.result_generation.get_input_path(self.scan_directory, artifact['file'])

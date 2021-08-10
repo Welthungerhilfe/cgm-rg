@@ -6,6 +6,11 @@ from bunch import Bunch
 from datetime import datetime
 from fastcore.basics import store_attr
 
+import log
+
+
+logger = log.setup_custom_logger(__name__)
+
 resize_factor_for_scan_version = {
     "v0.1": 3,
     "v0.2": 3,
@@ -57,7 +62,7 @@ class BlurFlow:
         """Blur the list of artifacts"""
         for artifact in self.artifacts:
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
-            print(f"input_path of image to perform blur: {input_path}\n")
+            logger.info("%s %s", "input_path of image to perform blur:", input_path)
             blur_img_binary, blur_status, faces_detected = self.blur_face(input_path)
             if blur_status:
                 artifact['blurred_image'] = blur_img_binary
@@ -68,11 +73,11 @@ class BlurFlow:
             self.resize_factor = resize_factor_for_scan_version[self.scan_version]
         else:
             # Default Resize factor to 1
-            print("New Scan Version Type")
+            logger.info("New Scan Version Type")
             self.resize_factor = 1
 
-        print("resize_factor is ", self.resize_factor)
-        print("scan_version is ", self.scan_version)
+        logger.info("%s %s", "resize_factor is", self.resize_factor)
+        logger.info("%s %s", "scan_version is", self.scan_version)
 
     def blur_img_transformation_using_scan_version(self, rgb_image):
         if self.scan_version in ["v0.7"]:
@@ -88,8 +93,8 @@ class BlurFlow:
         # The images are provided in 90degrees turned. Here we rotate 90degress to
         # the right.
         image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
-        print("scan_version is ", self.scan_version)
-        print("swapped image axis")
+        logger.info("%s %s", "scan_version is", self.scan_version)
+        logger.info("swapped image axis")
         return image
 
     def blur_face(self, source_path: str) -> bool:
@@ -140,7 +145,7 @@ class BlurFlow:
         rgb_image = image[:, :, ::-1]  # BGR -> RGB for OpenCV
 
         # logging.info(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
-        print(f"{len(face_locations)} face locations found and blurred for path: {source_path}\n")
+        logger.info("%s %s %s", len(face_locations), "face locations found and blurred for path:", source_path)
         return rgb_image, True, faces_detected
 
     def post_blur_files(self):
@@ -192,9 +197,9 @@ class BlurFlow:
         res = self.prepare_result_object()
         res_object = self.result_generation.bunch_object_to_json_object(res)
         if self.result_generation.api.post_results(res_object) == 201:
-            print("successfully post blur results: ", res_object)
+            logger.info("%s %s", "successfully post blur results:", res_object)
 
         faces_res = self.prepare_faces_result_object()
         faces_res_object = self.result_generation.bunch_object_to_json_object(faces_res)
         if self.result_generation.api.post_results(faces_res_object) == 201:
-            print("successfully post faces detected results: ", faces_res_object)
+            logger.info("%s %s", "successfully post faces detected results:", faces_res_object)
