@@ -60,6 +60,7 @@ class HeightFlow:
 
     def scan_level_height_result_object(self, predictions, generated_timestamp, workflow_obj):
         """Prepare scan level height result object"""
+        # TODO add precision results
         res = Bunch(dict(results=[]))
         result = Bunch(dict(
             id=f"{uuid.uuid4()}",
