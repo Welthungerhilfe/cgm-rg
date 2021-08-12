@@ -220,7 +220,39 @@ def run_retroactive_flow():
 
         workflow_matched = True
 
-        if workflow.match_workflows(blur_workflow_path, workflow_id):
+        if workflow.match_workflows(height_workflow_artifact_path, workflow_id):
+            logger.info("Matched with HeightFlowPlainCnn at Artifact level Results")
+            flow = HeightFlowPlainCnn(
+                result_generation,
+                height_workflow_artifact_path,
+                height_workflow_scan_path,
+                depth_artifacts,
+                person_details,
+                result_level= 'artifact')
+            flow.run_flow()
+
+        elif workflow.match_workflows(height_workflow_scan_path, workflow_id):
+            logger.info("Matched with HeightFlowPlainCnn at Scan Level Results")
+            flow = HeightFlowPlainCnn(
+                result_generation,
+                height_workflow_artifact_path,
+                height_workflow_scan_path,
+                depth_artifacts,
+                person_details,
+                result_level= 'scan')
+            flow.run_flow()
+
+        elif workflow.match_workflows(height_workflow_artifact_path, workflow_id):
+            logger.info("Matched with HeightFlowPlainCnn")
+            flow = HeightFlowPlainCnn(
+                result_generation,
+                height_workflow_artifact_path,
+                None,
+                depth_artifacts,
+                person_details)
+            flow.run_flow()
+
+        elif workflow.match_workflows(blur_workflow_path, workflow_id):
             logger.info("Matched with BlurFlow")
             flow = BlurFlow(
                 result_generation,
@@ -243,14 +275,14 @@ def run_retroactive_flow():
                 depthmap_img_workflow_path,
                 depth_artifacts)
 
-        elif workflow.match_workflows(height_workflow_scan_path, workflow_id):
-            logger.info("Matched with HeightFlowPlainCnn")
-            flow = HeightFlowPlainCnn(
-                result_generation,
-                height_workflow_artifact_path,
-                height_workflow_scan_path,
-                depth_artifacts,
-                person_details)
+        # elif workflow.match_workflows(height_workflow_scan_path, workflow_id):
+        #     logger.info("Matched with HeightFlowPlainCnn")
+        #     flow = HeightFlowPlainCnn(
+        #         result_generation,
+        #         height_workflow_artifact_path,
+        #         height_workflow_scan_path,
+        #         depth_artifacts,
+        #         person_details)
 
         elif workflow.match_workflows(height_depthmapmultiartifactlatefusion_workflow_path, workflow_id):
             logger.info("Matched with HeightFlowMultiArtifact")
