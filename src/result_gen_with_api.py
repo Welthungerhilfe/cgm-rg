@@ -228,7 +228,7 @@ def run_retroactive_flow():
                 height_workflow_scan_path,
                 depth_artifacts,
                 person_details,
-                result_level= 'artifact')
+                result_level='artifact')
             flow.run_flow()
 
         elif workflow.match_workflows(height_workflow_scan_path, workflow_id):
@@ -239,7 +239,7 @@ def run_retroactive_flow():
                 height_workflow_scan_path,
                 depth_artifacts,
                 person_details,
-                result_level= 'scan')
+                result_level='scan')
             flow.run_flow()
 
         elif workflow.match_workflows(height_workflow_artifact_path, workflow_id):
