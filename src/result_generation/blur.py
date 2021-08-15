@@ -11,17 +11,17 @@ import log
 
 logger = log.setup_custom_logger(__name__)
 
-resize_factor_for_scan_version = {
-    "v0.1": 3,
-    "v0.2": 3,
-    "v0.4": 3,
-    "v0.5": 3,
-    "v0.6": 3,
-    "v0.7": 4,
-    "v0.8": 1,
-    "v0.9": 1,
-    "v1.0": 1,
-}
+# resize_factor_for_scan_version = {
+#     "v0.1": 3,
+#     "v0.2": 3,
+#     "v0.4": 3,
+#     "v0.5": 3,
+#     "v0.6": 3,
+#     "v0.7": 4,
+#     "v0.8": 1,
+#     "v0.9": 1,
+#     "v1.0": 1,
+# }
 
 standing_scan_type = ["101", "102", "103"]
 laying_scan_type = ["201", "202", "203"]
@@ -57,7 +57,7 @@ class BlurFlow:
 
     def run_flow(self):
         """Driver method for blur flow"""
-        self.blur_set_resize_factor()
+        # self.blur_set_resize_factor()
         self.blur_artifacts()
         self.post_blur_files()
         self.post_result_object()
@@ -72,16 +72,16 @@ class BlurFlow:
                 artifact['blurred_image'] = blur_img_binary
                 artifact['faces_detected'] = faces_detected
 
-    def blur_set_resize_factor(self):
-        if self.scan_version in resize_factor_for_scan_version:
-            self.resize_factor = resize_factor_for_scan_version[self.scan_version]
-        else:
-            # Default Resize factor to 1
-            logger.info("New Scan Version Type")
-            self.resize_factor = 1
+    # def blur_set_resize_factor(self):
+    #     if self.scan_version in resize_factor_for_scan_version:
+    #         self.resize_factor = resize_factor_for_scan_version[self.scan_version]
+    #     else:
+    #         # Default Resize factor to 1
+    #         logger.info("New Scan Version Type")
+    #         self.resize_factor = 1
 
-        logger.info("%s %s", "resize_factor is", self.resize_factor)
-        logger.info("%s %s", "scan_version is", self.scan_version)
+    #     logger.info("%s %s", "resize_factor is", self.resize_factor)
+    #     logger.info("%s %s", "scan_version is", self.scan_version)
 
     def blur_img_transformation_using_scan_version_and_scan_type(self, rgb_image):
         if self.scan_version in ["v0.7"]:
@@ -116,10 +116,19 @@ class BlurFlow:
         rgb_image = cv2.imread(str(source_path))
 
         image = self.blur_img_transformation_using_scan_version_and_scan_type(rgb_image)
+        height, width, channels = image.shape
+
+        resized_height = 500.0
+        resize_factor = height / resized_height
+        # resized_width = width / resize_factor
+        # resized_height, resized_width = int(resized_height), int(resized_width)
 
         # Scale image down for faster prediction.
+        # small_image = cv2.resize(
+        #     image, (0, 0), fx=1.0 / self.resize_factor, fy=1.0 / self.resize_factor)
+
         small_image = cv2.resize(
-            image, (0, 0), fx=1.0 / self.resize_factor, fy=1.0 / self.resize_factor)
+            image, (0, 0), fx=1.0 / resize_factor, fy=1.0 / resize_factor)
 
         # Find face locations.
         face_locations = face_recognition.face_locations(small_image, model="cnn")
@@ -130,10 +139,11 @@ class BlurFlow:
         for top, right, bottom, left in face_locations:
             # Scale back up face locations since the frame we detected in was
             # scaled to 1/4 size
-            top *= self.resize_factor
-            right *= self.resize_factor
-            bottom *= self.resize_factor
-            left *= self.resize_factor
+            top *= resize_factor
+            right *= resize_factor
+            bottom *= resize_factor
+            left *= resize_factor
+            top, right, bottom, left = int(top), int(right), int(bottom), int(left)
 
             # Extract the region of the image that contains the face.
             face_image = image[top:bottom, left:right]
