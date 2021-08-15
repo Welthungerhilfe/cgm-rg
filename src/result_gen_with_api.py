@@ -4,7 +4,6 @@ import json
 import os
 import uuid
 
-from matplotlib.pyplot import sca
 from azure.storage.queue import QueueService
 
 import log

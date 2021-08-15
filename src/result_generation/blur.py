@@ -26,6 +26,7 @@ resize_factor_for_scan_version = {
 standing_scan_type = ["101", "102", "103"]
 laying_scan_type = ["201", "202", "203"]
 
+
 class BlurFlow:
     """Face blur results generation"""
 
