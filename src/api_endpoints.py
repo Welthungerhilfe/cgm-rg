@@ -22,6 +22,7 @@ ENDPOINTS = Bunch(dict(
     WORKFLOWS='/api/workflows',
     PERSONS='/api/persons/',
     MOD_SCAN='/api/scans',
+    GET_RESULTS='/api/scans?show_results=true'
 ))
 
 
@@ -35,6 +36,7 @@ class ApiEndpoints:
         self.workflow_endpoint = ENDPOINTS.WORKFLOWS
         self.person_detail_endpoint = ENDPOINTS.PERSONS
         self.mod_scan_endpoint = ENDPOINTS.MOD_SCAN
+        self.get_results_endpoint = ENDPOINTS.GET_RESULTS
         self.headers = {}
         self.x_api_key = os.getenv("API_KEY", None)
 
@@ -101,6 +103,27 @@ class ApiEndpoints:
         logger.info("%s %s", "File Id from post of test.jpg:", file_id)
 
         return file_id, response.status_code
+
+    def get_results(self, scan_id, workflow_id):
+        """Get the results for a scan for a particular workflow using scanid and workflow id"""
+        response = requests.get(
+            self.url + self.get_results_endpoint, 
+            params={
+                'scan_id': scan_id,
+                'workflow': workflow_id
+            },
+            headers=self.prepare_header()
+            )
+
+        if response.status_code == 200:
+            content = response.json()
+            logger.info("Result Details : ")
+            logger.info(pprint.pformat(content))
+            return content
+        else:
+            logger.info("%s %s", "Response code :", response.status_code)
+            return False
+
 
     def post_results(self, result_json_obj):
         """Post the result object produced while Result Generation using POST /results"""
