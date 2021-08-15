@@ -155,10 +155,9 @@ class HeightFlow:
 
     def get_height_prediction_using_api(self):
         height_results = self.result_generation.api.get_results(
-            self.result_generation.scan_metadata['id'], 
+            self.result_generation.scan_metadata['id'],
             self.artifact_workflow_obj["id"]
-            )
+        )
         # TODO add parser to get height_predictions
         height_predictions = height_results
         return height_predictions
-

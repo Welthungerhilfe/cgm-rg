@@ -10,7 +10,7 @@ import utils.preprocessing as preprocessing  # noqa: E402
 
 
 class HeightFlowPlainCnn(HeightFlow):
-    def __init__(self, result_generation, artifact_workflow_path, scan_workflow_path, artifacts, person_details, image_artifacts, result_level = None):
+    def __init__(self, result_generation, artifact_workflow_path, scan_workflow_path, artifacts, person_details, image_artifacts, result_level=None):
         super().__init__(result_generation, artifact_workflow_path, scan_workflow_path, artifacts, person_details, image_artifacts=image_artifacts)
         self.result_level = result_level
 
