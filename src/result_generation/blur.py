@@ -23,6 +23,8 @@ resize_factor_for_scan_version = {
     "v1.0": 1,
 }
 
+standing_scan_type = ["101", "102", "103"]
+laying_scan_type = ["201", "202", "203"]
 
 class BlurFlow:
     """Face blur results generation"""
@@ -33,8 +35,9 @@ class BlurFlow:
             workflow_path,
             workflow_faces_path,
             artifacts,
-            scan_version):
-        store_attr('result_generation,artifacts,workflow_path,workflow_faces_path,artifacts,scan_version', self)
+            scan_version,
+            scan_type):
+        store_attr('result_generation,artifacts,workflow_path,workflow_faces_path,artifacts,scan_version,scan_type', self)
         self.workflow_obj = self.result_generation.workflows.load_workflows(self.workflow_path)
         self.workflow_faces_obj = self.result_generation.workflows.load_workflows(self.workflow_faces_path)
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
@@ -79,7 +82,7 @@ class BlurFlow:
         logger.info("%s %s", "resize_factor is", self.resize_factor)
         logger.info("%s %s", "scan_version is", self.scan_version)
 
-    def blur_img_transformation_using_scan_version(self, rgb_image):
+    def blur_img_transformation_using_scan_version_and_scan_type(self, rgb_image):
         if self.scan_version in ["v0.7"]:
             # Make the image smaller, The limit of cgm-api to post an image is 500 KB.
             # Some of the images of v0.7 is greater than 500 KB
@@ -92,7 +95,11 @@ class BlurFlow:
         # if self.scan_version in ["v0.1", "v0.2", "v0.4", "v0.5", "v0.6", "v0.7", "v0.8", "v0.9", "v1.0"]:
         # The images are provided in 90degrees turned. Here we rotate 90degress to
         # the right.
-        image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+        if self.scan_type in standing_scan_type:
+            image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+        elif self.scan_type in laying_scan_type:
+            image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
         logger.info("%s %s", "scan_version is", self.scan_version)
         logger.info("swapped image axis")
         return image
