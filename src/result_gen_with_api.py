@@ -3,6 +3,8 @@ import base64
 import json
 import os
 import uuid
+
+from matplotlib.pyplot import sca
 from azure.storage.queue import QueueService
 
 import log
@@ -77,6 +79,7 @@ def run_normal_flow():
 
     scan_metadata = get_scan_metadata.get_scan_metadata()
     scan_version = scan_metadata['version']
+    scan_type = scan_metadata["type"]
     logger.info("%s %s", "Scan Type Version:", scan_version)
     workflow.get_list_of_worflows()
 
@@ -97,7 +100,8 @@ def run_normal_flow():
         blur_workflow_path,
         blur_faces_workflow_path,
         rgb_artifacts,
-        scan_version)
+        scan_version,
+        scan_type)
     flows.append(flow)
 
     flow = StandingLaying(
@@ -203,6 +207,7 @@ def run_retroactive_flow():
 
         scan_metadata = scan_metadata_with_workflow_obj['scans'][0]
         scan_version = scan_metadata['version']
+        scan_type = scan_metadata['type']
         logger.info("%s %s", "Scan Type Version:", scan_version)
 
         workflow_id = scan_metadata_with_workflow_obj['workflow_id']
@@ -227,7 +232,8 @@ def run_retroactive_flow():
                 blur_workflow_path,
                 blur_faces_workflow_path,
                 rgb_artifacts,
-                scan_version)
+                scan_version,
+                scan_type)
 
         elif workflow.match_workflows(standing_laying_workflow_path, workflow_id):
             logger.info("Matched with StandingLaying")
