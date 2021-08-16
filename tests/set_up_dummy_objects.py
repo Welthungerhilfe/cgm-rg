@@ -22,7 +22,8 @@ def get_dummy_blur_flow_object(mock_some_fn):
         'src/workflows/blur-workflow.json',
         'src/workflows/blur-faces-worklows.json',
         sdv.rgb_artifacts,
-        sdv.scan_version)
+        sdv.scan_version,
+        sdv.scan_type)
 
 
 @patch.object(ProcessWorkflows, 'get_workflow_id')

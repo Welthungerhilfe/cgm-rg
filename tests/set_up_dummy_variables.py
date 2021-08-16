@@ -30,6 +30,7 @@ def create_dummy_vars():
         "scan_metadata_path": scan_metadata_path,
         "scan_metadata": scan_metadata,
         "scan_version": scan_metadata['version'],
+        "scan_type": scan_metadata['type'],
         "rgb_artifacts": load_json(CWD.joinpath('tests', 'static_files', 'rgb_artifacts.json'))['rgb_artifacts'],
         "depth_artifacts": load_json(CWD.joinpath('tests', 'static_files', 'depth_artifacts.json'))['depth_artifacts'],
         "scan_parent_dir": CWD.joinpath('tests', 'static_files'),
