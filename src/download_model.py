@@ -105,6 +105,10 @@ def main():
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/height_rgbd')
 
+    # Download model for Posenet
+    download_model_from_registered_model(
+        workspace=ws, model_name='pose_hrnet_w32_384x288', output_location=REPO_DIR / 'models/HRNet')
+
     # for id in ENSEMBLE_RUN_IDS:
     #     print(f"Downloading run {id}")
     #     download_model(
