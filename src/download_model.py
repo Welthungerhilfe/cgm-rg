@@ -1,11 +1,11 @@
 import os
 from pathlib import Path
+
 from azureml.core import Experiment, Run, Workspace
 from azureml.core.authentication import ServicePrincipalAuthentication
 from azureml.core.model import Model
 
 import log
-
 
 logger = log.setup_custom_logger(__name__)
 
