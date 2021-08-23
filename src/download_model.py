@@ -45,6 +45,19 @@ def download_model(ws, experiment_name, run_id, input_location, output_location)
     logger.info("%s %s", "Successfully downloaded model for experiment ", experiment_name)
 
 
+def download_model_from_registered_model(workspace, model_name, output_location):
+    '''
+    Download the pretrained model
+    Input:
+         workspace: workspace to access the experiment
+         model_name: Name of the model in which model is registered
+         target_path: Where model should download
+    '''
+    model = Model(workspace, name=model_name)
+    model.download(target_dir=output_location, exist_ok=True, exists_ok=None)
+    logger.info("%s %s", "Successfully downloaded", model_name, "model from registered model")
+
+
 def main():
     sp = ServicePrincipalAuthentication(
         tenant_id=os.environ['TENANT_ID'],
