@@ -131,3 +131,10 @@ venv.bak/
 ../.amlignore.amltmp
 .amlignore
 .amlignore.amltmp
+
+# model
+models/
+
+# data
+data/
+
