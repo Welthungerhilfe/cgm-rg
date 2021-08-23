@@ -1,0 +1,10 @@
+{
+    "name": "pose_prediction",
+    "version": "1.0.0",
+    "result_format": "dict",
+    "result_binding": "artifact",
+    "data": {
+        "input_format": "image/jpeg",
+        "model": "pose_hrnet_w32_384x288 "
+    }
+}
