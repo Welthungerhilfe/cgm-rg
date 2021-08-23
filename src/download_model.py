@@ -59,19 +59,19 @@ def main():
         auth=sp
     )
 
-    # Downlaod model for standing/laying
+    # Download model for standing/laying
     standing_laying = Model(ws, name='standing_laying_classifier')
     standing_laying.download(target_dir=REPO_DIR / 'models')
     logger.info("Standing Laying Model Succesfully downloaded")
 
-    # Downlaod model for height
+    # Download model for height
     download_model(ws=ws,
                    experiment_name='q3-depthmap-plaincnn-height-95k',
                    run_id='q3-depthmap-plaincnn-height-95k_1610709896_ef7f755d',
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/height')
 
-    # Downlaod model for  weight
+    # Download model for  weight
     download_model(ws=ws,
                    experiment_name='q4-depthmap-plaincnn-weight-95k',
                    run_id='q4-depthmap-plaincnn-weight-95k_1616424204_63e3c1b8',
@@ -85,7 +85,7 @@ def main():
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/depthmapmultiartifactlatefusion')
 
-    # Downlaod model for RGBD
+    # Download model for RGBD
     download_model(ws=ws,
                    experiment_name='2021q2-rgbd-plaincnn-height-5kscans',
                    run_id='2021q2-rgbd-plaincnn-height-5kscans_1616835920_c469620e',
