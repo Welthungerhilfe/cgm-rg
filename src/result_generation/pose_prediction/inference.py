@@ -138,7 +138,6 @@ class ResultGeneration:
         logger.info("Extracting artifacts from scans")
 
         logger.info("Result Generation Started")
-        artifact_paths = artifact_paths[:2]
         for jpg_path in artifact_paths:
             input_path = str(result_gen.get_input_path(scan_directory, jpg_path['file']))
 
