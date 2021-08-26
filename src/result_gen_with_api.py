@@ -9,17 +9,17 @@ from azure.storage.queue import QueueService
 import log
 from api_endpoints import ApiEndpoints
 from get_scan_metadata import GetScanMetadata
-from process_workflows import ProcessWorkflows
 from prepare_artifacts import PrepareArtifacts
+from process_workflows import ProcessWorkflows
 from result_generation.blur import BlurFlow
-from result_generation.result_generation import ResultGeneration
 from result_generation.depthmap_image import DepthMapImgFlow
-from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.height.height_multiartifact import HeightFlowMultiArtifact
+from result_generation.height.height_plaincnn import HeightFlowPlainCnn
+from result_generation.height.height_rgbd import HeightFlowRGBD
+from result_generation.pose import PosePrediction
+from result_generation.result_generation import ResultGeneration
 from result_generation.standing import StandingLaying
 from result_generation.weight import WeightFlow
-from result_generation.height.height_rgbd import HeightFlowRGBD
-
 
 logger = log.setup_custom_logger(__name__)
 
