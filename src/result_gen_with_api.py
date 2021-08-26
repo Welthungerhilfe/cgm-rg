@@ -96,6 +96,9 @@ def run_normal_flow():
 
     result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, scan_parent_dir)
 
+    flow = PosePrediction(result_generation, pose_workflow_path, rgb_artifacts, scan_version, scan_type)
+    flows.append(flow)
+
     flow = BlurFlow(
         result_generation,
         blur_workflow_path,
