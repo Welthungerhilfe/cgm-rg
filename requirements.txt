@@ -1,4 +1,4 @@
-tensorflow
+tensorflow==2.4.2
 azureml-sdk
 opencv-python
 pillow
