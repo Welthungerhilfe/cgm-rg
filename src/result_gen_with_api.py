@@ -32,6 +32,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     workflow_dir = '/app/src/workflows'
     parser.add_argument('--scan_parent_dir', default="data/scans/", help='Parent directory in which scans will be stored')  # noqa: E501
+    parser.add_argument('--pose_workflow_path', default=f"{workflow_dir}/pose_prediction-workflow.json")  # noqa: E501
     parser.add_argument('--blur_faces_workflow_path', default=f"{workflow_dir}/blur-faces-worklows.json")  # noqa: E501
     parser.add_argument('--blur_workflow_path', default=f"{workflow_dir}/blur-workflow.json")  # noqa: E501
     parser.add_argument('--standing_laying_workflow_path', default=f"{workflow_dir}/standing_laying-workflow.json")  # noqa: E501
@@ -50,6 +51,7 @@ def parse_args():
 def run_normal_flow():
     args = parse_args()
     scan_parent_dir = args.scan_parent_dir
+    pose_workflow_path = args.pose_workflow_path
     blur_workflow_path = args.blur_workflow_path
     blur_faces_workflow_path = args.blur_faces_workflow_path
     standing_laying_workflow_path = args.standing_laying_workflow_path
