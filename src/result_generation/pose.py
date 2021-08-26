@@ -65,7 +65,7 @@ class PosePrediction:
                 source_artifacts=[artifact['id']],
                 source_results=[],
                 generated=generated_timestamp,
-                data={'No of person': str(number), 'Pose Scores': score, 'Pose Result': result},
+                data={'No of person': str(number), 'Pose Scores': str(score), 'Pose Result': str(result)},
             ))
             res.results.append(result)
         return res
