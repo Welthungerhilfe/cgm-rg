@@ -1,9 +1,4 @@
-import os
-import time
-
 import cv2
-import glob2 as glob
-import pandas as pd
 import torch
 import torch.backends.cudnn as cudnn
 import torch.nn.parallel
@@ -14,7 +9,7 @@ import torchvision
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parents[1]))  # noqa: E402
-import result_generation.pose_prediction.code.models.pose_hrnet
+import result_generation.pose_prediction.code.models.pose_hrnet  # noqa
 from result_generation.pose_prediction.code.config import cfg, update_config
 from result_generation.pose_prediction.code.config.constants import (COCO_KEYPOINT_INDEXES, NUM_KPTS)
 from result_generation.pose_prediction.code.models.pose_hrnet import get_pose_net
@@ -40,7 +35,7 @@ class PosePrediction:
         self.pose_model = get_pose_net(cfg)
         self.pose_model.load_state_dict(torch.load(
             cfg.TEST.MODEL_FILE, map_location=torch.device('cpu')), strict=False)
-        #self.pose_model = torch.nn.DataParallel(self.pose_model, device_ids=cfg.GPUS)
+        # self.pose_model = torch.nn.DataParallel(self.pose_model, device_ids=cfg.GPUS)
         self.pose_model.to(self.ctx)
         self.pose_model.eval()
         self.pose_model
@@ -179,6 +174,5 @@ def inference_artifact(artifacts, scan_type, result_gen, scan_directory):
     pose_prediction.load_box_model()
     pose_prediction.load_pose_model()
 
-    result_generation = ResultGeneration(pose_prediction, False)
-    return result_generation.result_on_scan_level(artifacts,
-                                                  scan_type, result_gen, scan_directory)
+    result = ResultGeneration(pose_prediction, False)
+    return result.result_on_scan_level(artifacts, scan_type, result_gen, scan_directory)

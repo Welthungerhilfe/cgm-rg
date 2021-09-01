@@ -9,8 +9,8 @@ from bunch import Bunch
 from fastcore.basics import store_attr
 
 sys.path.append(str(Path(__file__).parents[1]))
-import utils.inference as inference  # noqa: E402
-import utils.preprocessing as preprocessing  # noqa: E402
+import utils.inference as inference  # noqa
+import utils.preprocessing as preprocessing  # noqa
 from pose_prediction.inference import inference_artifact
 import log
 
