@@ -53,8 +53,11 @@ class PrepareArtifacts:
             return 'img'
         elif format in ['application/zip', 'depth']:
             return 'depth'
+        elif format in ['calibration']:
+            return 'calibration'
         else:
-            raise NameError(f"Unknown format {format}")
+            logger.warning(f"Unknown format {format}")
+            # raise NameError(f"Unknown format {format}")
 
     def add_artifacts_to_format_dictionary(self, format, artifact):
         """Sort artifacts according to input format"""
