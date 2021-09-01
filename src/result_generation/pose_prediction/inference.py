@@ -19,7 +19,7 @@ from result_generation.pose_prediction.code.config import cfg, update_config
 from result_generation.pose_prediction.code.config.constants import (COCO_KEYPOINT_INDEXES, NUM_KPTS)
 from result_generation.pose_prediction.code.models.pose_hrnet import get_pose_net
 from result_generation.pose_prediction.code.utils.utils import (box_to_center_scale, calculate_pose_score, draw_pose,
-                                                                get_person_detection_boxes, get_pose_estimation_prediction)
+                                                                get_person_detection_boxes, get_pose_estimation_prediction, rot)
 import log
 
 
@@ -47,6 +47,7 @@ class PosePrediction:
 
     def read_image(self, image_path):
         self.image_bgr = cv2.imread(image_path)
+        return self.image_bgr.shape
 
     def preprocess_image(self):
         self.input = []
@@ -77,6 +78,16 @@ class PosePrediction:
             self.pose_model, self.img, center, scale)
         return self.pose_preds, self.pose_score
 
+    def orient_cordinate_using_scan_type(self, pose_keypoints, scan_type, height):
+        if scan_type in ['100', '101', '102']:
+            pose_keypoints = rot(pose_keypoints, 'ROTATE_90_COUNTERCLOCKWISE', height)
+        elif scan_type in ['200', '201', '202']:
+            pose_keypoints = rot(pose_keypoints, 'ROTATE_90_CLOCKWISE', height)
+        else:
+            logger.info("%s %s %s", "Provided scan type", scan_type, "not supported")
+            logger.info("Keeping the co-ordinate in the same orientation as provided")
+        return pose_keypoints
+
     def pose_draw_on_image(self):
         if len(self.pose_preds) >= 1:
             for kpt in self.pose_preds:
@@ -93,13 +104,14 @@ class ResultGeneration:
 
     def result_on_artifact_level(self, jpg_path, scan_type):
 
-        self.pose_prediction.read_image(jpg_path)
+        shape = self.pose_prediction.read_image(jpg_path)
         self.pose_prediction.orient_image_using_scan_type(scan_type)
         self.pose_prediction.preprocess_image()
 
         pred_boxes, pred_score = self.pose_prediction.perform_box_on_image()
 
         pose_result = []
+        (height, width, color) = shape
         body_pose_score = []
 
         for idx in range(len(pred_boxes)):
@@ -109,6 +121,9 @@ class ResultGeneration:
 
             pose_bbox = pred_boxes[idx]
             pose_preds, pose_score = self.pose_prediction.perform_pose_on_image(idx)
+
+            pose_preds[0] = self.pose_prediction.orient_cordinate_using_scan_type(pose_preds[0], scan_type, height)
+
             if self.save_pose_overlay:
                 self.pose_prediction.pose_draw_on_image()
                 # TODO Ensure save image path
@@ -164,6 +179,6 @@ def inference_artifact(artifacts, scan_type, result_gen, scan_directory):
     pose_prediction.load_box_model()
     pose_prediction.load_pose_model()
 
-    result_generation = ResultGeneration(pose_prediction, True)
+    result_generation = ResultGeneration(pose_prediction, False)
     return result_generation.result_on_scan_level(artifacts,
                                                   scan_type, result_gen, scan_directory)

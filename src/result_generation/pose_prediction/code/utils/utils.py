@@ -39,6 +39,20 @@ def get_person_detection_boxes(model, img, threshold=0.5):
     return person_boxes, pred_score
 
 
+def rot(keypoints, orientation, height):
+    """
+    Rotate a point counterclockwise,or clockwise.
+    """
+    rotated_keypoints = list()
+    for i in range(0, NUM_KPTS):
+        if orientation == 'ROTATE_90_CLOCKWISE':
+            rot_x, rot_y = keypoints[i][1], keypoints[i][0]
+        elif orientation == 'ROTATE_90_COUNTERCLOCKWISE':
+            rot_x, rot_y = keypoints[i][1], height - keypoints[i][0]
+        rotated_keypoints.append([rot_x, rot_y])
+    return rotated_keypoints
+
+
 def draw_pose(keypoints, img):
     """draw the keypoints and the skeletons.
     :params keypoints: the shape should be equal to [17,2]
