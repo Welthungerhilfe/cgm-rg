@@ -218,6 +218,7 @@ def run_retroactive_flow():
         data_processing.create_artifact_dir()
         rgb_artifacts = data_processing.download_artifacts('img')
         depth_artifacts = data_processing.download_artifacts('depth')
+        depth_artifacts = data_processing.download_artifacts('calibration')
         person_details = person(cgm_api, scan_metadata['person'])
 
         result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, retroactive_scan_dir)
