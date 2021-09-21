@@ -8,15 +8,6 @@ import numpy as np
 from bunch import Bunch
 from fastcore.basics import store_attr
 
-sys.path.append(str(Path(__file__).parents[1]))
-import utils.inference as inference  # noqa
-import utils.preprocessing as preprocessing  # noqa
-from pose_prediction.inference import inference_artifact
-import log
-
-
-logger = log.setup_custom_logger(__name__)
-
 
 class PosePrediction:
     """A class to handle Pose Prediction results generation"""
@@ -54,20 +45,31 @@ class PosePrediction:
         pose_result = np.array(pose_result)
         return no_of_person, pose_score, pose_result
 
-    def prepare_result_object(self, no_of_pose_detected, pose_score, pose_result, generated_timestamp):
+    def prepare_result_object(self, no_of_pose_detected, pose_score, pose_results, generated_timestamp):
         """Prepare result object for results generated"""
         res = Bunch(dict(results=[]))
-        for artifact, number, score, result in zip(self.artifacts, no_of_pose_detected, pose_score, pose_result):
-            result = Bunch(dict(
+        for artifact, number, score, pose_result in zip(self.artifacts, no_of_pose_detected, pose_score, pose_results):
+            no_of_pose_result = Bunch(dict(
                 id=f"{uuid.uuid4()}",
                 scan=self.result_generation.scan_metadata['id'],
                 workflow=self.workflow_obj["id"],
                 source_artifacts=[artifact['id']],
                 source_results=[],
                 generated=generated_timestamp,
-                data={'No of person': str(number), 'Pose Scores': str(score), 'Pose Result': str(result)},
+                data={'no of person using pose': str(number)},
             ))
-            res.results.append(result)
+            res.results.append(no_of_pose_result)
+            for i in range(0, number):
+                pose_score_results = Bunch(dict(
+                    id=f"{uuid.uuid4()}",
+                    scan=self.result_generation.scan_metadata['id'],
+                    workflow=self.workflow_obj["id"],
+                    source_artifacts=[artifact['id']],
+                    source_results=[],
+                    generated=generated_timestamp,
+                    data={'Pose Scores': str(score[i]), 'Pose Results': str(pose_result[i])},
+                ))
+                res.results.append(pose_score_results)
         return res
 
     def post_result_object(self, no_of_person, pose_score, pose_result, generated_timestamp):
@@ -76,3 +78,16 @@ class PosePrediction:
         res_object = self.result_generation.bunch_object_to_json_object(res)
         if self.result_generation.api.post_results(res_object) == 201:
             logger.info("%s %s", "successfully post Post prediction results:", res_object)
+
+
+# For Artifact 1: we have 3 poses
+
+
+# Result Id 1 Artifact 1 : {no of person using pose : 3}
+# Result Id 2 Artifact 1 : {pose score : pose_score_1, pose_result : {keypoints_dict_1 , keypoints_score_dict_1}}
+# Result Id 3 Artifact 1 : {pose score : pose_score_2, pose_result : {keypoints_dict_2 , keypoints_score_dict_2}}
+# Result Id 4 Artifact 1 : {pose score : pose_score_3, pose_result : {keypoints_dict_3 , keypoints_score_dict_3}}
+
+# pose_detection
+
+# pose_visualisation

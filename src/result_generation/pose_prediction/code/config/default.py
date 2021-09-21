@@ -30,6 +30,8 @@ _C.TEST = CfgNode()
 # size of images for each device
 # Test Model Epoch
 _C.TEST.POST_PROCESS = False
+_C.TEST.POSE_DRAW = False
+_C.TEST.DATA_PATH = ''
 
 
 # nms

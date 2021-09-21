@@ -60,18 +60,17 @@ def download_model_from_registered_model(workspace, model_name, output_location)
 
 def main():
     sp = ServicePrincipalAuthentication(
-        tenant_id=os.environ['TENANT_ID'],
-        service_principal_id=os.environ['SP_ID'],
-        service_principal_password=os.environ['SP_PASSWD']
-    )
+        tenant_id='3a27c573-ec1a-4734-9cd3-3208af51794b',
+        service_principal_id='fbc89310-16e7-4a21-bfec-c8f518689f76',
+        service_principal_password='~4.ELWf~wBi~McUF840s3.L-F1hV4nZo93')
 
     ws = Workspace(
-        subscription_id=os.environ['SUB_ID'],
+        subscription_id="9b5bbfae-d5d1-4aae-a2ca-75159c0c887d",
         resource_group="cgm-ml-prod-we-rg",
         workspace_name="cgm-ml-prod-we-azml",
         auth=sp
     )
-
+    '''
     # Download model for standing/laying
     download_model_from_registered_model(
         workspace=ws, model_name='standing_laying_classifier', output_location=REPO_DIR / 'models')
@@ -103,11 +102,11 @@ def main():
                    run_id='2021q2-rgbd-plaincnn-height-5kscans_1616835920_c469620e',
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/height_rgbd')
-
+    
     # Download model for Posenet
     download_model_from_registered_model(
         workspace=ws, model_name='pose_hrnet_w32_384x288', output_location=REPO_DIR / 'models/HRNet')
-
+    '''
     # for id in ENSEMBLE_RUN_IDS:
     #     print(f"Downloading run {id}")
     #     download_model(

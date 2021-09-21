@@ -1,4 +1,3 @@
-
 import cv2
 import numpy as np
 import torch
@@ -26,27 +25,29 @@ def get_person_detection_boxes(model, img, threshold=0.5):
     pred_score = list(pred[0]['scores'].detach().cpu().numpy())
     if not pred_score or max(pred_score) < threshold:
         return [], 0
-    # Get list of index with score greater than threshold
-    pred_t = [pred_score.index(x) for x in pred_score if x > threshold][-1]
-    pred_boxes = pred_boxes[:pred_t + 1]
-    pred_classes = pred_classes[:pred_t + 1]
 
-    person_boxes = []
-    for idx, box in enumerate(pred_boxes):
-        if pred_classes[idx] == 'person':
+    filtered_index = [pred_score.index(x) for x in pred_score if x > threshold]
+    pred_boxes = [pred_boxes[idx] for idx in filtered_index]
+    pred_score = [pred_score[idx] for idx in filtered_index]
+    pred_classes = [pred_classes[idx] for idx in filtered_index]
+
+    person_boxes, person_scores = [], []
+    for box, score, class_ in zip(pred_boxes, pred_score, pred_classes):
+        if class_ == 'person':
             person_boxes.append(box)
+            person_scores.append(score)
 
-    return person_boxes, pred_score
+    return person_boxes, person_scores
 
 
-def rot(keypoints, orientation, height):
+def rot(keypoints, orientation, height, width):
     """
     Rotate a point counterclockwise,or clockwise.
     """
     rotated_keypoints = list()
     for i in range(0, NUM_KPTS):
         if orientation == 'ROTATE_90_CLOCKWISE':
-            rot_x, rot_y = keypoints[i][1], keypoints[i][0]
+            rot_x, rot_y = width - keypoints[i][1], keypoints[i][0]
         elif orientation == 'ROTATE_90_COUNTERCLOCKWISE':
             rot_x, rot_y = keypoints[i][1], height - keypoints[i][0]
         rotated_keypoints.append([rot_x, rot_y])
@@ -63,9 +64,10 @@ def draw_pose(keypoints, img):
         kpt_a, kpt_b = SKELETON[i][0], SKELETON[i][1]
         x_a, y_a = keypoints[kpt_a][0], keypoints[kpt_a][1]
         x_b, y_b = keypoints[kpt_b][0], keypoints[kpt_b][1]
-        cv2.circle(img, (int(x_a), int(y_a)), 6, CocoColors[i], -1)
-        cv2.circle(img, (int(x_b), int(y_b)), 6, CocoColors[i], -1)
-        cv2.line(img, (int(x_a), int(y_a)), (int(x_b), int(y_b)), CocoColors[i], 2)
+        img = cv2.circle(img, (int(x_a), int(y_a)), 6, CocoColors[i], -1)
+        img = cv2.circle(img, (int(x_b), int(y_b)), 6, CocoColors[i], -1)
+        img = cv2.line(img, (int(x_a), int(y_a)), (int(x_b), int(y_b)), CocoColors[i], 2)
+    return img
 
 
 def get_pose_estimation_prediction(pose_model, image, center, scale):
@@ -108,7 +110,6 @@ def box_to_center_scale(box, model_image_width, model_image_height):
         bottom left and top right corner of a box
     model_image_width : int
     model_image_height : int
-
     Returns
     -------
     (numpy array, numpy array)
