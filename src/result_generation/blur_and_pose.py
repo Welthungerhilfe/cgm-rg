@@ -19,17 +19,6 @@ from result_generation.pose_prediction.code.utils.utils import draw_pose
 
 logger = log.setup_custom_logger(__name__)
 
-# resize_factor_for_scan_version = {
-#     "v0.1": 3,
-#     "v0.2": 3,
-#     "v0.4": 3,
-#     "v0.5": 3,
-#     "v0.6": 3,
-#     "v0.7": 4,
-#     "v0.8": 1,
-#     "v0.9": 1,
-#     "v1.0": 1,
-# }
 
 standing_scan_type = ["101", "102", "103"]
 laying_scan_type = ["201", "202", "203"]
@@ -48,9 +37,11 @@ class PoseAndBlurFlow:
             artifacts,
             scan_version,
             scan_type):
+
         store_attr(
             'result_generation,artifacts,workflow_blur_path,workflow_faces_path,workflow_pose_path,workflow_pose_visualize_pose_path,artifacts,scan_version,scan_type', self)
         self.workflow_blur_obj = self.result_generation.workflows.load_workflows(self.workflow_blur_path)
+
         self.workflow_faces_obj = self.result_generation.workflows.load_workflows(self.workflow_faces_path)
         self.workflow_pose_obj = self.result_generation.workflows.load_workflows(self.workflow_pose_path)
         self.workflow_pose_visualize_obj = self.result_generation.workflows.load_workflows(
@@ -70,8 +61,6 @@ class PoseAndBlurFlow:
             self.workflow_pose_obj['name'], self.workflow_pose_obj['version'])
         self.workflow_pose_visualize_obj['id'] = self.result_generation.workflows.get_workflow_id(
             self.workflow_pose_visualize_obj['name'], self.workflow_pose_visualize_obj['version'])
-
-        self.scan_version = scan_version
 
     def run_flow(self):
         """Driver method for blur flow"""
@@ -125,9 +114,24 @@ class PoseAndBlurFlow:
     #         # Default Resize factor to 1
     #         logger.info("New Scan Version Type")
     #         self.resize_factor = 1
+    def orient_img(self, image):
+        # The images are rotated 90 degree clockwise for standing children
+        # and 90 degree anticlock wise for laying children to make children
+        # head at top and toe at bottom
+        if self.scan_type in standing_scan_type:
+            image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+        elif self.scan_type in laying_scan_type:
+            image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
-    #     logger.info("%s %s", "resize_factor is", self.resize_factor)
-    #     logger.info("%s %s", "scan_version is", self.scan_version)
+        return image
+
+    def reorient_back(self, image):
+        if self.scan_type in standing_scan_type:
+            image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        elif self.scan_type in laying_scan_type:
+            image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+
+        return image
 
     def blur_img_transformation_using_scan_version_and_scan_type(self, rgb_image):
         if self.scan_version in ["v0.7"]:
@@ -162,7 +166,8 @@ class PoseAndBlurFlow:
         rgb_image = cv2.imread(str(source_path))
 
         image = self.blur_img_transformation_using_scan_version_and_scan_type(rgb_image)
-        logger.info('%s', image.shape)
+        image = self.orient_img(image)
+
         height, width, channels = image.shape
 
         resized_height = 500.0
@@ -171,16 +176,11 @@ class PoseAndBlurFlow:
         # resized_height, resized_width = int(resized_height), int(resized_width)
 
         # Scale image down for faster prediction.
-        # small_image = cv2.resize(
-        #     image, (0, 0), fx=1.0 / self.resize_factor, fy=1.0 / self.resize_factor)
-
         small_image = cv2.resize(
             image, (0, 0), fx=1.0 / resize_factor, fy=1.0 / resize_factor)
 
         # Find face locations.
-        logger.info('%s', 'before fc')
         face_locations = face_recognition.face_locations(small_image, model="cnn")
-        logger.info('%s', 'after fc')
 
         faces_detected = len(face_locations)
         logger.info("%s %s", faces_detected, "face locations found and blurred for path:")
@@ -207,9 +207,7 @@ class PoseAndBlurFlow:
             # Put the blurred face region back into the frame image.
             image[top:bottom, left:right] = face_image
 
-        # if self.scan_version in ["v0.2", "v0.4", "v0.6", "v0.7", "v0.8"]:
-        #    # Rotate image back.
-        #    image = np.swapaxes(image, 0, 1)
+        image = self.reorient_back(image)
 
         # Write image to hard drive.
         rgb_image = image[:, :, ::-1]  # BGR -> RGB for OpenCV

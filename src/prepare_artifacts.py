@@ -3,6 +3,7 @@ import os
 import pprint
 from api_endpoints import ApiEndpoints
 import log
+from collections import defaultdict
 
 
 logger = log.setup_custom_logger(__name__)
@@ -21,7 +22,7 @@ class PrepareArtifacts:
     def __init__(self, api: ApiEndpoints, scan_metadata, scan_parent_dir):
         self.api = api
         self.scan_metadata = scan_metadata
-        self.format_wise_artifact = {}
+        self.format_wise_artifact = defaultdict(list)
         self.scan_parent_dir = scan_parent_dir
         self.scan_dir = os.path.join(self.scan_parent_dir, self.scan_metadata['id'])
         logger.info("%s %s", "Parent Scan Dir:", self.scan_dir)
@@ -53,15 +54,15 @@ class PrepareArtifacts:
             return 'img'
         elif format in ['application/zip', 'depth']:
             return 'depth'
+        elif format in ['calibration']:
+            return 'calibration'
         else:
-            raise NameError(f"Unknown format {format}")
+            logger.warning(f"Unknown format {format}")
+            # raise NameError(f"Unknown format {format}")
 
     def add_artifacts_to_format_dictionary(self, format, artifact):
         """Sort artifacts according to input format"""
-        if format in self.format_wise_artifact:
-            self.format_wise_artifact[format].append(artifact)
-        else:
-            self.format_wise_artifact[format] = [artifact]
+        self.format_wise_artifact[format].append(artifact)
 
     def process_scan_metadata(self):
         """Process artifacts in a scan.
