@@ -7,7 +7,6 @@ from datetime import datetime
 from fastcore.basics import store_attr
 import sys
 from pathlib import Path
-import numpy as np
 
 
 import log

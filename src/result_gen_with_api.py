@@ -16,7 +16,6 @@ from result_generation.depthmap_image import DepthMapImgFlow
 from result_generation.height.height_multiartifact import HeightFlowMultiArtifact
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.height.height_rgbd import HeightFlowRGBD
-from result_generation.pose import PosePrediction
 from result_generation.result_generation import ResultGeneration
 from result_generation.standing import StandingLaying
 from result_generation.weight import WeightFlow
