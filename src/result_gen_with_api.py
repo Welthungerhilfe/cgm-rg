@@ -120,7 +120,7 @@ def run_normal_flow():
         depthmap_img_workflow_path,
         depth_artifacts)
     flows.append(flow)
-    '''
+
     flow = HeightFlowPlainCnn(
         result_generation,
         height_workflow_artifact_path,
@@ -153,7 +153,7 @@ def run_normal_flow():
         person_details,
         rgb_artifacts)
     flows.append(flow)
-    '''
+
     for flow in flows:
         try:
             flow.run_flow()
@@ -306,7 +306,7 @@ def run_retroactive_flow():
 
 def main():
     run_normal_flow()
-    # run_retroactive_flow()
+    run_retroactive_flow()
 
 
 if __name__ == "__main__":
