@@ -237,6 +237,33 @@ class PoseAndBlurFlow:
                 artifact['pose_id_from_post_request'] = pose_id_from_post_request
                 artifact['generated_timestamp'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
+    def prepare_no_of_person_result_object(self):
+        """Prepare result object for results generated"""
+        res = Bunch(dict(results=[]))
+        for artifact, number, score, pose_result in zip(self.artifacts, artifact['no_of_pose_detected'], artifact['pose_score'], artifact['pose_results']):
+            no_of_pose_result = Bunch(dict(
+                id=f"{uuid.uuid4()}",
+                scan=self.result_generation.scan_metadata['id'],
+                workflow=self.workflow_obj["id"],
+                source_artifacts=[artifact['id']],
+                source_results=[],
+                generated=artifact['generated_timestamp'],
+                data={'no of person using pose': str(number)},
+            ))
+            res.results.append(no_of_pose_result)
+            for i in range(0, number):
+                pose_score_results = Bunch(dict(
+                    id=f"{uuid.uuid4()}",
+                    scan=self.result_generation.scan_metadata['id'],
+                    workflow=self.workflow_obj["id"],
+                    source_artifacts=[artifact['id']],
+                    source_results=[],
+                    generated=artifact['generated_timestamp'],
+                    data={'Pose Scores': str(score[i]), 'Pose Results': str(pose_result[i])},
+                ))
+                res.results.append(pose_score_results)
+        return res
+
     def prepare_pose_result_object(self):
         res = Bunch(dict(results=[]))
         for artifact in self.artifacts:
@@ -254,6 +281,7 @@ class PoseAndBlurFlow:
         return res
 
     # def prepare_blur_result_object(self):
+
     def prepare_result_object(self):
         """Prepare result object for results generated"""
         res = Bunch(dict(results=[]))
@@ -299,6 +327,11 @@ class PoseAndBlurFlow:
         res_object = self.result_generation.bunch_object_to_json_object(res)
         if self.result_generation.api.post_results(res_object) == 201:
             logger.info("%s %s", "successfully post pose results:", res_object)
+
+        pose_res = self.prepare_no_of_person_result_object()
+        pose_res_object = self.result_generation.bunch_object_to_json_object(pose_res)
+        if self.result_generation.api.post_results(pose_res_object) == 201:
+            logger.info("%s %s", "successfully post pose detected results:", pose_res_object)
 
         faces_res = self.prepare_faces_result_object()
         faces_res_object = self.result_generation.bunch_object_to_json_object(faces_res)
