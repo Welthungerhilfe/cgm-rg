@@ -237,7 +237,7 @@ class PoseAndBlurFlow:
     def prepare_no_of_person_result_object(self):
         """Prepare result object for results generated"""
         res = Bunch(dict(results=[]))
-        for artifact, number, score, pose_result in zip(self.artifacts, artifact['no_of_pose_detected'], artifact['pose_score'], artifact['pose_results']):
+        for artifact in self.artifacts:
             no_of_pose_result = Bunch(dict(
                 id=f"{uuid.uuid4()}",
                 scan=self.result_generation.scan_metadata['id'],
@@ -245,10 +245,10 @@ class PoseAndBlurFlow:
                 source_artifacts=[artifact['id']],
                 source_results=[],
                 generated=artifact['generated_timestamp'],
-                data={'no of person using pose': str(number)},
+                data={'no of person using pose': str(artifact['no_of_pose_detected'])},
             ))
             res.results.append(no_of_pose_result)
-            for i in range(0, number):
+            for i in range(0, artifact['no_of_pose_detected']):
                 pose_score_results = Bunch(dict(
                     id=f"{uuid.uuid4()}",
                     scan=self.result_generation.scan_metadata['id'],
@@ -256,7 +256,8 @@ class PoseAndBlurFlow:
                     source_artifacts=[artifact['id']],
                     source_results=[],
                     generated=artifact['generated_timestamp'],
-                    data={'Pose Scores': str(score[i]), 'Pose Results': str(pose_result[i])},
+                    data={'Pose Scores': str(artifact['pose_score'][i]),
+                          'Pose Results': str(artifact['pose_results'][i])},
                 ))
                 res.results.append(pose_score_results)
         return res
