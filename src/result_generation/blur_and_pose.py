@@ -257,7 +257,7 @@ class PoseAndBlurFlow:
                     source_results=[],
                     generated=artifact['generated_timestamp'],
                     data={'Pose Scores': str(artifact['pose_score'][i]),
-                          'Pose Results': str(artifact['pose_results'][i])},
+                          'Pose Results': str(artifact['pose_result'][i])},
                 ))
                 res.results.append(pose_score_results)
         return res
