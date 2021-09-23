@@ -70,7 +70,6 @@ class PoseAndBlurFlow:
         self.pose_prediction_artifacts()
         logger.info("%s", "Blur Done in run flow")
         self.pose_and_blur_visualsation()
-
         self.post_pose_with_blur_visualization_files()
         self.post_result_object()
 
@@ -254,12 +253,11 @@ class PoseAndBlurFlow:
                     id=f"{uuid.uuid4()}",
                     scan=self.result_generation.scan_metadata['id'],
                     workflow=self.workflow_pose_obj["id"],
-
                     source_artifacts=[artifact['id']],
                     source_results=[],
                     generated=artifact['generated_timestamp'],
                     data={'Pose Scores': str(artifact['pose_score'][i]),
-                          'Pose Results': str(artifact['pose_results'][i])},
+                          'Pose Results': str(artifact['pose_result'][i])},
                 ))
                 res.results.append(pose_score_results)
         return res
