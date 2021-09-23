@@ -66,10 +66,10 @@ class PoseAndBlurFlow:
         """Driver method for blur flow"""
         # self.blur_set_resize_factor()
         self.blur_artifacts()
+        self.post_blur_files()
         self.pose_prediction_artifacts()
         logger.info("%s", "Blur Done in run flow")
         self.pose_and_blur_visualsation()
-        self.post_blur_files()
         self.post_pose_with_blur_visualization_files()
         self.post_result_object()
 
@@ -241,7 +241,7 @@ class PoseAndBlurFlow:
             no_of_pose_result = Bunch(dict(
                 id=f"{uuid.uuid4()}",
                 scan=self.result_generation.scan_metadata['id'],
-                workflow=self.workflow_obj["id"],
+                workflow=self.workflow_pose_obj["id"],
                 source_artifacts=[artifact['id']],
                 source_results=[],
                 generated=artifact['generated_timestamp'],
@@ -252,7 +252,7 @@ class PoseAndBlurFlow:
                 pose_score_results = Bunch(dict(
                     id=f"{uuid.uuid4()}",
                     scan=self.result_generation.scan_metadata['id'],
-                    workflow=self.workflow_obj["id"],
+                    workflow=self.workflow_pose_obj["id"],
                     source_artifacts=[artifact['id']],
                     source_results=[],
                     generated=artifact['generated_timestamp'],
