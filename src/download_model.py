@@ -1,11 +1,11 @@
 import os
 from pathlib import Path
+
 from azureml.core import Experiment, Run, Workspace
 from azureml.core.authentication import ServicePrincipalAuthentication
 from azureml.core.model import Model
 
 import log
-
 
 logger = log.setup_custom_logger(__name__)
 
@@ -45,6 +45,19 @@ def download_model(ws, experiment_name, run_id, input_location, output_location)
     logger.info("%s %s", "Successfully downloaded model for experiment ", experiment_name)
 
 
+def download_model_from_registered_model(workspace, model_name, output_location):
+    '''
+    Download the pretrained model
+    Input:
+         workspace: workspace to access the experiment
+         model_name: Name of the model in which model is registered
+         target_path: Where model should download
+    '''
+    model = Model(workspace, name=model_name)
+    model.download(target_dir=output_location, exist_ok=True, exists_ok=None)
+    logger.info("%s %s %s", "Successfully downloaded", model_name, "model from registered model")
+
+
 def main():
     sp = ServicePrincipalAuthentication(
         tenant_id=os.environ['TENANT_ID'],
@@ -59,19 +72,18 @@ def main():
         auth=sp
     )
 
-    # Downlaod model for standing/laying
-    standing_laying = Model(ws, name='standing_laying_classifier')
-    standing_laying.download(target_dir=REPO_DIR / 'models')
-    logger.info("Standing Laying Model Succesfully downloaded")
+    # Download model for standing/laying
+    download_model_from_registered_model(
+        workspace=ws, model_name='standing_laying_classifier', output_location=REPO_DIR / 'models')
 
-    # Downlaod model for height
+    # Download model for height
     download_model(ws=ws,
                    experiment_name='q3-depthmap-plaincnn-height-95k',
                    run_id='q3-depthmap-plaincnn-height-95k_1610709896_ef7f755d',
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/height')
 
-    # Downlaod model for  weight
+    # Download model for  weight
     download_model(ws=ws,
                    experiment_name='q4-depthmap-plaincnn-weight-95k',
                    run_id='q4-depthmap-plaincnn-weight-95k_1616424204_63e3c1b8',
@@ -85,12 +97,16 @@ def main():
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/depthmapmultiartifactlatefusion')
 
-    # Downlaod model for RGBD
+    # Download model for RGBD
     download_model(ws=ws,
                    experiment_name='2021q2-rgbd-plaincnn-height-5kscans',
                    run_id='2021q2-rgbd-plaincnn-height-5kscans_1616835920_c469620e',
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/height_rgbd')
+
+    # Download model for Posenet
+    download_model_from_registered_model(
+        workspace=ws, model_name='pose_hrnet_w32_384x288', output_location=REPO_DIR / 'models/HRNet')
 
     # for id in ENSEMBLE_RUN_IDS:
     #     print(f"Downloading run {id}")

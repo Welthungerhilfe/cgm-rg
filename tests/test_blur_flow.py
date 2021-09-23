@@ -1,4 +1,5 @@
-import sys
+
+'''import sys
 import pytest
 from pathlib import Path
 
@@ -54,3 +55,4 @@ def test_post_result_object_successful():
 def test_post_result_object_unsuccessful():
     """Test to check unsuccessful upload of result object"""
     pass
+'''

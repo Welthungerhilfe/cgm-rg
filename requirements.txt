@@ -1,4 +1,4 @@
-tensorflow
+tensorflow==2.4.2
 azureml-sdk
 opencv-python
 pillow
@@ -22,3 +22,7 @@ mock==4.0.3
 glob2
 fastcore
 azure-storage-queue==2.1.0
+yacs
+torch==1.9.0
+torchvision==0.10.0
+torchaudio==0.9.0

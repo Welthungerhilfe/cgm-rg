@@ -9,17 +9,16 @@ from azure.storage.queue import QueueService
 import log
 from api_endpoints import ApiEndpoints
 from get_scan_metadata import GetScanMetadata
-from process_workflows import ProcessWorkflows
 from prepare_artifacts import PrepareArtifacts
-from result_generation.blur import BlurFlow
-from result_generation.result_generation import ResultGeneration
+from process_workflows import ProcessWorkflows
+from result_generation.blur_and_pose import PoseAndBlurFlow
 from result_generation.depthmap_image import DepthMapImgFlow
-from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.height.height_multiartifact import HeightFlowMultiArtifact
+from result_generation.height.height_plaincnn import HeightFlowPlainCnn
+from result_generation.height.height_rgbd import HeightFlowRGBD
+from result_generation.result_generation import ResultGeneration
 from result_generation.standing import StandingLaying
 from result_generation.weight import WeightFlow
-from result_generation.height.height_rgbd import HeightFlowRGBD
-
 
 logger = log.setup_custom_logger(__name__)
 
@@ -32,6 +31,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     workflow_dir = '/app/src/workflows'
     parser.add_argument('--scan_parent_dir', default="data/scans/", help='Parent directory in which scans will be stored')  # noqa: E501
+    parser.add_argument('--pose_workflow_path', default=f"{workflow_dir}/pose_prediction-workflow.json")  # noqa: E501
+    parser.add_argument('--pose_visualization_workflow_path', default=f"{workflow_dir}/pose-visualize-workflows.json")  # noqa: E501
     parser.add_argument('--blur_faces_workflow_path', default=f"{workflow_dir}/blur-faces-worklows.json")  # noqa: E501
     parser.add_argument('--blur_workflow_path', default=f"{workflow_dir}/blur-workflow.json")  # noqa: E501
     parser.add_argument('--standing_laying_workflow_path', default=f"{workflow_dir}/standing_laying-workflow.json")  # noqa: E501
@@ -50,6 +51,8 @@ def parse_args():
 def run_normal_flow():
     args = parse_args()
     scan_parent_dir = args.scan_parent_dir
+    pose_workflow_path = args.pose_workflow_path
+    pose_visualization_workflow_path = args.pose_visualization_workflow_path
     blur_workflow_path = args.blur_workflow_path
     blur_faces_workflow_path = args.blur_faces_workflow_path
     standing_laying_workflow_path = args.standing_laying_workflow_path
@@ -94,10 +97,12 @@ def run_normal_flow():
 
     result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, scan_parent_dir)
 
-    flow = BlurFlow(
+    flow = PoseAndBlurFlow(
         result_generation,
         blur_workflow_path,
         blur_faces_workflow_path,
+        pose_workflow_path,
+        pose_visualization_workflow_path,
         rgb_artifacts,
         scan_version,
         scan_type)
@@ -161,6 +166,7 @@ def run_retroactive_flow():
     # scan_parent_dir = args.scan_parent_dir
     blur_workflow_path = args.blur_workflow_path
     blur_faces_workflow_path = args.blur_faces_workflow_path
+    pose_workflow_path = args.pose_workflow_path
     standing_laying_workflow_path = args.standing_laying_workflow_path
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
@@ -227,10 +233,11 @@ def run_retroactive_flow():
 
         if workflow.match_workflows(blur_workflow_path, workflow_id):
             logger.info("Matched with BlurFlow")
-            flow = BlurFlow(
+            flow = PoseAndBlurFlow(
                 result_generation,
                 blur_workflow_path,
                 blur_faces_workflow_path,
+                pose_workflow_path,
                 rgb_artifacts,
                 scan_version,
                 scan_type)
