@@ -105,7 +105,7 @@ def run_normal_flow():
         pose_visualization_workflow_path,
         rgb_artifacts,
         scan_version,
-        scan_type)
+        scan_type, ['POSE', 'BLUR'])
     flows.append(flow)
 
     flow = StandingLaying(
@@ -233,7 +233,7 @@ def run_retroactive_flow():
         workflow_matched = True
 
         if workflow.match_workflows(blur_workflow_path, workflow_id):
-            logger.info("Matched with PoseAndBlurFlow")
+            logger.info("Matched with BlurFlow")
             flow = PoseAndBlurFlow(
                 result_generation,
                 blur_workflow_path,
@@ -242,7 +242,21 @@ def run_retroactive_flow():
                 pose_visualization_workflow_path,
                 rgb_artifacts,
                 scan_version,
-                scan_type)
+                scan_type,
+                ['BLUR'])
+
+        elif workflow.match_workflows(pose_workflow_path, workflow_id):
+            logger.info("Matched with PoseFlow")
+            flow = PoseAndBlurFlow(
+                result_generation,
+                blur_workflow_path,
+                blur_faces_workflow_path,
+                pose_workflow_path,
+                pose_visualization_workflow_path,
+                rgb_artifacts,
+                scan_version,
+                scan_type,
+                ['POSE'])
 
         elif workflow.match_workflows(standing_laying_workflow_path, workflow_id):
             logger.info("Matched with StandingLaying")
