@@ -36,10 +36,11 @@ class PoseAndBlurFlow:
             workflow_pose_visualize_pose_path,
             artifacts,
             scan_version,
-            scan_type):
+            scan_type,
+            workflow_type):
 
         store_attr(
-            'result_generation,artifacts,workflow_blur_path,workflow_faces_path,workflow_pose_path,workflow_pose_visualize_pose_path,artifacts,scan_version,scan_type', self)
+            'result_generation,artifacts,workflow_blur_path,workflow_faces_path,workflow_pose_path,workflow_pose_visualize_pose_path,artifacts,scan_version,scan_type,workflow_type', self)
         self.workflow_blur_obj = self.result_generation.workflows.load_workflows(self.workflow_blur_path)
 
         self.workflow_faces_obj = self.result_generation.workflows.load_workflows(self.workflow_faces_path)
@@ -66,12 +67,15 @@ class PoseAndBlurFlow:
         """Driver method for blur flow"""
         # self.blur_set_resize_factor()
         self.blur_artifacts()
-        self.post_blur_files()
-        self.pose_prediction_artifacts()
-        logger.info("%s", "Blur Done in run flow")
-        self.pose_and_blur_visualsation()
-        self.post_pose_with_blur_visualization_files()
-        self.post_result_object()
+        if 'BLUR' in self.workflow_type:
+            self.post_blur_files()
+            self.post_blur_result_object()
+        if 'POSE' in self.workflow_type:
+            self.pose_prediction_artifacts()
+            self.post_pose_result_object()
+            self.pose_and_blur_visualsation()
+            self.post_pose_with_blur_visualization_files()
+            self.post_pose_with_blur_visualization_object()
 
     def pose_prediction_artifacts(self):
         """Blur the list of artifacts"""
@@ -262,7 +266,7 @@ class PoseAndBlurFlow:
                 res.results.append(pose_score_results)
         return res
 
-    def prepare_pose_result_object(self):
+    def prepare_pose_visualize_object(self):
         res = Bunch(dict(results=[]))
         for artifact in self.artifacts:
             result = Bunch(dict(
@@ -314,22 +318,25 @@ class PoseAndBlurFlow:
 
         return res
 
-    def post_result_object(self):
+    def post_pose_result_object(self):
+        """Post the result object to the API"""
+        pose_res = self.prepare_no_of_person_result_object()
+        pose_res_object = self.result_generation.bunch_object_to_json_object(pose_res)
+        if self.result_generation.api.post_results(pose_res_object) == 201:
+            logger.info("%s %s", "successfully post pose detected results:", pose_res_object)
+
+    def post_pose_with_blur_visualization_object(self):
+        res = self.prepare_pose_visualize_object()
+        res_object = self.result_generation.bunch_object_to_json_object(res)
+        if self.result_generation.api.post_results(res_object) == 201:
+            logger.info("%s %s", "successfully post pose results:", res_object)
+
+    def post_blur_result_object(self):
         """Post the result object to the API"""
         res = self.prepare_result_object()
         res_object = self.result_generation.bunch_object_to_json_object(res)
         if self.result_generation.api.post_results(res_object) == 201:
             logger.info("%s %s", "successfully post blur results:", res_object)
-
-        res = self.prepare_pose_result_object()
-        res_object = self.result_generation.bunch_object_to_json_object(res)
-        if self.result_generation.api.post_results(res_object) == 201:
-            logger.info("%s %s", "successfully post pose results:", res_object)
-
-        pose_res = self.prepare_no_of_person_result_object()
-        pose_res_object = self.result_generation.bunch_object_to_json_object(pose_res)
-        if self.result_generation.api.post_results(pose_res_object) == 201:
-            logger.info("%s %s", "successfully post pose detected results:", pose_res_object)
 
         faces_res = self.prepare_faces_result_object()
         faces_res_object = self.result_generation.bunch_object_to_json_object(faces_res)
