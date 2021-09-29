@@ -233,7 +233,7 @@ def run_retroactive_flow():
         workflow_matched = True
 
         if workflow.match_workflows(blur_workflow_path, workflow_id):
-            logger.info("Matched with BlurFlow")
+            logger.info("Matched with PoseAndBlurFlow")
             flow = PoseAndBlurFlow(
                 result_generation,
                 blur_workflow_path,
