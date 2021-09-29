@@ -167,6 +167,7 @@ def run_retroactive_flow():
     blur_workflow_path = args.blur_workflow_path
     blur_faces_workflow_path = args.blur_faces_workflow_path
     pose_workflow_path = args.pose_workflow_path
+    pose_visualization_workflow_path = args.pose_visualization_workflow_path
     standing_laying_workflow_path = args.standing_laying_workflow_path
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
@@ -232,12 +233,13 @@ def run_retroactive_flow():
         workflow_matched = True
 
         if workflow.match_workflows(blur_workflow_path, workflow_id):
-            logger.info("Matched with BlurFlow")
+            logger.info("Matched with PoseAndBlurFlow")
             flow = PoseAndBlurFlow(
                 result_generation,
                 blur_workflow_path,
                 blur_faces_workflow_path,
                 pose_workflow_path,
+                pose_visualization_workflow_path,
                 rgb_artifacts,
                 scan_version,
                 scan_type)
