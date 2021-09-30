@@ -1,6 +1,6 @@
 {
     "name": "pose_prediction",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "result_format": "dict",
     "result_binding": "artifact",
     "data": {
