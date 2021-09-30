@@ -85,7 +85,6 @@ class PoseAndBlurFlow:
             logger.info("%s %s", "input_path of image to perform Pose prediction:", input_path)
             no_of_pose_detected, pose_score, pose_result = inference_artifact(
                 pose_prediction, input_path, self.scan_type)
-            logger.info("%s %s %s %s ", "pose_score", "no_of_pose_detected", pose_score, no_of_pose_detected)
             artifact['no_of_pose_detected'] = no_of_pose_detected
             artifact['pose_score'] = pose_score
             artifact['pose_result'] = pose_result
@@ -96,7 +95,6 @@ class PoseAndBlurFlow:
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             logger.info("%s %s", "input_path of image to perform blur:", input_path)
             blur_img_binary, blur_status, faces_detected = self.blur_face(input_path)
-            logger.info("%s", "Blur Done")
 
             if blur_status:
                 artifact['blurred_image'] = blur_img_binary
