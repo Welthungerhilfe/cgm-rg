@@ -73,9 +73,9 @@ class PoseAndBlurFlow:
         if 'POSE' in self.workflow_type:
             logger.info('%s', 'Pose Prediction Started')
             self.pose_prediction_artifacts()
-            self.post_pose_result_object()
             self.pose_and_blur_visualsation()
             self.post_pose_with_blur_visualization_files()
+            self.post_pose_result_object()
             self.post_pose_with_blur_visualization_object()
 
     def pose_prediction_artifacts(self):
