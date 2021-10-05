@@ -1,11 +1,12 @@
 {
-    "name": "q3-depthmap-height-mean",
-    "version": "run-01_01",
+    "name": "q4-depthmap-height-mean",
+    "version": "2.0.0",
     "result_format": "dict",
     "result_binding": "scan",
     "data":{
         "input_format":"application/zip",
-        "model":"q3-depthmap-plaincnn-height-95k"
+        "model":"q4-depthmap-plaincnn-height-264k",
+        "run_id":"q4-depthmap-plaincnn-height-264k_1631047085_7bc153d2"
     },
     "eligible": true
 }

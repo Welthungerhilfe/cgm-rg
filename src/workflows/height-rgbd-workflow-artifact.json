@@ -6,7 +6,8 @@
     "data":{
         "input_format":"application/zip",
         "image_input_format":"image/jpeg",
-        "model":"2021q2-rgbd-plaincnn-height-5kscans"
+        "model":"2021q2-rgbd-plaincnn-height-5kscans",
+        "run_id":"2021q2-rgbd-plaincnn-height-5kscans_1616835920_c469620e"
     }
 }
 
