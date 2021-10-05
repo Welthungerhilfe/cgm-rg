@@ -67,42 +67,30 @@ def main():
 
     ws = Workspace(
         subscription_id=os.environ['SUB_ID'],
-        resource_group="cgm-ml-prod-we-rg",
-        workspace_name="cgm-ml-prod-we-azml",
+        resource_group="cgm-ml-prod-ci-rg",
+        workspace_name="cgm-ml-prod-ci-azml",
         auth=sp
     )
 
     # Download model for standing/laying
-    download_model_from_registered_model(
-        workspace=ws, model_name='standing_laying_classifier', output_location=REPO_DIR / 'models')
+    # download_model_from_registered_model(
+    #    workspace=ws, model_name='standing_laying_classifier', output_location=REPO_DIR / 'models')
 
     # Download model for height
-    download_model(ws=ws,
-                   experiment_name='q3-depthmap-plaincnn-height-95k',
-                   run_id='q3-depthmap-plaincnn-height-95k_1610709896_ef7f755d',
-                   input_location=os.path.join('outputs', 'best_model.ckpt'),
-                   output_location=REPO_DIR / 'models/height')
+    download_model_from_registered_model(
+        workspace=ws, model_name='q3-depthmap-plaincnn-height-95k', output_location=REPO_DIR / 'models/height')
 
     # Download model for  weight
-    download_model(ws=ws,
-                   experiment_name='q4-depthmap-plaincnn-weight-95k',
-                   run_id='q4-depthmap-plaincnn-weight-95k_1616424204_63e3c1b8',
-                   input_location=os.path.join('outputs', 'best_model.ckpt'),
-                   output_location=REPO_DIR / 'models/weight')
+    download_model_from_registered_model(
+        workspace=ws, model_name='q4-depthmap-plaincnn-weight-95k', output_location=REPO_DIR / 'models/weight')
 
     # Download M-CNN Model for height
-    download_model(ws=ws,
-                   experiment_name='q3-depthmapmultiartifactlatefusion-plaincnn-height-95',
-                   run_id='q3-depthmapmultiartifactlatefusion-plaincnn-height-95k_1614177517_ecd7b6e2',
-                   input_location=os.path.join('outputs', 'best_model.ckpt'),
-                   output_location=REPO_DIR / 'models/depthmapmultiartifactlatefusion')
+    download_model_from_registered_model(workspace=ws, model_name='q3-depthmapmultiartifactlatefusion-plaincnn-height-95',
+                                         output_location=REPO_DIR / 'models/depthmapmultiartifactlatefusion')
 
     # Download model for RGBD
-    download_model(ws=ws,
-                   experiment_name='2021q2-rgbd-plaincnn-height-5kscans',
-                   run_id='2021q2-rgbd-plaincnn-height-5kscans_1616835920_c469620e',
-                   input_location=os.path.join('outputs', 'best_model.ckpt'),
-                   output_location=REPO_DIR / 'models/height_rgbd')
+    download_model_from_registered_model(
+        workspace=ws, model_name='2021q2-rgbd-plaincnn-height-5kscans', output_location=REPO_DIR / 'models/height_rgbd')
 
     # Download model for Posenet
     download_model_from_registered_model(
