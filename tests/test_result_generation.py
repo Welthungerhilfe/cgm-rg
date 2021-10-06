@@ -50,6 +50,7 @@ def test_get_mean_scan_results():
     truth = str(5.5)
     assert result == truth
 
+
 def test_get_median_scan_results():
     """Test to check if we get correct median results"""
     # Setup

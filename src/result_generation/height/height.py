@@ -53,7 +53,7 @@ class HeightFlow:
                 source_results=[],
                 generated=generated_timestamp,
                 data={'height': str(prediction[0])},
-                run_id = self.run_id,
+                run_id=self.run_id,
             ))
             res.results.append(result)
         return res
@@ -68,7 +68,7 @@ class HeightFlow:
             source_artifacts=[artifact['id'] for artifact in self.artifacts],
             source_results=[],
             generated=generated_timestamp,
-            run_id = self.run_id,
+            run_id=self.run_id,
         ))
         mean_prediction = self.result_generation.get_mean_scan_results(predictions)
         median_prediction = self.result_generation.get_median_scan_results(predictions)
