@@ -25,7 +25,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 
 try:
     height_model = load_model(
-        '/app/models/height/outputs/best_model.ckpt/', compile=False)
+        '/app/models/height/best_model.ckpt/', compile=False)
 except OSError as error:
     print(error)
     print("Not able to load the Height model")
@@ -34,7 +34,7 @@ except Exception as e:
 
 try:
     depthmapmultiartifactlatefusion_height_model = load_model(
-        '/app/models/depthmapmultiartifactlatefusion/outputs/best_model.ckpt',
+        '/app/models/depthmapmultiartifactlatefusion/best_model.ckpt',
         compile=False)
 except OSError as error:
     print(error)
@@ -44,7 +44,7 @@ except Exception as e:
 
 try:
     weight_model = load_model(
-        '/app/models/weight/outputs/best_model.ckpt/', compile=False)
+        '/app/models/weight/best_model.ckpt/', compile=False)
 except OSError as error:
     print(error)
     print("Not able to load the Weight model")
@@ -61,7 +61,7 @@ except Exception as e:
 
 try:
     height_rgbd_model = load_model(
-        '/app/models/height_rgbd/outputs/best_model.ckpt', compile=False)
+        '/app/models/height_rgbd/best_model.ckpt', compile=False)
 except OSError as error:
     print(error)
     print("Not able to load the rgbd model")
