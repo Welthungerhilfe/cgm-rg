@@ -49,3 +49,16 @@ def test_get_mean_scan_results():
     # Verify
     truth = str(5.5)
     assert result == truth
+
+def test_get_median_scan_results():
+    """Test to check if we get correct median results"""
+    # Setup
+    result_generation = set_up_dummy_objects.get_dummy_result_generation_object()
+    a = np.array([[4], [6], [5], [7], [8]])
+
+    # Exercise
+    result = result_generation.get_median_scan_results(a)
+
+    # Verify
+    truth = str(6.0)
+    assert result == truth
