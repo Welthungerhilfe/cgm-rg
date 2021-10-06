@@ -77,8 +77,9 @@ class WeightFlow:
             generated=generated_timestamp,
         ))
         mean_prediction = self.result_generation.get_mean_scan_results(predictions)
+        median_prediction = self.result_generation.get_median_scan_results(predictions)
         class_wfa = self.zscore_wfa(mean_prediction)
-        result.data = {'mean_weight': mean_prediction, 'Weight Diagnosis': class_wfa}
+        result.data = {'mean_weight': mean_prediction, 'median_weight': median_prediction, 'Weight Diagnosis': class_wfa}
         res.results.append(result)
         return res
 
