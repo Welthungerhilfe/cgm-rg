@@ -31,3 +31,6 @@ class ResultGeneration:
 
     def get_mean_scan_results(self, predictions):
         return str(np.mean(predictions))
+
+    def get_median_scan_results(self, predictions):
+        return str(np.median(predictions))
