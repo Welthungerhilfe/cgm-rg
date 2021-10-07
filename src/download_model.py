@@ -78,7 +78,7 @@ def main():
 
     # Download model for height
     download_model_from_registered_model(
-        workspace=ws, model_name='q3-depthmap-plaincnn-height-95k', output_location=REPO_DIR / 'models/height')
+        workspace=ws, model_name='q4-depthmap-plaincnn-height-264k', output_location=REPO_DIR / 'models/height')
 
     # Download model for  weight
     download_model_from_registered_model(
