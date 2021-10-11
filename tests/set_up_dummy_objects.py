@@ -7,7 +7,6 @@ from mock import patch
 from result_gen_with_api import ProcessWorkflows
 # from result_generation.blur import BlurFlow
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
-from result_generation.weight import WeightFlow
 from result_generation.result_generation import ResultGeneration
 
 
@@ -36,17 +35,6 @@ def get_dummy_height_flow_object(mock_some_fn):
         'src/workflows/height-plaincnn-workflow-scan.json',
         sdv.depth_artifacts,
         sdv.rgb_artifacts,
-        sdv.person_details)
-
-
-@patch.object(ProcessWorkflows, 'get_workflow_id')
-def get_dummy_weight_flow_object(mock_some_fn):
-    mock_some_fn.return_value = '44af5600-69d2-11eb-9498-8ffe0e3b2017'
-    return WeightFlow(
-        get_dummy_result_generation_object_for_subclass(),
-        'src/workflows/weight-workflow-artifact.json',
-        'src/workflows/weight-workflow-scan.json',
-        sdv.depth_artifacts,
         sdv.person_details)
 
 
