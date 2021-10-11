@@ -32,24 +32,6 @@ except OSError as error:
 except Exception as e:
     print(e)
 
-try:
-    depthmapmultiartifactlatefusion_height_model = load_model(
-        '/app/models/depthmapmultiartifactlatefusion/best_model.ckpt',
-        compile=False)
-except OSError as error:
-    print(error)
-    print("Not able to load the depthmapmultiartifactlatefusion Height model")
-except Exception as e:
-    print(e)
-
-try:
-    weight_model = load_model(
-        '/app/models/weight/best_model.ckpt/', compile=False)
-except OSError as error:
-    print(error)
-    print("Not able to load the Weight model")
-except Exception as e:
-    print(e)
 
 try:
     standing_laying = load_model('/app/models/Standing_laying/best_model.h5')
