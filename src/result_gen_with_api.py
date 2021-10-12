@@ -13,12 +13,10 @@ from prepare_artifacts import PrepareArtifacts
 from process_workflows import ProcessWorkflows
 from result_generation.blur_and_pose import PoseAndBlurFlow
 from result_generation.depthmap_image import DepthMapImgFlow
-from result_generation.height.height_multiartifact import HeightFlowMultiArtifact
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.height.height_rgbd import HeightFlowRGBD
 from result_generation.result_generation import ResultGeneration
 from result_generation.standing import StandingLaying
-from result_generation.weight import WeightFlow
 
 logger = log.setup_custom_logger(__name__)
 
@@ -38,10 +36,7 @@ def parse_args():
     parser.add_argument('--standing_laying_workflow_path', default=f"{workflow_dir}/standing_laying-workflow.json")  # noqa: E501
     parser.add_argument('--depthmap_img_workflow_path', default=f"{workflow_dir}/depthmap-img-workflow.json")  # noqa: E501
     parser.add_argument('--height_workflow_artifact_path', default=f"{workflow_dir}/height-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
-    parser.add_argument('--height_depthmapmultiartifactlatefusion_workflow_path', default=f"{workflow_dir}/height-depthmapmultiartifactlatefusion-workflow.json")  # noqa: E501
     parser.add_argument('--height_workflow_scan_path', default=f"{workflow_dir}/height-plaincnn-workflow-scan.json")  # noqa: E501
-    parser.add_argument('--weight_workflow_artifact_path', default=f"{workflow_dir}/weight-workflow-artifact-run_05.json")  # noqa: E501
-    parser.add_argument('--weight_workflow_scan_path', default=f"{workflow_dir}/weight-workflow-scan-run_05.json")  # noqa: E501
     parser.add_argument('--height_rgbd_workflow_artifact_path', default=f"{workflow_dir}/height-rgbd-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--height_rgbd_workflow_scan_path', default=f"{workflow_dir}/height-rgbd-workflow-scan.json")  # noqa: E501
     args = parser.parse_args()
@@ -59,9 +54,6 @@ def run_normal_flow():
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
-    height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
-    weight_workflow_artifact_path = args.weight_workflow_artifact_path
-    weight_workflow_scan_path = args.weight_workflow_scan_path
     height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
     height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
 
@@ -128,22 +120,6 @@ def run_normal_flow():
         person_details)
     flows.append(flow)
 
-    flow = HeightFlowMultiArtifact(
-        result_generation,
-        height_workflow_artifact_path,
-        height_depthmapmultiartifactlatefusion_workflow_path,
-        depth_artifacts,
-        person_details)
-    flows.append(flow)
-
-    flow = WeightFlow(
-        result_generation,
-        weight_workflow_artifact_path,
-        weight_workflow_scan_path,
-        depth_artifacts,
-        person_details)
-    flows.append(flow)
-
     flow = HeightFlowRGBD(
         result_generation,
         height_rgbd_workflow_artifact_path,
@@ -172,9 +148,6 @@ def run_retroactive_flow():
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
-    height_depthmapmultiartifactlatefusion_workflow_path = args.height_depthmapmultiartifactlatefusion_workflow_path
-    weight_workflow_artifact_path = args.weight_workflow_artifact_path
-    weight_workflow_scan_path = args.weight_workflow_scan_path
     height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
     height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
 
@@ -278,24 +251,6 @@ def run_retroactive_flow():
                 result_generation,
                 height_workflow_artifact_path,
                 height_workflow_scan_path,
-                depth_artifacts,
-                person_details)
-
-        elif workflow.match_workflows(height_depthmapmultiartifactlatefusion_workflow_path, workflow_id):
-            logger.info("Matched with HeightFlowMultiArtifact")
-            flow = HeightFlowMultiArtifact(
-                result_generation,
-                height_workflow_artifact_path,
-                height_depthmapmultiartifactlatefusion_workflow_path,
-                depth_artifacts,
-                person_details)
-
-        elif workflow.match_workflows(weight_workflow_scan_path, workflow_id):
-            logger.info("Matched with WeightFlow")
-            flow = WeightFlow(
-                result_generation,
-                weight_workflow_artifact_path,
-                weight_workflow_scan_path,
                 depth_artifacts,
                 person_details)
 

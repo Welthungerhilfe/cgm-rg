@@ -80,14 +80,6 @@ def main():
     download_model_from_registered_model(
         workspace=ws, model_name='q4-depthmap-plaincnn-height-264k', output_location=REPO_DIR / 'models/height')
 
-    # Download model for  weight
-    download_model_from_registered_model(
-        workspace=ws, model_name='q4-depthmap-plaincnn-weight-95k', output_location=REPO_DIR / 'models/weight')
-
-    # Download M-CNN Model for height
-    download_model_from_registered_model(workspace=ws, model_name='q3-depthmapmultiartifactlatefusion-plaincnn-height-95',
-                                         output_location=REPO_DIR / 'models/depthmapmultiartifactlatefusion')
-
     # Download model for RGBD
     download_model_from_registered_model(
         workspace=ws, model_name='2021q2-rgbd-plaincnn-height-5kscans', output_location=REPO_DIR / 'models/height_rgbd')
