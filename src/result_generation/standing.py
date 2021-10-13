@@ -24,8 +24,9 @@ class StandingLaying:
             self,
             result_generation,
             workflow_path,
-            artifacts):
-        store_attr('result_generation, workflow_path, artifacts', self)
+            artifacts,
+            scan_type):
+        store_attr('result_generation, workflow_path, artifacts', 'scan_type', self)
         self.workflow_obj = self.result_generation.workflows.load_workflows(self.workflow_path)
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.standing_laying_input_format = 'img'
@@ -47,7 +48,7 @@ class StandingLaying:
         for i, artifact in enumerate(self.artifacts):
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             logger.info("%s %s", "input_path of image to perform standing laying:", input_path)
-            img = preprocessing.standing_laying_data_preprocessing(input_path)
+            img = preprocessing.standing_laying_data_preprocessing(input_path, self.scan_type)
             prediction = inference.get_standing_laying_prediction_local(img)
             predictions.append(prediction)
         predictions = np.array(predictions)
