@@ -68,11 +68,9 @@ class HeightFlow:
             generated=generated_timestamp,
         ))
         mean_prediction = self.result_generation.get_mean_scan_results(predictions)
-        median_prediction = self.result_generation.get_median_scan_results(predictions)
         class_lhfa = self.zscore_lhfa(mean_prediction)
         result.data = {
             'mean_height': mean_prediction,
-            'median_height': median_prediction,
             'Height Diagnosis': class_lhfa}
         res.results.append(result)
         return res
@@ -138,11 +136,9 @@ class HeightFlow:
             generated=generated_timestamp,
         ))
         mean_prediction = self.result_generation.get_mean_scan_results(predictions)
-        median_prediction = self.result_generation.get_median_scan_results(predictions)
         mean_std = self.result_generation.get_mean_scan_results(stds)
         class_lhfa = self.zscore_lhfa(mean_prediction)
         result = {'mean_height': mean_prediction,
-                  'median_height': median_prediction,
                   'Height Diagnosis': class_lhfa,
                   'uncertainty': mean_std}
         result.data = result

@@ -160,7 +160,7 @@ def run_retroactive_flow():
     url = os.getenv('APP_URL', 'http://localhost:5001')
     logger.info("%s %s", "App URL:", url)
     queue_name = "retroactive-scan-process"
-    retroactive_scan_dir = '/api/data/retroactive_scans/'
+    retroactive_scan_dir = '/app/data/retroactive_scans/'
 
     cgm_api = ApiEndpoints(url)
     workflow = ProcessWorkflows(cgm_api)
@@ -199,7 +199,7 @@ def run_retroactive_flow():
         data_processing.create_artifact_dir()
         rgb_artifacts = data_processing.download_artifacts('img')
         depth_artifacts = data_processing.download_artifacts('depth')
-        depth_artifacts = data_processing.download_artifacts('calibration')
+        # depth_artifacts = data_processing.download_artifacts('calibration')
         person_details = person(cgm_api, scan_metadata['person'])
 
         result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, retroactive_scan_dir)
