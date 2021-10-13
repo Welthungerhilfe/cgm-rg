@@ -73,8 +73,8 @@ def main():
     )
 
     # Download model for standing/laying
-    # download_model_from_registered_model(
-    #    workspace=ws, model_name='standing_laying_classifier', output_location=REPO_DIR / 'models')
+    download_model_from_registered_model(
+        workspace=ws, model_name='standing_laying_classifier', output_location=REPO_DIR / 'models')
 
     # Download model for height
     download_model_from_registered_model(

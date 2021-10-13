@@ -103,7 +103,8 @@ def run_normal_flow():
     flow = StandingLaying(
         result_generation,
         standing_laying_workflow_path,
-        rgb_artifacts)
+        rgb_artifacts,
+        scan_type)
     flows.append(flow)
 
     flow = DepthMapImgFlow(
@@ -236,7 +237,8 @@ def run_retroactive_flow():
             flow = StandingLaying(
                 result_generation,
                 standing_laying_workflow_path,
-                rgb_artifacts)
+                rgb_artifacts,
+                scan_type)
 
         elif workflow.match_workflows(depthmap_img_workflow_path, workflow_id):
             logger.info("Matched with DepthMapImgFlow")
