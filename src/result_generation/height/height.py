@@ -107,6 +107,10 @@ class HeightFlow:
         if self.result_generation.api.post_results(scan_level_height_result_json) == 201:
             logger.info("%s %s", "successfully post scan level height results:", scan_level_height_result_json)
 
+    def post_height_and_gradcam_results(self, predictions, heatmaps, generated_timestamp):
+        pass
+        #continue here
+
     def artifact_level_result_ensemble(self, predictions, generated_timestamp, stds):
         """Prepare artifact level height result object"""
         res = Bunch(dict(results=[]))
