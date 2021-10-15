@@ -1,6 +1,6 @@
 {
-    "name": "q3-depthmap-height-mean",
-    "version": "2.0.1",
+    "name": "q4-depthmap-plaincnn-height",
+    "version": "2.0.0",
     "result_format": "dict",
     "result_binding": "scan",
     "data":{
