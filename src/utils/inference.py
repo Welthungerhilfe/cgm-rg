@@ -4,7 +4,7 @@ import pathlib
 # from azureml.core import Workspace
 # from azureml.core.authentication import ServicePrincipalAuthentication
 from tensorflow.keras.models import load_model, Model
-import tensorflow as tf 
+import tensorflow as tf
 import numpy as np
 import cv2
 
@@ -56,7 +56,6 @@ except Exception as e:
     print(e)
 
 
-# where should this function be stored?
 def extract_last_conv_layer_name(model, substring='conv'):
     # 1. save all layer names in a list
     layer_names = [layer.name for layer in model.layers]
@@ -71,8 +70,8 @@ def extract_last_conv_layer_name(model, substring='conv'):
 
 # should this all be global?
 last_conv_layer_name = extract_last_conv_layer_name(height_model)
-grad_model = Model(inputs=[height_model.inputs], 
-                        outputs=[height_model.get_layer(last_conv_layer_name).output, height_model.output])
+grad_model = Model(inputs=[height_model.inputs],
+                   outputs=[height_model.get_layer(last_conv_layer_name).output, height_model.output])
 
 
 def get_height_predictions_local(numpy_array):
@@ -93,24 +92,31 @@ def get_ensemble_height_predictions_local(model_path, numpy_array):
     return model.predict(numpy_array)
 
 
-def get_height_prediction_and_heatmap_local(numpy_array):
-    # GET the score for target prediction
-    with tf.GradientTape() as tape:
-        numpy_array = tf.cast(numpy_array, tf.float32)
-        (conv_outputs, height_prediction) = grad_model(np.array(numpy_array))
-    # EXTRACT filters and gradients
-    output = conv_outputs[0]
-    grads = tape.gradient(height_prediction, conv_outputs)[0]
-    # GUIDED backpropagation - eliminating elements that act negatively towards the decision - zeroing-out negative gradients
-    guided_grads = tf.cast(output > 0, 'float32') * tf.cast(grads > 0, 'float32') * grads
-    # AVERAGE gradients spatially
-    weights = tf.reduce_mean(guided_grads, axis=(0, 1))
-    # BUILD a weighted map of filters according to gradients importance
-    cam = np.ones(output.shape[0: 2], dtype = np.float32)
-    for i, w in enumerate(weights):
-        cam += w * output[:, :, i]
-    # HEATMAP visualization
-    cam = cv2.resize(cam.numpy(), (preprocessing.IMAGE_TARGET_HEIGHT, preprocessing.IMAGE_TARGET_WIDTH))
-    cam = np.maximum(cam, 0)
-    heatmap = (cam - cam.min()) / (cam.max() - cam.min())
-    return heatmap, height_prediction
+def get_height_prediction_and_heatmap_local(numpy_arrays):
+    heatmaps = []
+    height_predictions = []
+    for numpy_array in numpy_arrays:
+        # GET the score for target prediction
+        with tf.GradientTape() as tape:
+            numpy_array = tf.cast(numpy_array, tf.float32)
+            (conv_outputs, height_prediction) = grad_model(np.array(numpy_array))
+        # EXTRACT filters and gradients
+        output = conv_outputs[0]
+        grads = tape.gradient(height_prediction, conv_outputs)[0]
+        # GUIDED backpropagation - eliminating elements that act negatively towards the decision - zeroing-out negative gradients
+        guided_grads = tf.cast(output > 0, 'float32') * tf.cast(grads > 0, 'float32') * grads
+        # AVERAGE gradients spatially
+        weights = tf.reduce_mean(guided_grads, axis=(0, 1))
+        # BUILD a weighted map of filters according to gradients importance
+        cam = np.ones(output.shape[0: 2], dtype=np.float32)  # change name "cam"
+        for i, w in enumerate(weights):
+            cam += w * output[:, :, i]
+        # HEATMAP visualization
+        cam = cv2.resize(cam.numpy(), (preprocessing.IMAGE_TARGET_HEIGHT, preprocessing.IMAGE_TARGET_WIDTH))
+        cam = np.maximum(cam, 0)
+        heatmap = (cam - cam.min()) / (cam.max() - cam.min())
+
+        heatmaps.append(heatmap)
+        height_predictions.append(height_prediction)
+
+    return heatmaps, height_predictions
