@@ -141,17 +141,17 @@ class HeightFlow:
             logger.info("%s %s", "Successfully post Heatmap Image results:", res_object)
 
     def post_gradcam_results(self, heatmaps, generated_timestamps):
-        #self.post_depthmap_image_files()  # 1. post heatmap image files itself - I will get ID for each heatmap, but in list
+        # self.post_depthmap_image_files()  # 1. post heatmap image files itself - I will get ID for each heatmap, but in list
         self.post_heatmap_image_files(self, heatmaps, generated_timestamps)
         self.post_heatmap_result_object(self, heatmaps, generated_timestamps)  # 2. prepare json with IDs, again post json to API
-        #self.artifact_level_gradcam(self, heatmaps, generated_timestamps)
+        # self.artifact_level_gradcam(self, heatmaps, generated_timestamps)
 
     def post_height_and_gradcam_results(self, predictions, heatmaps, generated_timestamp):
         # send height
         self.post_height_results(self, predictions, generated_timestamp)
         # send gradcam seperately
         self.post_gradcam_results(self, heatmaps, generated_timestamp)
-        #write new code
+        # write new code
 
     def artifact_level_result_ensemble(self, predictions, generated_timestamp, stds):
         """Prepare artifact level height result object"""
