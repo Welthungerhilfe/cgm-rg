@@ -8,7 +8,7 @@ import tensorflow as tf
 import numpy as np
 import cv2
 
-import preprocessing as preprocessing  # noqa: E402
+import utils.preprocessing as preprocessing  # noqa: E402
 
 
 # To include the config file
