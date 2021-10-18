@@ -37,7 +37,7 @@ def parse_args():
     parser.add_argument('--depthmap_img_workflow_path', default=f"{workflow_dir}/depthmap-img-workflow.json")  # noqa: E501
     parser.add_argument('--height_workflow_artifact_path', default=f"{workflow_dir}/height-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
     parser.add_argument('--height_workflow_scan_path', default=f"{workflow_dir}/height-plaincnn-workflow-scan.json")  # noqa: E501
-    
+
     parser.add_argument('--height_workflow_artifact_gradcam_img_path', default=f"{workflow_dir}/height-plaincnn-workflow-artifact-gradcam-img.json")
     parser.add_argument('--height_workflow_artifact_gradcam_dict_path', default=f"{workflow_dir}/height-plaincnn-workflow-artifact-gradcam-dict.json")
 
