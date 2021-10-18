@@ -109,49 +109,49 @@ class HeightFlow:
         if self.result_generation.api.post_results(scan_level_height_result_json) == 201:
             logger.info("%s %s", "successfully post scan level height results:", scan_level_height_result_json)
 
-    def post_heatmap_image_files(self, heatmaps, generated_timestamps):
+    def post_heatmap_image_files(self, heatmaps):
+        heatmap_ids = []
         for heatmap in heatmaps:
-            heatmap_img_id_from_post_request, post_status = self.result_generation.api.post_files(heatmap['heatmap_img'])
+            heatmap_img_id_from_post_request, post_status = self.result_generation.api.post_files(heatmap)
             if post_status == 201:
-                heatmap['heatmap_img_id_from_post_request'] = heatmap_img_id_from_post_request
-                heatmap['generated_timestamp'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+                heatmap_ids.append(heatmap_img_id_from_post_request)
+            return heatmap_ids
 
-    def prepare_result_object_artifact_level_gradcam(self, heatmaps, generated_timestamp):
-        """Prepare artifact level gradcam result objevt"""
+    def prepare_result_object_artifact_level_gradcam(self, generated_timestamp, heatmap_ids):
+        """Prepare artifact level gradcam result object"""
         res = Bunch(dict(results=[]))
-        for artifact, heatmap in zip(self.artifacts, heatmaps):  # DO I ALSO NEED PREDICTIONS HERE?
+        for artifact, heatmap_id in zip(self.artifacts, heatmap_ids):
+            # DO I NEED ALL OF THIS INFORMATION?
             result = Bunch(dict(
                 id=str(uuid.uuid4()),
                 scan=self.result_generation.scan_metadata['id'],
                 workflow=self.artifact_workflow_obj["id"],
                 source_artifacts=[artifact['id']],
                 source_results=[],
-                generated=heatmap['generated_timestamp'],  # DO I NEED TO MAKE HEATMAP A MEMBER VAR??
-                # not sure what to do here. Do I need the heatmap ID that was generated in post_heatmap_image_files?
-                file=heatmap['heatmap_img_id_from_post_request']
+                generated=generated_timestamp,
+                file=heatmap_id
             ))
             res.results.append(result)
 
         return res
 
-    def post_heatmap_result_object(self, heatmaps, generated_timestamps):
-        res = self.prepare_result_object_artifact_level_gradcam(self, heatmaps, generated_timestamps)
+    def post_heatmap_result_object(self, generated_timestamps, heatmap_ids):
+        res = self.prepare_result_object_artifact_level_gradcam(self, generated_timestamps, heatmap_ids)
         res_object = self.result_generation.bunch_object_to_json_object(res)
         if self.result_generation.api.post_results(res_object) == 201:
             logger.info("%s %s", "Successfully post Heatmap Image results:", res_object)
 
     def post_gradcam_results(self, heatmaps, generated_timestamps):
-        # self.post_depthmap_image_files()  # 1. post heatmap image files itself - I will get ID for each heatmap, but in list
-        self.post_heatmap_image_files(self, heatmaps, generated_timestamps)
-        self.post_heatmap_result_object(self, heatmaps, generated_timestamps)  # 2. prepare json with IDs, again post json to API
-        # self.artifact_level_gradcam(self, heatmaps, generated_timestamps)
+        # 1. post heatmap image files itself - returns ID for each heatmap in list
+        heatmap_ids = self.post_heatmap_image_files(self, heatmaps)
+        # 2. prepare json with IDs, again post json to API
+        self.post_heatmap_result_object(self, generated_timestamps, heatmap_ids)
 
     def post_height_and_gradcam_results(self, predictions, heatmaps, generated_timestamp):
         # send height
         self.post_height_results(self, predictions, generated_timestamp)
         # send gradcam seperately
         self.post_gradcam_results(self, heatmaps, generated_timestamp)
-        # write new code
 
     def artifact_level_result_ensemble(self, predictions, generated_timestamp, stds):
         """Prepare artifact level height result object"""

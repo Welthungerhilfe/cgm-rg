@@ -37,6 +37,10 @@ def parse_args():
     parser.add_argument('--depthmap_img_workflow_path', default=f"{workflow_dir}/depthmap-img-workflow.json")  # noqa: E501
     parser.add_argument('--height_workflow_artifact_path', default=f"{workflow_dir}/height-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
     parser.add_argument('--height_workflow_scan_path', default=f"{workflow_dir}/height-plaincnn-workflow-scan.json")  # noqa: E501
+    
+    parser.add_argument('--height_workflow_artifact_gradcam_img_path', default=f"{workflow_dir}/height-plaincnn-workflow-artifact-gradcam-img.json")
+    parser.add_argument('--height_workflow_artifact_gradcam_dict_path', default=f"{workflow_dir}/height-plaincnn-workflow-artifact-gradcam-dict.json")
+
     parser.add_argument('--height_rgbd_workflow_artifact_path', default=f"{workflow_dir}/height-rgbd-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--height_rgbd_workflow_scan_path', default=f"{workflow_dir}/height-rgbd-workflow-scan.json")  # noqa: E501
     args = parser.parse_args()
@@ -54,6 +58,10 @@ def run_normal_flow():
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
+
+    height_workflow_artifact_gradcam_img_path = args.height_workflow_artifact_gradcam_img_path
+    height_workflow_artifact_gradcam_dict_path = args.height_workflow_artifact_gradcam_dict_path
+
     height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
     height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
 
@@ -116,6 +124,8 @@ def run_normal_flow():
         result_generation,
         height_workflow_artifact_path,
         height_workflow_scan_path,
+        height_workflow_artifact_gradcam_img_path,
+        height_workflow_artifact_gradcam_dict_path,
         depth_artifacts,
         person_details)
     flows.append(flow)
@@ -148,6 +158,10 @@ def run_retroactive_flow():
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
+
+    height_workflow_artifact_gradcam_img_path = args.height_workflow_artifact_gradcam_img_path
+    height_workflow_artifact_gradcam_dict_path = args.height_workflow_artifact_gradcam_dict_path
+
     height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
     height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
 
@@ -251,6 +265,8 @@ def run_retroactive_flow():
                 result_generation,
                 height_workflow_artifact_path,
                 height_workflow_scan_path,
+                height_workflow_artifact_gradcam_img_path,
+                height_workflow_artifact_gradcam_dict_path,
                 depth_artifacts,
                 person_details)
 
