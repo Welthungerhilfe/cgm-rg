@@ -1,6 +1,8 @@
 import uuid
 from pathlib import Path
 import sys
+from datetime import datetime
+
 
 from bunch import Bunch
 from cgmzscore import Calculator
@@ -40,7 +42,7 @@ class HeightFlow:
         self.scan_workflow_obj['id'] = self.result_generation.workflows.get_workflow_id(
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
 
-    def artifact_level_result(self, predictions, generated_timestamp):
+    def artifact_level_result(self, predictions, generated_timestamp, start_time):
         """Prepare artifact level height result object"""
         res = Bunch(dict(results=[]))
         for artifact, prediction in zip(self.artifacts, predictions):
@@ -52,11 +54,13 @@ class HeightFlow:
                 source_results=[],
                 generated=generated_timestamp,
                 data={'height': str(prediction[0])},
+                start_time=start_time,
+                end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             ))
             res.results.append(result)
         return res
 
-    def scan_level_height_result_object(self, predictions, generated_timestamp, workflow_obj):
+    def scan_level_height_result_object(self, predictions, generated_timestamp, workflow_obj, start_time):
         """Prepare scan level height result object"""
         res = Bunch(dict(results=[]))
         result = Bunch(dict(
@@ -66,6 +70,8 @@ class HeightFlow:
             source_artifacts=[artifact['id'] for artifact in self.artifacts],
             source_results=[],
             generated=generated_timestamp,
+            start_time=start_time,
+            end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         ))
         mean_prediction = self.result_generation.get_mean_scan_results(predictions)
         class_lhfa = self.zscore_lhfa(mean_prediction)
@@ -92,16 +98,16 @@ class HeightFlow:
             class_lhfa = 'Not Found'
         return class_lhfa
 
-    def post_height_results(self, predictions, generated_timestamp):
+    def post_height_results(self, predictions, generated_timestamp, start_time):
         """Post the artifact and scan level height results to the API"""
-        artifact_level_height_result_bunch = self.artifact_level_result(predictions, generated_timestamp)
+        artifact_level_height_result_bunch = self.artifact_level_result(predictions, generated_timestamp, start_time)
         artifact_level_height_result_json = self.result_generation.bunch_object_to_json_object(
             artifact_level_height_result_bunch)
         if self.result_generation.api.post_results(artifact_level_height_result_json) == 201:
             logger.info("%s %s", "successfully post artifact level height results:", artifact_level_height_result_json)
 
         scan_level_height_result_bunch = self.scan_level_height_result_object(
-            predictions, generated_timestamp, self.scan_workflow_obj)
+            predictions, generated_timestamp, self.scan_workflow_obj, start_time)
         scan_level_height_result_json = self.result_generation.bunch_object_to_json_object(
             scan_level_height_result_bunch)
         if self.result_generation.api.post_results(scan_level_height_result_json) == 201:
@@ -118,7 +124,7 @@ class HeightFlow:
                 source_artifacts=[artifact['id']],
                 source_results=[],
                 generated=generated_timestamp,
-                data={'height': str(prediction[0]), 'uncertainty': str(std[0])}
+                data={'height': str(prediction[0]), 'uncertainty': str(std[0])},
             ))
             res.results.append(result)
 

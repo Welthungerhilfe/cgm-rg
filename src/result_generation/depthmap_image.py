@@ -19,6 +19,7 @@ import utils.preprocessing as preprocessing  # noqa: E402
 
 class DepthMapImgFlow:
     """A class to visualise depthmap image in result generation"""
+
     def __init__(
             self,
             result_generation,
@@ -53,6 +54,7 @@ class DepthMapImgFlow:
 
     def depthmap_img_artifacts(self):
         for artifact in self.artifacts:
+            artifact['depthmap_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             depthmap, depthmap_status = self.preprocess_depthmap(input_path)
             scaled_depthmap = depthmap * 255.0
@@ -78,6 +80,8 @@ class DepthMapImgFlow:
                 source_results=[],
                 file=artifact['depthmap_img_id_from_post_request'],
                 generated=artifact['generated_timestamp'],
+                start_time=artifact['standing_start_time'],
+                end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             ))
             res.results.append(result)
         return res
