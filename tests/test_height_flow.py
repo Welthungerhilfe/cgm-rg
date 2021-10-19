@@ -26,10 +26,11 @@ def test_artifact_level_result():
     # Setup
     flow = set_up_dummy_objects.get_dummy_height_flow_object()
     predictions = np.random.uniform(70, 80, [26, 1])
+    start_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
     generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
     # Exercise
-    result = flow.artifact_level_result(predictions, generated_timestamp)
+    result = flow.artifact_level_result(predictions, generated_timestamp, start_time)
 
     # Verify
     assert isinstance(result, Bunch)
