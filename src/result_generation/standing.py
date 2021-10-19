@@ -45,7 +45,7 @@ class StandingLaying:
         """Give prediction of standing/laying to the list of artifacts"""
         predictions = []
         for artifact in self.artifacts:
-            artifact['standing_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+            artifact['standing_laying_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             logger.info("%s %s", "input_path of image to perform standing laying:", input_path)
             img = preprocessing.standing_laying_data_preprocessing(input_path)
@@ -66,7 +66,7 @@ class StandingLaying:
                 source_results=[],
                 generated=generated_timestamp,
                 data={'standing': str(prediction[0])},
-                start_time=artifact['standing_start_time'],
+                start_time=artifact['standing_laying_start_time'],
                 end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             ))
             res.results.append(result)

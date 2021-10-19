@@ -80,7 +80,7 @@ class DepthMapImgFlow:
                 source_results=[],
                 file=artifact['depthmap_img_id_from_post_request'],
                 generated=artifact['generated_timestamp'],
-                start_time=artifact['standing_start_time'],
+                start_time=artifact['depthmap_start_time'],
                 end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             ))
             res.results.append(result)
