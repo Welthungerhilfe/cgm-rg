@@ -1,3 +1,4 @@
+#from datetime import datetime
 import uuid
 from pathlib import Path
 import sys
@@ -43,6 +44,7 @@ class HeightFlow:
     def artifact_level_result(self, predictions, generated_timestamp):
         """Prepare artifact level height result object"""
         res = Bunch(dict(results=[]))
+
         for artifact, prediction in zip(self.artifacts, predictions):
             result = Bunch(dict(
                 id=str(uuid.uuid4()),
@@ -106,6 +108,50 @@ class HeightFlow:
             scan_level_height_result_bunch)
         if self.result_generation.api.post_results(scan_level_height_result_json) == 201:
             logger.info("%s %s", "successfully post scan level height results:", scan_level_height_result_json)
+
+    def post_heatmap_image_files(self, heatmaps):
+        heatmap_ids = []
+        for heatmap in heatmaps:
+            heatmap_img_id_from_post_request, post_status = self.result_generation.api.post_files(heatmap)
+            if post_status == 201:
+                heatmap_ids.append(heatmap_img_id_from_post_request)
+            return heatmap_ids
+
+    def prepare_result_object_artifact_level_gradcam(self, generated_timestamp, heatmap_ids):
+        """Prepare artifact level gradcam result object"""
+        res = Bunch(dict(results=[]))
+        for artifact, heatmap_id in zip(self.artifacts, heatmap_ids):
+            # DO I NEED ALL OF THIS INFORMATION?
+            result = Bunch(dict(
+                id=str(uuid.uuid4()),
+                scan=self.result_generation.scan_metadata['id'],
+                workflow=self.artifact_workflow_obj["id"],
+                source_artifacts=[artifact['id']],
+                source_results=[],
+                generated=generated_timestamp,
+                file=heatmap_id
+            ))
+            res.results.append(result)
+
+        return res
+
+    def post_heatmap_result_object(self, generated_timestamps, heatmap_ids):
+        res = self.prepare_result_object_artifact_level_gradcam(self, generated_timestamps, heatmap_ids)
+        res_object = self.result_generation.bunch_object_to_json_object(res)
+        if self.result_generation.api.post_results(res_object) == 201:
+            logger.info("%s %s", "Successfully post Heatmap Image results:", res_object)
+
+    def post_gradcam_results(self, heatmaps, generated_timestamps):
+        # 1. post heatmap image files itself - returns ID for each heatmap in list
+        heatmap_ids = self.post_heatmap_image_files(self, heatmaps)
+        # 2. prepare json with IDs, again post json to API
+        self.post_heatmap_result_object(self, generated_timestamps, heatmap_ids)
+
+    def post_height_and_gradcam_results(self, predictions, heatmaps, generated_timestamp):
+        # send height
+        self.post_height_results(self, predictions, generated_timestamp)
+        # send gradcam seperately
+        self.post_gradcam_results(self, heatmaps, generated_timestamp)
 
     def artifact_level_result_ensemble(self, predictions, generated_timestamp, stds):
         """Prepare artifact level height result object"""
