@@ -1,5 +1,5 @@
 {
-    "name": "q3-depthmap-height",
+    "name": "q3-depthmap-height-gradcam-img",
     "version": "2.0.1",
     "result_format": "img",
     "result_binding": "artifact",
