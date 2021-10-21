@@ -10,6 +10,9 @@ IMAGE_TARGET_HEIGHT = 240
 IMAGE_TARGET_WIDTH = 180
 NORMALIZATION_VALUE = 7.5
 
+STANDING_SCAN_TYPE = ["101", "102", "103"]
+LAYING_SCAN_TYPE = ["201", "202", "203"]
+
 
 def process_depthmaps(artifacts, scan_directory, result_generation):
     """Load the list of depthmaps in scan as numpy array"""
@@ -107,11 +110,14 @@ def get_depthmaps(fpaths):
     return depthmaps
 
 
-def standing_laying_data_preprocessing(source_path):
+def standing_laying_data_preprocessing(source_path, scan_type):
     img = tf.io.read_file(str(source_path))
     img = tf.image.decode_jpeg(img, channels=3)
     img = tf.cast(img, tf.float32) * (1. / 256)
-    img = tf.image.rot90(img, k=3)
+    if scan_type in STANDING_SCAN_TYPE:
+        img = tf.image.rot90(img, k=3)
+    elif scan_type in LAYING_SCAN_TYPE:
+        img = tf.image.rot90(img, k=1)
     img = tf.image.resize(img, [240, 180])
     img = tf.expand_dims(img, axis=0)
     return img

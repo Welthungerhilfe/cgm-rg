@@ -1,10 +1,10 @@
 {
     "name": "standing_laying",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "result_format": "dict",
     "result_binding": "artifact",
-    "data":{
-        "input_format":"image/jpeg",
-        "model":"q4-rgb-plaincnn-classifaction-standing-lying-8k"
+    "data": {
+        "input_format": "image/jpeg",
+        "model": "q4-rgb-plaincnn-classifaction-standing-lying-8k"
     }
 }
