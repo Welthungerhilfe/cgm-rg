@@ -22,10 +22,11 @@ ORDER_DIFFERENCE_ALLOWED = 3
 
 class HeightFlowRGBD(HeightFlow):
     def run_flow(self):
+        start_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         rgbd_scans = self.process_rgbd()
         height_predictions = inference.get_height_rgbd_prediction_local(rgbd_scans)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-        self.post_height_results(height_predictions, generated_timestamp)
+        self.post_height_results(height_predictions, generated_timestamp, start_time)
 
     def process_rgbd(self):
         rgbd_scan = []

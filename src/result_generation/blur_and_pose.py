@@ -82,6 +82,7 @@ class PoseAndBlurFlow:
         """Blur the list of artifacts"""
         pose_prediction = init_pose_prediction()
         for artifact in self.artifacts:
+            artifact['pose_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             logger.info("%s %s", "input_path of image to perform Pose prediction:", input_path)
             no_of_pose_detected, pose_score, pose_result = inference_artifact(
@@ -94,6 +95,7 @@ class PoseAndBlurFlow:
     def blur_artifacts(self):
         """Blur the list of artifacts"""
         for artifact in self.artifacts:
+            artifact['blur_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             logger.info("%s %s", "input_path of image to perform blur:", input_path)
             blur_img_binary, blur_status, faces_detected = self.blur_face(input_path)
@@ -251,6 +253,8 @@ class PoseAndBlurFlow:
                 source_results=[],
                 generated=artifact['generated_timestamp'],
                 data={'no of person using pose': str(artifact['no_of_pose_detected'])},
+                start_time=artifact['pose_start_time'],
+                end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             ))
             res.results.append(no_of_pose_result)
             for i in range(0, artifact['no_of_pose_detected']):
@@ -263,6 +267,8 @@ class PoseAndBlurFlow:
                     generated=artifact['generated_timestamp'],
                     data={'Pose Scores': str(artifact['pose_score'][i]),
                           'Pose Results': str(artifact['pose_result'][i])},
+                    start_time=artifact['pose_start_time'],
+                    end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
                 ))
                 res.results.append(pose_score_results)
         return res
@@ -278,6 +284,8 @@ class PoseAndBlurFlow:
                 source_results=[],
                 file=artifact['pose_id_from_post_request'],
                 generated=artifact['generated_timestamp'],
+                start_time=artifact['pose_start_time'],
+                end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             ))
             res.results.append(result)
 
@@ -297,6 +305,8 @@ class PoseAndBlurFlow:
                 source_results=[],
                 file=artifact['blur_id_from_post_request'],
                 generated=artifact['generated_timestamp'],
+                start_time=artifact['blur_start_time'],
+                end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             ))
             res.results.append(result)
 
@@ -314,6 +324,8 @@ class PoseAndBlurFlow:
                 source_results=[],
                 generated=artifact['generated_timestamp'],
                 data={'faces_detected': str(artifact['faces_detected'])},
+                start_time=artifact['blur_start_time'],
+                end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             ))
             res.results.append(result)
 
