@@ -26,7 +26,7 @@ class StandingLaying:
             workflow_path,
             artifacts,
             scan_type):
-        store_attr('result_generation, workflow_path, artifacts', 'scan_type', self)
+        store_attr('result_generation, workflow_path, artifacts, scan_type', self)
         self.workflow_obj = self.result_generation.workflows.load_workflows(self.workflow_path)
         if self.workflow_obj["data"]["input_format"] == 'image/jpeg':
             self.standing_laying_input_format = 'img'
