@@ -8,7 +8,7 @@ class ProcessWorkflows:
     def __init__(self, api: ApiEndpoints):
         self.api = api
 
-    def get_list_of_worflows(self):
+    def get_list_of_workflows(self):
         """Get the list of workflows from api"""
         self.workflows = self.api.get_workflows()
 

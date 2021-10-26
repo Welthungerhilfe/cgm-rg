@@ -181,18 +181,18 @@ class ApiEndpoints:
 
     def get_person_details(self, person_id):
         headers = self.prepare_header()
-        resposne = requests.get(
+        response = requests.get(
             self.url + self.person_detail_endpoint + person_id + '/basic',
             headers=headers)
 
-        if resposne.status_code == 200:
-            content = resposne.json()
+        if response.status_code == 200:
+            content = response.json()
             logger.info("Person Details :")
             logger.info(pprint.pprint(content))
         return content
 
     def get_workflows(self):
-        """Get all registerd workflows"""
+        """Get all registered workflows"""
         headers = self.prepare_header()
         response = requests.get(self.url + self.workflow_endpoint, headers=headers)
         return response.json()

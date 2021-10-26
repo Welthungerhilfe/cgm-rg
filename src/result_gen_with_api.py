@@ -75,7 +75,7 @@ def run_normal_flow():
     scan_version = scan_metadata['version']
     scan_type = scan_metadata["type"]
     logger.info("%s %s", "Scan Type Version:", scan_version)
-    workflow.get_list_of_worflows()
+    workflow.get_list_of_workflows()
 
     data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
     data_processing.process_scan_metadata()
@@ -164,7 +164,7 @@ def run_retroactive_flow():
 
     cgm_api = ApiEndpoints(url)
     workflow = ProcessWorkflows(cgm_api)
-    workflow.get_list_of_worflows()
+    workflow.get_list_of_workflows()
     try:
         queue_service = QueueService(connection_string=connect_str)
     except Exception:
