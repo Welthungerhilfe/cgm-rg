@@ -1,4 +1,4 @@
-#from datetime import datetime
+# from datetime import datetime
 import uuid
 from pathlib import Path
 import sys
@@ -115,7 +115,7 @@ class HeightFlow:
             heatmap_img_id_from_post_request, post_status = self.result_generation.api.post_files(heatmap)
             if post_status == 201:
                 heatmap_ids.append(heatmap_img_id_from_post_request)
-            return heatmap_ids
+        return heatmap_ids
 
     def prepare_result_object_artifact_level_gradcam(self, generated_timestamp, heatmap_ids):
         """Prepare artifact level gradcam result object"""
