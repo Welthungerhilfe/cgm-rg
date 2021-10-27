@@ -1,3 +1,7 @@
+models/*
+!models/.gitkeep
+data/
+env.list
 src/data/**
 test-output.xml
 
@@ -126,15 +130,7 @@ venv.bak/
 # os
 .DS_Store
 
-
 ../.amlignore
 ../.amlignore.amltmp
 .amlignore
 .amlignore.amltmp
-
-# model
-models/
-
-# data
-data/
-
