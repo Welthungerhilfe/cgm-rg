@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 printenv | grep -v "no_proxy" >> /etc/environment
 
 python3 src/download_model.py
