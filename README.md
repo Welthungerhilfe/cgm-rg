@@ -54,6 +54,17 @@ docker run -it --rm --env-file ./env.list \
     --name rg_service_1_0 rgservice:1.0
 ```
 
+## Deploying to an environment
+
+e.g. Sandbox environment.
+
+### How to use/test
+
+In order to use this you need a phone running the Scanner App.
+Inside the app, you can upload a sample scan using cgm app.
+Results will be generated and shown in the tagging tool.
+To debug you can also check the logs in the environment's ACI.
+
 ## Versioning
 
 This project is versioned according to CGM
