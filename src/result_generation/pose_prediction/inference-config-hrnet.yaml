@@ -68,7 +68,7 @@ MODEL:
 
 
 TEST:
-  MODEL_FILE: '/app/models/HRNet/weights/pytorch/pose_coco/pose_hrnet_w32_384x288.pth'
+  MODEL_FILE: 'models/HRNet/weights/pytorch/pose_coco/pose_hrnet_w32_384x288.pth'
   POST_PROCESS: true
   POSE_DRAW : true
   DATA_PATH: 'data/path/version_wise_jpg'
