@@ -14,9 +14,6 @@ sys.path.append(
             os.path.realpath(__file__)),
         os.pardir))
 
-current_working_directory = pathlib.Path.cwd()
-models_path = current_working_directory.joinpath('models')
-
 REPO_DIR = Path(os.environ['PWD']).absolute()
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 
