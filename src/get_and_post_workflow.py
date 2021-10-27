@@ -16,6 +16,26 @@ def get_list_of_files(source_folder):
     return json_paths
 
 
+def log_status(workflows, workflow_obj, response):
+    if response.status_code == 201:
+        logger.info("successfully registered workflow for name %s and version %s",
+                    workflow_obj['name'], workflow_obj['version'])
+
+    elif response.status_code == 200:
+        if response.json() != workflows[f"{workflow_obj['name']} {workflow_obj['version']}"]:
+            logger.info("updated workflow for name %s and version %s",
+                        workflow_obj['name'], workflow_obj['version'])
+        else:
+            logger.info("workflow for name %s and version %s is up to date",
+                        workflow_obj['name'], workflow_obj['version'])
+    elif response.status_code == 403:
+        logger.info("attempted to update forbidden keys for %s version %s",
+                    workflow_obj['name'], workflow_obj['version'])
+    else:
+        logger.info("unexpected error in registering workflow for name %s and version %s",
+                    workflow_obj['name'], workflow_obj['version'])
+
+
 def upsert_workflows(json_paths, workflows, cgm_api):
     workflows = {f"{workflow['name']} {workflow['version']}": workflow for workflow in workflows['workflows']}
 
@@ -24,29 +44,7 @@ def upsert_workflows(json_paths, workflows, cgm_api):
             workflow_obj = json.load(f)
 
         response = cgm_api.post_workflow_and_save_response(workflow_obj)
-        status_code = response.status_code
-        if status_code == 201:
-            logger.info("%s %s %s %s", "successfully registered workflow for name",
-                        workflow_obj['name'], "and version", workflow_obj['version'])
-
-        elif status_code == 200:
-            if response.json() != workflows[f"{workflow_obj['name']} {workflow_obj['version']}"]:
-                logger.info("%s %s %s %s",
-                            "updated workflow for name", workflow_obj['name'], "and version", workflow_obj['version'])
-            else:
-                logger.info(
-                    "%s %s %s %s %s",
-                    "workflow for name",
-                    workflow_obj['name'],
-                    "and version",
-                    workflow_obj['version'],
-                    "is up to date")
-        elif status_code == 403:
-            logger.info("%s %s %s %s", "attempted to update forbidden keys for",
-                        workflow_obj['name'], "version", workflow_obj['version'])
-        else:
-            logger.info("%s %s %s %s", "unexpected error in registering workflow for name",
-                        workflow_obj['name'], "and version", workflow_obj['version'])
+        log_status(workflows, workflow_obj, response)
 
 
 if __name__ == "__main__":
