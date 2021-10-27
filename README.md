@@ -29,7 +29,11 @@ For some parts of the code to work, you need ML models.
 You can either build them yourself using [cgm-ml](https://github.com/Welthungerhilfe/cgm-ml).
 However, for internal contributors we recommend to download existing models as follows:
 * Note that `src/download_model.py` helps to download models and uses environment variables
-*
+* Internal contributors can get the environment variables, e.g. for the sandbox environment:
+    * Go to <portal.azure.com>
+    * Find the ACI (Azure container instance) for your environment, e.g. `cgmbecidevrgaci` for sandbox
+    * On the left (in the `Settings` section), click `Containers`
+    * Go to the `Properties` tab and copy the needed environment variables from here
 
 ## Branch Policy
 
