@@ -53,6 +53,9 @@ def download_model_from_registered_model(workspace, model_name, output_location)
          model_name: Name of the model in which model is registered
          target_path: Where model should download
     '''
+    if Path(output_location).exists():
+        logger.info("%s %s %s", "Found existing model", model_name, "- Skipping download")
+        return
     model = Model(workspace, name=model_name)
     model.download(target_dir=output_location, exist_ok=True, exists_ok=None)
     logger.info("%s %s %s", "Successfully downloaded", model_name, "model from registered model")
