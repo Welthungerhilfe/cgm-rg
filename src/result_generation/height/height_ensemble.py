@@ -2,6 +2,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 import glob2 as glob
+import os
 
 import numpy as np
 
@@ -10,17 +11,17 @@ from result_generation.height.height import HeightFlow
 sys.path.append(str(Path(__file__).parents[1]))
 import utils.inference as inference  # noqa: E402
 import utils.preprocessing as preprocessing  # noqa: E402
-
 import log
 
 
 logger = log.setup_custom_logger(__name__)
 
+REPO_DIR = Path(os.environ['PWD']).absolute()
 
 class HeightFlowDeepEnsemble(HeightFlow):
     def run_flow(self):
         depthmaps = preprocessing.process_depthmaps(self.artifacts, self.scan_directory, self.result_generation)
-        model_paths = glob.glob('/app/models/deepensemble/*')
+        model_paths = glob.glob(f'{str(REPO_DIR)}/models/deepensemble/*')
 
         prediction_list = []
         for model_path in model_paths:
