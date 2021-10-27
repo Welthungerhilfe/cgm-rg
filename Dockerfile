@@ -1,7 +1,7 @@
 FROM python:3.7-slim-stretch
 
-RUN apt-get -y update
-RUN apt-get install -y --fix-missing \
+RUN apt-get -y update && \
+    apt-get install -y --fix-missing \
     build-essential \
     cmake \
     gfortran \
@@ -35,8 +35,9 @@ WORKDIR /app
 RUN mkdir log
 
 ADD requirements.txt /app/requirements.txt
-RUN pip install -r requirements.txt
-RUN pip install torch==1.9.0+cpu torchvision==0.10.0+cpu torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir torch==1.9.0+cpu torchvision==0.10.0+cpu torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 
 ADD . /app
 
