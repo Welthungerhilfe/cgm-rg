@@ -34,6 +34,23 @@ However, for internal contributors we recommend to download existing models as f
     * Find the ACI (Azure container instance) for your environment, e.g. `cgmbecidevrgaci` for sandbox
     * On the left (in the `Settings` section), click `Containers`
     * Go to the `Properties` tab and copy the needed environment variables from here
+    * Put the enviromentment into a file called `env.list`. Example (make sure to replace with actual variable values)
+
+    ```
+    SUB_ID=00000000-1111-2222-3333-444444444444
+    TENANT_ID=00000000-1111-2222-3333-444444444444
+    SP_ID=00000000-1111-2222-3333-444444444444
+    SP_PASSWD=00000000-1111-2222-3333-444444444444
+    ```
+
+It can be helpful to run the local development using this command
+```bash
+docker run -it --rm --env-file ./env.list \
+    -v $(pwd)/src:/app/src \
+    -v $(pwd)/models:/app/models \
+    --add-host="localhost:<YOUR IP>" \
+    --name rg_service_1_0 rgservice:1.0
+```
 
 ## Branch Policy
 
