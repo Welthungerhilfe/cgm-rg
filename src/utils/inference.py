@@ -1,6 +1,5 @@
 import os
 import sys
-import pathlib
 from pathlib import Path
 
 # from azureml.core import Workspace
