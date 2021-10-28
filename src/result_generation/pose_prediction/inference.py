@@ -20,7 +20,6 @@ from result_generation.pose_prediction.code.utils.utils import (box_to_center_sc
                                                                 get_person_detection_boxes, get_pose_estimation_prediction, rot)
 import log
 
-
 logger = log.setup_custom_logger(__name__)
 
 REPO_DIR = Path(os.getenv('APP_DIR', '/app'))

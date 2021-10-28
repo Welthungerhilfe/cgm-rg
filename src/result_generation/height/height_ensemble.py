@@ -13,7 +13,6 @@ import utils.inference as inference  # noqa: E402
 import utils.preprocessing as preprocessing  # noqa: E402
 import log
 
-
 logger = log.setup_custom_logger(__name__)
 
 REPO_DIR = Path(os.getenv('APP_DIR', '/app'))
