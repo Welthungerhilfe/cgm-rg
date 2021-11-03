@@ -171,6 +171,18 @@ stages:
             runOnce:
               deploy:
                 steps:
+                  - task: AzureCLI@2
+                    displayName: TEMPORARY Downgrade az cli because of bug in version 2.30
+                    inputs:
+                      azureSubscription: cgm-${{ env }}-sub-cd
+                      scriptType: bash
+                      scriptLocation: inlineScript
+                      inlineScript: |
+                        sudo apt-get remove azure-cli
+                        curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+                        echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
+                        sudo apt-get update
+                        sudo apt-get install -y azure-cli=2.29.2-1~focal
                   - task: DownloadPipelineArtifact@2
                     inputs:
                       source: current
