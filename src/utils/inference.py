@@ -25,7 +25,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 
 try:
     height_model = load_model(
-        '/app/models/height/best_model.ckpt/', compile=False)
+        '/app/models/height/outputs/best_model.ckpt/', compile=False)
 except OSError as error:
     print(error)
     print("Not able to load the Height model")
