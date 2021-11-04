@@ -60,7 +60,7 @@ def run_normal_flow():
     height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
     height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
 
-    scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
+    scan_metadata_name = f'scan_meta_{str(uuid.uuid4())}.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
 
     # URL
