@@ -59,20 +59,20 @@ def run_normal_flow():
     height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
     height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
 
-    scan_metadata_name = f'scan_meta_{str(uuid.uuid4())}.json'
-    scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
-
     # URL
     url = os.getenv('APP_URL', 'http://localhost:5001')
     logger.info("App URL %s", url)
     api_manager = ApiManager(url)
 
-    get_scan_metadata = MetadataManager(api_manager, scan_metadata_path)
+    metadata_manager = MetadataManager(
+        api_manager,
+        scan_metadata_path=os.path.join(scan_parent_dir, f'scan_meta_{str(uuid.uuid4())}.json')
+    )
 
-    if get_scan_metadata.get_unprocessed_scans() <= 0:
+    if metadata_manager.get_unprocessed_scans() <= 0:
         return
 
-    scan_metadata = get_scan_metadata.get_scan_metadata()
+    scan_metadata = metadata_manager.get_scan_metadata()
     scan_version = scan_metadata['version']
     scan_type = scan_metadata["type"]
     logger.info("%s %s", "Scan Type Version:", scan_version)
