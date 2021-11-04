@@ -74,7 +74,7 @@ def run_normal_flow():
     logger.info("%s %s", "Scan Type Version:", scan_version)
 
     workflow_processor = WorkflowProcessor(api_manager)
-    workflow_processor.get_list_of_workflows()
+    workflow_processor.load_list_of_workflows()
 
     artifacts_manager = ArtifactsManager(scan_metadata, scan_parent_dir)
     artifacts_manager.process_scan_metadata()
@@ -163,7 +163,7 @@ def run_retroactive_flow():
 
     api_manager = ApiManager(url)
     workflow_processor = WorkflowProcessor(api_manager)
-    workflow_processor.get_list_of_workflows()
+    workflow_processor.load_list_of_workflows()
     try:
         queue_service = QueueService(connection_string=connect_str)
     except Exception:
