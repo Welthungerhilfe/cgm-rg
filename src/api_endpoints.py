@@ -152,7 +152,7 @@ class ApiManager:
             logger.info("Response code: %s", response.status_code)
             return 0
 
-    def get_scan_for_scan_version_workflow_id(self, scan_version, workflow_id, scan_path):  # TODO unused
+    def get_number_of_scans_for_scan_version_workflow_id(self, scan_version, workflow_id, scan_path):  # TODO unused
         """Get the scan metadata filtered by scan_version and workflow_id"""
         headers = self.prepare_header()
         # use scan_version and workflow id to get filtered scans
@@ -184,9 +184,8 @@ class ApiManager:
 
     def get_person_details(self, person_id):
         headers = self.prepare_header()
-        response = requests.get(
-            self.url + self.person_detail_endpoint + person_id + '/basic',
-            headers=headers)
+        response = requests.get(f'{self.url}{self.person_detail_endpoint}{person_id}/basic',
+                                headers=headers)
 
         if response.status_code == 200:
             content = response.json()
@@ -194,7 +193,7 @@ class ApiManager:
             logger.info(pprint.pprint(content))
         return content
 
-    def get_workflows(self):
+    def get_workflows(self) -> dict:
         """Get all registered workflows"""
         headers = self.prepare_header()
         response = requests.get(self.url + self.workflow_endpoint, headers=headers)

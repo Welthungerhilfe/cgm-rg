@@ -33,7 +33,7 @@ class MetadataManager:
         Length of the unprocessed scan filtered by scan version type and workflow id
         """
 
-        return api_manager.get_scan_for_scan_version_workflow_id(scan_version, workflow_id, scan_metadata_path)
+        return api_manager.get_number_of_scans_for_scan_version_workflow_id(scan_version, workflow_id, scan_metadata_path)
 
     def get_scan_metadata(self) -> dict:
         with open(self.scan_metadata_path, 'r') as f:
