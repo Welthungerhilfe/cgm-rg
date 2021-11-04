@@ -19,15 +19,14 @@ class ArtifactsManager:
             directory where scans are stored
     """
 
-    def __init__(self, api: ApiManager, scan_metadata, scan_parent_dir):
-        self.api = api
+    def __init__(self, scan_metadata, scan_parent_dir):
         self.scan_metadata = scan_metadata
         self.format_wise_artifact = defaultdict(list)
         self.scan_parent_dir = scan_parent_dir
         self.scan_dir = os.path.join(self.scan_parent_dir, self.scan_metadata['id'])
         logger.info("%s %s", "Parent Scan Dir:", self.scan_dir)
 
-    def download_artifacts(self, input_format):
+    def download_artifacts(self, api: ApiManager, input_format):
         """Download artifacts for the scan"""
         logger.info("%s %s %s", "Downloading Artifacts for", input_format, "format")
         self.artifacts = []
@@ -36,7 +35,7 @@ class ArtifactsManager:
             mod_artifact = copy.deepcopy(artifact)
 
             logger.info("%s %s", "Downloading Artifact Name:", mod_artifact["file"])
-            status_code = self.api.get_files(mod_artifact["file"], os.path.join(self.scan_dir, input_format))
+            status_code = api.get_files(mod_artifact["file"], os.path.join(self.scan_dir, input_format))
             # status_code = get_files_mockup(mod_artifact["file"], format_dir)
             if status_code == 200:
                 mod_artifact['download_status'] = True
