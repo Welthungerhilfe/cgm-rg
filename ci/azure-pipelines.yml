@@ -205,6 +205,12 @@ stages:
                         docker push "$IMAGE"
                   - script: sudo snap install yq
                     displayName: Install yq utility
+                  - task: UsePythonVersion@0
+                    inputs:
+                      versionSpec: '3.x'
+                      architecture: 'x64'
+                  - bash: pip install azure-cli==2.29.2
+                    displayName: 'Downgrade Azure CLI to 2.29.2'
                   - task: AzureCLI@2
                     displayName: Update Container Instance
                     inputs:
@@ -221,7 +227,7 @@ stages:
                         
                         set -e
                         
-                        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+                        # curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
                         # Export current setup -> modify and use as input for in-place update
                         TMP_CONF_FILE=rg-ci-conf.yaml
                         az container export \
