@@ -2,16 +2,10 @@ import json
 from api_endpoints import ApiManager
 
 
-class GetScanMetadata:
+class MetadataManager:
     """Get and process scan metadata"""
 
     def __init__(self, api: ApiManager, scan_metadata_path: str):
-        """Construct all the necessary attributes for the GetScanMetadata object.
-
-        Parameters:
-            api
-            scan_metadata_path: path to store scan metadata
-        """
         self.api = api
         self.scan_metadata_path = scan_metadata_path
 
