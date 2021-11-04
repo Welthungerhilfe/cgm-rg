@@ -1,11 +1,11 @@
 import json
-from api_endpoints import ApiEndpoints
+from api_endpoints import ApiManager
 
 
 class WorkflowProcessor:
     """Process all the workflows"""
 
-    def __init__(self, api: ApiEndpoints):
+    def __init__(self, api: ApiManager):
         self.api = api
 
     def get_list_of_workflows(self):

@@ -6,14 +6,14 @@ import numpy as np
 from fastcore.basics import store_attr
 
 sys.path.append(str(Path(__file__).parents[1]))
-from api_endpoints import ApiEndpoints
+from api_endpoints import ApiManager
 
 
 class ResultGeneration:
 
     def __init__(
             self,
-            api: ApiEndpoints,
+            api: ApiManager,
             workflows,
             scan_metadata,
             scan_parent_dir):

@@ -1,7 +1,7 @@
 import copy
 import os
 import pprint
-from api_endpoints import ApiEndpoints
+from api_endpoints import ApiManager
 import log
 from collections import defaultdict
 
@@ -19,7 +19,7 @@ class PrepareArtifacts:
             directory where scans are stored
     """
 
-    def __init__(self, api: ApiEndpoints, scan_metadata, scan_parent_dir):
+    def __init__(self, api: ApiManager, scan_metadata, scan_parent_dir):
         self.api = api
         self.scan_metadata = scan_metadata
         self.format_wise_artifact = defaultdict(list)

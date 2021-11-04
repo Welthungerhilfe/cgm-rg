@@ -8,7 +8,7 @@ from pathlib import Path
 from azure.storage.queue import QueueService
 
 import log
-from api_endpoints import ApiEndpoints
+from api_endpoints import ApiManager
 from get_scan_metadata import GetScanMetadata
 from prepare_artifacts import PrepareArtifacts
 from process_workflows import WorkflowProcessor
@@ -66,9 +66,9 @@ def run_normal_flow():
     # URL
     url = os.getenv('APP_URL', 'http://localhost:5001')
     logger.info("%s %s", "App URL:", url)
-    cgm_api = ApiEndpoints(url)
+    api_manager = ApiManager(url)
 
-    get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
+    get_scan_metadata = GetScanMetadata(api_manager, scan_metadata_path)
 
     if get_scan_metadata.get_unprocessed_scans() <= 0:
         return
@@ -78,20 +78,20 @@ def run_normal_flow():
     scan_type = scan_metadata["type"]
     logger.info("%s %s", "Scan Type Version:", scan_version)
 
-    workflow_processor = WorkflowProcessor(cgm_api)
+    workflow_processor = WorkflowProcessor(api_manager)
     workflow_processor.get_list_of_workflows()
 
-    data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
+    data_processing = PrepareArtifacts(api_manager, scan_metadata, scan_parent_dir)
     data_processing.process_scan_metadata()
     data_processing.create_scan_dir()
     data_processing.create_artifact_dir()
     rgb_artifacts = data_processing.download_artifacts('img')
     depth_artifacts = data_processing.download_artifacts('depth')
-    person_details = person(cgm_api, scan_metadata['person'])
+    person_details = person(api_manager, scan_metadata['person'])
 
     flows = []
 
-    result_generation = ResultGeneration(cgm_api, workflow_processor, scan_metadata, scan_parent_dir)
+    result_generation = ResultGeneration(api_manager, workflow_processor, scan_metadata, scan_parent_dir)
 
     flow = PoseAndBlurFlow(
         result_generation,
@@ -166,7 +166,7 @@ def run_retroactive_flow():
     queue_name = "retroactive-scan-process"
     retroactive_scan_dir = str(REPO_DIR / 'data/retroactive_scans/')
 
-    cgm_api = ApiEndpoints(url)
+    cgm_api = ApiManager(url)
     workflow = WorkflowProcessor(cgm_api)
     workflow.get_list_of_workflows()
     try:

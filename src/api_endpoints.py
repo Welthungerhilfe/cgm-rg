@@ -25,7 +25,7 @@ ENDPOINTS = Bunch(dict(
 ))
 
 
-class ApiEndpoints:
+class ApiManager:
     def __init__(self, url):
         self.url = url
         self.scan_endpoint = ENDPOINTS.SCANS
