@@ -35,14 +35,14 @@ class MetadataManager:
 
         return api_manager.get_scan_for_scan_version_workflow_id(scan_version, workflow_id, scan_metadata_path)
 
-    def get_scan_metadata(self):
+    def get_scan_metadata(self) -> dict:
         with open(self.scan_metadata_path, 'r') as f:
             scan_metadata_obj = json.load(f)
         scan_metadata = scan_metadata_obj['scans'][0]
 
         return scan_metadata
 
-    def get_scan_metadata_by_path(self, scan_metadata_path):
+    def get_scan_metadata_by_path(self, scan_metadata_path) -> dict:
         with open(scan_metadata_path, 'r') as f:
             scan_metadata_obj = json.load(f)
         scan_metadata = scan_metadata_obj['scans'][0]
