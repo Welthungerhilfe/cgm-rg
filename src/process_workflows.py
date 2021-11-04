@@ -8,7 +8,7 @@ class WorkflowProcessor:
     def __init__(self, api: ApiManager):
         self.api = api
 
-    def get_list_of_workflows(self):
+    def load_list_of_workflows(self):
         """Get the list of workflows from api"""
         self.workflows = self.api.get_workflows()
 
