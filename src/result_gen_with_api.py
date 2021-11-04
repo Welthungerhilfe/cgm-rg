@@ -10,7 +10,7 @@ from azure.storage.queue import QueueService
 import log
 from api_endpoints import ApiManager
 from get_scan_metadata import MetadataManager
-from prepare_artifacts import PrepareArtifacts
+from prepare_artifacts import ArtifactsManager
 from process_workflows import WorkflowProcessor
 from result_generation.blur_and_pose import PoseAndBlurFlow
 from result_generation.depthmap_image import DepthMapImgFlow
@@ -79,7 +79,7 @@ def run_normal_flow():
     workflow_processor = WorkflowProcessor(api_manager)
     workflow_processor.get_list_of_workflows()
 
-    data_processing = PrepareArtifacts(api_manager, scan_metadata, scan_parent_dir)
+    data_processing = ArtifactsManager(api_manager, scan_metadata, scan_parent_dir)
     data_processing.process_scan_metadata()
     data_processing.create_scan_dir()
     data_processing.create_artifact_dir()
@@ -195,7 +195,7 @@ def run_retroactive_flow():
         workflow_id = scan_metadata_with_workflow_obj['workflow_id']
         logger.info("%s %s", "Workflow ID :", workflow_id)
 
-        data_processing = PrepareArtifacts(cgm_api, scan_metadata, retroactive_scan_dir)
+        data_processing = ArtifactsManager(cgm_api, scan_metadata, retroactive_scan_dir)
         data_processing.process_scan_metadata()
         data_processing.create_scan_dir()
         data_processing.create_artifact_dir()
