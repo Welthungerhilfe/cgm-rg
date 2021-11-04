@@ -23,10 +23,6 @@ logger = log.setup_custom_logger(__name__)
 REPO_DIR = Path(os.environ['PWD']).absolute()
 
 
-def person(api, person_id):
-    return api.get_person_details(person_id)
-
-
 def parse_args():
     parser = argparse.ArgumentParser()
     workflow_dir = str(REPO_DIR / 'src/workflows')
@@ -85,7 +81,7 @@ def run_normal_flow():
     artifacts_manager.create_artifact_dir()
     rgb_artifacts = artifacts_manager.download_artifacts(api_manager, 'img')
     depth_artifacts = artifacts_manager.download_artifacts(api_manager, 'depth')
-    person_details = person(api_manager, scan_metadata['person'])
+    person_details = api_manager.get_person_details(scan_metadata['person'])
 
     flows = []
 
@@ -202,7 +198,7 @@ def run_retroactive_flow():
         rgb_artifacts = artifacts_manager.download_artifacts(api_manager, 'img')
         depth_artifacts = artifacts_manager.download_artifacts(api_manager, 'depth')
         # depth_artifacts = artifacts_manager.download_artifacts(api_manager, 'calibration')
-        person_details = person(api_manager, scan_metadata['person'])
+        person_details = api_manager.get_person_details(scan_metadata['person'])
 
         result_generation = ResultGeneration(api_manager, workflow_processor, scan_metadata, retroactive_scan_dir)
 
