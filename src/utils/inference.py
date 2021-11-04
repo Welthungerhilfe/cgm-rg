@@ -23,7 +23,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 # pointclouds
 
 try:
-    height_model = load_model(str(REPO_DIR / 'models/height/best_model.ckpt/'), compile=False)
+    height_model = load_model(str(REPO_DIR / 'models/height/outputs/best_model.ckpt/'), compile=False)
 except OSError as error:
     print(error)
     print("Not able to load the Height model")
