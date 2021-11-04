@@ -154,13 +154,11 @@ stages:
     - stage: Deploy_${{ replace(env, '-', '_') }}
       displayName: Deploy ${{ env }}
       dependsOn: 
-        - Setup
-        - Build
-      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+        #- Setup
+        #- Build
+      condition: succeeded() # and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
       variables:
         - group: cgm-rg-${{ env }}-ci
-        - name: TAG
-          value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
       jobs:
         - deployment: Deploy_Container_Instance
           displayName: "Container Instance deployment ${{ env }}"
@@ -171,40 +169,13 @@ stages:
             runOnce:
               deploy:
                 steps:
-                  - task: DownloadPipelineArtifact@2
+                  # Specify python version
+                  - task: UsePythonVersion@0
                     inputs:
-                      source: current
-                      artifact: DockerCache
-                      path: $(DOCKER_CACHE_DIR)
-                  - script: |
-                      # echo all variables for debug
-                      echo "##[debug] TAG: $(TAG)"
-                      echo "##[debug] isRelease: $(isRelease)"
-                      echo "##[debug] DOCKER_CACHE_DIR: $(DOCKER_CACHE_DIR)"
-                      echo "##[debug] DOCKER_CACHE_IMG_FILE: $(DOCKER_CACHE_IMG_FILE)"
-                      echo "##[debug] IMAGE_REPOSITORY: $(IMAGE_REPOSITORY)"
-                      echo "##[debug] TARGET_REGISTRY: $(TARGET_REGISTRY)"
-
-                      set -e
-                      docker image load -i $(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)
-                      echo "##[debug] IMAGE_REPOSITORY:tag : $(IMAGE_REPOSITORY):$TAG"
-                      docker tag "$(IMAGE_REPOSITORY):$TAG" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$TAG"
-                    displayName: Load and Tag image
-                  - task: AzureCLI@2
-                    displayName: Push to target ACR
-                    inputs:
-                      azureSubscription: cgm-${{ env }}-sub-cd
-                      scriptType: bash
-                      scriptLocation: inlineScript
-                      inlineScript: |
-                        set -e
-                        # Login to ACR
-                        az acr login --name $(TARGET_REGISTRY)
-                        # Push Docker image
-                        IMAGE="$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
-                        docker push "$IMAGE"
-                  - script: sudo snap install yq
-                    displayName: Install yq utility
+                      versionSpec: '3.x'
+                      architecture: 'x64'
+                  - bash: pip install azure-cli=2.29.2
+                    displayName: 'Downgrade Azure CLI to 2.29.2'
                   - task: AzureCLI@2
                     displayName: Update Container Instance
                     inputs:
@@ -212,7 +183,7 @@ stages:
                       scriptType: bash
                       scriptLocation: inlineScript
                       inlineScript: |
-                        sudo apt install -y --allow-downgrades azure-cli=2.29.2-1~bionic
+                        # sudo apt install -y --allow-downgrades azure-cli=2.29.2-1~bionic
                         # sudo apt-get remove azure-cli
                         # curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
                         # echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
