@@ -130,10 +130,13 @@ class ApiManager:
         """Mockup of Post the workflows using POST /files"""
         return str(uuid.uuid4()), 200
 
-    def get_scan(self, scan_path):
-        """Get the scan metadata"""
+    def get_number_of_scans(self, scan_path) -> int:
+        """Get the scan metadata
+
+        This function has side effects!
+        """
         headers = self.prepare_header()
-        response = requests.get(self.url + self.scan_endpoint, headers=headers)
+        response = requests.get(f'{self.url}{self.scan_endpoint}', headers=headers)
 
         if response.status_code == 200:
             content = response.json()
