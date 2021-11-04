@@ -3,7 +3,7 @@ import json
 import os
 
 import log
-from api_endpoints import ApiEndpoints
+from api_endpoints import ApiManager
 
 
 logger = log.setup_custom_logger(__name__)
@@ -50,7 +50,7 @@ def upsert_workflows(json_paths, workflows, cgm_api):
 if __name__ == "__main__":
     url = os.getenv('APP_URL', 'http://localhost:5001')
     logger.info("%s %s", "App URL:", url)
-    cgm_api = ApiEndpoints(url)
+    cgm_api = ApiManager(url)
     workflow_paths = 'src/workflows'
     json_paths = get_list_of_files(workflow_paths)
     workflows = cgm_api.get_workflows()

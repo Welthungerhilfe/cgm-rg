@@ -2,7 +2,7 @@ import sys
 
 import set_up_dummy_variables
 sys.path.append('./src')  # noqa: E402
-from api_endpoints import ApiEndpoints
+from api_endpoints import ApiManager
 from mock import patch
 from result_gen_with_api import WorkflowProcessor
 # from result_generation.blur import BlurFlow
@@ -61,7 +61,7 @@ def get_dummy_get_scan_metadata_object():
 
 
 def get_dummy_api_endpoint_object():
-    return ApiEndpoints(sdv.url)
+    return ApiManager(sdv.url)
 
 
 def get_dummy_prepare_artifacts_object():
