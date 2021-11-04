@@ -104,14 +104,14 @@ class HeightFlow:
         artifact_level_height_result_json = self.result_generation.bunch_object_to_json_object(
             artifact_level_height_result_bunch)
         if self.result_generation.api.post_results(artifact_level_height_result_json) == 201:
-            logger.info("%s %s", "successfully post artifact level height results:", artifact_level_height_result_json)
+            logger.info("successfully post artifact level height results: %s", artifact_level_height_result_json)
 
         scan_level_height_result_bunch = self.scan_level_height_result_object(
             predictions, generated_timestamp, self.scan_workflow_obj, start_time)
         scan_level_height_result_json = self.result_generation.bunch_object_to_json_object(
             scan_level_height_result_bunch)
         if self.result_generation.api.post_results(scan_level_height_result_json) == 201:
-            logger.info("%s %s", "successfully post scan level height results:", scan_level_height_result_json)
+            logger.info("successfully post scan level height results: %s", scan_level_height_result_json)
 
     def artifact_level_result_ensemble(self, predictions, generated_timestamp, stds):
         """Prepare artifact level height result object"""

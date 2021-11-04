@@ -53,7 +53,7 @@ class HeightFlowRGBD(HeightFlow):
                 image_input_path = self.result_generation.get_input_path(
                     scan_image_directory, result_image_dict['file'])
             else:
-                logger.info("%s %s", "No RGB found for order:", depth_id)
+                logger.info("No RGB found for order: %s", depth_id)
                 continue
             raw_image = cv2.imread(str(image_input_path))  # cv2.imread gives error when reading from posix path
             rot_image = cv2.rotate(raw_image, cv2.ROTATE_90_CLOCKWISE)
