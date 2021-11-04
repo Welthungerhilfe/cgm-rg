@@ -80,11 +80,6 @@ stages:
                           --resource-group "$TARGET_RESOURCE_GROUP" \
                           --file "$TMP_CONF_FILE"
 
-                        # Replace image
-                        IMAGE="$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
-                        export IMAGE
-                        yq eval '.properties.containers[0].properties.image = strenv(IMAGE)' "$TMP_CONF_FILE" -i
-
                         # Insert registry credentials
                         REGISTRY_CREDENTIALS=$(az acr credential show --name "$TARGET_REGISTRY")
 
