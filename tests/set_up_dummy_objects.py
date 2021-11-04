@@ -4,7 +4,7 @@ import set_up_dummy_variables
 sys.path.append('./src')  # noqa: E402
 from api_endpoints import ApiEndpoints
 from mock import patch
-from result_gen_with_api import ProcessWorkflows
+from result_gen_with_api import WorkflowProcessor
 # from result_generation.blur import BlurFlow
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.result_generation import ResultGeneration
@@ -13,7 +13,7 @@ from result_generation.result_generation import ResultGeneration
 sdv = set_up_dummy_variables.create_dummy_vars()
 
 '''
-@patch.object(ProcessWorkflows, 'get_workflow_id')
+@patch.object(WorkflowProcessor, 'get_workflow_id')
 def get_dummy_blur_flow_object(mock_some_fn):
     mock_some_fn.return_value = '44af5600-69d2-11eb-9498-8ffe0e3b2017'
     return BlurFlow(
@@ -26,7 +26,7 @@ def get_dummy_blur_flow_object(mock_some_fn):
 '''
 
 
-@patch.object(ProcessWorkflows, 'get_workflow_id')
+@patch.object(WorkflowProcessor, 'get_workflow_id')
 def get_dummy_height_flow_object(mock_some_fn):
     mock_some_fn.return_value = '44af5600-69d2-11eb-9498-8ffe0e3b2017'
     return HeightFlowPlainCnn(
@@ -38,7 +38,7 @@ def get_dummy_height_flow_object(mock_some_fn):
         sdv.person_details)
 
 
-@patch.object(ProcessWorkflows, 'get_workflow_id')
+@patch.object(WorkflowProcessor, 'get_workflow_id')
 def get_dummy_result_generation_object(mock_some_fn):
     mock_some_fn.return_value = '44af5600-69d2-11eb-9498-8ffe0e3b2017'
     return ResultGeneration(
@@ -69,4 +69,4 @@ def get_dummy_prepare_artifacts_object():
 
 
 def get_dummy_process_workflows_object():
-    return ProcessWorkflows(get_dummy_api_endpoint_object())
+    return WorkflowProcessor(get_dummy_api_endpoint_object())
