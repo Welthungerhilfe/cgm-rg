@@ -9,7 +9,7 @@ from azure.storage.queue import QueueService
 
 import log
 from api_endpoints import ApiManager
-from get_scan_metadata import GetScanMetadata
+from get_scan_metadata import MetadataManager
 from prepare_artifacts import PrepareArtifacts
 from process_workflows import WorkflowProcessor
 from result_generation.blur_and_pose import PoseAndBlurFlow
@@ -65,10 +65,10 @@ def run_normal_flow():
 
     # URL
     url = os.getenv('APP_URL', 'http://localhost:5001')
-    logger.info("%s %s", "App URL:", url)
+    logger.info("App URL %s", url)
     api_manager = ApiManager(url)
 
-    get_scan_metadata = GetScanMetadata(api_manager, scan_metadata_path)
+    get_scan_metadata = MetadataManager(api_manager, scan_metadata_path)
 
     if get_scan_metadata.get_unprocessed_scans() <= 0:
         return
