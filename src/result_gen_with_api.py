@@ -67,7 +67,6 @@ def run_normal_flow():
     logger.info("%s %s", "App URL:", url)
     cgm_api = ApiEndpoints(url)
 
-    workflow_processor = WorkflowProcessor(cgm_api)
     get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
 
     if get_scan_metadata.get_unprocessed_scans() <= 0:
@@ -77,6 +76,8 @@ def run_normal_flow():
     scan_version = scan_metadata['version']
     scan_type = scan_metadata["type"]
     logger.info("%s %s", "Scan Type Version:", scan_version)
+
+    workflow_processor = WorkflowProcessor(cgm_api)
     workflow_processor.get_list_of_workflows()
 
     data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
