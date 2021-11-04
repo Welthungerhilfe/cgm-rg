@@ -9,7 +9,7 @@ from collections import defaultdict
 logger = log.setup_custom_logger(__name__)
 
 
-class PrepareArtifacts:
+class ArtifactsManager:
     """Prepare artifacts for result generation.
 
     Attributes
