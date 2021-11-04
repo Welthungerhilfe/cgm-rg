@@ -143,10 +143,10 @@ class ApiManager:
             with open(scan_path, 'w') as f:
                 json.dump(content, f, indent=4)
 
-            logger.info("%s %s", "Written scan metadata successfully to", scan_path)
+            logger.info("Written scan metadata successfully to %s", scan_path)
             return len(content['scans'])
         else:
-            logger.info("%s %s", "Response code :", response.status_code)
+            logger.info("Response code: %s", response.status_code)
             return 0
 
     def get_scan_for_scan_version_workflow_id(self, scan_version, workflow_id, scan_path):
