@@ -49,7 +49,7 @@ def upsert_workflows(json_paths, workflows, cgm_api):
 
 if __name__ == "__main__":
     url = os.getenv('APP_URL', 'http://localhost:5001')
-    logger.info("%s %s", "App URL:", url)
+    logger.info("App URL: %s", url)
     cgm_api = ApiManager(url)
     workflow_paths = 'src/workflows'
     json_paths = get_list_of_files(workflow_paths)

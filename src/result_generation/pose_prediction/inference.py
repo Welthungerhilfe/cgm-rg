@@ -54,7 +54,7 @@ class PosePrediction:
         elif scan_type in [200, 201, 202]:
             rotated_image = cv2.rotate(original_image, cv2.ROTATE_90_COUNTERCLOCKWISE)  # Laying
         else:
-            logger.info("%s %s %s", "Provided scan type", scan_type, "not supported")
+            logger.info("Provided scan type %s not supported", scan_type)
             logger.info("Keeping the image in the same orientation as provided")
             rotated_image = original_image
         return rotated_image
@@ -65,7 +65,7 @@ class PosePrediction:
         elif scan_type in [200, 201, 202]:
             pose_keypoints = rot(pose_keypoints, 'ROTATE_90_CLOCKWISE', height, width)
         else:
-            logger.info("%s %s %s", "Provided scan type", scan_type, "not supported")
+            logger.info("Provided scan type %s not supported", scan_type)
             logger.info("Keeping the co-ordinate in the same orientation as provided")
         return pose_keypoints
 
@@ -105,10 +105,10 @@ class ResultGeneration:
         original_image, shape = self.pose_prediction.read_image(str(jpg_path))
         rotated_image = self.pose_prediction.orient_image_using_scan_type(original_image, scan_type)
         box_model_input, rotated_image_rgb = self.pose_prediction.preprocess_image(rotated_image)
-        logger.info("%s %s ", "shape", shape)
+        logger.info("shape %s ", shape)
 
         pred_boxes, pred_score = self.pose_prediction.perform_box_on_image(box_model_input)
-        logger.info("%s ", pred_boxes)
+        logger.info(pred_boxes)
 
         pose_result = []
 
@@ -163,7 +163,7 @@ class ResultGeneration:
 
 def init_pose_prediction():
     ctx = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    logger.info("%s %s", "cuda is available", torch.cuda.is_available())
+    logger.info("cuda is available %s", torch.cuda.is_available())
 
     # cudnn related setting
     cudnn.benchmark = cfg.CUDNN.BENCHMARK

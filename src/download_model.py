@@ -42,7 +42,7 @@ def download_model(ws, experiment_name, run_id, input_location, output_location)
         run.download_files(prefix=input_location, output_directory=output_location)
     else:
         raise NameError(f"{input_location}'s path extension not supported")
-    logger.info("%s %s", "Successfully downloaded model for experiment ", experiment_name)
+    logger.info("Successfully downloaded model for experiment %s", experiment_name)
 
 
 def download_model_from_registered_model(workspace, model_name, output_location):
@@ -54,11 +54,11 @@ def download_model_from_registered_model(workspace, model_name, output_location)
          target_path: Where model should download
     '''
     if Path(output_location).exists():
-        logger.info("%s %s %s", "Found existing model", model_name, "- Skipping download")
+        logger.info("Found existing model %s - Skipping download", model_name)
         return
     model = Model(workspace, name=model_name)
     model.download(target_dir=output_location, exist_ok=True, exists_ok=None)
-    logger.info("%s %s %s", "Successfully downloaded", model_name, "model from registered model")
+    logger.info("Successfully downloaded %s model from registered model", model_name)
 
 
 def main():

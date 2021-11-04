@@ -48,7 +48,7 @@ class StandingLaying:
         for artifact in self.artifacts:
             artifact['standing_laying_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
-            logger.info("%s %s", "input_path of image to perform standing laying:", input_path)
+            logger.info("input_path of image to perform standing laying: %s", input_path)
             img = preprocessing.standing_laying_data_preprocessing(input_path, self.scan_type)
             prediction = inference.get_standing_laying_prediction_local(img)
             predictions.append(prediction)
@@ -78,4 +78,4 @@ class StandingLaying:
         res = self.prepare_result_object(prediction, generated_timestamp)
         res_object = self.result_generation.bunch_object_to_json_object(res)
         if self.result_generation.api.post_results(res_object) == 201:
-            logger.info("%s %s", "successfully post Standing laying results:", res_object)
+            logger.info("successfully post Standing laying results: %s", res_object)

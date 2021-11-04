@@ -24,24 +24,24 @@ class ArtifactsManager:
         self.format_wise_artifact = defaultdict(list)
         self.scan_parent_dir = scan_parent_dir
         self.scan_dir = os.path.join(self.scan_parent_dir, self.scan_metadata['id'])
-        logger.info("%s %s", "Parent Scan Dir:", self.scan_dir)
+        logger.info("Parent Scan Dir: %s", self.scan_dir)
 
     def download_artifacts(self, api: ApiManager, input_format):
         """Download artifacts for the scan"""
-        logger.info("%s %s %s", "Downloading Artifacts for", input_format, "format")
+        logger.info("Downloading Artifacts for %s format", input_format)
         self.artifacts = []
 
         for i, artifact in enumerate(self.format_wise_artifact[input_format]):
             mod_artifact = copy.deepcopy(artifact)
 
-            logger.info("%s %s", "Downloading Artifact Name:", mod_artifact["file"])
+            logger.info("Downloading Artifact Name: %s", mod_artifact["file"])
             status_code = api.get_files(mod_artifact["file"], os.path.join(self.scan_dir, input_format))
             # status_code = get_files_mockup(mod_artifact["file"], format_dir)
             if status_code == 200:
                 mod_artifact['download_status'] = True
                 self.artifacts.append(mod_artifact)
 
-        logger.info("%s %s %s", "Below Artifacts for", input_format, "workflow")
+        logger.info("Below Artifacts for %s workflow", input_format)
         logger.info(self.artifacts)
         logger.info("Download Artifact for completed")
 

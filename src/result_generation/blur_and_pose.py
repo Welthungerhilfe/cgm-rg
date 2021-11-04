@@ -84,10 +84,10 @@ class PoseAndBlurFlow:
         for artifact in self.artifacts:
             artifact['pose_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
-            logger.info("%s %s", "input_path of image to perform Pose prediction:", input_path)
+            logger.info("input_path of image to perform Pose prediction: %s", input_path)
             no_of_pose_detected, pose_score, pose_result = inference_artifact(
                 pose_prediction, input_path, self.scan_type)
-            logger.info("%s %s %s %s ", "pose_score", "no_of_pose_detected", pose_score, no_of_pose_detected)
+            logger.info("pose_score no_of_pose_detected %s %s", pose_score, no_of_pose_detected)
             artifact['no_of_pose_detected'] = no_of_pose_detected
             artifact['pose_score'] = pose_score
             artifact['pose_result'] = pose_result
@@ -97,9 +97,9 @@ class PoseAndBlurFlow:
         for artifact in self.artifacts:
             artifact['blur_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
-            logger.info("%s %s", "input_path of image to perform blur:", input_path)
+            logger.info("input_path of image to perform blur: %s", input_path)
             blur_img_binary, blur_status, faces_detected = self.blur_face(input_path)
-            logger.info("%s", "Blur Done")
+            logger.info("Blur Done")
 
             if blur_status:
                 artifact['blurred_image'] = blur_img_binary
@@ -158,7 +158,7 @@ class PoseAndBlurFlow:
         elif self.scan_type in laying_scan_type:
             image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
-        logger.info("%s %s", "scan_version is", self.scan_version)
+        logger.info("scan_version is %s", self.scan_version)
         logger.info("swapped image axis")
         return image
 
@@ -190,7 +190,7 @@ class PoseAndBlurFlow:
         face_locations = face_recognition.face_locations(small_image, model="cnn")
 
         faces_detected = len(face_locations)
-        logger.info("%s %s", faces_detected, "face locations found and blurred for path:")
+        logger.info("%s face locations found and blurred for path: %s", faces_detected, source_path)
 
         # Blur the image.
         for top, right, bottom, left in face_locations:
@@ -219,8 +219,7 @@ class PoseAndBlurFlow:
         # Write image to hard drive.
         rgb_image = image[:, :, ::-1]  # BGR -> RGB for OpenCV
 
-        # logging.info(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
-        logger.info("%s %s %s", len(face_locations), "face locations found and blurred for path:", source_path)
+        logger.info("%s face locations found and blurred for path: %s", len(face_locations), source_path)
         return rgb_image, True, faces_detected
 
     def post_blur_files(self):
@@ -336,22 +335,22 @@ class PoseAndBlurFlow:
         pose_res = self.prepare_no_of_person_result_object()
         pose_res_object = self.result_generation.bunch_object_to_json_object(pose_res)
         if self.result_generation.api.post_results(pose_res_object) == 201:
-            logger.info("%s %s", "successfully post pose detected results:", pose_res_object)
+            logger.info("successfully post pose detected results: %s", pose_res_object)
 
     def post_pose_with_blur_visualization_object(self):
         res = self.prepare_pose_visualize_object()
         res_object = self.result_generation.bunch_object_to_json_object(res)
         if self.result_generation.api.post_results(res_object) == 201:
-            logger.info("%s %s", "successfully post pose results:", res_object)
+            logger.info("successfully post pose results: %s", res_object)
 
     def post_blur_result_object(self):
         """Post the result object to the API"""
         res = self.prepare_result_object()
         res_object = self.result_generation.bunch_object_to_json_object(res)
         if self.result_generation.api.post_results(res_object) == 201:
-            logger.info("%s %s", "successfully post blur results:", res_object)
+            logger.info("successfully post blur results: %s", res_object)
 
         faces_res = self.prepare_faces_result_object()
         faces_res_object = self.result_generation.bunch_object_to_json_object(faces_res)
         if self.result_generation.api.post_results(faces_res_object) == 201:
-            logger.info("%s %s", "successfully post faces detected results:", faces_res_object)
+            logger.info("successfully post faces detected results: %s", faces_res_object)

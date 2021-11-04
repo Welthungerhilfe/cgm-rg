@@ -71,7 +71,7 @@ def run_normal_flow():
     scan_metadata = metadata_manager.get_scan_metadata()
     scan_version = scan_metadata['version']
     scan_type = scan_metadata["type"]
-    logger.info("%s %s", "Scan Type Version:", scan_version)
+    logger.info("Scan Type Version: %s", scan_version)
 
     workflow_processor = WorkflowProcessor(api_manager)
     workflow_processor.load_list_of_workflows()
@@ -157,7 +157,7 @@ def run_retroactive_flow():
     connect_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
     # URL
     url = os.getenv('APP_URL', 'http://localhost:5001')
-    logger.info("%s %s", "App URL:", url)
+    logger.info("App URL: %s", url)
     queue_name = "retroactive-scan-process"
     retroactive_scan_dir = str(REPO_DIR / 'data/retroactive_scans/')
 
@@ -171,26 +171,26 @@ def run_retroactive_flow():
         return
 
     messages = queue_service.get_messages(queue_name, num_messages=1, visibility_timeout=1)
-    logger.info("%s %s", "Length of messages :", len(messages))
-    logger.info("%s %s", "messages :", messages)
+    logger.info("Length of messages : %s", len(messages))
+    logger.info("messages : %s", messages)
 
     for message in messages:
         encoded_msg = message.content[2:-1].encode('utf-8')
 
-        logger.info("%s %s", "message.content :", encoded_msg)
+        logger.info("message.content : %s", encoded_msg)
         original_msg = base64.b64decode(encoded_msg).decode('utf-8', "ignore")
-        logger.info("%s %s", "message :", original_msg)
+        logger.info("message : %s", original_msg)
 
         scan_metadata_with_workflow_obj = json.loads(original_msg)
-        logger.info("%s %s", "Scan Metadata with Workflow", scan_metadata_with_workflow_obj)
+        logger.info("Scan Metadata with Workflow %s", scan_metadata_with_workflow_obj)
 
         scan_metadata = scan_metadata_with_workflow_obj['scans'][0]
         scan_version = scan_metadata['version']
         scan_type = scan_metadata['type']
-        logger.info("%s %s", "Scan Type Version:", scan_version)
+        logger.info("Scan Type Version: %s", scan_version)
 
         workflow_id = scan_metadata_with_workflow_obj['workflow_id']
-        logger.info("%s %s", "Workflow ID :", workflow_id)
+        logger.info("Workflow ID : %s", workflow_id)
 
         # Match workflow with height artifact level workflow and skip data download and preprocessing
         if workflow_processor.match_workflows(height_workflow_artifact_path, workflow_id) or workflow_processor.match_workflows(height_rgbd_workflow_artifact_path, workflow_id):
