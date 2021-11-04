@@ -80,12 +80,12 @@ def run_normal_flow():
     workflow_processor = WorkflowProcessor(api_manager)
     workflow_processor.get_list_of_workflows()
 
-    data_processing = ArtifactsManager(api_manager, scan_metadata, scan_parent_dir)
-    data_processing.process_scan_metadata()
-    data_processing.create_scan_dir()
-    data_processing.create_artifact_dir()
-    rgb_artifacts = data_processing.download_artifacts('img')
-    depth_artifacts = data_processing.download_artifacts('depth')
+    artifacts_manager = ArtifactsManager(scan_metadata, scan_parent_dir)
+    artifacts_manager.process_scan_metadata()
+    artifacts_manager.create_scan_dir()
+    artifacts_manager.create_artifact_dir()
+    rgb_artifacts = artifacts_manager.download_artifacts(api_manager, 'img')
+    depth_artifacts = artifacts_manager.download_artifacts(api_manager, 'depth')
     person_details = person(api_manager, scan_metadata['person'])
 
     flows = []
@@ -165,9 +165,9 @@ def run_retroactive_flow():
     queue_name = "retroactive-scan-process"
     retroactive_scan_dir = str(REPO_DIR / 'data/retroactive_scans/')
 
-    cgm_api = ApiManager(url)
-    workflow = WorkflowProcessor(cgm_api)
-    workflow.get_list_of_workflows()
+    api_manager = ApiManager(url)
+    workflow_processor = WorkflowProcessor(api_manager)
+    workflow_processor.get_list_of_workflows()
     try:
         queue_service = QueueService(connection_string=connect_str)
     except Exception:
@@ -197,25 +197,25 @@ def run_retroactive_flow():
         logger.info("%s %s", "Workflow ID :", workflow_id)
 
         # Match workflow with height artifact level workflow and skip data download and preprocessing
-        if workflow.match_workflows(height_workflow_artifact_path, workflow_id) or workflow.match_workflows(height_rgbd_workflow_artifact_path, workflow_id):
+        if workflow_processor.match_workflows(height_workflow_artifact_path, workflow_id) or workflow_processor.match_workflows(height_rgbd_workflow_artifact_path, workflow_id):
             queue_service.delete_message(queue_name, message.id, message.pop_receipt)
             logger.info("%s %s", "Skipped Height Artifact level workflow for Retroactive", workflow_id)
             continue
 
-        data_processing = ArtifactsManager(cgm_api, scan_metadata, retroactive_scan_dir)
-        data_processing.process_scan_metadata()
-        data_processing.create_scan_dir()
-        data_processing.create_artifact_dir()
-        rgb_artifacts = data_processing.download_artifacts('img')
-        depth_artifacts = data_processing.download_artifacts('depth')
-        # depth_artifacts = data_processing.download_artifacts('calibration')
-        person_details = person(cgm_api, scan_metadata['person'])
+        artifacts_manager = ArtifactsManager(scan_metadata, retroactive_scan_dir)
+        artifacts_manager.process_scan_metadata()
+        artifacts_manager.create_scan_dir()
+        artifacts_manager.create_artifact_dir()
+        rgb_artifacts = artifacts_manager.download_artifacts(api_manager, 'img')
+        depth_artifacts = artifacts_manager.download_artifacts(api_manager, 'depth')
+        # depth_artifacts = artifacts_manager.download_artifacts(api_manager, 'calibration')
+        person_details = person(api_manager, scan_metadata['person'])
 
-        result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, retroactive_scan_dir)
+        result_generation = ResultGeneration(api_manager, workflow_processor, scan_metadata, retroactive_scan_dir)
 
         workflow_matched = True
 
-        if workflow.match_workflows(blur_workflow_path, workflow_id):
+        if workflow_processor.match_workflows(blur_workflow_path, workflow_id):
             logger.info("Matched with PoseAndBlurFlow")
             flow = PoseAndBlurFlow(
                 result_generation,
@@ -228,7 +228,7 @@ def run_retroactive_flow():
                 scan_type,
                 ['BLUR'])
 
-        elif workflow.match_workflows(pose_workflow_path, workflow_id):
+        elif workflow_processor.match_workflows(pose_workflow_path, workflow_id):
             logger.info("Matched with PoseFlow")
             flow = PoseAndBlurFlow(
                 result_generation,
@@ -241,7 +241,7 @@ def run_retroactive_flow():
                 scan_type,
                 ['POSE'])
 
-        elif workflow.match_workflows(standing_laying_workflow_path, workflow_id):
+        elif workflow_processor.match_workflows(standing_laying_workflow_path, workflow_id):
             logger.info("Matched with StandingLaying")
             flow = StandingLaying(
                 result_generation,
@@ -249,14 +249,14 @@ def run_retroactive_flow():
                 rgb_artifacts,
                 scan_type)
 
-        elif workflow.match_workflows(depthmap_img_workflow_path, workflow_id):
+        elif workflow_processor.match_workflows(depthmap_img_workflow_path, workflow_id):
             logger.info("Matched with DepthMapImgFlow")
             flow = DepthMapImgFlow(
                 result_generation,
                 depthmap_img_workflow_path,
                 depth_artifacts)
 
-        elif workflow.match_workflows(height_workflow_scan_path, workflow_id):
+        elif workflow_processor.match_workflows(height_workflow_scan_path, workflow_id):
             logger.info("Matched with HeightFlowPlainCnn")
             flow = HeightFlowPlainCnn(
                 result_generation,
@@ -265,7 +265,7 @@ def run_retroactive_flow():
                 depth_artifacts,
                 person_details)
 
-        elif workflow.match_workflows(height_rgbd_workflow_scan_path, workflow_id):
+        elif workflow_processor.match_workflows(height_rgbd_workflow_scan_path, workflow_id):
             logger.info("Matched with HeightFlowRGBD")
             flow = HeightFlowRGBD(
                 result_generation,
