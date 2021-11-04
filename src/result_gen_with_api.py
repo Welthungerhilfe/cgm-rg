@@ -65,11 +65,10 @@ def run_normal_flow():
     api_manager = ApiManager(url)
 
     metadata_manager = MetadataManager(
-        api_manager,
         scan_metadata_path=os.path.join(scan_parent_dir, f'scan_meta_{str(uuid.uuid4())}.json')
     )
 
-    if metadata_manager.get_unprocessed_scans() <= 0:
+    if metadata_manager.get_unprocessed_scans(api_manager) <= 0:
         return
 
     scan_metadata = metadata_manager.get_scan_metadata()
