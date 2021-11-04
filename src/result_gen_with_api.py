@@ -11,7 +11,7 @@ import log
 from api_endpoints import ApiEndpoints
 from get_scan_metadata import GetScanMetadata
 from prepare_artifacts import PrepareArtifacts
-from process_workflows import ProcessWorkflows
+from process_workflows import WorkflowProcessor
 from result_generation.blur_and_pose import PoseAndBlurFlow
 from result_generation.depthmap_image import DepthMapImgFlow
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
@@ -67,7 +67,7 @@ def run_normal_flow():
     logger.info("%s %s", "App URL:", url)
     cgm_api = ApiEndpoints(url)
 
-    workflow = ProcessWorkflows(cgm_api)
+    workflow_processor = WorkflowProcessor(cgm_api)
     get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
 
     if get_scan_metadata.get_unprocessed_scans() <= 0:
@@ -77,7 +77,7 @@ def run_normal_flow():
     scan_version = scan_metadata['version']
     scan_type = scan_metadata["type"]
     logger.info("%s %s", "Scan Type Version:", scan_version)
-    workflow.get_list_of_workflows()
+    workflow_processor.get_list_of_workflows()
 
     data_processing = PrepareArtifacts(cgm_api, scan_metadata, scan_parent_dir)
     data_processing.process_scan_metadata()
@@ -89,7 +89,7 @@ def run_normal_flow():
 
     flows = []
 
-    result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, scan_parent_dir)
+    result_generation = ResultGeneration(cgm_api, workflow_processor, scan_metadata, scan_parent_dir)
 
     flow = PoseAndBlurFlow(
         result_generation,
@@ -165,7 +165,7 @@ def run_retroactive_flow():
     retroactive_scan_dir = str(REPO_DIR / 'data/retroactive_scans/')
 
     cgm_api = ApiEndpoints(url)
-    workflow = ProcessWorkflows(cgm_api)
+    workflow = WorkflowProcessor(cgm_api)
     workflow.get_list_of_workflows()
     try:
         queue_service = QueueService(connection_string=connect_str)

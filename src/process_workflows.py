@@ -2,7 +2,7 @@ import json
 from api_endpoints import ApiEndpoints
 
 
-class ProcessWorkflows:
+class WorkflowProcessor:
     """Process all the workflows"""
 
     def __init__(self, api: ApiEndpoints):
