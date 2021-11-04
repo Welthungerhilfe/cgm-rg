@@ -1,24 +1,22 @@
 import json
-from api_endpoints import ApiManager
 
 
 class MetadataManager:
     """Get and process scan metadata"""
 
-    def __init__(self, api: ApiManager, scan_metadata_path: str):
-        self.api = api
+    def __init__(self, scan_metadata_path: str):
         self.scan_metadata_path = scan_metadata_path
 
-    def get_unprocessed_scans(self):
+    def get_unprocessed_scans(self, api_manager):
         """Get unprocessed_scans from api and returns the no of scans
 
         Returns
             the no of scans in scan metadata.
         """
 
-        return self.api.get_scan(self.scan_metadata_path)
+        return api_manager.get_scan(self.scan_metadata_path)
 
-    def get_unprocessed_scans_for_scan_version_workflow_id(self, scan_version, workflow_id, scan_metadata_path):
+    def get_unprocessed_scans_for_scan_version_workflow_id(self, api_manager, scan_version, workflow_id, scan_metadata_path):  # TODO unused
         """
         Gets unprocessed_scans from api filtered by scan version type and workflow id and returns the no of scans
 
@@ -33,7 +31,7 @@ class MetadataManager:
         Length of the unprocessed scan filtered by scan version type and workflow id
         """
 
-        return self.api.get_scan_for_scan_version_workflow_id(scan_version, workflow_id, scan_metadata_path)
+        return api_manager.get_scan_for_scan_version_workflow_id(scan_version, workflow_id, scan_metadata_path)
 
     def get_scan_metadata(self):
         with open(self.scan_metadata_path, 'r') as f:

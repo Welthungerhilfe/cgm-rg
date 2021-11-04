@@ -149,7 +149,7 @@ class ApiManager:
             logger.info("Response code: %s", response.status_code)
             return 0
 
-    def get_scan_for_scan_version_workflow_id(self, scan_version, workflow_id, scan_path):
+    def get_scan_for_scan_version_workflow_id(self, scan_version, workflow_id, scan_path):  # TODO unused
         """Get the scan metadata filtered by scan_version and workflow_id"""
         headers = self.prepare_header()
         # use scan_version and workflow id to get filtered scans
