@@ -30,15 +30,137 @@ parameters:
       - naunam
 
 stages:
+  - stage: Setup
+    jobs:
+      - job: Variables
+        displayName: Setup pipeline variables
+        variables:
+          isRelease: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
+        steps:
+          - script: |
+              set -e
+              if [ "$(isRelease)" == 'True' ]
+              then
+                # Read version from version file
+                tag=$(head -n 1 VERSION)
+              else
+                # For feature commits tag containers with Git hash
+                tag=$(git rev-parse HEAD)
+              fi
+              echo "##[debug] tag: $tag"
+              echo "##vso[task.setvariable variable=TAG;isOutput=true]$tag"
+            name: ParseTag
+            displayName: Parse Docker tag
+
+  - stage: Verify
+    jobs:
+      - job: Verify
+        steps:
+          - task: Cache@2
+            displayName: Cache Python dependencies
+            inputs:
+              key: 'rg-venv-cache | "$(Agent.OS)" | requirements.txt'
+              path: $(VENV_CACHE_DIR)
+              cacheHitVar: VENV_CACHE_RESTORED
+          - script: |
+              set -e
+              python -m venv $(VENV_CACHE_DIR)
+              source $(VENV_CACHE_DIR)/bin/activate
+              pip install setuptools==50.3.2 wheel==0.36.2
+              pip install -r requirements.txt
+            displayName: Install dependencies
+            condition: and(not(canceled()), eq(variables.VENV_CACHE_RESTORED, 'false'))
+          - script: |
+              set -e
+              source $(VENV_CACHE_DIR)/bin/activate
+              flake8 src/ --ignore=E501,E402
+            displayName: Run Flake8
+          - script: |
+              set -e
+              source $(VENV_CACHE_DIR)/bin/activate
+              pytest --cov=src --cov-report=xml --junitxml="TEST-rg-pytest.xml"
+            displayName: Run unit tests
+            continueOnError: true
+          - task: PublishCodeCoverageResults@1
+            inputs:
+              codeCoverageTool: Cobertura
+              summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/TEST-*.xml'
+              failTaskOnFailedTests: true
+
+  - stage: Version
+    displayName: Tag & bump version
+    dependsOn: Verify
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - job:
+        displayName: Update version number
+        condition: ne(variables['Build.Reason'], 'Manual')
+        steps:
+          - checkout: self
+            fetchDepth: 1
+            persistCredentials: true
+          - script: pip install bump2version
+            displayName: Install bump2version
+          - script: |
+              set -e
+              # Setup Git
+              git config --global user.email "noreply@childgrowthmonitor.org"
+              git config --global user.name "CGM CI"
+              # Tag current commit
+              CURR_VERSION=$(head -n 1 VERSION)
+              git tag -a "v$CURR_VERSION" -m "Result Generation version $CURR_VERSION"
+              # Bump PATCH version
+              bumpversion --commit patch
+              # Push tag and bumped version
+              git push --follow-tags origin HEAD:main
+            displayName: Tag and bump version
+
+  - stage: Build
+    dependsOn:
+      - Setup
+      - Verify
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+    variables:
+      - name: TAG
+        value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
+    jobs:
+      - job: Build
+        displayName: Build Docker image
+        steps:
+          - task: Docker@2
+            displayName: Build Docker image
+            inputs:
+              command: build
+              repository: $(IMAGE_REPOSITORY)
+              tags: |
+                latest
+                $(Build.BuildId)
+                $(TAG)
+          - script: |
+              set -e
+              echo $(TAG)
+              echo "##[debug] TAG: $(TAG)"
+              mkdir -p $(DOCKER_CACHE_DIR)
+              docker image save --output "$(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)" $(IMAGE_REPOSITORY)
+            condition: not(canceled())
+          - publish: $(DOCKER_CACHE_DIR)
+            artifact: DockerCache
+
   - ${{ each env in parameters.var_groups }}:
     - stage: Deploy_${{ replace(env, '-', '_') }}
       displayName: Deploy ${{ env }}
       dependsOn: 
-        #- Setup
-        #- Build
-      condition: succeeded() # and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+        - Setup
+        - Build
+      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
       variables:
         - group: cgm-rg-${{ env }}-ci
+        - name: TAG
+          value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
       jobs:
         - deployment: Deploy_Container_Instance
           displayName: "Container Instance deployment ${{ env }}"
@@ -49,13 +171,40 @@ stages:
             runOnce:
               deploy:
                 steps:
-                  # Specify python version
-                  - task: UsePythonVersion@0
+                  - task: DownloadPipelineArtifact@2
                     inputs:
-                      versionSpec: '3.x'
-                      architecture: 'x64'
-                  - bash: pip install azure-cli==2.29.2
-                    displayName: 'Downgrade Azure CLI to 2.29.2'
+                      source: current
+                      artifact: DockerCache
+                      path: $(DOCKER_CACHE_DIR)
+                  - script: |
+                      # echo all variables for debug
+                      echo "##[debug] TAG: $(TAG)"
+                      echo "##[debug] isRelease: $(isRelease)"
+                      echo "##[debug] DOCKER_CACHE_DIR: $(DOCKER_CACHE_DIR)"
+                      echo "##[debug] DOCKER_CACHE_IMG_FILE: $(DOCKER_CACHE_IMG_FILE)"
+                      echo "##[debug] IMAGE_REPOSITORY: $(IMAGE_REPOSITORY)"
+                      echo "##[debug] TARGET_REGISTRY: $(TARGET_REGISTRY)"
+
+                      set -e
+                      docker image load -i $(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)
+                      echo "##[debug] IMAGE_REPOSITORY:tag : $(IMAGE_REPOSITORY):$TAG"
+                      docker tag "$(IMAGE_REPOSITORY):$TAG" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$TAG"
+                    displayName: Load and Tag image
+                  - task: AzureCLI@2
+                    displayName: Push to target ACR
+                    inputs:
+                      azureSubscription: cgm-${{ env }}-sub-cd
+                      scriptType: bash
+                      scriptLocation: inlineScript
+                      inlineScript: |
+                        set -e
+                        # Login to ACR
+                        az acr login --name $(TARGET_REGISTRY)
+                        # Push Docker image
+                        IMAGE="$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
+                        docker push "$IMAGE"
+                  - script: sudo snap install yq
+                    displayName: Install yq utility
                   - task: AzureCLI@2
                     displayName: Update Container Instance
                     inputs:
@@ -79,6 +228,11 @@ stages:
                           --name "$TARGET_CONTAINER_INSTANCE_NAME" \
                           --resource-group "$TARGET_RESOURCE_GROUP" \
                           --file "$TMP_CONF_FILE"
+
+                        # Replace image
+                        IMAGE="$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
+                        export IMAGE
+                        yq eval '.properties.containers[0].properties.image = strenv(IMAGE)' "$TMP_CONF_FILE" -i
 
                         # Insert registry credentials
                         REGISTRY_CREDENTIALS=$(az acr credential show --name "$TARGET_REGISTRY")
