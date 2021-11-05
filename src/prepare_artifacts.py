@@ -107,6 +107,6 @@ class PrepareArtifacts:
         os.makedirs(self.scan_dir, exist_ok=True)
 
     def create_artifact_dir(self):
-        """Create directory to store downloaded artifacts"""
+        """Create directory to store downloaded artifacts """
         for artifact_format in self.format_wise_artifact:
             os.makedirs(os.path.join(self.scan_dir, artifact_format), exist_ok=True)
