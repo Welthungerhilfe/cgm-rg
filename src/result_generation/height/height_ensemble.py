@@ -18,6 +18,7 @@ logger = log.setup_custom_logger(__name__)
 
 REPO_DIR = Path(os.environ['PWD']).absolute()
 
+
 class HeightFlowDeepEnsemble(HeightFlow):
     def run_flow(self):
         depthmaps = preprocessing.process_depthmaps(self.artifacts, self.scan_directory, self.result_generation)

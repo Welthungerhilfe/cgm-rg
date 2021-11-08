@@ -1,6 +1,7 @@
 import os
 import sys
-import pathlib
+from pathlib import Path
+
 # from azureml.core import Workspace
 # from azureml.core.authentication import ServicePrincipalAuthentication
 from tensorflow.keras.models import load_model
@@ -12,7 +13,7 @@ sys.path.append(
             os.path.realpath(__file__)),
         os.pardir))
 
-current_working_directory = pathlib.Path.cwd()
+current_working_directory = Path.cwd()
 models_path = current_working_directory.joinpath('models')
 
 REPO_DIR = Path(os.environ['PWD']).absolute()

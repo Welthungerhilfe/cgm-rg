@@ -24,6 +24,7 @@ logger = log.setup_custom_logger(__name__)
 
 REPO_DIR = Path(os.environ['PWD']).absolute()
 
+
 def person(api, person_id):
     return api.get_person_details(person_id)
 
