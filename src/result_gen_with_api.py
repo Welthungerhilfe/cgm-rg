@@ -1,7 +1,6 @@
 import argparse
 import base64
 import json
-import logging
 import os
 import uuid
 
@@ -197,7 +196,7 @@ def run_retroactive_flow():
         # Match workflow with height artifact level workflow and skip data download and preprocessing
         if workflow.match_workflows(height_workflow_artifact_path, workflow_id) or workflow.match_workflows(height_rgbd_workflow_artifact_path, workflow_id):
             queue_service.delete_message(queue_name, message.id, message.pop_receipt)
-            logging.info("%s %s", "Skipped Height Artifact level workflow for Retroactive", workflow_id)
+            logger.info("%s %s", "Skipped Height Artifact level workflow for Retroactive", workflow_id)
             continue
 
         data_processing = PrepareArtifacts(cgm_api, scan_metadata, retroactive_scan_dir)
