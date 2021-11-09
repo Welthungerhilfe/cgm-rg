@@ -80,8 +80,11 @@ def main():
         workspace=ws, model_name='standing_laying_classifier', output_location=REPO_DIR / 'models')
 
     # Download model for height
-    download_model_from_registered_model(
-        workspace=ws, model_name='q4-depthmap-plaincnn-height-264k', output_location=REPO_DIR / 'models/height')
+    download_model(ws=ws,
+                   experiment_name='q4-depthmap-plaincnn-height-264k',
+                   run_id='q4-depthmap-plaincnn-height-264k_1632249604_5eb2be91',
+                   input_location=os.path.join('outputs', 'best_model.ckpt'),
+                   output_location=REPO_DIR / 'models/height')
 
     # Download model for RGBD
     download_model_from_registered_model(
