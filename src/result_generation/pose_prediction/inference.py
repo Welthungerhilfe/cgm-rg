@@ -1,3 +1,7 @@
+import sys
+import os
+from pathlib import Path
+
 import cv2
 import torch
 import torch.backends.cudnn as cudnn
@@ -6,8 +10,7 @@ import torch.optim
 import torch.utils.data
 import torch.utils.data.distributed
 import torchvision
-import sys
-from pathlib import Path
+
 sys.path.append(str(Path(__file__).parents[1]))  # noqa: E402
 import result_generation.pose_prediction.code.models.pose_hrnet  # noqa
 from result_generation.pose_prediction.code.config import cfg, update_config
@@ -20,21 +23,23 @@ import log
 
 logger = log.setup_custom_logger(__name__)
 
+REPO_DIR = Path(os.environ['PWD']).absolute()
+
 
 class PosePrediction:
     def __init__(self, ctx):
         self.ctx = ctx
 
     def load_box_model(self):
-        self.box_model = torchvision.models.detection.fasterrcnn_resnet50_fpn(
-            pretrained=True)
+        self.box_model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
         self.box_model.to(self.ctx)
         self.box_model.eval()
 
     def load_pose_model(self):
         self.pose_model = get_pose_net(cfg)
-        self.pose_model.load_state_dict(torch.load(
-            cfg.TEST.MODEL_FILE, map_location=torch.device('cpu')), strict=False)
+        model_file_path = str(REPO_DIR / cfg.TEST.MODEL_FILE)
+        loaded_model = torch.load(model_file_path, map_location=torch.device('cpu'))
+        self.pose_model.load_state_dict(loaded_model, strict=False)
         # self.pose_model = torch.nn.DataParallel(self.pose_model, device_ids=cfg.GPUS)
         self.pose_model.to(self.ctx)
         self.pose_model.eval()
@@ -165,7 +170,7 @@ def init_pose_prediction():
     cudnn.benchmark = cfg.CUDNN.BENCHMARK
     torch.backends.cudnn.deterministic = cfg.CUDNN.DETERMINISTIC
     torch.backends.cudnn.enabled = cfg.CUDNN.ENABLED
-    args = '/app/src/result_generation/pose_prediction/inference-config-hrnet.yaml'
+    args = str(REPO_DIR / 'src/result_generation/pose_prediction/inference-config-hrnet.yaml')
     update_config(cfg, args)
 
     pose_prediction = PosePrediction(ctx)

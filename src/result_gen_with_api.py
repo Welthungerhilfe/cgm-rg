@@ -3,6 +3,7 @@ import base64
 import json
 import os
 import uuid
+from pathlib import Path
 
 from azure.storage.queue import QueueService
 
@@ -21,13 +22,16 @@ from result_generation.standing import StandingLaying
 logger = log.setup_custom_logger(__name__)
 
 
+REPO_DIR = Path(os.environ['PWD']).absolute()
+
+
 def person(api, person_id):
     return api.get_person_details(person_id)
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    workflow_dir = '/app/src/workflows'
+    workflow_dir = str(REPO_DIR / 'src/workflows')
     parser.add_argument('--scan_parent_dir', default="data/scans/", help='Parent directory in which scans will be stored')  # noqa: E501
     parser.add_argument('--pose_workflow_path', default=f"{workflow_dir}/pose_prediction-workflow.json")  # noqa: E501
     parser.add_argument('--pose_visualization_workflow_path', default=f"{workflow_dir}/pose-visualize-workflows.json")  # noqa: E501
@@ -160,7 +164,7 @@ def run_retroactive_flow():
     url = os.getenv('APP_URL', 'http://localhost:5001')
     logger.info("%s %s", "App URL:", url)
     queue_name = "retroactive-scan-process"
-    retroactive_scan_dir = '/app/data/retroactive_scans/'
+    retroactive_scan_dir = str(REPO_DIR / 'data/retroactive_scans/')
 
     cgm_api = ApiEndpoints(url)
     workflow = ProcessWorkflows(cgm_api)

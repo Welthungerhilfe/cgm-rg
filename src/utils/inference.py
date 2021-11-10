@@ -1,6 +1,7 @@
 import os
 import sys
-import pathlib
+from pathlib import Path
+
 # from azureml.core import Workspace
 # from azureml.core.authentication import ServicePrincipalAuthentication
 from tensorflow.keras.models import load_model
@@ -12,9 +13,10 @@ sys.path.append(
             os.path.realpath(__file__)),
         os.pardir))
 
-current_working_directory = pathlib.Path.cwd()
+current_working_directory = Path.cwd()
 models_path = current_working_directory.joinpath('models')
 
+REPO_DIR = Path(os.environ['PWD']).absolute()
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 
 # TODO generate the config file
@@ -24,8 +26,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 # pointclouds
 
 try:
-    height_model = load_model(
-        '/app/models/height/outputs/best_model.ckpt', compile=False)
+    height_model = load_model(str(REPO_DIR / 'models/height/outputs/best_model.ckpt'), compile=False)
 except OSError as error:
     print(error)
     print("Not able to load the Height model")
@@ -34,7 +35,7 @@ except Exception as e:
 
 
 try:
-    standing_laying = load_model('/app/models/Standing_laying/best_model.h5')
+    standing_laying = load_model(str(REPO_DIR / 'models/Standing_laying/best_model.h5'))
 except OSError as error:
     print(error)
     print("Not able to load the Standind Laying model")
@@ -42,8 +43,7 @@ except Exception as e:
     print(e)
 
 try:
-    height_rgbd_model = load_model(
-        '/app/models/height_rgbd/best_model.ckpt', compile=False)
+    height_rgbd_model = load_model(str(REPO_DIR / 'app/models/height_rgbd/best_model.ckpt'), compile=False)
 except OSError as error:
     print(error)
     print("Not able to load the rgbd model")
