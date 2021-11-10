@@ -16,7 +16,7 @@ sys.path.append(
 current_working_directory = Path.cwd()
 models_path = current_working_directory.joinpath('models')
 
-REPO_DIR = Path(os.environ['PWD']).absolute()
+REPO_DIR = Path(os.getenv('APP_DIR', '/app'))
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 
 # TODO generate the config file
