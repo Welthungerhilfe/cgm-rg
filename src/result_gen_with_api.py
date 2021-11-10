@@ -22,7 +22,7 @@ from result_generation.standing import StandingLaying
 logger = log.setup_custom_logger(__name__)
 
 
-REPO_DIR = Path(os.environ['PWD']).absolute()
+REPO_DIR = Path(os.getenv('APP_DIR', '/app'))
 
 
 def person(api, person_id):

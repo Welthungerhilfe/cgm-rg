@@ -13,7 +13,7 @@ sys.path.append(
             os.path.realpath(__file__)),
         os.pardir))
 
-REPO_DIR = Path(os.environ['PWD']).absolute()
+REPO_DIR = Path(os.getenv('APP_DIR', '/app'))
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 
 # TODO generate the config file
