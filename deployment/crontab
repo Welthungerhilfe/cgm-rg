@@ -20,6 +20,6 @@
 
 * * * * * echo "Started RG" >> /app/rg.log 2>&1
 
-* * * * * /usr/bin/flock -n /app/result-gen.lock /usr/local/bin/python3 /app/src/result_gen_with_api.py --scan_parent_dir /app/data/scans/ --blur_workflow_path /app/src/workflows/blur-workflow.json --depthmap_img_workflow_path /app/src/workflows/depthmap-img-workflow.json --standing_laying_workflow_path /app/src/workflows/standing_laying-workflow.json --height_workflow_artifact_path /app/src/workflows/height-plaincnn-workflow-artifact.json --height_workflow_scan_path /app/src/workflows/height-plaincnn-workflow-scan.json >> /app/rg.log 2>&1
+* * * * * /usr/bin/flock -n /app/result-gen.lock /usr/local/bin/python3 /app/src/result_gen_with_api.py >> /app/rg.log 2>&1
 
 * * * * * echo "Finished RG" >> /app/rg.log 2>&1
