@@ -32,7 +32,7 @@ def person(api, person_id):
 def parse_args():
     parser = argparse.ArgumentParser()
     workflow_dir = str(REPO_DIR / 'src/workflows')
-    parser.add_argument('--scan_parent_dir', default="data/scans/", help='Parent directory in which scans will be stored')  # noqa: E501
+    parser.add_argument('--scan_parent_dir', default=f"{REPO_DIR}/data/scans/", help='Parent directory in which scans will be stored')  # noqa: E501
     parser.add_argument('--pose_workflow_path', default=f"{workflow_dir}/pose_prediction-workflow.json")  # noqa: E501
     parser.add_argument('--pose_visualization_workflow_path', default=f"{workflow_dir}/pose-visualize-workflows.json")  # noqa: E501
     parser.add_argument('--blur_faces_workflow_path', default=f"{workflow_dir}/blur-faces-worklows.json")  # noqa: E501
