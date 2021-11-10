@@ -1,6 +1,6 @@
 {
     "name": "q4-depthmap-plaincnn-height",
-    "version": "2.0.3",
+    "version": "2.0.4",
     "result_format": "dict",
     "result_binding": "artifact",
     "data": {
