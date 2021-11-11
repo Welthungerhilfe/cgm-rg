@@ -22,9 +22,18 @@ def process_depthmaps(artifacts, scan_directory, result_generation):
         data, width, height, depth_scale, _max_confidence = load_depth(input_path)
         depthmap = prepare_depthmap(data, width, height, depth_scale)
         depthmap = preprocess(depthmap)
+        depthmap = eval_preprocessing(depthmap)
         depthmaps.append(depthmap)
     depthmaps = np.array(depthmaps)
     return depthmaps
+
+
+def eval_preprocessing(depthmap):
+    depthmap = depthmap.astype("float32")
+    depthmap = depthmap / NORMALIZATION_VALUE
+    depthmap = tf.image.resize(depthmap, (IMAGE_TARGET_HEIGHT, IMAGE_TARGET_WIDTH))
+    depthmap.set_shape((IMAGE_TARGET_HEIGHT, IMAGE_TARGET_WIDTH, 1))
+    return depthmap
 
 
 def load_depth(fpath: str) -> Tuple[bytes, int, int, float, float]:
