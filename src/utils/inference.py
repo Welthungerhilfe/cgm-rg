@@ -40,7 +40,7 @@ except Exception as e:
     print(e)
 
 try:
-    height_rgbd_model = load_model(str(REPO_DIR / 'app/models/height_rgbd/best_model.ckpt'), compile=False)
+    height_rgbd_model = load_model(str(REPO_DIR / 'models/height_rgbd/best_model.ckpt'), compile=False)
 except OSError as error:
     print(error)
     print("Not able to load the rgbd model")
