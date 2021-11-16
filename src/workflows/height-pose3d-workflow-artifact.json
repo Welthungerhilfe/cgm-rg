@@ -1,0 +1,11 @@
+{
+    "name": "Pose-3d-model",
+    "version": "0.0.1",
+    "result_format": "dict",
+    "result_binding": "artifact",
+    "data": {
+        "input_format": "application/zip",
+        "model": "pose-3d-model",
+        "run_id": "1st"
+    }
+}
