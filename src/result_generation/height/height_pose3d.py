@@ -4,7 +4,7 @@ from datetime import datetime
 import cv2
 import numpy as np
 from bunch import Bunch
-#import log
+import log
 from cgmml.common.depthmap_toolkit.depthmap import Depthmap
 from cgmml.models.HRNET.hrnet3d import (convert_2dskeleton_to_3d,
                                         write_skeleton_into_obj)
@@ -15,7 +15,7 @@ from result_generation.pose_prediction.inference import (inference_artifact,
 from utils.config_train import CONFIG_TRAIN
 from utils.pose_utils import get_features_from_fpath
 
-#logger = log.setup_custom_logger(__name__)
+logger = log.setup_custom_logger(__name__)
 
 
 class HeightFlowPose3D(HeightFlow):
@@ -23,8 +23,6 @@ class HeightFlowPose3D(HeightFlow):
         if self.scan_version in ["v0.9", "v1.0.2"] and self.scan_type in [200, 201, 202]:
             start_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             mean_prediction = self.pose_prediction_artifacts()
-            #depthmaps = preprocessing.process_depthmaps(self.artifacts, self.scan_directory, self.result_generation)
-            #height_predictions = inference.get_height_predictions_local(depthmaps)
             generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             self.post_height_results(mean_prediction, generated_timestamp, start_time)
 
@@ -36,7 +34,7 @@ class HeightFlowPose3D(HeightFlow):
         processed_artifacts = 0
         for image_artifact, artifact in zip(self.image_artifacts, self.artifacts):
             input_rgb_path = self.result_generation.get_input_path(self.scan_rgb_directory, image_artifact['file'])
-            #logger.info("%s %s", "input_path of image to perform Pose prediction:", input_path)
+            logger.info("%s %s", "input_path of image to perform Pose prediction:", input_path)
             no_of_body_pose, _, _, self.persons_coordinates = inference_artifact(
                 pose_prediction, input_rgb_path, self.scan_type)
             if no_of_body_pose == 1:
@@ -93,14 +91,14 @@ class HeightFlowPose3D(HeightFlow):
         artifact_level_height_result_json = self.result_generation.bunch_object_to_json_object(
             artifact_level_height_result_bunch)
         if self.result_generation.api.post_results(artifact_level_height_result_json) == 201:
-            print("%s %s", "successfully post artifact level height results:", artifact_level_height_result_json)
+            logger.info("%s %s", "successfully post artifact level height results:", artifact_level_height_result_json)
 
         scan_level_height_result_bunch = self.scan_level_height_result_object(mean_prediction,
                                                                               generated_timestamp, self.scan_workflow_obj, start_time)
         scan_level_height_result_json = self.result_generation.bunch_object_to_json_object(
             scan_level_height_result_bunch)
         if self.result_generation.api.post_results(scan_level_height_result_json) == 201:
-            print("%s %s", "successfully post scan level height results:", scan_level_height_result_json)
+            logger.info("%s %s", "successfully post scan level height results:", scan_level_height_result_json)
 
     def artifact_level_result(self, generated_timestamp, start_time):
         """Prepare artifact level height result object"""
