@@ -1,7 +1,5 @@
-import sys
 import uuid
 from datetime import datetime
-from pathlib import Path
 
 import cv2
 import numpy as np
@@ -9,7 +7,6 @@ from bunch import Bunch
 #import log
 from cgmml.common.depthmap_toolkit.depthmap import Depthmap
 from cgmml.models.HRNET.hrnet3d import (convert_2dskeleton_to_3d,
-                                        get_person_standing_confidence,
                                         write_skeleton_into_obj)
 from joblib import load
 from result_generation.height.height import HeightFlow

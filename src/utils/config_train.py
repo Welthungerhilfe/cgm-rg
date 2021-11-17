@@ -1,10 +1,16 @@
-from bunch import Bunch
 import numpy as np
-from cgmml.models.HRNET.hrnet3d import (
-    JOINT_INDEX_NOSE, JOINT_INDEX_LEFT_EYE, JOINT_INDEX_RIGHT_EYE, JOINT_INDEX_LEFT_EAR, JOINT_INDEX_RIGHT_EAR,
-    JOINT_INDEX_LEFT_SHOULDER, JOINT_INDEX_RIGHT_SHOULDER, JOINT_INDEX_LEFT_ELBOW, JOINT_INDEX_RIGHT_ELBOW,
-    JOINT_INDEX_LEFT_WRIST, JOINT_INDEX_RIGHT_WRIST, JOINT_INDEX_LEFT_HIP, JOINT_INDEX_RIGHT_HIP,
-    JOINT_INDEX_LEFT_KNEE, JOINT_INDEX_RIGHT_KNEE, JOINT_INDEX_LEFT_ANKLE, JOINT_INDEX_RIGHT_ANKLE)
+from bunch import Bunch
+from cgmml.models.HRNET.hrnet3d import (JOINT_INDEX_LEFT_ANKLE,
+                                        JOINT_INDEX_LEFT_EYE,
+                                        JOINT_INDEX_LEFT_HIP,
+                                        JOINT_INDEX_LEFT_KNEE,
+                                        JOINT_INDEX_LEFT_SHOULDER,
+                                        JOINT_INDEX_NOSE,
+                                        JOINT_INDEX_RIGHT_ANKLE,
+                                        JOINT_INDEX_RIGHT_EYE,
+                                        JOINT_INDEX_RIGHT_HIP,
+                                        JOINT_INDEX_RIGHT_KNEE,
+                                        JOINT_INDEX_RIGHT_SHOULDER)
 
 SKELETON_IMPORTANT = np.array([
     [JOINT_INDEX_RIGHT_KNEE, JOINT_INDEX_RIGHT_ANKLE],
