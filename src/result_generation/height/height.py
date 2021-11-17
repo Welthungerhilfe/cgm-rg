@@ -26,8 +26,10 @@ class HeightFlow:
             scan_workflow_path,
             artifacts,
             person_details,
-            image_artifacts=None):
-        store_attr('result_generation,artifact_workflow_path,scan_workflow_path,artifacts,person_details', self)
+            image_artifacts,
+            scan_type,
+            scan_version):
+        store_attr('result_generation,artifact_workflow_path,scan_workflow_path,artifacts,person_details,scan_type,scan_version', self)
         self.image_artifacts = [] if image_artifacts is None else image_artifacts
         self.artifact_workflow_obj = self.result_generation.workflows.load_workflows(
             self.artifact_workflow_path)
@@ -35,8 +37,11 @@ class HeightFlow:
             self.scan_workflow_path)
         if self.artifact_workflow_obj["data"]["input_format"] == 'application/zip':
             self.depth_input_format = 'depth'
+            self.rgb_input_format = 'img'
             self.scan_directory = Path(self.result_generation.scan_parent_dir) / \
                 self.result_generation.scan_metadata['id'] / self.depth_input_format
+            self.scan_rgb_directory = Path(self.result_generation.scan_parent_dir) / \
+                self.result_generation.scan_metadata['id'] / self.rgb_input_format
         self.artifact_workflow_obj['id'] = self.result_generation.workflows.get_workflow_id(
             self.artifact_workflow_obj['name'], self.artifact_workflow_obj['version'])
         self.scan_workflow_obj['id'] = self.result_generation.workflows.get_workflow_id(
