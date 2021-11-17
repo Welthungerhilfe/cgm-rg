@@ -148,18 +148,8 @@ class ResultGeneration:
             }
             pose_result.append(single_body_pose_result)
 
-        return len(pred_boxes), body_pose_score, pose_result
-
-    def result_on_scan_level(self, input_path, scan_type):
-
-        # self.artifact_pose_result = []
-        logger.info("Extracting artifacts from scans")
-
-        logger.info("Result Generation Started")
-
-        no_of_body_pose, body_pose_score, pose_result = self.result_on_artifact_level(input_path, scan_type)
-
-        return no_of_body_pose, body_pose_score, pose_result
+        pose_result_of_artifact = {'no_of_body_pose_detected': len(pred_boxes), 'pose_result': pose_result}
+        return len(pred_boxes), body_pose_score, pose_result, pose_result_of_artifact
 
 
 def init_pose_prediction():
@@ -181,5 +171,6 @@ def init_pose_prediction():
 
 def inference_artifact(pose_prediction, input_path, scan_type):
     result = ResultGeneration(pose_prediction, False)
-    no_of_body_pose, body_pose_score, pose_result = result.result_on_artifact_level(input_path, scan_type)
-    return no_of_body_pose, body_pose_score, pose_result
+    no_of_body_pose, body_pose_score, pose_result, pose_result_of_artifact = result.result_on_artifact_level(
+        input_path, scan_type)
+    return no_of_body_pose, body_pose_score, pose_result, pose_result_of_artifact
