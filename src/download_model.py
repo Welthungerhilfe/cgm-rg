@@ -94,6 +94,9 @@ def main():
     download_model_from_registered_model(
         workspace=ws, model_name='pose_hrnet_w32_384x288', output_location=REPO_DIR / 'models/HRNet')
 
+    # Download model for Posenet
+    download_model_from_registered_model(
+        workspace=ws, model_name='points3d-rf-height-28k-laying', output_location=REPO_DIR / 'models/pose-3d')
     # for id in ENSEMBLE_RUN_IDS:
     #     print(f"Downloading run {id}")
     #     download_model(
