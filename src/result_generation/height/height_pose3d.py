@@ -41,7 +41,7 @@ class HeightFlowPose3D(HeightFlow):
             if no_of_body_pose == 1:
                 input_depth_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
                 self.dmap = Depthmap.create_from_zip_absolute(
-                    input_depth_path, 0, 'src/result_generation/height/camera_calibration_p30pro_EU.txt')
+                    input_depth_path, 0, '/app/src/result_generation/height/camera_calibration_p30pro_EU.txt')
 
                 self.floor = self.dmap.get_floor_level()
                 rgb = cv2.imread(str(input_rgb_path))
