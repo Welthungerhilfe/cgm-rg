@@ -85,7 +85,7 @@ class PoseAndBlurFlow:
             artifact['pose_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             logger.info("%s %s", "input_path of image to perform Pose prediction:", input_path)
-            no_of_pose_detected, pose_score, pose_result = inference_artifact(
+            no_of_pose_detected, pose_score, pose_result, _ = inference_artifact(
                 pose_prediction, input_path, self.scan_type)
             logger.info("%s %s %s %s ", "pose_score", "no_of_pose_detected", pose_score, no_of_pose_detected)
             artifact['no_of_pose_detected'] = no_of_pose_detected
