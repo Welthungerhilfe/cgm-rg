@@ -22,6 +22,7 @@ class HeightFlowPose3D(HeightFlow):
     def run_flow(self):
         if self.scan_version in ["v0.9", "v1.1.0"] and self.scan_type in [200, 201, 202]:
             start_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+            logger.info("%s", "Result genration Pose 3d start")
             mean_prediction = self.pose_prediction_artifacts()
             generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             self.post_height_results(mean_prediction, generated_timestamp, start_time)
@@ -29,21 +30,26 @@ class HeightFlowPose3D(HeightFlow):
     def pose_prediction_artifacts(self):
         """Blur the list of artifacts"""
         pose_prediction = init_pose_prediction()
+        logger.info("%s", "Pose 3d Model loading")
         MODEL = load('/app/models/pose-3d/2021q4-points3d-rf-height-28k-200and201.joblib')
         mean_prediction = 0
         processed_artifacts = 0
         for image_artifact, artifact in zip(self.image_artifacts, self.artifacts):
+            logger.info("%s %s", "Order id ", artifact['order'])
             assert image_artifact['order'] == artifact['order']
+            logger.info("%s ", "Order id Matched ")
             input_rgb_path = self.result_generation.get_input_path(self.scan_rgb_directory, image_artifact['file'])
-            logger.info("%s %s", "input_path of image to perform Pose prediction:", input_rgb_path)
+            logger.info("%s %s", "input_path of image to perform Pose prediction for Pose-3d:", input_rgb_path)
             no_of_body_pose, _, _, self.persons_coordinates = inference_artifact(
                 pose_prediction, input_rgb_path, self.scan_type)
             if no_of_body_pose == 1:
+                logger.info("%s %s", "No of body_pose ", no_of_body_pose)
                 input_depth_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
                 self.dmap = Depthmap.create_from_zip_absolute(
                     input_depth_path, 0, '/app/src/result_generation/height/camera_calibration_p30pro_EU.txt')
 
                 self.floor = self.dmap.get_floor_level()
+                logger.info("%s %s", "Floor Value ", self.floor)
                 rgb = cv2.imread(str(input_rgb_path))
                 dim = (640, int(rgb.shape[0] / rgb.shape[1] * 640.0))
                 self.rgb = cv2.resize(rgb, dim, cv2.INTER_AREA)
@@ -52,13 +58,16 @@ class HeightFlowPose3D(HeightFlow):
                 obj_file_path = '/app/output_skeleton.obj'
                 child_features = get_features_from_fpath(obj_file_path, config_train=CONFIG_TRAIN)
                 feats = np.array(list(child_features.values()))
+                logger.info("%s %s", "Pose 3d Prediction ", self.floor)
                 prediction = MODEL.predict([feats])[0]
                 artifact['prediction'] = prediction
                 mean_prediction += prediction
                 processed_artifacts += 1
             else:
+                logger.info("%s ", "No Body Pose Detected ")
                 artifact['prediction'] = 0
-        mean_prediction = mean_prediction / processed_artifacts
+        if processed_artifacts != 0:
+            mean_prediction = mean_prediction / processed_artifacts
         return mean_prediction
 
     def get_person_joints(self) -> list:
