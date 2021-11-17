@@ -1,11 +1,11 @@
 import sys
+import uuid
 from datetime import datetime
 from pathlib import Path
-from bunch import Bunch
-import uuid
 
 import cv2
 import numpy as np
+from bunch import Bunch
 #import log
 from cgmml.common.depthmap_toolkit.depthmap import Depthmap
 from cgmml.models.HRNET.hrnet3d import (convert_2dskeleton_to_3d,
