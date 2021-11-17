@@ -34,8 +34,10 @@ def get_dummy_height_flow_object(mock_some_fn):
         'src/workflows/height-plaincnn-workflow-artifact.json',
         'src/workflows/height-plaincnn-workflow-scan.json',
         sdv.depth_artifacts,
+        sdv.person_details,
         sdv.rgb_artifacts,
-        sdv.person_details)
+        sdv.scan_type,
+        sdv.scan_version)
 
 
 @patch.object(ProcessWorkflows, 'get_workflow_id')
