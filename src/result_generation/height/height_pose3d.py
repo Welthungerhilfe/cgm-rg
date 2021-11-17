@@ -33,6 +33,7 @@ class HeightFlowPose3D(HeightFlow):
         mean_prediction = 0
         processed_artifacts = 0
         for image_artifact, artifact in zip(self.image_artifacts, self.artifacts):
+            assert image_artifact['order'] == artifact['order']
             input_rgb_path = self.result_generation.get_input_path(self.scan_rgb_directory, image_artifact['file'])
             logger.info("%s %s", "input_path of image to perform Pose prediction:", input_rgb_path)
             no_of_body_pose, _, _, self.persons_coordinates = inference_artifact(
