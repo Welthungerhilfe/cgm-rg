@@ -29,7 +29,7 @@ class HeightFlowPose3D(HeightFlow):
     def pose_prediction_artifacts(self):
         """Blur the list of artifacts"""
         pose_prediction = init_pose_prediction()
-        MODEL = load('models/pose-3d/2021q4-points3d-rf-height-28k-200and201.joblib')
+        MODEL = load('/app/models/pose-3d/2021q4-points3d-rf-height-28k-200and201.joblib')
         mean_prediction = 0
         processed_artifacts = 0
         for image_artifact, artifact in zip(self.image_artifacts, self.artifacts):
@@ -48,8 +48,8 @@ class HeightFlowPose3D(HeightFlow):
                 dim = (640, int(rgb.shape[0] / rgb.shape[1] * 640.0))
                 self.rgb = cv2.resize(rgb, dim, cv2.INTER_AREA)
                 self.dmap.resize(rgb.shape[1], rgb.shape[0])
-                self.export_object('output_skeleton.obj')
-                obj_file_path = 'output_skeleton.obj'
+                self.export_object('/app/output_skeleton.obj')
+                obj_file_path = '/app/output_skeleton.obj'
                 child_features = get_features_from_fpath(obj_file_path, config_train=CONFIG_TRAIN)
                 feats = np.array(list(child_features.values()))
                 prediction = MODEL.predict([feats])[0]
