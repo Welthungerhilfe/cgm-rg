@@ -22,6 +22,10 @@ def create_dummy_vars():
     scan_metadata_name = 'scan_meta_0933fc94-e4e6-4d39-89bf-2ecc19d39e5a.json'
     scan_metadata_path = CWD.joinpath('tests', 'static_files', 'scan_meta_0933fc94-e4e6-4d39-89bf-2ecc19d39e5a.json')
     scan_metadata = load_json(scan_metadata_path)['scans'][0]
+    scan_meta_data_details = {
+        "age": "0",
+        "scan_type": 101
+    }
 
     return Bunch({
         "person_details": person_details,
@@ -29,6 +33,7 @@ def create_dummy_vars():
         "scan_metadata_name": scan_metadata_name,
         "scan_metadata_path": scan_metadata_path,
         "scan_metadata": scan_metadata,
+        "scan_meta_data_details": scan_meta_data_details,
         "scan_version": scan_metadata['version'],
         "scan_type": scan_metadata['type'],
         "rgb_artifacts": load_json(CWD.joinpath('tests', 'static_files', 'rgb_artifacts.json'))['rgb_artifacts'],
