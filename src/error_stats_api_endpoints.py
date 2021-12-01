@@ -1,12 +1,8 @@
 import copy
-import json
 import logging
 import os
-import pprint
-import uuid
 
 from bunch import Bunch
-import cv2
 import requests
 
 
