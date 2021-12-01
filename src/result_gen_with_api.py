@@ -30,6 +30,10 @@ def person(api, person_id):
     return api.get_person_details(person_id)
 
 
+def scan_id_meta_data(api, scan_id):
+    return api.get_scan_meta(scan_id)
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     workflow_dir = str(REPO_DIR / 'src/workflows')
@@ -72,6 +76,7 @@ def run_normal_flow():
     # URL
     url = os.getenv('APP_URL', 'http://localhost:5001')
     logger.info("%s %s", "App URL:", url)
+
     cgm_api = ApiEndpoints(url)
 
     workflow = ProcessWorkflows(cgm_api)
