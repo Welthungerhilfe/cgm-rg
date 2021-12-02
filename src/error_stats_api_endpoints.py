@@ -20,7 +20,7 @@ class ErrorStatsEndpointsManager:
         self.url = url
         self.percentile_error_endpoints = ENDPOINTS.PERCENTILE_ERROR
         self.headers = {}
-        self.x_api_key = os.getenv("API_KEY_ERROR_STATS", 'z:6.VQ;j]t>z}JRjSuxdmT-n~j7K2NRZ')
+        self.x_api_key = os.getenv("API_KEY_ERROR_STATS", '')
 
     def prepare_header(self):
         headers = copy.deepcopy(self.headers)
