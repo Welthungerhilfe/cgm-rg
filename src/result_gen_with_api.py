@@ -30,6 +30,10 @@ def person(api, person_id):
     return api.get_person_details(person_id)
 
 
+def scan_id_meta_data(api, scan_id):
+    return api.get_scan_meta(scan_id)
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     workflow_dir = str(REPO_DIR / 'src/workflows')
@@ -72,6 +76,7 @@ def run_normal_flow():
     # URL
     url = os.getenv('APP_URL', 'http://localhost:5001')
     logger.info("%s %s", "App URL:", url)
+
     cgm_api = ApiEndpoints(url)
 
     workflow = ProcessWorkflows(cgm_api)
@@ -93,6 +98,7 @@ def run_normal_flow():
     rgb_artifacts = data_processing.download_artifacts('img')
     depth_artifacts = data_processing.download_artifacts('depth')
     person_details = person(cgm_api, scan_metadata['person'])
+    scan_meta_data_details = scan_id_meta_data(cgm_api, scan_metadata['id'])
 
     flows = []
 
@@ -130,7 +136,8 @@ def run_normal_flow():
         person_details,
         rgb_artifacts,
         scan_type,
-        scan_version)
+        scan_version,
+        scan_meta_data_details)
     flows.append(flow)
 
     flow = HeightFlowRGBD(
@@ -141,7 +148,8 @@ def run_normal_flow():
         person_details,
         rgb_artifacts,
         scan_type,
-        scan_version)
+        scan_version,
+        scan_meta_data_details)
     flows.append(flow)
 
     flow = HeightFlowPose3D(
@@ -152,7 +160,8 @@ def run_normal_flow():
         person_details,
         rgb_artifacts,
         scan_type,
-        scan_version)
+        scan_version,
+        scan_meta_data_details)
     flows.append(flow)
 
     for flow in flows:

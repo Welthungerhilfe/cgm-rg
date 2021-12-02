@@ -27,6 +27,7 @@ class HeightFlowRGBD(HeightFlow):
         rgbd_scans = self.process_rgbd()
         height_predictions = inference.get_height_rgbd_prediction_local(rgbd_scans)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        self.calculate_percentile()
         self.post_height_results(height_predictions, generated_timestamp, start_time)
 
     def process_rgbd(self):
@@ -49,7 +50,8 @@ class HeightFlowRGBD(HeightFlow):
             result_image_dict = next(iter(gen), None)
 
             if result_image_dict:
-                image_input_path = self.result_generation.get_input_path(scan_image_directory, result_image_dict['file'])
+                image_input_path = self.result_generation.get_input_path(
+                    scan_image_directory, result_image_dict['file'])
             else:
                 logger.info("%s %s", "No RGB found for order:", depth_id)
                 continue

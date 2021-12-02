@@ -22,6 +22,7 @@ ENDPOINTS = Bunch(dict(
     WORKFLOWS='/api/workflows',
     PERSONS='/api/persons/',
     MOD_SCAN='/api/scans',
+    SCAN_META='/api/scan_metadata/',
 ))
 
 
@@ -35,6 +36,7 @@ class ApiEndpoints:
         self.workflow_endpoint = ENDPOINTS.WORKFLOWS
         self.person_detail_endpoint = ENDPOINTS.PERSONS
         self.mod_scan_endpoint = ENDPOINTS.MOD_SCAN
+        self.scan_meta_endpoint = ENDPOINTS.SCAN_META
         self.headers = {}
         self.x_api_key = os.getenv("API_KEY", None)
 
@@ -195,6 +197,12 @@ class ApiEndpoints:
         """Get all registered workflows"""
         headers = self.prepare_header()
         response = requests.get(self.url + self.workflow_endpoint, headers=headers)
+        return response.json()
+
+    def get_scan_meta(self, scan_id):
+        """Get scan meta data from scan id"""
+        headers = self.prepare_header()
+        response = requests.get(self.url + self.scan_meta_endpoint + scan_id, headers=headers)
         return response.json()
 
 
