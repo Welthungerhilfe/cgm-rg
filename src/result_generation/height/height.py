@@ -92,6 +92,7 @@ class HeightFlow:
         return res, pos_percentile_error_99, neg_percentile_error_99, mae_scan
 
     def scan_level_height_result_object(self, predictions, generated_timestamp, workflow_obj, start_time, pos_percentile_error_99, neg_percentile_error_99, mae_scan):
+        logger.info("%s", "Scan Level Result started")
         """Prepare scan level height result object"""
         res = Bunch(dict(results=[]))
         result = Bunch(dict(
