@@ -99,6 +99,7 @@ class HeightFlow:
             mae_scan = (mae_scan[mid] + mae_scan[~mid]) / 2
         else:
             mae_scan = None
+
         return res, pos_percentile_error_99, neg_percentile_error_99, mae_scan
 
     def scan_level_height_result_object(self, predictions, generated_timestamp, workflow_obj, start_time, pos_percentile_error_99, neg_percentile_error_99, mae_scan):
