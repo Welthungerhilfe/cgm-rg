@@ -66,13 +66,14 @@ class HeightFlow:
         neg_percentile_error_99 = 0
         mae_scan = []
         for artifact, prediction in zip(self.artifacts, predictions):
-            mae_scan.append(artifact['percentile']['mae'])
-            if artifact['percentile']['99_percentile_pos_error'] is not None:
-                pos_percentile_error_99 = max(pos_percentile_error_99,
-                                              artifact['percentile']['99_percentile_pos_error'])
-            if artifact['percentile']['99_percentile_neg_error'] is not None:
-                neg_percentile_error_99 = min(neg_percentile_error_99,
-                                              artifact['percentile']['99_percentile_neg_error'])
+            if bool(artifact['percentile']):
+                mae_scan.append(artifact['percentile']['mae'])
+                if artifact['percentile']['99_percentile_pos_error'] is not None:
+                    pos_percentile_error_99 = max(pos_percentile_error_99,
+                                                  artifact['percentile']['99_percentile_pos_error'])
+                if artifact['percentile']['99_percentile_neg_error'] is not None:
+                    neg_percentile_error_99 = min(neg_percentile_error_99,
+                                                  artifact['percentile']['99_percentile_neg_error'])
             result = Bunch(dict(
                 id=str(uuid.uuid4()),
                 scan=self.result_generation.scan_metadata['id'],
@@ -81,14 +82,17 @@ class HeightFlow:
                 source_results=[],
                 generated=generated_timestamp,
                 data={'height': str(prediction[0]), 'pos_pe': artifact['percentile']['99_percentile_neg_error'],
-                      'neg_pe': artifact['percentile']['99_percentile_pos_error'], 'mae': artifact['percentile']['mae']},
+                      'neg_pe': artifact['percentile']['99_percentile_pos_error'], 'mae': artifact['percentile']['mae']} if bool(artifact['percentile']) else {'height': str(prediction[0])},
                 start_time=start_time,
                 end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             ))
             res.results.append(result)
-        mae_scan.sort()
-        mid = len(mae_scan) // 2
-        mae_scan = (mae_scan[mid] + mae_scan[~mid]) / 2
+        if bool(artifact['percentile']):
+            mae_scan.sort()
+            mid = len(mae_scan) // 2
+            mae_scan = (mae_scan[mid] + mae_scan[~mid]) / 2
+        else:
+            mae_scan = 0
         return res, pos_percentile_error_99, neg_percentile_error_99, mae_scan
 
     def scan_level_height_result_object(self, predictions, generated_timestamp, workflow_obj, start_time, pos_percentile_error_99, neg_percentile_error_99, mae_scan):
