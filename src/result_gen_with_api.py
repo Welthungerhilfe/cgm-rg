@@ -143,7 +143,7 @@ def run_normal_flow():
     flow = HeightFlowRGBD(
         result_generation,
         height_rgbd_workflow_artifact_path,
-        height_pose3d_workflow_scan_path,
+        height_rgbd_workflow_scan_path,
         depth_artifacts,
         person_details,
         rgb_artifacts,
@@ -155,7 +155,7 @@ def run_normal_flow():
     flow = HeightFlowPose3D(
         result_generation,
         height_pose3d_workflow_artifact_path,
-        height_rgbd_workflow_scan_path,
+        height_pose3d_workflow_scan_path,
         depth_artifacts,
         person_details,
         rgb_artifacts,
@@ -313,11 +313,11 @@ def run_retroactive_flow():
                 scan_type,
                 scan_version)
         elif workflow.match_workflows(height_pose3d_workflow_scan_path, workflow_id):
-            logger.info("Matched with HeightFlowRGBD")
+            logger.info("Matched with Height Flow Pose 3d")
             flow = HeightFlowPose3D(
                 result_generation,
                 height_pose3d_workflow_artifact_path,
-                height_rgbd_workflow_scan_path,
+                height_pose3d_workflow_scan_path,
                 depth_artifacts,
                 person_details,
                 rgb_artifacts,
