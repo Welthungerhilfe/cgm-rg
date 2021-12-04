@@ -1,6 +1,6 @@
 {
     "name": "points3d-rf-height-28k-laying-scan",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "result_format": "dict",
     "result_binding": "scan",
     "data": {
