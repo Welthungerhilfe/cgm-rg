@@ -243,6 +243,7 @@ def run_retroactive_flow():
         depth_artifacts = data_processing.download_artifacts('depth')
         # depth_artifacts = data_processing.download_artifacts('calibration')
         person_details = person(cgm_api, scan_metadata['person'])
+        scan_meta_data_details = scan_id_meta_data(cgm_api, scan_metadata['id'])
 
         result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, retroactive_scan_dir)
 
@@ -299,7 +300,8 @@ def run_retroactive_flow():
                 person_details,
                 rgb_artifacts,
                 scan_type,
-                scan_version)
+                scan_version,
+                scan_meta_data_details)
 
         elif workflow.match_workflows(height_rgbd_workflow_scan_path, workflow_id):
             logger.info("Matched with HeightFlowRGBD")
@@ -311,7 +313,8 @@ def run_retroactive_flow():
                 person_details,
                 rgb_artifacts,
                 scan_type,
-                scan_version)
+                scan_version,
+                scan_meta_data_details)
         elif workflow.match_workflows(height_pose3d_workflow_scan_path, workflow_id):
             logger.info("Matched with Height Flow Pose 3d")
             flow = HeightFlowPose3D(
@@ -322,7 +325,8 @@ def run_retroactive_flow():
                 person_details,
                 rgb_artifacts,
                 scan_type,
-                scan_version)
+                scan_version,
+                scan_meta_data_details)
         else:
             workflow_matched = False
             logger.info("Workflow id does not match with any of the id of registered Workflow")
