@@ -20,13 +20,10 @@ logger = log.setup_custom_logger(__name__)
 
 class HeightFlowPose3D(HeightFlow):
     def run_flow(self):
-        if self.scan_version in ["v0.9", "v1.1.0", "v1.0.2"]:
+        if self.scan_version in ["v0.9", "v1.1.0", "v1.0.2"] and self.scan_type in [200, 201, 202]:
             start_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             logger.info("%s", "Result genration Pose 3d start")
-            if self.scan_type in [200, 201, 202]:
-                mean_prediction = self.pose_prediction_artifacts()
-            else:
-                mean_prediction = 0
+            mean_prediction = self.pose_prediction_artifacts()
             generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             self.post_height_results(mean_prediction, generated_timestamp, start_time)
 
