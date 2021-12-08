@@ -1,0 +1,27 @@
+RELEASE NOTES 
+
+
+5.0.3
+-----------------------------
+
+Features
+- #2026 Compute scan level positive/negative percentile errors in the scan level workflow.
+- #1944 Upgrade cgm-rg to get the percentile error using cgm-error-stats-api(artifact level).
+
+Workflow
+
+Active
+depthmap-image	1.0.1
+face_detection	1.0.3
+face_recognition	1.0.3
+pose_prediction	1.0.4
+pose_prediction_visualization	1.0.4
+q4-depthmap-plaincnn-height	2.0.5
+q4-depthmap-plaincnn-height-mean	2.0.5
+rgbd-plaincnn-height-5kscans	run-01_01
+rgbd-plaincnn-height-5kscans-mean	run-01_01
+standing_laying	1.0.1
+
+Beta
+points3d-rf-height-28k-laying-scan 0.0.3
+points3d-rf-height-28k-laying-artifact 0.0.3
