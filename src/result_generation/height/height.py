@@ -1,19 +1,19 @@
-import uuid
-from pathlib import Path
-import sys
-from datetime import datetime
+import math
 import os
-
+import sys
+import uuid
+from datetime import datetime
+from pathlib import Path
 
 from bunch import Bunch
 from cgmzscore import Calculator
-from fastcore.basics import store_attr
 from error_stats_api_endpoints import ErrorStatsEndpointsManager
+from fastcore.basics import store_attr
 
 sys.path.append(str(Path(__file__).parents[1]))
-from result_generation.utils import MAX_AGE, MAX_HEIGHT, MIN_HEIGHT, calculate_age
 import log
-
+from result_generation.utils import (MAX_AGE, MAX_HEIGHT, MIN_HEIGHT,
+                                     calculate_age)
 
 logger = log.setup_custom_logger(__name__)
 
@@ -51,8 +51,7 @@ class HeightFlow:
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
 
     def calculate_percentile(self):
-        url_error_stats = os.getenv('APP_URL_ERROR_STATS',
-                                    'https://cgm-be-ci-dev-errsts-api.azurewebsites.net/')
+        url_error_stats = os.getenv('APP_URL_ERROR_STATS', 'http://localhost:5002/')
         logger.info("%s %s", "App URL Error Stats:", url_error_stats)
         cgm_error_stats_api = ErrorStatsEndpointsManager(url_error_stats)
         for artifact in self.artifacts:
@@ -62,24 +61,18 @@ class HeightFlow:
     def artifact_level_result(self, predictions, generated_timestamp, start_time):
         """Prepare artifact level height result object"""
         res = Bunch(dict(results=[]))
-        pos_percentile_error_99 = None
-        neg_percentile_error_99 = None
+        pos_percentile_error_99 = float('-inf')
+        neg_percentile_error_99 = float('inf')
         mae_scan = []
         for artifact, prediction in zip(self.artifacts, predictions):
             if bool(artifact['percentile']):
                 mae_scan.append(artifact['percentile']['mae'])
                 if artifact['percentile']['99_percentile_pos_error'] is not None:
-                    if pos_percentile_error_99 is None:
-                        pos_percentile_error_99 = artifact['percentile']['99_percentile_pos_error']
-                    else:
-                        pos_percentile_error_99 = max(pos_percentile_error_99,
-                                                      artifact['percentile']['99_percentile_pos_error'])
+                    pos_percentile_error_99 = max(pos_percentile_error_99,
+                                                  artifact['percentile']['99_percentile_pos_error'])
                 if artifact['percentile']['99_percentile_neg_error'] is not None:
-                    if neg_percentile_error_99 is None:
-                        neg_percentile_error_99 = artifact['percentile']['99_percentile_neg_error']
-                    else:
-                        neg_percentile_error_99 = min(neg_percentile_error_99,
-                                                      artifact['percentile']['99_percentile_neg_error'])
+                    neg_percentile_error_99 = min(neg_percentile_error_99,
+                                                  artifact['percentile']['99_percentile_neg_error'])
             result = Bunch(dict(
                 id=str(uuid.uuid4()),
                 scan=self.result_generation.scan_metadata['id'],
@@ -99,6 +92,10 @@ class HeightFlow:
             mae_scan = (mae_scan[mid] + mae_scan[~mid]) / 2
         else:
             mae_scan = None
+        if (math.isinf(pos_percentile_error_99)):
+            pos_percentile_error_99 = None
+        if (math.isinf(neg_percentile_error_99)):
+            neg_percentile_error_99 = None
 
         return res, pos_percentile_error_99, neg_percentile_error_99, mae_scan
 
