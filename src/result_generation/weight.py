@@ -68,6 +68,7 @@ class WeightFlow:
         depthmaps = preprocessing.process_depthmaps(self.artifacts, self.scan_directory, self.result_generation)
         weight_predictions = inference.get_weight_predictions_local(depthmaps)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        self.calculate_percentile()
         self.post_weight_results(weight_predictions, generated_timestamp, start_time)
 
     def artifact_level_result(self, predictions, generated_timestamp):
@@ -77,7 +78,7 @@ class WeightFlow:
         neg_percentile_error_99 = None
         mae_scan = []
         for artifact, prediction in zip(self.artifacts, predictions):
-            if bool(artifact['percentile']):
+            if 'percentile' in artifact and bool(artifact['percentile']):
                 mae_scan.append(artifact['percentile']['mae'])
                 if artifact['percentile']['99_percentile_pos_error'] is not None:
                     if pos_percentile_error_99 is None:
