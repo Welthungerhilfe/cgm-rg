@@ -107,7 +107,7 @@ class WeightFlow:
                             prediction[0]),
                         'pos_pe': artifact['percentile']['99_percentile_neg_error'],
                         'neg_pe': artifact['percentile']['99_percentile_pos_error'],
-                        'mae': artifact['percentile']['mae']} if bool(
+                        'mae': artifact['percentile']['mae']} if 'percentile' in artifact and bool(
                         artifact['percentile']) else {
                             'weight': str(
                                 prediction[0])},
