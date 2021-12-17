@@ -1,6 +1,6 @@
 {
-    "name": "q4-depthmap-plaincnn-weight-264k",
-    "version": "1.0.0",
+    "name": "q4-depthmap-plaincnn-weight-264k-mean",
+    "version": "1.0.1",
     "result_format": "dict",
     "result_binding": "scan",
     "data":{
