@@ -114,7 +114,7 @@ class WeightFlow:
                 ))
             res.results.append(result)
 
-        if bool(artifact['percentile']):
+        if 'percentile' in artifact and bool(artifact['percentile']):
             mae_scan.sort()
             mid = len(mae_scan) // 2
             mae_scan = (mae_scan[mid] + mae_scan[~mid]) / 2
