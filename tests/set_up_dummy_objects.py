@@ -41,6 +41,7 @@ def get_dummy_height_flow_object(mock_some_fn):
         sdv.scan_version,
         sdv.scan_meta_data_details)
 
+
 @patch.object(ProcessWorkflows, 'get_workflow_id')
 def get_dummy_weight_flow_object(mock_some_fn):
     mock_some_fn.return_value = '44af5600-69d2-11eb-9498-8ffe0e3b2017'
@@ -53,6 +54,7 @@ def get_dummy_weight_flow_object(mock_some_fn):
         sdv.scan_type,
         sdv.scan_version,
         sdv.scan_meta_data_details)
+
 
 @patch.object(ProcessWorkflows, 'get_workflow_id')
 def get_dummy_result_generation_object(mock_some_fn):
