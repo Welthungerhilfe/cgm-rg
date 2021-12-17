@@ -59,8 +59,10 @@ except Exception as e:
 def get_height_predictions_local(numpy_array):
     return height_model.predict(numpy_array)
 
+
 def get_weight_predictions_local(numpy_array):
     return weight_model.predict(numpy_array)
+
 
 def get_standing_laying_prediction_local(numpy_array):
     return standing_laying.predict(numpy_array)

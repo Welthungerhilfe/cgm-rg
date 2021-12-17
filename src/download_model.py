@@ -86,8 +86,6 @@ def main():
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/height')
 
-
-
     # Download model for  weight
     download_model(ws=ws,
                    experiment_name='q4-depthmap-plaincnn-weight-264k',
