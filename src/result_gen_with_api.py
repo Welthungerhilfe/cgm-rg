@@ -19,6 +19,7 @@ from result_generation.height.height_rgbd import HeightFlowRGBD
 from result_generation.height.height_pose3d import HeightFlowPose3D
 from result_generation.result_generation import ResultGeneration
 from result_generation.standing import StandingLaying
+from result_generation.weight import WeightFlow
 
 logger = log.setup_custom_logger(__name__)
 
@@ -50,6 +51,8 @@ def parse_args():
     parser.add_argument('--height_rgbd_workflow_scan_path', default=f"{workflow_dir}/height-rgbd-workflow-scan.json")  # noqa: E501
     parser.add_argument('--height_pose3d_workflow_artifact_path', default=f"{workflow_dir}/height-pose3d-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--height_pose3d_workflow_scan_path', default=f"{workflow_dir}/height-pose3d-workflow-scan.json")  # noqa: E501
+    parser.add_argument('--weight_workflow_artifact_path', default=f"{workflow_dir}/weight-workflow-artifact.json")  # noqa: E501
+    parser.add_argument('--weight_workflow_scan_path', default=f"{workflow_dir}/weight-workflow-scan.json")  # noqa: E501
     args = parser.parse_args()
     return args
 
@@ -69,6 +72,8 @@ def run_normal_flow():
     height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
     height_pose3d_workflow_artifact_path = args.height_pose3d_workflow_artifact_path
     height_pose3d_workflow_scan_path = args.height_pose3d_workflow_scan_path
+    weight_workflow_artifact_path = args.weight_workflow_artifact_path
+    weight_workflow_scan_path = args.weight_workflow_scan_path
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
@@ -164,6 +169,17 @@ def run_normal_flow():
         scan_meta_data_details)
     flows.append(flow)
 
+    flow = WeightFlow(
+        result_generation,
+        weight_workflow_artifact_path,
+        weight_workflow_scan_path,
+        depth_artifacts,
+        person_details,
+        scan_type,
+        scan_version,
+        scan_meta_data_details)
+    flows.append(flow)
+
     for flow in flows:
         try:
             flow.run_flow()
@@ -187,6 +203,9 @@ def run_retroactive_flow():
     height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
     height_pose3d_workflow_artifact_path = args.height_pose3d_workflow_artifact_path
     height_pose3d_workflow_scan_path = args.height_pose3d_workflow_scan_path
+
+    weight_workflow_artifact_path = args.weight_workflow_artifact_path
+    weight_workflow_scan_path = args.weight_workflow_scan_path
 
     logger.info("Started Retroactive Flow")
     # Retrieve the connection string from an environment
@@ -327,6 +346,19 @@ def run_retroactive_flow():
                 scan_type,
                 scan_version,
                 scan_meta_data_details)
+
+        elif workflow.match_workflows(weight_workflow_scan_path, workflow_id):
+            logger.info("Matched with WeightFlow")
+            flow = WeightFlow(
+                result_generation,
+                weight_workflow_artifact_path,
+                weight_workflow_scan_path,
+                depth_artifacts,
+                person_details,
+                scan_type,
+                scan_version,
+                scan_meta_data_details)
+
         else:
             workflow_matched = False
             logger.info("Workflow id does not match with any of the id of registered Workflow")
