@@ -86,6 +86,15 @@ def main():
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/height')
 
+
+
+    # Download model for  weight
+    download_model(ws=ws,
+                   experiment_name='q4-depthmap-plaincnn-weight-264k',
+                   run_id='q4-depthmap-plaincnn-weight-264k_1639458653_b7ce8488',
+                   input_location=os.path.join('outputs', 'best_model.ckpt'),
+                   output_location=REPO_DIR / 'models/weight')
+
     # Download model for RGBD
     download_model_from_registered_model(
         workspace=ws, model_name='2021q2-rgbd-plaincnn-height-5kscans', output_location=REPO_DIR / 'models/height_rgbd')

@@ -30,6 +30,14 @@ except OSError as error:
 except Exception as e:
     print(e)
 
+try:
+    weight_model = load_model(
+        '/app/models/weight/best_model.ckpt/', compile=False)
+except OSError as error:
+    print(error)
+    print("Not able to load the Weight model")
+except Exception as e:
+    print(e)
 
 try:
     standing_laying = load_model(str(REPO_DIR / 'models/Standing_laying/best_model.h5'))
@@ -51,6 +59,8 @@ except Exception as e:
 def get_height_predictions_local(numpy_array):
     return height_model.predict(numpy_array)
 
+def get_weight_predictions_local(numpy_array):
+    return weight_model.predict(numpy_array)
 
 def get_standing_laying_prediction_local(numpy_array):
     return standing_laying.predict(numpy_array)
