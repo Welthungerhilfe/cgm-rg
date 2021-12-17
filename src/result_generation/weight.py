@@ -164,7 +164,8 @@ class WeightFlow:
             self.person_details['date_of_birth'], self.result_generation.scan_metadata['scan_start'])
         class_wfa = 'Not Found'
         if age_in_days <= MAX_AGE:
-            zscore_wfa = Calculator().zScore_lhfa(age_in_days=str(age_in_days), sex=sex, height=mean_prediction)
+            zscore_wfa = Calculator().zScore_wfa(
+                age_in_days=str(age_in_days), sex=sex, weight=mean_prediction)
             if zscore_wfa < -3:
                 class_wfa = 'Severly Under-weight'
             elif zscore_wfa < -2:
