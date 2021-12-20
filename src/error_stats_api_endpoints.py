@@ -2,8 +2,6 @@ import copy
 import logging
 import os
 
-from requests.models import Response
-
 from bunch import Bunch
 import requests
 
@@ -30,25 +28,31 @@ class ErrorStatsEndpointsManager:
             headers['X-API-Key'] = self.x_api_key
         return headers
 
-    def get_percentile_from_error_stats(self, age, scan_type, scan_version, workflow_name, workflow_version, percentile_value):
+    def get_percentile_from_error_stats(
+            self,
+            age,
+            scan_type,
+            scan_version,
+            workflow_name,
+            workflow_version,
+            percentile_value):
         """Get the scan metadata filtered by scan_version and workflow_id"""
         headers = self.prepare_header()
         # use scan_version and workflow id to get filtered scans
 
-        params = {
-                'age': age,
-                'scan_type': scan_type,
-                'scan_version': scan_version,
-                'workflow_name': workflow_name,
-                'workflow_ver': workflow_version,
-                'percentile_value': percentile_value,
-            }
+        params = {'age': age,
+                  'scan_type': scan_type,
+                  'scan_version': scan_version,
+                  'workflow_name': workflow_name,
+                  'workflow_ver': workflow_version,
+                  'percentile_value': percentile_value,
+                  }
         response = requests.get(
             self.url + self.percentile_error_endpoints,
             params=params,
             headers=headers)
 
-        if response.status_code is 200:
+        if response.status_code == 200:
             error_stats = response.json()
         else:
             error_stats = {}
@@ -56,7 +60,7 @@ class ErrorStatsEndpointsManager:
             logger.error("%s %s", "Status code for response is", response.status_code)
             logger.error("%s %s", "Respone of error stats api", response.json())
             logger.info("%s %s", "Percentile Endpoint", self.url + self.percentile_error_endpoints)
-            logger.info("%s %s", "params" , params)
+            logger.info("%s %s", "params", params)
 
         return error_stats
 

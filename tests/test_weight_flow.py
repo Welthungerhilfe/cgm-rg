@@ -35,7 +35,6 @@ def test_artifact_level_result():
     assert isinstance(result, Bunch)
 
 
-
 def test_scan_level_result():
     """Test creation of scan level weight object"""
     # Setup
@@ -49,12 +48,11 @@ def test_scan_level_result():
 
     # Exercise
     result = weightflow.scan_level_result(
-        predictions, 
-        generated_timestamp, 
-        start_time, 
+        predictions,
+        generated_timestamp,
+        start_time,
         pos_percentile_error_99,
         neg_percentile_error_99,
         mae_scan)
     # Verify
     assert isinstance(result, Bunch)
-

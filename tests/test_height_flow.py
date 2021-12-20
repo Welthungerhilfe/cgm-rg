@@ -37,7 +37,6 @@ def test_artifact_level_result():
     assert isinstance(result, Bunch)
 
 
-
 '''
 def test_scan_level_height_result_object():
     """Test creation of scan level height object"""
