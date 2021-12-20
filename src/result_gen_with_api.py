@@ -226,7 +226,7 @@ def run_retroactive_flow():
         logger.exception("Error in Queue Service")
         return
 
-    messages = queue_service.get_messages(queue_name, num_messages=1, visibility_timeout=1)
+    messages = queue_service.get_messages(queue_name, num_messages=10, visibility_timeout=1)
     logger.info("%s %s", "Length of messages :", len(messages))
     logger.info("%s %s", "messages :", messages)
 
@@ -249,9 +249,9 @@ def run_retroactive_flow():
         logger.info("%s %s", "Workflow ID :", workflow_id)
 
         # Match workflow with height artifact level workflow and skip data download and preprocessing
-        if workflow.match_workflows(height_workflow_artifact_path, workflow_id) or workflow.match_workflows(height_rgbd_workflow_artifact_path, workflow_id):
+        if workflow.match_workflows(height_workflow_artifact_path, workflow_id) or workflow.match_workflows(height_rgbd_workflow_artifact_path, workflow_id) or workflow.match_workflows(weight_workflow_artifact_path, workflow_id):
             queue_service.delete_message(queue_name, message.id, message.pop_receipt)
-            logger.info("%s %s", "Skipped Height Artifact level workflow for Retroactive", workflow_id)
+            logger.info("%s %s", "Skipped Artifact level workflow for Retroactive", workflow_id)
             continue
 
         data_processing = PrepareArtifacts(cgm_api, scan_metadata, retroactive_scan_dir)
