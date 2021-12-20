@@ -71,7 +71,7 @@ class WeightFlow:
         self.calculate_percentile()
         self.post_weight_results(weight_predictions, generated_timestamp, start_time)
 
-    def artifact_level_result(self, predictions, generated_timestamp):
+    def artifact_level_result(self, predictions, generated_timestamp, start_time):
         """Prepare artifact level weight result object"""
         res = Bunch(dict(results=[]))
         pos_percentile_error_99 = None
@@ -103,14 +103,15 @@ class WeightFlow:
                     source_results=[],
                     generated=generated_timestamp,
                     data={
-                        'weight': str(
-                            prediction[0]),
+                        'weight': str(prediction[0]),
                         'pos_pe': artifact['percentile']['99_percentile_neg_error'],
                         'neg_pe': artifact['percentile']['99_percentile_pos_error'],
                         'mae': artifact['percentile']['mae']} if 'percentile' in artifact and bool(
                         artifact['percentile']) else {
                             'weight': str(
                                 prediction[0])},
+                    start_time=start_time,
+                    end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
                 ))
             res.results.append(result)
 
