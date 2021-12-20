@@ -31,8 +31,7 @@ except Exception as e:
     print(e)
 
 try:
-    weight_model = load_model(
-        '/app/models/weight/best_model.ckpt/', compile=False)
+    weight_model = load_model(str(REPO_DIR / 'models/weight/outputs/best_model.ckpt'), compile=False)
 except OSError as error:
     print(error)
     print("Not able to load the Weight model")
