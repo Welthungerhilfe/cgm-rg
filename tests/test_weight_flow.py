@@ -26,9 +26,10 @@ def test_artifact_level_result():
     weightflow = set_up_dummy_objects.get_dummy_weight_flow_object()
     predictions = np.random.uniform(70, 80, [26, 1])
     generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+    start_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
     # Exercise
-    result, _, _, _ = weightflow.artifact_level_result(predictions, generated_timestamp)
+    result, _, _, _ = weightflow.artifact_level_result(predictions, generated_timestamp, start_time)
 
     # Verify
     assert isinstance(result, Bunch)
