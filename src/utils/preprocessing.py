@@ -120,8 +120,9 @@ def get_depthmaps(fpaths):
 
 
 def standing_laying_data_preprocessing(source_path, scan_type):
-    img = tf.io.read_file(str(source_path))
-    img = tf.image.decode_jpeg(img, channels=3)
+    img = cv2.imread(str(source_path))
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = tf.convert_to_tensor(img, dtype=tf.float32)
     img = tf.cast(img, tf.float32) * (1. / 256)
     if scan_type in STANDING_SCAN_TYPE:
         img = tf.image.rot90(img, k=3)
