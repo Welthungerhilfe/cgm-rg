@@ -10,8 +10,8 @@ IMAGE_TARGET_HEIGHT = 240
 IMAGE_TARGET_WIDTH = 180
 NORMALIZATION_VALUE = 7.5
 
-STANDING_SCAN_TYPE = ["101", "102", "103"]
-LAYING_SCAN_TYPE = ["201", "202", "203"]
+STANDING_SCAN_TYPE = ["100", "101", "102"]
+LAYING_SCAN_TYPE = ["200", "201", "202"]
 
 
 def process_depthmaps(artifacts, scan_directory, result_generation):
