@@ -1,6 +1,6 @@
 {
     "name": "standing_laying",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "result_format": "dict",
     "result_binding": "artifact",
     "data": {
