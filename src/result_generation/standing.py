@@ -49,7 +49,7 @@ class StandingLaying:
             artifact['standing_laying_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             logger.info("%s %s", "input_path of image to perform standing laying:", input_path)
-            img = preprocessing.standing_laying_data_preprocessing(input_path, self.scan_type)
+            img = preprocessing.standing_laying_data_preprocessing(input_path)
             prediction = inference.get_standing_laying_prediction_local(img)
             predictions.append(prediction)
         predictions = np.array(predictions)
