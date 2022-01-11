@@ -119,7 +119,7 @@ def get_depthmaps(fpaths):
     return depthmaps
 
 
-def standing_laying_data_preprocessing(source_path, scan_type):
+def standing_laying_data_preprocessing(source_path):
     img = tf.io.read_file(str(source_path))
     img = tf.image.decode_jpeg(img, channels=3)
     img = tf.cast(img, tf.float32) * (1. / 256)
