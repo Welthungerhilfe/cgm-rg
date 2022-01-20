@@ -1,4 +1,3 @@
-from nntplib import ArticleInfo
 import os
 import sys
 import uuid
