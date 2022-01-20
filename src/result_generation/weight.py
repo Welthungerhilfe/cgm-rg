@@ -1,3 +1,4 @@
+from nntplib import ArticleInfo
 import os
 import sys
 import uuid
@@ -63,6 +64,34 @@ class WeightFlow:
                 self.scan_workflow_obj['version'],
                 99)
 
+    def calculate_scan_level_error_stats(self):
+        scan_99_percentile_pos_error = None
+        scan_99_percentile_neg_error = None
+        mae_artifact_result = []
+        for artifact in self.artifacts:
+            if 'percentile' in artifact and bool(artifact['percentile']):
+                if artifact['percentile']['mae'] is not None:
+                    mae_artifact_result.append(artifact['percentile']['mae'])
+                if artifact['percentile']['99_percentile_pos_error'] is not None:
+                    if scan_99_percentile_pos_error is None:
+                        scan_99_percentile_pos_error = artifact['percentile']['99_percentile_pos_error']
+                    else:
+                        scan_99_percentile_pos_error = max(scan_99_percentile_pos_error,
+                                                           artifact['percentile']['99_percentile_pos_error'])
+                if artifact['percentile']['99_percentile_neg_error'] is not None:
+                    if scan_99_percentile_neg_error is None:
+                        scan_99_percentile_neg_error = artifact['percentile']['99_percentile_neg_error']
+                    else:
+                        scan_99_percentile_neg_error = min(scan_99_percentile_neg_error,
+                                                           artifact['percentile']['99_percentile_neg_error'])
+        if 'percentile' in artifact and bool(artifact['percentile']):
+            mae_artifact_result.sort()
+            mid = len(mae_artifact_result) // 2
+            mae_scan = (mae_artifact_result[mid] + mae_artifact_result[~mid]) / 2
+        else:
+            mae_scan = None
+        return scan_99_percentile_pos_error, scan_99_percentile_neg_error, mae_scan
+
     def run_flow(self):
         start_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         depthmaps = preprocessing.process_depthmaps(self.artifacts, self.scan_directory, self.result_generation)
@@ -74,24 +103,7 @@ class WeightFlow:
     def artifact_level_result(self, predictions, generated_timestamp, start_time):
         """Prepare artifact level weight result object"""
         res = Bunch(dict(results=[]))
-        pos_percentile_error_99 = None
-        neg_percentile_error_99 = None
-        mae_scan = []
         for artifact, prediction in zip(self.artifacts, predictions):
-            if 'percentile' in artifact and bool(artifact['percentile']):
-                mae_scan.append(artifact['percentile']['mae'])
-                if artifact['percentile']['99_percentile_pos_error'] is not None:
-                    if pos_percentile_error_99 is None:
-                        pos_percentile_error_99 = artifact['percentile']['99_percentile_pos_error']
-                    else:
-                        pos_percentile_error_99 = max(pos_percentile_error_99,
-                                                      artifact['percentile']['99_percentile_pos_error'])
-                if artifact['percentile']['99_percentile_neg_error'] is not None:
-                    if neg_percentile_error_99 is None:
-                        neg_percentile_error_99 = artifact['percentile']['99_percentile_neg_error']
-                    else:
-                        neg_percentile_error_99 = min(neg_percentile_error_99,
-                                                      artifact['percentile']['99_percentile_neg_error'])
 
             result = Bunch(
                 dict(
@@ -114,16 +126,8 @@ class WeightFlow:
                     end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
                 ))
             res.results.append(result)
-
-        if 'percentile' in artifact and bool(artifact['percentile']):
-            mae_scan.sort()
-            mid = len(mae_scan) // 2
-            mae_scan = (mae_scan[mid] + mae_scan[~mid]) / 2
-        else:
-            mae_scan = None
-
-        # return res
-        return res, pos_percentile_error_99, neg_percentile_error_99, mae_scan
+        scan_99_percentile_pos_error, scan_99_percentile_neg_error, mae_scan = self.calculate_scan_level_error_stats()
+        return res, scan_99_percentile_pos_error, scan_99_percentile_neg_error, mae_scan
 
     def scan_level_result(
             self,
