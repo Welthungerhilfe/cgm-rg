@@ -120,7 +120,7 @@ class WeightFlow:
                         'mae': artifact['percentile']['mae']} if 'percentile' in artifact and bool(
                         artifact['percentile']) else {
                             'weight': str(
-                                prediction[0])},
+                                prediction[0]), 'pos_pe': None, 'neg_pe': None, 'mae': None},
                     start_time=start_time,
                     end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
                 ))
