@@ -78,8 +78,8 @@ class HeightFlow:
                         scan_99_percentile_neg_error = artifact['percentile']['99_percentile_neg_error']
                     else:
                         scan_99_percentile_neg_error = min(scan_99_percentile_neg_error,
-                                                           artifact['percentile']['99_percentile_neg_error'])
-        if 'percentile' in artifact and bool(artifact['percentile']):
+                                                           if artifact['percentile']['99_percentile_neg_error'])
+        if len(mae_artifact_result) > 0:
             mae_artifact_result.sort()
             mid = len(mae_artifact_result) // 2
             mae_scan = (mae_artifact_result[mid] + mae_artifact_result[~mid]) / 2
