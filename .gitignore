@@ -134,3 +134,10 @@ venv.bak/
 ../.amlignore.amltmp
 .amlignore
 .amlignore.amltmp
+
+# Azure Functions artifacts
+bin
+obj
+appsettings.json
+local.settings.json
+.python_packages
