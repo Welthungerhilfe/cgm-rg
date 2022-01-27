@@ -1,4 +1,6 @@
-FROM python:3.7-slim-stretch
+# To enable ssh & remote debugging on app service change the base image to the one below
+# FROM mcr.microsoft.com/azure-functions/python:3.0-python3.8-appservice
+FROM mcr.microsoft.com/azure-functions/python:3.0-python3.8
 
 RUN apt-get -y update && \
     apt-get install -y --fix-missing \
@@ -31,17 +33,10 @@ RUN cd ~ && \
     cd  dlib/ && \
     python3 setup.py install --yes USE_AVX_INSTRUCTIONS
 
-WORKDIR /app
-RUN mkdir log
+ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
+    AzureFunctionsJobHost__Logging__Console__IsEnabled=true
 
-ADD requirements.txt /app/requirements.txt
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir torch==1.9.0+cpu torchvision==0.10.0+cpu torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
+COPY requirements.txt /
+RUN pip install -r /requirements.txt
 
-ADD . /app
-
-RUN crontab deployment/crontab
-RUN chmod +x entrypoint_with_api.sh
-
-ENTRYPOINT ["/app/entrypoint_with_api.sh"]
+COPY . /home/site/wwwroot
