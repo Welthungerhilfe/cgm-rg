@@ -1,8 +1,9 @@
-import sys
 import os
+import sys
 from pathlib import Path
 
 import cv2
+import log
 import torch
 import torch.backends.cudnn as cudnn
 import torch.nn.parallel
@@ -14,12 +15,14 @@ import torchvision
 sys.path.append(str(Path(__file__).parents[1]))  # noqa: E402
 import result_generation.pose_prediction.code.models.pose_hrnet  # noqa
 from result_generation.pose_prediction.code.config import cfg, update_config
-from result_generation.pose_prediction.code.config.constants import (COCO_KEYPOINT_INDEXES, NUM_KPTS)
-from result_generation.pose_prediction.code.models.pose_hrnet import get_pose_net
-from result_generation.pose_prediction.code.utils.utils import (box_to_center_scale, calculate_pose_score, draw_pose,
-                                                                get_person_detection_boxes, get_pose_estimation_prediction, rot)
-import log
-
+from result_generation.pose_prediction.code.config.constants import (
+    COCO_KEYPOINT_INDEXES, NUM_KPTS)
+from result_generation.pose_prediction.code.models.pose_hrnet import \
+    get_pose_net
+from result_generation.pose_prediction.code.utils.utils import (
+    box_to_center_scale, calculate_pose_score,
+    draw_face_blur_using_pose_advance, draw_pose, get_person_detection_boxes,
+    get_pose_estimation_prediction, rot)
 
 logger = log.setup_custom_logger(__name__)
 
@@ -90,6 +93,7 @@ class PosePrediction:
     def pose_draw_on_image(self, rotated_pose_preds, original_image):
         if len(rotated_pose_preds) >= 1:
             for kpt in rotated_pose_preds:
+                draw_face_blur_using_pose_advance(kpt, original_image)  # draw the face blur
                 draw_pose(kpt, original_image)  # draw the poses
 
     def save_final_image(self, final_image_name, original_image):
