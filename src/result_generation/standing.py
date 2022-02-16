@@ -19,7 +19,6 @@ logger = log.setup_custom_logger(__name__)
 
 class StandingLaying:
     """A class to handle standing/laying results generation"""
-
     def __init__(
             self,
             result_generation,

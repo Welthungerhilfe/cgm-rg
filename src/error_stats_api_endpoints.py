@@ -47,7 +47,7 @@ class ErrorStatsEndpointsManager:
                   'workflow_name': workflow_name,
                   'workflow_ver': workflow_version,
                   'percentile_value': percentile_value,
-                  'standing_laying':standing_laying,
+                  'standing_laying': standing_laying,
                   }
         response = requests.get(
             self.url + self.percentile_error_endpoints,

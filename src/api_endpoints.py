@@ -204,11 +204,10 @@ class ApiEndpoints:
         headers = self.prepare_header()
         response = requests.get(self.url + self.scan_meta_endpoint + scan_id, headers=headers)
         return response.json()
-    
-    def get_results(self,scan_id,workflow_id):
+
+    def get_results(self, scan_id, workflow_id):
         """Get Result from scan id and workflow id """
         headers = self.prepare_header()
-
         response = requests.get(
             self.url + self.mod_scan_endpoint,
             params={
@@ -225,7 +224,6 @@ class ApiEndpoints:
         else:
             logger.info("%s %s", "Response code :", response.status_code)
             return 0
-        
 
 
 if __name__ == "__main__":
