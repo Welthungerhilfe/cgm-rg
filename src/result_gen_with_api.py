@@ -142,7 +142,8 @@ def run_normal_flow():
         rgb_artifacts,
         scan_type,
         scan_version,
-        scan_meta_data_details)
+        scan_meta_data_details,
+        standing_laying_workflow_path)
     flows.append(flow)
 
     flow = HeightFlowRGBD(
@@ -154,7 +155,8 @@ def run_normal_flow():
         rgb_artifacts,
         scan_type,
         scan_version,
-        scan_meta_data_details)
+        scan_meta_data_details,
+        standing_laying_workflow_path)
     flows.append(flow)
 
     flow = HeightFlowPose3D(
@@ -166,7 +168,8 @@ def run_normal_flow():
         rgb_artifacts,
         scan_type,
         scan_version,
-        scan_meta_data_details)
+        scan_meta_data_details,
+        standing_laying_workflow_path)
     flows.append(flow)
 
     flow = WeightFlow(

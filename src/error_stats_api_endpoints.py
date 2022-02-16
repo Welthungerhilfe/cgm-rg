@@ -35,7 +35,8 @@ class ErrorStatsEndpointsManager:
             scan_version,
             workflow_name,
             workflow_version,
-            percentile_value):
+            percentile_value,
+            standing_laying):
         """Get the scan metadata filtered by scan_version and workflow_id"""
         headers = self.prepare_header()
         # use scan_version and workflow id to get filtered scans
@@ -46,6 +47,7 @@ class ErrorStatsEndpointsManager:
                   'workflow_name': workflow_name,
                   'workflow_ver': workflow_version,
                   'percentile_value': percentile_value,
+                  'standing_laying':standing_laying,
                   }
         response = requests.get(
             self.url + self.percentile_error_endpoints,

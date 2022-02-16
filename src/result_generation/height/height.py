@@ -1,19 +1,19 @@
-import uuid
-from pathlib import Path
-import sys
-from datetime import datetime
 import os
+import sys
+import uuid
+from datetime import datetime
+from pathlib import Path
 
-
+import log
+from api_endpoints import ApiEndpoints
 from bunch import Bunch
 from cgmzscore import Calculator
-from fastcore.basics import store_attr
 from error_stats_api_endpoints import ErrorStatsEndpointsManager
+from fastcore.basics import store_attr
 
 sys.path.append(str(Path(__file__).parents[1]))
-from result_generation.utils import MAX_AGE, MAX_HEIGHT, MIN_HEIGHT, calculate_age
-import log
-
+from result_generation.utils import (MAX_AGE, MAX_HEIGHT, MIN_HEIGHT,
+                                     calculate_age)
 
 logger = log.setup_custom_logger(__name__)
 
@@ -31,11 +31,14 @@ class HeightFlow:
             image_artifacts,
             scan_type,
             scan_version,
-            scan_meta_data_details):
-        store_attr('result_generation,artifact_workflow_path,scan_workflow_path,artifacts,person_details,scan_type,scan_version,scan_meta_data_details', self)
+            scan_meta_data_details,
+            standing_laying_workflow_path):
+        store_attr('result_generation,artifact_workflow_path,scan_workflow_path,artifacts,person_details,scan_type,scan_version,scan_meta_data_details,standing_laying_workflow_path', self)
         self.image_artifacts = [] if image_artifacts is None else image_artifacts
         self.artifact_workflow_obj = self.result_generation.workflows.load_workflows(
             self.artifact_workflow_path)
+        self.standing_laying_workflow_obj = self.result_generation.workflows.load_workflows(
+            self.standing_laying_workflow_path)
         self.scan_workflow_obj = self.result_generation.workflows.load_workflows(
             self.scan_workflow_path)
         if self.artifact_workflow_obj["data"]["input_format"] == 'application/zip':
@@ -47,8 +50,26 @@ class HeightFlow:
                 self.result_generation.scan_metadata['id'] / self.rgb_input_format
         self.artifact_workflow_obj['id'] = self.result_generation.workflows.get_workflow_id(
             self.artifact_workflow_obj['name'], self.artifact_workflow_obj['version'])
+        self.standing_laying_workflow_obj['id'] = self.result_generation.workflows.get_workflow_id(
+            self.standing_laying_workflow_obj['name'], self.standing_laying_workflow_obj['version'])
         self.scan_workflow_obj['id'] = self.result_generation.workflows.get_workflow_id(
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
+
+    def get_standing_results(self):
+        url = os.getenv('APP_URL', 'http://localhost:5001')
+        cgm_api = ApiEndpoints(url)
+        result = cgm_api.get_results(self.standing_laying_workflow_obj['id'],self.result_generation.scan_metadata['id'])
+        artifact_id_dict_by_order_id = {}
+        sl_data_dict_by_order_id={}
+        for image_artifact in self.image_artifacts:
+            artifact_id_dict_by_order_id[image_artifact['id']] = image_artifact['order']
+        for r in result:
+            rgb_image_id = r['source_artifacts'][0]
+            sl_data_dict_by_order_id[artifact_id_dict_by_order_id[rgb_image_id]] = float(r['data']['standing_laying'][1:-1])
+        for artifact in self.artifacts: 
+            if artifact['order'] in sl_data_dict_by_order_id:
+                artifact['standing_laying'] = sl_data_dict_by_order_id[artifact['order']]
+
 
     def calculate_percentile(self):
         url_error_stats = os.getenv('APP_URL_ERROR_STATS',
@@ -56,8 +77,12 @@ class HeightFlow:
         logger.info("%s %s", "App URL Error Stats:", url_error_stats)
         cgm_error_stats_api = ErrorStatsEndpointsManager(url_error_stats)
         for artifact in self.artifacts:
-            artifact['percentile'] = cgm_error_stats_api.get_percentile_from_error_stats(
-                self.scan_meta_data_details['age'], self.scan_meta_data_details['scan_type'], self.scan_version, self.artifact_workflow_obj['name'], self.scan_workflow_obj['version'], 99)
+            if 'standing_laying' in artifact:
+                artifact['percentile'] = cgm_error_stats_api.get_percentile_from_error_stats(
+                    self.scan_meta_data_details['age'], self.scan_meta_data_details['scan_type'], self.scan_version, self.artifact_workflow_obj['name'], self.scan_workflow_obj['version'], 99)
+            else:
+                artifact['percentile'] = cgm_error_stats_api.get_percentile_from_error_stats(
+                    self.scan_meta_data_details['age'], self.scan_meta_data_details['scan_type'], self.scan_version, self.artifact_workflow_obj['name'], self.scan_workflow_obj['version'], 99,artifact['standing_laying'])
 
     def calculate_scan_level_error_stats(self):
         scan_99_percentile_pos_error = None
