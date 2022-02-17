@@ -58,7 +58,7 @@ class HeightFlow:
     def get_standing_results(self):
         url = os.getenv('APP_URL', 'http://localhost:5001')
         cgm_api = ApiEndpoints(url)
-        result = cgm_api.get_results(self.standing_laying_workflow_obj['id'], self.result_generation.scan_metadata['id'])
+        result = cgm_api.get_results(self.result_generation.scan_metadata['id'],self.standing_laying_workflow_obj['id'])
         artifact_id_dict_by_order_id = {}
         sl_data_dict_by_order_id = {}
         for image_artifact in self.image_artifacts:
@@ -69,6 +69,8 @@ class HeightFlow:
         for artifact in self.artifacts:
             if artifact['order'] in sl_data_dict_by_order_id:
                 artifact['standing_laying'] = sl_data_dict_by_order_id[artifact['order']]
+            else:
+                artifact['standing_laying'] = None
 
     def calculate_percentile(self):
         url_error_stats = os.getenv('APP_URL_ERROR_STATS',
@@ -76,12 +78,10 @@ class HeightFlow:
         logger.info("%s %s", "App URL Error Stats:", url_error_stats)
         cgm_error_stats_api = ErrorStatsEndpointsManager(url_error_stats)
         for artifact in self.artifacts:
-            if 'standing_laying' in artifact:
-                artifact['percentile'] = cgm_error_stats_api.get_percentile_from_error_stats(
-                    self.scan_meta_data_details['age'], self.scan_meta_data_details['scan_type'], self.scan_version, self.artifact_workflow_obj['name'], self.scan_workflow_obj['version'], 99)
-            else:
-                artifact['percentile'] = cgm_error_stats_api.get_percentile_from_error_stats(
-                    self.scan_meta_data_details['age'], self.scan_meta_data_details['scan_type'], self.scan_version, self.artifact_workflow_obj['name'], self.scan_workflow_obj['version'], 99, artifact['standing_laying'])
+            artifact['percentile'] = cgm_error_stats_api.get_percentile_from_error_stats(
+                self.scan_meta_data_details['age'], self.scan_meta_data_details['scan_type'],
+                self.scan_version, self.artifact_workflow_obj['name'], self.scan_workflow_obj['version'],
+                99, artifact['standing_laying'])
 
     def calculate_scan_level_error_stats(self):
         scan_99_percentile_pos_error = None
