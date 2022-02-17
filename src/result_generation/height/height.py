@@ -58,14 +58,17 @@ class HeightFlow:
     def get_standing_results(self):
         url = os.getenv('APP_URL', 'http://localhost:5001')
         cgm_api = ApiEndpoints(url)
-        result = cgm_api.get_results(self.result_generation.scan_metadata['id'],self.standing_laying_workflow_obj['id'])
+        result = cgm_api.get_results(self.result_generation.scan_metadata['id'], self.standing_laying_workflow_obj['id'])
         artifact_id_dict_by_order_id = {}
         sl_data_dict_by_order_id = {}
         for image_artifact in self.image_artifacts:
             artifact_id_dict_by_order_id[image_artifact['id']] = image_artifact['order']
         for r in result:
             rgb_image_id = r['source_artifacts'][0]
-            sl_data_dict_by_order_id[artifact_id_dict_by_order_id[rgb_image_id]] = float(r['data']['standing_laying'][1:-1])
+            if rgb_image_id in artifact_id_dict_by_order_id:
+                sl_data_dict_by_order_id[artifact_id_dict_by_order_id[rgb_image_id]] = float(r['data']['standing_laying'][1:-1])
+            else:
+                logger.info("%s %s", rgb_image_id, "Id is not present in artifact_id_dict_by_order_id")
         for artifact in self.artifacts:
             if artifact['order'] in sl_data_dict_by_order_id:
                 artifact['standing_laying'] = sl_data_dict_by_order_id[artifact['order']]
