@@ -39,7 +39,8 @@ def get_dummy_height_flow_object(mock_some_fn):
         sdv.rgb_artifacts,
         sdv.scan_type,
         sdv.scan_version,
-        sdv.scan_meta_data_details)
+        sdv.scan_meta_data_details,
+        sdv.standing_laying_artifacts)
 
 
 @patch.object(ProcessWorkflows, 'get_workflow_id')
