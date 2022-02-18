@@ -205,6 +205,26 @@ class ApiEndpoints:
         response = requests.get(self.url + self.scan_meta_endpoint + scan_id, headers=headers)
         return response.json()
 
+    def get_results(self, scan_id, workflow_id):
+        """Get Result from scan id and workflow id """
+        headers = self.prepare_header()
+        response = requests.get(
+            self.url + self.mod_scan_endpoint,
+            params={
+                'workflow': workflow_id,
+                'show_results': True,
+                'scan_id': scan_id
+            },
+            headers=headers)
+        if response.status_code == 200:
+            content = response.json()
+            logger.info("Result Details :")
+            result = content['scans'][0]['results']
+            return result
+        else:
+            logger.info("%s %s", "Response code :", response.status_code)
+            return 0
+
 
 if __name__ == "__main__":
     url = os.getenv('APP_URL', 'http://localhost:5001')
