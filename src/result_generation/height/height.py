@@ -66,7 +66,7 @@ class HeightFlow:
         for r in result:
             rgb_image_id = r['source_artifacts'][0]
             if rgb_image_id in artifact_id_dict_by_order_id:
-                sl_data_dict_by_order_id[artifact_id_dict_by_order_id[rgb_image_id]] = float(r['data']['standing_laying'][1:-1])
+                sl_data_dict_by_order_id[artifact_id_dict_by_order_id[rgb_image_id]] = float(r['data']['standing'][1:-1])
             else:
                 logger.info("%s %s", rgb_image_id, "Id is not present in artifact_id_dict_by_order_id")
         for artifact in self.artifacts:
