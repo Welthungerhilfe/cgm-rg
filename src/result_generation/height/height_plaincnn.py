@@ -15,6 +15,6 @@ class HeightFlowPlainCnn(HeightFlow):
         depthmaps = preprocessing.process_depthmaps(self.artifacts, self.scan_directory, self.result_generation)
         height_predictions = inference.get_height_predictions_local(depthmaps)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-        self.calculate_percentile()
         self.get_standing_results()
+        self.calculate_percentile()
         self.post_height_results(height_predictions, generated_timestamp, start_time)
