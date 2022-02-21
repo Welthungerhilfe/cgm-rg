@@ -17,4 +17,5 @@ class HeightFlowPlainCnn(HeightFlow):
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         self.get_standing_results()
         self.calculate_percentile()
+        self.get_standing_results()
         self.post_height_results(height_predictions, generated_timestamp, start_time)
