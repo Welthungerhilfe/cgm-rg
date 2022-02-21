@@ -61,7 +61,8 @@ class WeightFlow:
                 self.scan_version,
                 self.artifact_workflow_obj['name'],
                 self.scan_workflow_obj['version'],
-                99)
+                99,
+                None)
 
     def calculate_scan_level_error_stats(self):
         scan_99_percentile_pos_error = None
