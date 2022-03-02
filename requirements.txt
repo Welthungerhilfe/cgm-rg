@@ -1,3 +1,9 @@
 # Do not include azure-functions-worker as it may conflict with the Azure Functions platform
 
 azure-functions
+face-recognition
+requests==2.26.0
+opencv-python==4.4.0.46
+bunch==1.0.1
+azureml-sdk==1.21.0
+azure-mgmt-datafactory==0.8.0
