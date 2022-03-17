@@ -21,8 +21,6 @@ NORMALIZATION_VALUE = 7.5
 STANDING_SCAN_TYPE = ["100", "101", "102"]
 LAYING_SCAN_TYPE = ["200", "201", "202"]
 
-url = getenv('URL')
-headers = {'X-API-Key': getenv('API_KEY')}
 
 def process_depthmaps(artifacts, scan_directory, result_generation):
     """Load the list of depthmaps in scan as numpy array"""
@@ -146,6 +144,7 @@ def standing_laying_data_preprocessing(file_id, scan_type, ml_api):
     img = orient_img(rgb_image, scan_type)
 
     return img
+
 
 def blur_img_transformation_using_scan_version_and_scan_type(rgb_image, scan_version, scan_type):
     if scan_version in ["v0.7"]:

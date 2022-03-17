@@ -41,6 +41,7 @@ def main(req: func.HttpRequest,
             scan_metadata = req_body.get('scan_metadata')
             workflow_name = req_body.get('workflow_name')
             workflow_version = req_body.get('workflow_version')
+            service_name = req_body.get('service_name')
     try:
         if scan_metadata:
             standing_laying_workflow_id = ml_api.get_workflow_id(workflow_name, workflow_version)
@@ -52,7 +53,7 @@ def main(req: func.HttpRequest,
             for rgb_artifact in rgb_artifacts:
                 rgb_artifact['start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
                 img = standing_laying_data_preprocessing(rgb_artifact['file'], scan_type)
-                prediction = get_standing_laying_prediction(img)
+                prediction = get_standing_laying_prediction(img, service_name)
                 predictions.append(prediction)
             predictions = np.array(predictions)
             # logging.info(f"predictions are {predictions}")
