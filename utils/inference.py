@@ -7,7 +7,6 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 import requests
 
-
 sp = ServicePrincipalAuthentication(
     tenant_id=getenv('TENANT_ID'),
     service_principal_id=getenv('SP_ID'),

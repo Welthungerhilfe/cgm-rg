@@ -52,7 +52,7 @@ def main(req: func.HttpRequest,
             predictions = []
             for rgb_artifact in rgb_artifacts:
                 rgb_artifact['start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-                img = standing_laying_data_preprocessing(rgb_artifact['file'], scan_type)
+                img = standing_laying_data_preprocessing(rgb_artifact['file'], scan_type, ml_api)
                 prediction = get_standing_laying_prediction(img, service_name)
                 predictions.append(prediction)
             predictions = np.array(predictions)
