@@ -30,7 +30,8 @@ def main(msg: func.QueueMessage,
         "input":{
             "scan_metadata":scan_metadata,
             "workflow_name":message_received['workflow_name'],
-            "workflow_version":message_received['workflow_version']
+            "workflow_version":message_received['workflow_version'],
+            "service_name":message_received['service_name']
         }
     }
     logging.info(f"passed parameters are {params}")
