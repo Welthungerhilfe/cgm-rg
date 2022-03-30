@@ -56,3 +56,19 @@ def get_standing_laying_prediction(img, service_name):
     predictions = response.json()
 
     return predictions
+
+
+def get_height_prediction(depthmaps, service_name):
+    service = Webservice(workspace=workspace, name=service_name)
+    scoring_uri = service.scoring_uri
+    
+    data = {
+         "data":depthmaps.tolist()
+    }
+    data = json.dumps(data)
+    headers = {"Content-Type": "application/json"}
+    response = requests_retry_session().post(scoring_uri, data=data, headers=headers)
+    logging.info(f"predictions {response.content} and status code is {response.status_code}")
+    predictions = response.json()
+
+    return predictions

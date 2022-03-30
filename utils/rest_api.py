@@ -92,3 +92,31 @@ class MlApi(RestApi):
         workflow = [workflow for workflow in workflows if workflow['name'] == workflow_name and workflow['version'] == workflow_version]
 
         return workflow[0]['id']
+
+
+class ErrorStatsApi(RestApi):
+    def __init__(self):
+        super().__init__(getenv("ERROR_STATS_URL"),getenv("ERROR_STATS_API_KEY"))
+
+    def get_percentile_from_error_stats(self, age, scan_type, scan_version, workflow_name, workflow_version, percentile_value, standing_laying):
+        """Get the scan metadata filtered by scan_version and workflow_id"""
+        # use scan_version and workflow id to get filtered scans
+        if standing_laying is not None:
+            params = {'age': age,
+                      'scan_type': scan_type,
+                      'scan_version': scan_version,
+                      'workflow_name': workflow_name,
+                      'workflow_ver': workflow_version,
+                      'percentile_value': percentile_value,
+                      'standing_laying': standing_laying,
+                      }
+        else:
+            params = {'age': age,
+                      'scan_type': scan_type,
+                      'scan_version': scan_version,
+                      'workflow_name': workflow_name,
+                      'workflow_ver': workflow_version,
+                      'percentile_value': percentile_value,
+                      }
+
+        return self.get_json('/api/percentile_errors', params=params)

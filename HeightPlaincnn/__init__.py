@@ -12,24 +12,34 @@ from datetime import datetime
 import uuid
 from bunch import Bunch
 import json
+from utils.preprocessing import process_depthmaps
+from utils.rest_api import MlApi
+from utils.inference import get_height_prediction
+from utils.result_object_utils import bunch_object_to_json_object
+
+ml_api = MlApi()
 
 
-url = getenv('URL')
-headers = {'X-API-Key': getenv('API_KEY')}
+def artifact_level_result(artifacts, predictions, workflow_id, scan_id):
+    """Prepare artifact level height result object"""
+    res = Bunch(dict(results=[]))
+    for artifact, prediction in zip(artifacts, predictions):
+        result = Bunch(dict(
+            id=str(uuid.uuid4()),
+            scan=scan_id,
+            workflow=workflow_id,
+            source_artifacts=[artifact['id']],
+            source_results=[],
+            data={'height': str(prediction[0])}
+        ))
+        res.results.append(result)
+    return res
 
 
-def get_workflow_id(workflow_name, workflow_version):
-    response = requests.get(url + f"/api/workflows", headers=headers)
-    if response.status_code != 200:
-        logging.info(f"error getting workflows {response.content}")
-    workflows = response.json()['workflows']
-    workflow = [workflow for workflow in workflows if workflow['name'] == workflow_name and workflow['version'] == workflow_version]
-
-    return workflow[0]['id']
-
-
-def post_height_result_object():
-    pass
+def post_height_result_object(artifacts, predictions, workflow_id, scan_id):
+    res = artifact_level_result(artifacts, predictions, workflow_id, scan_id)
+    res_object = bunch_object_to_json_object(res)
+    ml_api.post_results(res_object)
 
 
 def main(req: func.HttpRequest,
@@ -49,32 +59,26 @@ def main(req: func.HttpRequest,
             pass
         else:
             scan_metadata = req_body.get('scan_metadata')
+            workflow_name = req_body.get('workflow_name')
+            workflow_version = req_body.get('workflow_version')
+            service_name = req_body.get('service_name')
     try:
         if scan_metadata:
             scan_id = scan_metadata['id']
-            height_plaincnn_workflow_id = get_workflow_id(getenv("HEIGHT_PLAINCNN_WORKFLOW_NAME"), getenv("HEIGHT_PLAINCNN_WORKFLOW_VERSION"))
-            logging.info(f"starting face blur for scan id {scan_id}, {height_plaincnn_workflow_id}")
+            height_plaincnn_workflow_id = ml_api.get_workflow_id(workflow_name, workflow_version)
+            logging.info(f"starting height RG for scan id {scan_id}, {height_plaincnn_workflow_id}")
 
             scan_version = scan_metadata['version']
             scan_type = scan_metadata['type']
-            depth_artifacts = [a for a in scan_metadata['artifacts'] if a['format'] == 'rgb']
+            depth_artifacts = [a for a in scan_metadata['artifacts'] if a['format'] == 'depth']
 
+            depthmaps = process_depthmaps(depth_artifacts, ml_api)
+            predictions = get_height_prediction(depthmaps, service_name)
 
-
-            post_height_result_object(depth_artifacts, scan_id, height_plaincnn_workflow_id)
-
-            keys_wanted = ['id', 'blur_id_from_post_request'] # , 'blurred_image']
-            pose_input = {
-                "blur_artifacts" : [{k: rgb_artifact[k] for k in keys_wanted} for rgb_artifact in rgb_artifacts],
-                "scan_id" : scan_id,
-                "scan_version" : scan_version,
-                "scan_type" : scan_type
-            }
-            # for blur_arti in pose_input['blur_artifacts']:
-            #     blur_arti['blurred_image'] = blur_arti['blurred_image'].tolist()
+            post_height_result_object(depth_artifacts, predictions, height_plaincnn_workflow_id, scan_id)
 
             response_object["status"] = 'Success'
-            response_object["results"] = pose_input
+            response_object["results"] = predictions
             # logging.info(f"response object is {response_object}")
             response_json = json.dumps(response_object)
             return response_json

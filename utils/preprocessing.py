@@ -22,12 +22,11 @@ STANDING_SCAN_TYPE = ["100", "101", "102"]
 LAYING_SCAN_TYPE = ["200", "201", "202"]
 
 
-def process_depthmaps(artifacts, scan_directory, result_generation):
+def process_depthmaps(artifacts, ml_api):
     """Load the list of depthmaps in scan as numpy array"""
     depthmaps = []
     for artifact in artifacts:
-        input_path = result_generation.get_input_path(scan_directory, artifact['file'])
-        data, width, height, depth_scale, _max_confidence = load_depth(input_path)
+        data, width, height, depth_scale, _max_confidence = load_depth(artifact['file'], ml_api)
         depthmap = prepare_depthmap(data, width, height, depth_scale)
         depthmap = preprocess(depthmap)
         depthmap = eval_preprocessing(depthmap)
@@ -44,7 +43,7 @@ def eval_preprocessing(depthmap):
     return depthmap
 
 
-def load_depth(file_id: str) -> Tuple[bytes, int, int, float, float]:
+def load_depth(file_id: str, ml_api) -> Tuple[bytes, int, int, float, float]:
     """Take ZIP file and extract depth and metadata
     Args:
         fpath (str): File path to the ZIP
@@ -56,8 +55,8 @@ def load_depth(file_id: str) -> Tuple[bytes, int, int, float, float]:
         max_confidence(float)
     """
 
-    response = requests.get(url + f"/api/files/{file_id}", headers=headers)
-    zipfile = ZipFile(BytesIO(response.content))
+    response = ml_api.get_files(file_id)
+    zipfile = ZipFile(BytesIO(response))
     with zipfile.open('data') as f:
         # Example for a first_line: '180x135_0.001_7_0.57045287_-0.0057296_0.0022602521_0.82130724_-0.059177425_0.0024800065_0.030834956'
         first_line = f.readline().decode().strip()
