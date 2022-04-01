@@ -76,9 +76,16 @@ def main(req: func.HttpRequest,
             predictions = get_height_prediction(depthmaps, service_name)
 
             post_height_result_object(depth_artifacts, predictions, height_plaincnn_workflow_id, scan_id)
-
+            # keys_wanted = ['id'] # , 'blurred_image']
+            mean_workflow_input = {
+                "artifact_ids" : [depth_artifact['id'] for depth_artifact in depth_artifacts],
+                "predictions": predictions,
+                "scan_id" : scan_id,
+                "scan_version" : scan_version,
+                "scan_type" : scan_type
+            }
             response_object["status"] = 'Success'
-            response_object["results"] = predictions
+            response_object["results"] = mean_workflow_input
             # logging.info(f"response object is {response_object}")
             response_json = json.dumps(response_object)
             return response_json
