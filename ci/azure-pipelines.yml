@@ -28,6 +28,7 @@ parameters:
       - demo-qa
       - inbmz
       - naunam
+      - nep
 
 stages:
   - stage: Setup
