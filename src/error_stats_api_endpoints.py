@@ -69,7 +69,6 @@ class ErrorStatsEndpointsManager:
             error_stats = {}
             logger.info("Sending empty error stats due to below enconutered error:")
             logger.error("%s %s", "Status code for response is", response.status_code)
-            logger.error("%s %s", "Respone of error stats api", response.json())
             logger.info("%s %s", "Percentile Endpoint", self.url + self.percentile_error_endpoints)
             logger.info("%s %s", "params", params)
 
