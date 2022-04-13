@@ -1,0 +1,153 @@
+pool:
+  vmImage: ubuntu-latest
+
+trigger:
+  branches:
+    include:
+      - 'ml_rg'
+    # exclude:
+    #   - 'ml-api'
+  # tags:
+  #   include:
+  #     - 'v*'
+
+variables:
+  - group: cgm-ml-rg
+
+parameters:
+  - name: var_groups
+    type: object
+    default:
+      - sandbox
+      - demo-qa
+      - prod
+      # - naunam
+
+stages:
+  - stage: Setup
+    jobs:
+      - job: Variables
+        displayName: Setup pipeline variables
+        variables:
+          isRelease: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
+        steps:
+          - script: |
+              set -e
+              if [ "$(isRelease)" == 'True' ]
+              then
+                # Read version from version file
+                tag=$(head -n 1 VERSION)
+              else
+                # For feature commits tag containers with Git hash
+                tag=$(git rev-parse HEAD)
+              fi
+              echo "##vso[task.setvariable variable=TAG;isOutput=true]$tag"
+            name: ParseTag
+            displayName: Parse Docker tag
+
+  - stage: Verify_and_Build
+    displayName: Verify and Build
+    dependsOn: Setup
+    variables:
+      TAG: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
+    jobs:
+      - job:
+        steps:
+          - task: Docker@2
+            displayName: Build Docker image
+            inputs:
+              command: build
+              repository: $(IMAGE_REPOSITORY)
+              tags: |
+                $(Build.BuildId)
+                $(TAG)
+          # - script: |
+          #     set -e
+          #     docker-compose up -d
+          #     docker-compose exec -T api pytest --cov
+          #   displayName: Run tests
+          - script: |
+              set -e
+              outdir="$(Pipeline.Workspace)/image"
+              mkdir "$outdir"
+              docker image save --output "$outdir/cgm-ml-rg.tar" $(IMAGE_REPOSITORY):$(TAG)
+            displayName: Save Docker Image
+            condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+          - publish: $(Pipeline.Workspace)/image
+            artifact: MlRgDockerImage
+            condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+
+  # - stage: Version
+  #   displayName: Tag & bump version
+  #   dependsOn: Verify_and_Build
+  #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  #   jobs:
+  #     - job:
+  #       displayName: Update version number
+  #       condition: ne(variables['Build.Reason'], 'Manual')
+  #       steps:
+  #         - checkout: self
+  #           fetchDepth: 1
+  #           persistCredentials: true
+  #         - script: pip install bump2version
+  #           displayName: Install bump2version
+  #         - script: |
+  #             set -e
+  #             # Setup Git
+  #             git config --global user.email "noreply@childgrowthmonitor.org"
+  #             git config --global user.name "CGM CI"
+  #             # Tag current commit
+  #             CURR_VERSION=$(head -n 1 VERSION)
+  #             git tag -a "v$CURR_VERSION" -m "CGM API version $CURR_VERSION"
+  #             # Bump PATCH version
+  #             bumpversion --commit patch
+  #             # Push tag and bumped version
+  #             git push --follow-tags origin HEAD:main
+  #           displayName: Tag and bump version
+
+  - ${{ each env in parameters.var_groups }}:
+    - stage: Deploy_${{ replace(env, '-', '_') }}
+      displayName: Deploy ${{ env }}
+      dependsOn:
+        - Setup
+        - Verify_and_Build
+      # condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+      variables:
+        - group: cgm-ml-rg-${{ env }}-ci
+        - name: TAG
+          value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
+      jobs:
+        - deployment: Deploy_Function_App
+          displayName: "Function App deployment ${{ env }}"
+          environment: cgm-ml-rg-${{ env }}-env
+          strategy:
+            runOnce:
+              deploy:
+                steps:
+                  - task: DownloadPipelineArtifact@2
+                    displayName: "Download docker image"
+                    inputs:
+                      source: current
+                      artifact: MlRgDockerImage
+                      path: $(Pipeline.Workspace)/image
+                  - script: |
+                      set -e
+                      docker image load -i $(Pipeline.Workspace)/image/cgm-api.tar
+                      docker tag "$(IMAGE_REPOSITORY):$(TAG)" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
+                    displayName: Load and Tag image
+                  - task: AzureCLI@2
+                    inputs:
+                      azureSubscription: cgm-${{ env }}-sub-cd
+                      scriptType: bash
+                      scriptLocation: inlineScript
+                      inlineScript: |
+                        set -e
+                        # Push docker image to ACR
+                        IMAGE="$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
+                        az acr login --name $(TARGET_REGISTRY)
+                        docker push "$IMAGE"
+                        # Deploy pushed image to App Service
+                        az functionapp config container set \
+                          --name "$(FUNCTION_APP)" \
+                          --resource-group "$(RESOURCE_GROUP)" \
+                          --docker-custom-image-name "$IMAGE"
