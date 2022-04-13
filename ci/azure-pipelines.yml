@@ -72,10 +72,10 @@ stages:
               mkdir "$outdir"
               docker image save --output "$outdir/cgm-ml-rg.tar" $(IMAGE_REPOSITORY):$(TAG)
             displayName: Save Docker Image
-            condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+            # condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
           - publish: $(Pipeline.Workspace)/image
             artifact: MlRgDockerImage
-            condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+            # condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
 
   # - stage: Version
   #   displayName: Tag & bump version
