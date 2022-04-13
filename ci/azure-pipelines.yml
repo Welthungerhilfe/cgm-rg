@@ -132,7 +132,7 @@ stages:
                       path: $(Pipeline.Workspace)/image
                   - script: |
                       set -e
-                      docker image load -i $(Pipeline.Workspace)/image/cgm-api.tar
+                      docker image load -i $(Pipeline.Workspace)/image/cgm-ml-rg.tar
                       docker tag "$(IMAGE_REPOSITORY):$(TAG)" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
                     displayName: Load and Tag image
                   - task: AzureCLI@2
