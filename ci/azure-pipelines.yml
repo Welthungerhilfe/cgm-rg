@@ -61,11 +61,6 @@ stages:
               tags: |
                 $(Build.BuildId)
                 $(TAG)
-          # - script: |
-          #     set -e
-          #     docker-compose up -d
-          #     docker-compose exec -T api pytest --cov
-          #   displayName: Run tests
           - script: |
               set -e
               outdir="$(Pipeline.Workspace)/image"
