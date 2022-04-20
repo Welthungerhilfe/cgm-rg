@@ -6,7 +6,7 @@ trigger:
     include:
       - '*'
     exclude:
-      - 'ml_rg_*'
+      - 'ml_rg*'
   tags:
     include:
       - 'v*'
