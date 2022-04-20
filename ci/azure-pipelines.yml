@@ -5,11 +5,6 @@ trigger:
   branches:
     include:
       - 'ml_rg'
-    # exclude:
-    #   - 'ml-api'
-  # tags:
-  #   include:
-  #     - 'v*'
 
 variables:
   - group: cgm-ml-rg
