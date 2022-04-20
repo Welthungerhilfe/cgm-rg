@@ -5,6 +5,8 @@ trigger:
   branches:
     include:
       - '*'
+    exclude:
+      - 'ml_rg*'
   tags:
     include:
       - 'v*'
