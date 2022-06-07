@@ -10,7 +10,6 @@ import utils.preprocessing as preprocessing  # noqa: E402
 
 
 def test_process_depthmaps():
-    pass
     """Test to check proper processing of depthmaps"""
     # Setup
     flow = set_up_dummy_objects.get_dummy_height_flow_object()
@@ -23,7 +22,6 @@ def test_process_depthmaps():
 
 
 def test_artifact_level_result():
-    pass
     """Test creation of artifact level height object"""
     # Setup
     flow = set_up_dummy_objects.get_dummy_height_flow_object()
