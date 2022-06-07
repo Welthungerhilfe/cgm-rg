@@ -323,7 +323,8 @@ def run_retroactive_flow():
                 rgb_artifacts,
                 scan_type,
                 scan_version,
-                scan_meta_data_details)
+                scan_meta_data_details,
+                standing_laying_workflow_path)
 
         elif workflow.match_workflows(height_rgbd_workflow_scan_path, workflow_id):
             logger.info("Matched with HeightFlowRGBD")
@@ -336,7 +337,8 @@ def run_retroactive_flow():
                 rgb_artifacts,
                 scan_type,
                 scan_version,
-                scan_meta_data_details)
+                scan_meta_data_details,
+                standing_laying_workflow_path)
         elif workflow.match_workflows(height_pose3d_workflow_scan_path, workflow_id):
             logger.info("Matched with Height Flow Pose 3d")
             flow = HeightFlowPose3D(
@@ -348,7 +350,8 @@ def run_retroactive_flow():
                 rgb_artifacts,
                 scan_type,
                 scan_version,
-                scan_meta_data_details)
+                scan_meta_data_details,
+                standing_laying_workflow_path)
 
         elif workflow.match_workflows(weight_workflow_scan_path, workflow_id):
             logger.info("Matched with WeightFlow")

@@ -28,3 +28,4 @@ mock==4.0.3
 coverage==6.0.2
 cgm-ml-common==3.1.7
 sklearn
+protobuf==3.20.0
