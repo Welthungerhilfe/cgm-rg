@@ -3,11 +3,6 @@ import logging
 import azure.functions as func
 import requests
 from os import getenv
-import numpy as np
-from PIL import Image
-import io
-import cv2
-import face_recognition
 from datetime import datetime
 import uuid
 from bunch import Bunch
@@ -51,20 +46,21 @@ def main(req: func.HttpRequest,
         'id' : context.trace_context.trace_parent.split('-')[2]
     }
 
-    scan_metadata = req.params.get('scan_metadata')
-    if not scan_metadata:
+    scan_id = req.params.get('scan_id')
+    if not scan_id:
         try:
             req_body = req.get_json()
         except ValueError:
             pass
         else:
-            scan_metadata = req_body.get('scan_metadata')
+            scan_id = req_body.get('scan_id')
             workflow_name = req_body.get('workflow_name')
             workflow_version = req_body.get('workflow_version')
             service_name = req_body.get('service_name')
     try:
-        if scan_metadata:
-            scan_id = scan_metadata['id']
+        if scan_id:
+            scan_metadata = ml_api.get_scan_metadata(scan_id)
+            # scan_id = scan_metadata['id']
             height_plaincnn_workflow_id = ml_api.get_workflow_id(workflow_name, workflow_version)
             logging.info(f"starting height RG for scan id {scan_id}, {height_plaincnn_workflow_id}")
 

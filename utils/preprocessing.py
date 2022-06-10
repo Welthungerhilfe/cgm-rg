@@ -6,7 +6,7 @@ import cv2
 from os import getenv
 import logging
 
-import face_recognition
+# import face_recognition
 import numpy as np
 import tensorflow as tf
 from skimage.transform import resize

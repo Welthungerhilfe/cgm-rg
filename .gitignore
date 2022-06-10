@@ -130,5 +130,5 @@ local.settings.json
 .python_packages
 
 # IDE
-
+.vscode/
 *.iml

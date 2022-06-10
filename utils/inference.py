@@ -22,8 +22,8 @@ workspace = Workspace(
 
 
 def requests_retry_session(
-    retries=5,
-    backoff_factor=0.3,
+    retries=9,
+    backoff_factor=2,
     status_forcelist=(500, 502, 503, 504),
     session=None,
 ):
