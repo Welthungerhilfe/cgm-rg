@@ -4,7 +4,7 @@ pool:
 trigger:
   branches:
     include:
-      - 'ml_rg'
+      - 'ml_rg_*'
 
 variables:
   - group: cgm-ml-rg
@@ -16,11 +16,10 @@ parameters:
       - sandbox
       - demo-qa
       - prod
-      # - naunam
 
 stages:
   - stage: Setup
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/ml_rg'))
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/ml_rg_*'))
     jobs:
       - job: Variables
         displayName: Setup pipeline variables
