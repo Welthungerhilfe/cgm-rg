@@ -19,7 +19,7 @@ parameters:
 
 stages:
   - stage: Setup
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/ml_rg*'))
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/ml_rg'))
     jobs:
       - job: Variables
         displayName: Setup pipeline variables
