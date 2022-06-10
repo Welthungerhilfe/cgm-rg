@@ -4,7 +4,7 @@ pool:
 trigger:
   branches:
     include:
-      - 'ml_rg_*'
+      - 'ml_rg*'
 
 variables:
   - group: cgm-ml-rg
@@ -19,7 +19,7 @@ parameters:
 
 stages:
   - stage: Setup
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/ml_rg_*'))
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/ml_rg*'))
     jobs:
       - job: Variables
         displayName: Setup pipeline variables
