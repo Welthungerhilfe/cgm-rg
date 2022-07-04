@@ -108,7 +108,7 @@ def run_normal_flow():
     flows = []
 
     result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, scan_parent_dir)
-
+    
     flow = PoseAndBlurFlow(
         result_generation,
         blur_workflow_path,
@@ -118,7 +118,7 @@ def run_normal_flow():
         rgb_artifacts,
         scan_version,
         scan_type, ['POSE', 'BLUR'])
-    flows.append(flow)
+    # flows.append(flow)
 
     flow = StandingLaying(
         result_generation,
@@ -157,7 +157,7 @@ def run_normal_flow():
         scan_version,
         scan_meta_data_details,
         standing_laying_workflow_path)
-    flows.append(flow)
+    # flows.append(flow)
 
     flow = HeightFlowPose3D(
         result_generation,
@@ -170,7 +170,7 @@ def run_normal_flow():
         scan_version,
         scan_meta_data_details,
         standing_laying_workflow_path)
-    flows.append(flow)
+    # flows.append(flow)
 
     flow = WeightFlow(
         result_generation,
