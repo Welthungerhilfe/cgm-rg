@@ -145,6 +145,17 @@ def standing_laying_data_preprocessing(file_id, scan_type, ml_api):
     return img
 
 
+def standing_laying_data_preprocessing_tf(file_id, ml_api):
+    response = ml_api.get_files(file_id)
+    # img = tf.io.decode_raw(response)
+    img = tf.image.decode_jpeg(response, channels=3)
+    img = tf.cast(img, tf.float32) * (1. / 256)
+    img = tf.image.rot90(img, k=3)
+    img = tf.image.resize(img, [240, 180])
+    img = tf.expand_dims(img, axis=0)
+    return img
+
+
 def blur_img_transformation_using_scan_version_and_scan_type(rgb_image, scan_version, scan_type):
     if scan_version in ["v0.7"]:
         # Make the image smaller, The limit of cgm-api to post an image is 500 KB.

@@ -87,36 +87,29 @@ class MlApi(RestApi):
         }
         return self.post_binary('/api/files', files=files).decode('utf-8')
 
-    def get_workflow_id(self, workflow_name, workflow_version):
+    def get_workflow_id_and_service_name(self, workflow_name, workflow_version, get_service_name=False):
         workflows = self.get_workflows()
         workflow = [workflow for workflow in workflows if workflow['name'] == workflow_name and workflow['version'] == workflow_version]
+        if get_service_name:
+            return workflow[0]['id'], workflow[0]['data']['service_name']
+        else:
+            return workflow[0]['id']
 
-        return workflow[0]['id']
+
+    def get_results(self, scan_id, workflow_id):
+        """Get Result from scan id and workflow id """
+        params = {
+            'workflow': workflow_id, 
+            'show_results': True, 
+            'scan_id': scan_id
+        }
+        return self.get_json('/api/scans', params=params)['scans'][0]['results']
 
 
 class ErrorStatsApi(RestApi):
     def __init__(self):
         super().__init__(getenv("ERROR_STATS_URL"),getenv("ERROR_STATS_API_KEY"))
 
-    def get_percentile_from_error_stats(self, age, scan_type, scan_version, workflow_name, workflow_version, percentile_value, standing_laying):
+    def get_percentile_from_error_stats(self, params):
         """Get the scan metadata filtered by scan_version and workflow_id"""
-        # use scan_version and workflow id to get filtered scans
-        if standing_laying is not None:
-            params = {'age': age,
-                      'scan_type': scan_type,
-                      'scan_version': scan_version,
-                      'workflow_name': workflow_name,
-                      'workflow_ver': workflow_version,
-                      'percentile_value': percentile_value,
-                      'standing_laying': standing_laying,
-                      }
-        else:
-            params = {'age': age,
-                      'scan_type': scan_type,
-                      'scan_version': scan_version,
-                      'workflow_name': workflow_name,
-                      'workflow_ver': workflow_version,
-                      'percentile_value': percentile_value,
-                      }
-
         return self.get_json('/api/percentile_errors', params=params)

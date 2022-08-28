@@ -28,10 +28,11 @@ def main(msg: func.QueueMessage,
 
     params = {
         "input":{
-            "scan_ids":message_received['scan_ids'],
-            "workflow_name":message_received['workflow_name'],
-            "workflow_version":message_received['workflow_version'],
-            "service_name":message_received['service_name']
+            "child_visit_id":message_received['child_visit_id'],
+            "scan_ids":message_received['scan_ids']
+            # "workflow_name":message_received['workflow_name'],
+            # "workflow_version":message_received['workflow_version'],
+            # "service_name":message_received['service_name']
         }
     }
     logging.info(f"passed parameters are {params}")

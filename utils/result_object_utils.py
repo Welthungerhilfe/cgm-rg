@@ -28,3 +28,10 @@ def prepare_result_object(rgb_artifacts, predictions, generated_timestamp, scan_
         ))
         res.results.append(result)
     return res
+
+
+def calculate_age(dob, scan_date):
+    date_dob = datetime.strptime(dob, "%Y-%m-%d")
+    date_scan = datetime.strptime(scan_date, '%Y-%m-%dT%H:%M:%SZ')
+    delta = date_scan - date_dob
+    return delta.days

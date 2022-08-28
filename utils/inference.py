@@ -6,6 +6,7 @@ import logging
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 import requests
+import numpy
 
 sp = ServicePrincipalAuthentication(
     tenant_id=getenv('TENANT_ID'),
@@ -47,7 +48,7 @@ def get_standing_laying_prediction(img, service_name):
     scoring_uri = service.scoring_uri
     
     data = {
-         "data":img.tolist()
+         "data":img.numpy().tolist()
     }
     data = json.dumps(data)
     headers = {"Content-Type": "application/json"}
