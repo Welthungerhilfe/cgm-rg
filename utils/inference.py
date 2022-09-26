@@ -89,3 +89,39 @@ def get_weight_prediction(depthmaps, service_name):
     predictions = response.json()
 
     return predictions
+
+
+def get_pose_boxes_prediction(box_model_input, service_name):
+    service = Webservice(workspace=workspace, name=service_name)
+    scoring_uri = service.scoring_uri
+
+    data = {
+         "data":[box_model_input[0].numpy().tolist()]
+    }
+    data = json.dumps(data)
+    headers = {"Content-Type": "application/json"}
+    response = requests_retry_session().post(scoring_uri, data=data, headers=headers)
+    logging.info(f"predictions {response.content} and status code is {response.status_code}")
+    predictions = response.json()
+
+    return predictions
+
+
+def get_pose_prediction(rotated_image_rgb, pose_box_result, shape, scan_type, service_name):
+    service = Webservice(workspace=workspace, name=service_name)
+    scoring_uri = service.scoring_uri
+
+    data = {
+            "rotated_image_rgb":rotated_image_rgb.tolist(),
+            "pred_boxes":pose_box_result['pred_boxes'],
+            "pred_score":pose_box_result['pred_score'],
+            "shape":list(shape),
+            "scan_type":scan_type
+    }
+    data = json.dumps(data)
+    headers = {"Content-Type": "application/json"}
+    response = requests_retry_session().post(scoring_uri, data=data, headers=headers)
+    logging.info(f"predictions {response.content} and status code is {response.status_code}")
+    predictions = response.json()
+
+    return predictions

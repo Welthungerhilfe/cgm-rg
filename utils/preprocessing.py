@@ -6,13 +6,15 @@ import cv2
 from os import getenv
 import logging
 
-# import face_recognition
+import face_recognition
 import numpy as np
 import tensorflow as tf
 from skimage.transform import resize
 from PIL import Image
 import io
+import torch
 
+ctx = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 IMAGE_TARGET_HEIGHT = 240
 IMAGE_TARGET_WIDTH = 180
@@ -245,3 +247,28 @@ def blur_face(file_id: str, scan_version, scan_type, ml_api):
     # logging.info(f"{len(face_locations)} face locations found and blurred for path: {source_path}")
     logging.info("%s %s", len(face_locations), "face locations found and blurred for path:")
     return rgb_image, True, faces_detected
+
+
+def read_image(file_id, ml_api):
+    response = ml_api.get_files(file_id)
+    image_rgb = np.asarray(Image.open(io.BytesIO(response)))
+    image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
+    return image_bgr, image_bgr.shape
+
+def orient_image_using_scan_type(original_image, scan_type):
+    if scan_type in [100, 101, 102]:
+        rotated_image = cv2.rotate(original_image, cv2.ROTATE_90_CLOCKWISE)  # Standing
+    elif scan_type in [200, 201, 202]:
+        rotated_image = cv2.rotate(original_image, cv2.ROTATE_90_COUNTERCLOCKWISE)  # Laying
+    else:
+        print("%s %s %s", "Provided scan type", scan_type, "not supported")
+        print("Keeping the image in the same orientation as provided")
+        rotated_image = original_image
+    return rotated_image
+
+def preprocess_image_for_pose(rotated_image):
+    box_model_input = []
+    rotated_image_rgb = cv2.cvtColor(rotated_image, cv2.COLOR_BGR2RGB)
+    img_tensor = torch.from_numpy(rotated_image_rgb / 255.).permute(2, 0, 1).float().to(ctx)
+    box_model_input.append(img_tensor)
+    return box_model_input, rotated_image_rgb
