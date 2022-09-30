@@ -33,6 +33,7 @@ parameters:
       - naunam
       - nep
       - uga
+      - ban
 
 stages:
   - stage: Setup
