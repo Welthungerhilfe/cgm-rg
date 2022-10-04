@@ -15,7 +15,7 @@ from bunch import Bunch
 import json
 from utils.rest_api import MlApi
 from utils.preprocessing import read_image, orient_image_using_scan_type, preprocess_image_for_pose
-from pose_prediction.code.utils.utils import draw_pose
+# from pose_prediction.code.utils.utils import draw_pose
 from utils.result_object_utils import bunch_object_to_json_object
 from utils.inference import get_pose_boxes_prediction, get_pose_prediction
 
@@ -69,8 +69,8 @@ def main(req: func.HttpRequest,
     logging.info('Python HTTP trigger function processed a request.')
     response_object = {
         'invocation_id' : context.invocation_id,
-        # 'operation_id' : context.trace_context.trace_parent.split('-')[1],
-        # 'id' : context.trace_context.trace_parent.split('-')[2]
+        'operation_id' : context.trace_context.trace_parent.split('-')[1],
+        'id' : context.trace_context.trace_parent.split('-')[2]
     }
     scan_id = req.params.get('scan_id')
     # pose_prediction_workflow_id = req.params.get('pose_prediction_workflow_id')
@@ -101,11 +101,15 @@ def main(req: func.HttpRequest,
             rgb_artifacts = [a for a in scan_metadata['artifacts'] if a['format'] == 'rgb']
             pose_result_for_order = {}
             for artifact in rgb_artifacts:
+                artifact['pose_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
                 original_image, shape = read_image(artifact['file'], ml_api)
                 rotated_image = orient_image_using_scan_type(original_image, scan_type)
                 box_model_input, rotated_image_rgb = preprocess_image_for_pose(rotated_image)
                 pose_box_results = get_pose_boxes_prediction(box_model_input, service_names['box_model_service_name'])
-                pose_results = get_pose_prediction(rotated_image, pose_box_results, shape, scan_type, service_names['pose_model_service_name'])
+                if pose_box_results['pred_boxes']:
+                    pose_results = get_pose_prediction(rotated_image_rgb, pose_box_results, shape, scan_type, service_names['pose_model_service_name'])
+                else:
+                    pose_results = []
                 # pose_result_of_artifact = {'no_of_body_pose_detected': len(pose_box_results['pred_boxes']), 'pose_result': pose_results}
 
                 # # rgb_image = np.asarray(Image.open(io.BytesIO(arti['blurred_image'])))

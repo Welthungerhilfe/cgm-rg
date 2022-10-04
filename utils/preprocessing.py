@@ -6,13 +6,14 @@ import cv2
 from os import getenv
 import logging
 
-import face_recognition
+# import face_recognition
 import numpy as np
 import tensorflow as tf
 from skimage.transform import resize
 from PIL import Image
 import io
 import torch
+from utils.inference import get_face_locations
 
 ctx = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
@@ -188,7 +189,7 @@ def reorient_back(image, scan_type):
     return image
 
 
-def blur_face(file_id: str, scan_version, scan_type, ml_api):
+def blur_face(file_id: str, scan_version, scan_type, ml_api, service_name):
     """Run face blur on given source_path
     Returns:
         bool: True if blurred otherwise False
@@ -212,7 +213,7 @@ def blur_face(file_id: str, scan_version, scan_type, ml_api):
         image, (0, 0), fx=1.0 / resize_factor, fy=1.0 / resize_factor)
 
     # Find face locations.
-    face_locations = face_recognition.face_locations(small_image, model="cnn")
+    face_locations = get_face_locations(small_image, service_name)
 
     faces_detected = len(face_locations)
     logging.info("%s %s", faces_detected, "face locations found and blurred for path:")
@@ -254,6 +255,7 @@ def read_image(file_id, ml_api):
     image_rgb = np.asarray(Image.open(io.BytesIO(response)))
     image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
     return image_bgr, image_bgr.shape
+
 
 def orient_image_using_scan_type(original_image, scan_type):
     if scan_type in [100, 101, 102]:

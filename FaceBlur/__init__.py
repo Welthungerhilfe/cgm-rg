@@ -69,11 +69,11 @@ def prepare_faces_result_object(artifacts, scan_id, workflow_id):
     return res
 
 
-def post_results(result_json_obj):
-    """Post the result object produced while Result Generation using POST /results"""
-    response = requests.post(url + '/api/results', json=result_json_obj, headers=headers)
-    logging.info("%s %s", "Status of post result response:", response.status_code)
-    return response.status_code
+# def post_results(result_json_obj):
+#     """Post the result object produced while Result Generation using POST /results"""
+#     response = requests.post(url + '/api/results', json=result_json_obj, headers=headers)
+#     logging.info("%s %s", "Status of post result response:", response.status_code)
+#     return response.status_code
 
 
 def post_blur_result_object(artifacts, scan_id, face_recognition_workflow_id, face_detection_workflow_id):
@@ -96,23 +96,23 @@ def main(req: func.HttpRequest,
         'id' : context.trace_context.trace_parent.split('-')[2]
     }
 
-    scan_metadata = req.params.get('scan_metadata')
+    scan_id = req.params.get('scan_id')
     # face_recognition_workflow_id = req.params.get('face_recognition_workflow_id')
     # face_detection_workflow_id = req.params.get('face_detection_workflow_id')
-    if not scan_metadata:
+    if not scan_id:
         try:
             req_body = req.get_json()
         except ValueError:
             pass
         else:
-            scan_metadata = req_body.get('scan_metadata')
+            scan_id = req_body.get('scan_id')
             # face_recognition_workflow_id = req_body.get('face_recognition_workflow_id')
             # face_detection_workflow_id = req_body.get('face_detection_workflow_id')
     try:
-        if scan_metadata:
-            scan_id = scan_metadata['id']
-            face_recognition_workflow_id = ml_api.get_workflow_id(getenv("FACE_RECOGNITION_WORKFLOW_NAME"), getenv("FACE_RECOGNITION_WORKFLOW_VERSION"))
-            face_detection_workflow_id = ml_api.get_workflow_id(getenv("FACE_DETECTION_WORKFLOW_NAME"), getenv("FACE_DETECTION_WORKFLOW_VERSION"))
+        if scan_id:
+            scan_metadata = ml_api.get_scan_metadata(scan_id)
+            face_recognition_workflow_id = ml_api.get_workflow_id_and_service_name(getenv("FACE_RECOGNITION_WORKFLOW_NAME"), getenv("FACE_RECOGNITION_WORKFLOW_VERSION"))
+            face_detection_workflow_id, service_name = ml_api.get_workflow_id_and_service_name(getenv("FACE_DETECTION_WORKFLOW_NAME"), getenv("FACE_DETECTION_WORKFLOW_VERSION"), get_service_name=True)
             logging.info(f"starting face blur for scan id {scan_id}, {face_recognition_workflow_id}, {face_detection_workflow_id}")
 
             # response = requests.get(url + f"/api/scans?scan_id={scan_id}", headers=headers)
@@ -122,7 +122,7 @@ def main(req: func.HttpRequest,
             rgb_artifacts = [a for a in scan_metadata['artifacts'] if a['format'] == 'rgb']
             for rgb_artifact in rgb_artifacts:
                 rgb_artifact['blur_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-                blur_img_binary, blur_status, faces_detected = blur_face(rgb_artifact['file'], scan_version, scan_type)
+                blur_img_binary, blur_status, faces_detected = blur_face(rgb_artifact['file'], scan_version, scan_type, ml_api, service_name)
                 if blur_status:
                     rgb_artifact['blurred_image'] = blur_img_binary
                     rgb_artifact['faces_detected'] = faces_detected
