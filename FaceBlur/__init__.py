@@ -3,6 +3,7 @@ import re
 from turtle import pos
 
 import azure.functions as func
+import concurrent.futures
 import requests
 from os import getenv
 import cv2
@@ -10,9 +11,14 @@ from datetime import datetime
 import uuid
 from bunch import Bunch
 import json
+from PIL import Image
+import io
+import numpy as np
 from utils.rest_api import MlApi
 from utils.result_object_utils import bunch_object_to_json_object # , prepare_result_object
 from utils.preprocessing import blur_face
+from utils.inference import get_face_locations
+from itertools import repeat
 
 ml_api = MlApi()
 
@@ -20,16 +26,16 @@ standing_scan_type = ["101", "102", "100"]
 laying_scan_type = ["201", "202", "200"]
 
 
-def post_blur_files(artifacts):
+def post_blur_files(artifacts, results_dict):
     for artifact in artifacts:
-        _, bin_file = cv2.imencode('.JPEG', artifact['blurred_image'])
+        _, bin_file = cv2.imencode('.JPEG', results_dict[artifact['id']]['blurred_image'])
         bin_file = bin_file.tostring()
         blur_id_from_post_request = ml_api.post_files(bin_file, 'rgb')        
         artifact['blur_id_from_post_request'] = blur_id_from_post_request
         artifact['generated_timestamp'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
-def prepare_result_object(artifacts, scan_id, workflow_id):
+def prepare_result_object(artifacts, scan_id, workflow_id, start_time):
     """Prepare result object for results generated"""
     res = Bunch(dict(results=[]))
     for artifact in artifacts:
@@ -41,7 +47,7 @@ def prepare_result_object(artifacts, scan_id, workflow_id):
             source_results=[],
             file=artifact['blur_id_from_post_request'],
             generated=artifact['generated_timestamp'],
-            start_time=artifact['blur_start_time'],
+            start_time=start_time,
             end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         ))
         res.results.append(result)
@@ -49,7 +55,7 @@ def prepare_result_object(artifacts, scan_id, workflow_id):
     return res
 
 
-def prepare_faces_result_object(artifacts, scan_id, workflow_id):
+def prepare_faces_result_object(artifacts, scan_id, workflow_id, results_dict, start_time):
     """Prepare result object for results generated"""
     res = Bunch(dict(results=[]))
     for artifact in artifacts:
@@ -60,8 +66,8 @@ def prepare_faces_result_object(artifacts, scan_id, workflow_id):
             source_artifacts=[artifact['id']],
             source_results=[],
             generated=artifact['generated_timestamp'],
-            data={'faces_detected': str(artifact['faces_detected'])},
-            start_time=artifact['blur_start_time'],
+            data={'faces_detected': str(results_dict[artifact['id']]['faces_detected'])},
+            start_time=start_time,
             end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         ))
         res.results.append(result)
@@ -69,22 +75,34 @@ def prepare_faces_result_object(artifacts, scan_id, workflow_id):
     return res
 
 
-# def post_results(result_json_obj):
-#     """Post the result object produced while Result Generation using POST /results"""
-#     response = requests.post(url + '/api/results', json=result_json_obj, headers=headers)
-#     logging.info("%s %s", "Status of post result response:", response.status_code)
-#     return response.status_code
-
-
-def post_blur_result_object(artifacts, scan_id, face_recognition_workflow_id, face_detection_workflow_id):
+def post_blur_result_object(artifacts, scan_id, face_recognition_workflow_id, face_detection_workflow_id, results_dict, start_time):
     """Post the result object to the API"""
-    res = prepare_result_object(artifacts, scan_id, face_recognition_workflow_id)
+    res = prepare_result_object(artifacts, scan_id, face_recognition_workflow_id, start_time)
     res_object = bunch_object_to_json_object(res)
     ml_api.post_results(res_object)
 
-    faces_res = prepare_faces_result_object(artifacts, scan_id, face_detection_workflow_id)
+    faces_res = prepare_faces_result_object(artifacts, scan_id, face_detection_workflow_id, results_dict, start_time)
     faces_res_object = bunch_object_to_json_object(faces_res)
     ml_api.post_results(faces_res_object)
+
+
+def run_face_blurring(rgb_artifact, scan_version, scan_type, service_name):
+    blur_img_binary, blur_status, faces_detected = blur_face(rgb_artifact['file'], scan_version, scan_type, ml_api, service_name)
+    print(blur_status, faces_detected)
+    if blur_status:
+        return {'blurred_image': blur_img_binary, 'faces_detected': faces_detected}
+        # rgb_artifact['blurred_image'] = blur_img_binary
+        # rgb_artifact['faces_detected'] = faces_detected
+    # return rgb_artifact
+
+
+def get_blurred_face(artifact, scan_type, scan_version, service_name):
+    response = ml_api.get_files(artifact['file'])
+    rgb_image = np.asarray(Image.open(io.BytesIO(response)))
+
+    faces_detected, blur_img_binary = get_face_locations(rgb_image, scan_type, scan_version, service_name)
+
+    return {artifact['id']: {'faces_detected': faces_detected, 'blurred_image': blur_img_binary}}
 
 
 def main(req: func.HttpRequest,
@@ -97,8 +115,6 @@ def main(req: func.HttpRequest,
     }
 
     scan_id = req.params.get('scan_id')
-    # face_recognition_workflow_id = req.params.get('face_recognition_workflow_id')
-    # face_detection_workflow_id = req.params.get('face_detection_workflow_id')
     if not scan_id:
         try:
             req_body = req.get_json()
@@ -106,8 +122,6 @@ def main(req: func.HttpRequest,
             pass
         else:
             scan_id = req_body.get('scan_id')
-            # face_recognition_workflow_id = req_body.get('face_recognition_workflow_id')
-            # face_detection_workflow_id = req_body.get('face_detection_workflow_id')
     try:
         if scan_id:
             scan_metadata = ml_api.get_scan_metadata(scan_id)
@@ -115,20 +129,17 @@ def main(req: func.HttpRequest,
             face_detection_workflow_id, service_name = ml_api.get_workflow_id_and_service_name(getenv("FACE_DETECTION_WORKFLOW_NAME"), getenv("FACE_DETECTION_WORKFLOW_VERSION"), get_service_name=True)
             logging.info(f"starting face blur for scan id {scan_id}, {face_recognition_workflow_id}, {face_detection_workflow_id}")
 
-            # response = requests.get(url + f"/api/scans?scan_id={scan_id}", headers=headers)
-            # scan_metadata = response.json()['scans']
             scan_version = scan_metadata['version']
             scan_type = scan_metadata['type']
+            start_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             rgb_artifacts = [a for a in scan_metadata['artifacts'] if a['format'] == 'rgb']
-            for rgb_artifact in rgb_artifacts:
-                rgb_artifact['blur_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-                blur_img_binary, blur_status, faces_detected = blur_face(rgb_artifact['file'], scan_version, scan_type, ml_api, service_name)
-                if blur_status:
-                    rgb_artifact['blurred_image'] = blur_img_binary
-                    rgb_artifact['faces_detected'] = faces_detected
 
-            post_blur_files(rgb_artifacts)
-            post_blur_result_object(rgb_artifacts, scan_id, face_recognition_workflow_id, face_detection_workflow_id)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=9) as executor:
+                result = executor.map(get_blurred_face, rgb_artifacts, repeat(scan_type), repeat(scan_version), repeat(service_name))
+            result_di = { k: v for r in result for k, v in r.items()}
+
+            post_blur_files(rgb_artifacts, result_di)
+            post_blur_result_object(rgb_artifacts, scan_id, face_recognition_workflow_id, face_detection_workflow_id, result_di, start_time)
 
             keys_wanted = ['id', 'blur_id_from_post_request'] # , 'blurred_image']
             pose_input = {
@@ -153,5 +164,5 @@ def main(req: func.HttpRequest,
     except Exception as error:
         response_object["status"] = 'Failed'
         response_object["exception"] = str(error)
-        # logging.info(f"response object is {response_object}")
+        logging.info(f"response object is {response_object}")
         return json.dumps(response_object)
