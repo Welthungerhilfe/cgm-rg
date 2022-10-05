@@ -159,6 +159,20 @@ def standing_laying_data_preprocessing_tf(file_id, ml_api):
     return img
 
 
+def standing_laying_data_preprocessing_tf_batch(file_ids, ml_api):
+    images = []
+    for file_id in file_ids:
+        response = ml_api.get_files(file_id)
+        # img = tf.io.decode_raw(response)
+        img = tf.image.decode_jpeg(response, channels=3)
+        img = tf.cast(img, tf.float32) * (1. / 256)
+        img = tf.image.rot90(img, k=3)
+        img = tf.image.resize(img, [240, 180])
+        images.append(img)
+    
+    return tf.convert_to_tensor(images)
+
+
 def blur_img_transformation_using_scan_version_and_scan_type(rgb_image, scan_version, scan_type):
     if scan_version in ["v0.7"]:
         # Make the image smaller, The limit of cgm-api to post an image is 500 KB.
@@ -217,6 +231,7 @@ def blur_face(file_id: str, scan_version, scan_type, ml_api, service_name):
 
     faces_detected = len(face_locations)
     logging.info("%s %s", faces_detected, "face locations found and blurred for path:")
+    logging.info(type(face_locations))
 
     # Blur the image.
     for top, right, bottom, left in face_locations:
@@ -234,11 +249,11 @@ def blur_face(file_id: str, scan_version, scan_type, ml_api, service_name):
         face_image = image[top:bottom, left:right]
 
         # Blur the face image.
-        face_image = cv2.GaussianBlur(
+        face_image_blur = cv2.GaussianBlur(
             face_image, ksize=(99, 99), sigmaX=30)
 
         # Put the blurred face region back into the frame image.
-        image[top:bottom, left:right] = face_image
+        image[top:bottom, left:right] = face_image_blur
 
     image = reorient_back(image, scan_type)
 
