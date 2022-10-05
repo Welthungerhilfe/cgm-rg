@@ -6,7 +6,7 @@ import logging
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 import requests
-import numpy
+import numpy as np
 
 sp = ServicePrincipalAuthentication(
     tenant_id=getenv('TENANT_ID'),
@@ -127,17 +127,19 @@ def get_pose_prediction(rotated_image_rgb, pose_box_result, shape, scan_type, se
     return predictions
 
 
-def get_face_locations(img, service_name):
+def get_face_locations(image, scan_type, scan_version, service_name):
     service = Webservice(workspace=workspace, name=service_name)
     scoring_uri = service.scoring_uri
     
     data = {
-         "data":img.tolist()
+        "data":image.tolist(),
+        "scan_type": scan_type,
+        "scan_version": scan_version
     }
     data = json.dumps(data)
     headers = {"Content-Type": "application/json"}
     response = requests_retry_session().post(scoring_uri, data=data, headers=headers)
-    logging.info(f"predictions {response.content} and status code is {response.status_code}")
+#     logging.info(f"predictions {response.content} and status code is {response.status_code}")
     predictions = response.json()
-
-    return predictions
+    
+    return predictions['faces_detected'], np.array(predictions['blur_img_binary'])
