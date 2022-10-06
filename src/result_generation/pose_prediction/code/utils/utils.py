@@ -1,3 +1,7 @@
+import math
+import sys
+from pathlib import Path
+
 import cv2
 import numpy as np
 import torch
@@ -6,14 +10,19 @@ import torch.optim
 import torch.utils.data
 import torch.utils.data.distributed
 import torchvision.transforms as transforms
-import sys
-from pathlib import Path
+
 sys.path.append(str(Path(__file__).parents[1]))  # noqa: E402
+import log
 import result_generation.pose_prediction.code.models.pose_hrnet  # noqa
 from result_generation.pose_prediction.code.config import cfg
-from result_generation.pose_prediction.code.config.constants import COCO_INSTANCE_CATEGORY_NAMES, NUM_KPTS, SKELETON, CocoColors
-from result_generation.pose_prediction.code.utils.post_processing import get_final_preds
-from result_generation.pose_prediction.code.utils.transforms import get_affine_transform
+from result_generation.pose_prediction.code.config.constants import (
+    COCO_INSTANCE_CATEGORY_NAMES, NUM_KPTS, SKELETON, CocoColors)
+from result_generation.pose_prediction.code.utils.post_processing import \
+    get_final_preds
+from result_generation.pose_prediction.code.utils.transforms import \
+    get_affine_transform
+
+logger = log.setup_custom_logger(__name__)
 
 
 def get_person_detection_boxes(model, img, threshold=0.5):
@@ -144,3 +153,100 @@ def box_to_center_scale(box, model_image_width, model_image_height):
 
 def calculate_pose_score(pose_score):
     return np.mean(pose_score)
+
+
+def draw_face_blur_using_pose_advance(keypoints, img):
+    """perform the face blur using the contour drawn from keypoints using advanced method.
+    :params keypoints: the shape should be equal to [17,2]
+    :params img:
+    """
+    assert keypoints.shape == (NUM_KPTS, 2)
+
+    # contour = contour_using_shoulder(keypoints)
+    contour = contour_using_eye_nose(keypoints)
+    # logger.info("%s %s", "contour ", contour)
+
+    contour = np.array(np.ceil(contour), dtype=int)
+    hull = cv2.convexHull(contour)
+
+    # ellipse = cv2.fitEllipse(contour)
+    # logger.info("%s %s", "ellipse ", ellipse)
+    logger.info("%s %s", "hull ", hull)
+
+    cv2.fillPoly(img, pts=[hull], color=(234, 237, 237))
+
+
+def contour_using_eye_nose(keypoints):
+    '''                                 y
+                                        |
+                                        |
+                                        | index 0
+                                        |
+                                        |
+                                        |
+                                        |
+                                        |
+    x ___________________________________
+        index 1
+    '''
+
+    # nose, left_eye, right_eye = keypoints['nose'], keypoints['left_eye'], keypoints['right_eye']  #error
+    nose, left_eye, right_eye = keypoints[0], keypoints[1], keypoints[2]
+
+    middle_eye_point = [min(left_eye[0], right_eye[0]), (left_eye[1] + right_eye[1]) / 2]
+    distance_bw_eyes = (right_eye[1] - left_eye[1]) / 2
+    # distance_bw_eye_nose_using_brute = middle_eye_point[0] - nose[0]
+    distance_bw_eye_nose = perpendicular_distance(left_eye, right_eye, nose)
+
+    left_eye = [left_eye[0], max(0, left_eye[1] - distance_bw_eyes)]
+    right_eye = [right_eye[0], right_eye[1] + distance_bw_eyes]
+
+    p1, p2 = get_perpendicular_points(left_eye, right_eye, -1.5 * distance_bw_eye_nose)
+    p3, p4 = get_perpendicular_points(left_eye, right_eye, 3 * distance_bw_eye_nose)
+
+    contour = [
+        left_eye, right_eye,
+        p1, p2,
+        p3, p4
+    ]
+
+    logger.info('----------------------------------------------')
+    logger.info("%s %s %s %s %s %s", "left eye ", left_eye, " right eye ", right_eye, " nose ", nose)
+    logger.info("%s %s", "middle_eye_point ", middle_eye_point)
+    logger.info("%s %s", "distance_bw_eyes ", distance_bw_eyes)
+    # logger.info("%s %s", "distance_bw_eye_nose_primitive using brute ", distance_bw_eye_nose_using_brute)
+    logger.info("%s %s", "distance_bw_eye_nose using perpendicular function ", distance_bw_eye_nose)
+    logger.info("%s %s %s %s %s %s %s %s", "p1 ", p1, " p2 ", p2, " p3 ", p3, " p4 ", p4)
+
+    logger.info("%s %s", "contour_using_eye_nose ", contour)
+
+    logger.info('----------------------------------------------')
+    return contour
+
+
+def perpendicular_distance(p1, p2, p3):
+    p1 = np.array(p1)
+    p2 = np.array(p2)
+    p3 = np.array(p3)
+    dist = np.abs(np.cross(p2 - p1, p3 - p1) / np.linalg.norm(p2 - p1))
+
+    return dist
+
+
+def get_perpendicular_points(p1, p2, n):
+    x1, y1 = p1[1], p1[0]
+    x2, y2 = p2[1], p2[0]
+
+    vx = x2 - x1
+    vy = y2 - y1
+    len = math.sqrt(vx * vx + vy * vy)
+    ux = -vy / len
+    uy = vx / len
+
+    x3 = x1 + n * ux
+    y3 = y1 + n * uy
+    x4 = x2 + n * ux
+    y4 = y2 + n * uy
+
+    p3, p4 = [y3, x3], [y4, x4]
+    return p3, p4
