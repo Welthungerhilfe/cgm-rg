@@ -80,6 +80,7 @@ stages:
           - script: |
               set -e
               source $(VENV_CACHE_DIR)/bin/activate
+              pip install importlib-metadata==4.13.0
               flake8 src/ --ignore=E501,E402
             displayName: Run Flake8
           - script: |
