@@ -70,7 +70,8 @@ stages:
               cacheHitVar: VENV_CACHE_RESTORED
           - script: |
               set -e
-              apt-get -y update && apt-get install python3.7 python3-venv python3.7-venv
+              apt-get -y update
+              apt-get install python3.7 python3-venv python3.7-venv
               python3.7 -m venv $(VENV_CACHE_DIR)
               source $(VENV_CACHE_DIR)/bin/activate
               pip install setuptools==50.3.2 wheel==0.36.2
