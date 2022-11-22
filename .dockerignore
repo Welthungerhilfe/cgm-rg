@@ -4,4 +4,3 @@
 !src/
 !requirements.txt
 !entrypoint_with_api.sh
-!tests/
