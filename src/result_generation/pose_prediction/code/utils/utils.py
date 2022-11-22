@@ -12,15 +12,15 @@ sys.path.append(str(Path(__file__).parents[1]))  # noqa: E402
 import result_generation.pose_prediction.code.models.pose_hrnet  # noqa
 from result_generation.pose_prediction.code.config import cfg
 from result_generation.pose_prediction.code.config.constants import (
-    COCO_INSTANCE_CATEGORY_NAMES, 
-    NUM_KPTS, 
-    SKELETON, 
+    COCO_INSTANCE_CATEGORY_NAMES,
+    NUM_KPTS,
+    SKELETON,
     CocoColors,
     MLKIT_SKELETON,
     MLKIT_NUM_KPTS,
     MLKIT_KEYPOINT_INDEXES,
     MlkitColors
-    )
+)
 
 
 from result_generation.pose_prediction.code.utils.post_processing import get_final_preds
@@ -82,7 +82,7 @@ def draw_mlkit_pose(keypoints, img):
 
 
 def prepare_draw_kpts(mlkit_pose_result):
-    key_point_result_list =  mlkit_pose_result['key_points_coordinate']
+    key_point_result_list = mlkit_pose_result['key_points_coordinate']
 
     intermediate_key_point_result = {}
     for key_point_result in key_point_result_list:
@@ -95,7 +95,7 @@ def prepare_draw_kpts(mlkit_pose_result):
         draw_kpts.append(
             intermediate_key_point_result[key_point]
         )
-    
+
     return draw_kpts
 
 
