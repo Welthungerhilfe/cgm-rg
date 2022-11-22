@@ -54,6 +54,10 @@ def parse_args():
     parser.add_argument('--height_pose3d_workflow_scan_path', default=f"{workflow_dir}/height-pose3d-workflow-scan.json")  # noqa: E501
     parser.add_argument('--weight_workflow_artifact_path', default=f"{workflow_dir}/weight-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--weight_workflow_scan_path', default=f"{workflow_dir}/weight-workflow-scan.json")  # noqa: E501
+
+    parser.add_argument('--app_pose_workflow_path', default=f"{workflow_dir}/app_pose_workflow_path.json")  # noqa: E501
+    parser.add_argument('--mlkit_pose_visualize_pose_workflow_path', default=f"{workflow_dir}/mlkit_pose_visualize_pose_workflow.json")  # noqa: E501
+
     args = parser.parse_args()
     return args
 
@@ -75,6 +79,7 @@ def run_normal_flow():
     height_pose3d_workflow_scan_path = args.height_pose3d_workflow_scan_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
+
     app_pose_workflow_path = args.app_pose_workflow_path
     mlkit_pose_visualize_pose_workflow_path = args.mlkit_pose_visualize_pose_workflow_path
 
