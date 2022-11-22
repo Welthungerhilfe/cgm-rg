@@ -17,6 +17,7 @@ from result_generation.pose_prediction.code.utils.utils import (
     prepare_draw_kpts
 )
 
+
 class MLkitPoseVisualise:
     """Face blur results generation"""
 
@@ -28,26 +29,27 @@ class MLkitPoseVisualise:
             artifacts,
             scan_version,
             scan_type,
-            ):
+    ):
 
         store_attr(
-            'result_generation,workflow_app_pose_path,workflow_mlkit_pose_visualize_pose_path,artifacts,scan_version,scan_type', self)
+            'result_generation,workflow_app_pose_path,workflow_mlkit_pose_visualize_pose_path,artifacts,scan_version,scan_type',
+            self)
         # self.workflow_blur_obj = self.result_generation.workflows.load_workflows(
         #     self.workflow_blur_path
         #     )
         self.workflow_app_pose_obj = self.result_generation.workflows.load_workflows(
             self.workflow_app_pose_path
-            )
+        )
         self.workflow_mlkit_pose_visualize_obj = self.result_generation.workflows.load_workflows(
             self.workflow_mlkit_pose_visualize_pose_path
-            )
+        )
         # if self.workflow_blur_obj["data"]["input_format"] == 'image/jpeg':
         #     self.blur_input_format = 'img'
         self.scan_directory = os.path.join(
             self.result_generation.scan_parent_dir,
             self.result_generation.scan_metadata['id'],
             'img'
-            )
+        )
 
         # self.workflow_blur_obj['id'] = self.result_generation.workflows.get_workflow_id(
         #     self.workflow_blur_obj['name'], self.workflow_blur_obj['version'])
@@ -58,7 +60,6 @@ class MLkitPoseVisualise:
         self.workflow_mlkit_pose_visualize_obj['id'] = self.result_generation.workflows.get_workflow_id(
             self.workflow_mlkit_pose_visualize_obj['name'], self.workflow_mlkit_pose_visualize_obj['version'])
 
-
     def run_flow(self):
         """Driver method for blur flow"""
         # self.blur_set_resize_factor()
@@ -67,15 +68,14 @@ class MLkitPoseVisualise:
         self.post_mlkit_pose_visualization_files()
         self.post_mlkit_pose_visualization_object()
 
-
     def get_app_pose_result(self):
         url = os.getenv('APP_URL', 'http://localhost:5001')
         cgm_api = ApiEndpoints(url)
 
         scan_level_app_pose_results = cgm_api.get_results(
-            self.result_generation.scan_metadata['id'], 
+            self.result_generation.scan_metadata['id'],
             self.self.workflow_app_pose_obj['id']
-            )
+        )
 
         for artifact in self.artifacts:
             # get the app pose from db
@@ -83,21 +83,19 @@ class MLkitPoseVisualise:
             artifact['app_pose_result'] = scan_level_app_pose_results[artifact['id']]
             artifact['mlkit_draw_kpt'] = prepare_draw_kpts(artifact['app_pose_result'])
 
-
     def mlkit_pose_visualsation(self):
         for artifact in self.artifacts:
             input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
             logger.info("%s %s", "input_path of image to perform blur:", input_path)
             assert os.path.exists(input_path), f"{input_path} does not exist"
             rgb_image = cv2.imread(str(input_path))
-            #img = artifact['blurred_image']
+            # img = artifact['blurred_image']
             # Here we are considering that mlkit is generating one pos
             # So this expect one pose. For multi pose visualisation
             # we will need to modify the code accordingly
             pose_preds = artifact['mlkit_draw_kpt']
             pose_img = draw_mlkit_pose(pose_preds, rgb_image)
             artifact['mlkit_pose_blurred_image'] = pose_img
-
 
     def post_mlkit_pose_visualization_files(self):
         """Post the blurred file to the API"""
@@ -107,7 +105,6 @@ class MLkitPoseVisualise:
             if post_status == 201:
                 artifact['pose_id_from_post_request'] = pose_id_from_post_request
                 artifact['generated_timestamp'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-
 
     def prepare_mlkit_pose_visualize_object(self):
         res = Bunch(dict(results=[]))
@@ -126,7 +123,6 @@ class MLkitPoseVisualise:
             res.results.append(result)
 
         return res
-
 
     def post_mlkit_pose_visualization_object(self):
         res = self.prepare_pose_visualize_object()
