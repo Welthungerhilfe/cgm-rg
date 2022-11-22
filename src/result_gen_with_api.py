@@ -13,6 +13,7 @@ from get_scan_metadata import GetScanMetadata
 from prepare_artifacts import PrepareArtifacts
 from process_workflows import ProcessWorkflows
 from result_generation.blur_and_pose import PoseAndBlurFlow
+from result_generation.mlkit_pose_visual import MLkitPoseVisualise
 from result_generation.depthmap_image import DepthMapImgFlow
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.height.height_rgbd import HeightFlowRGBD
@@ -74,6 +75,9 @@ def run_normal_flow():
     height_pose3d_workflow_scan_path = args.height_pose3d_workflow_scan_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
+    app_pose_workflow_path = args.app_pose_workflow_path
+    mlkit_pose_visualize_pose_workflow_path = args.mlkit_pose_visualize_pose_workflow_path
+
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
@@ -119,6 +123,18 @@ def run_normal_flow():
         scan_version,
         scan_type, ['POSE', 'BLUR'])
     flows.append(flow)
+
+
+    flow = MLkitPoseVisualise(
+        result_generation,
+        app_pose_workflow_path,
+        mlkit_pose_visualize_pose_workflow_path,
+        pose_visualization_workflow_path,
+        rgb_artifacts,
+        scan_version,
+        scan_type)
+    flows.append(flow)
+
 
     flow = StandingLaying(
         result_generation,
@@ -210,6 +226,9 @@ def run_retroactive_flow():
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
 
+    app_pose_workflow_path = args.app_pose_workflow_path
+    mlkit_pose_visualize_pose_workflow_path = args.mlkit_pose_visualize_pose_workflow_path
+
     logger.info("Started Retroactive Flow")
     # Retrieve the connection string from an environment
     # variable named AZURE_STORAGE_CONNECTION_STRING
@@ -296,6 +315,17 @@ def run_retroactive_flow():
                 scan_version,
                 scan_type,
                 ['POSE'])
+
+        elif workflow.match_workflows(pose_workflow_path, workflow_id):
+            logger.info("Matched with MLKitPoseVisualiseFlow")
+            flow = MLkitPoseVisualise(
+                result_generation,
+                app_pose_workflow_path,
+                mlkit_pose_visualize_pose_workflow_path,
+                pose_visualization_workflow_path,
+                rgb_artifacts,
+                scan_version,
+                scan_type)
 
         elif workflow.match_workflows(standing_laying_workflow_path, workflow_id):
             logger.info("Matched with StandingLaying")

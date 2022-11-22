@@ -62,14 +62,21 @@ def download_model_from_registered_model(workspace, model_name, output_location)
 
 
 def main():
+    # sp = ServicePrincipalAuthentication(
+    #     tenant_id=os.environ['TENANT_ID'],
+    #     service_principal_id=os.environ['SP_ID'],
+    #     service_principal_password=os.environ['SP_PASSWD']
+    # )
+
     sp = ServicePrincipalAuthentication(
-        tenant_id=os.environ['TENANT_ID'],
-        service_principal_id=os.environ['SP_ID'],
-        service_principal_password=os.environ['SP_PASSWD']
+        tenant_id='3a27c573-ec1a-4734-9cd3-3208af51794b',
+        service_principal_id='fbc89310-16e7-4a21-bfec-c8f518689f76',
+        service_principal_password='TJv8Q~qAPVUYzWHtwjjyDcYP~kcSErDzhP-a6cE.'
     )
 
+
     ws = Workspace(
-        subscription_id=os.environ['SUB_ID'],
+        subscription_id='9b5bbfae-d5d1-4aae-a2ca-75159c0c887d', #os.environ['SUB_ID'],
         resource_group="cgm-ml-prod-ci-rg",
         workspace_name="cgm-ml-prod-ci-azml",
         auth=sp
