@@ -37,13 +37,11 @@ RUN mkdir log
 ADD requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
-# RUN pip install --no-cache-dir torch==1.9.0+cpu torchvision==0.10.0+cpu torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
+RUN pip install --no-cache-dir torch==1.9.0+cpu torchvision==0.10.0+cpu torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 
 ADD . /app
-ADD . /app
 
+RUN crontab deployment/crontab
+RUN chmod +x entrypoint_with_api.sh
 
-# RUN crontab deployment/crontab
-# RUN chmod +x entrypoint_with_api.sh
-
-# ENTRYPOINT ["/app/entrypoint_with_api.sh"]
+ENTRYPOINT ["/app/entrypoint_with_api.sh"]
