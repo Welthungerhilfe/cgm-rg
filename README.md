@@ -88,3 +88,8 @@ bumpversion minor
 bumpversion --new-version <version> patch
 ```
 These utility command do not commit or tag the repository.
+
+
+## Flake 8 linting
+Use below command to fix flake8 issue
+autopep8 --in-place --aggressive --aggressive <filename>
