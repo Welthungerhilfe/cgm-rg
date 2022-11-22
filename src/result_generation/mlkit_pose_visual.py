@@ -41,12 +41,12 @@ class MLkitPoseVisualise:
         self.workflow_mlkit_pose_visualize_obj = self.result_generation.workflows.load_workflows(
             self.workflow_mlkit_pose_visualize_pose_path
             )
-        if self.workflow_blur_obj["data"]["input_format"] == 'image/jpeg':
-            self.blur_input_format = 'img'
+        # if self.workflow_blur_obj["data"]["input_format"] == 'image/jpeg':
+        #     self.blur_input_format = 'img'
         self.scan_directory = os.path.join(
             self.result_generation.scan_parent_dir,
             self.result_generation.scan_metadata['id'],
-            self.blur_input_format
+            'img'
             )
 
         # self.workflow_blur_obj['id'] = self.result_generation.workflows.get_workflow_id(
