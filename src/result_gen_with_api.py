@@ -83,7 +83,6 @@ def run_normal_flow():
     app_pose_workflow_path = args.app_pose_workflow_path
     mlkit_pose_visualize_pose_workflow_path = args.mlkit_pose_visualize_pose_workflow_path
 
-
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
 
@@ -129,7 +128,6 @@ def run_normal_flow():
         scan_type, ['POSE', 'BLUR'])
     flows.append(flow)
 
-
     flow = MLkitPoseVisualise(
         result_generation,
         app_pose_workflow_path,
@@ -139,7 +137,6 @@ def run_normal_flow():
         scan_version,
         scan_type)
     flows.append(flow)
-
 
     flow = StandingLaying(
         result_generation,
@@ -276,7 +273,13 @@ def run_retroactive_flow():
         logger.info("%s %s", "Workflow ID :", workflow_id)
 
         # Match workflow with height artifact level workflow and skip data download and preprocessing
-        if workflow.match_workflows(height_workflow_artifact_path, workflow_id) or workflow.match_workflows(height_rgbd_workflow_artifact_path, workflow_id) or workflow.match_workflows(weight_workflow_artifact_path, workflow_id):
+        if workflow.match_workflows(
+                height_workflow_artifact_path,
+                workflow_id) or workflow.match_workflows(
+                height_rgbd_workflow_artifact_path,
+                workflow_id) or workflow.match_workflows(
+                weight_workflow_artifact_path,
+                workflow_id):
             queue_service.delete_message(queue_name, message.id, message.pop_receipt)
             logger.info("%s %s", "Skipped Artifact level workflow for Retroactive", workflow_id)
             continue
