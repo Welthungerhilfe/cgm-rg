@@ -3,6 +3,8 @@ import sys
 import log
 import cv2
 import uuid
+import json
+import numpy as np
 from bunch import Bunch
 from pathlib import Path
 from datetime import datetime
@@ -61,9 +63,11 @@ class MLkitPoseVisualise:
             self.workflow_mlkit_pose_visualize_obj['name'], self.workflow_mlkit_pose_visualize_obj['version'])
 
     def run_flow(self):
-        """Driver method for blur flow"""
+        """Driver method for Mlkit Pose Visualise flow"""
         # self.blur_set_resize_factor()
         logger.info('%s', 'Pose Prediction Started')
+
+        self.get_app_pose_result()
         self.mlkit_pose_visualsation()
         self.post_mlkit_pose_visualization_files()
         self.post_mlkit_pose_visualization_object()
@@ -73,19 +77,65 @@ class MLkitPoseVisualise:
         cgm_api = ApiEndpoints(url)
 
         scan_level_app_pose_results = cgm_api.get_results(
-            self.result_generation.scan_metadata['id'],
-            self.self.workflow_app_pose_obj['id']
+            scan_id = self.result_generation.scan_metadata['id'],
+            workflow_id = self.workflow_app_pose_obj['id']
         )
 
+        pose_result_by_artifact_id = {}
+        for result in scan_level_app_pose_results:
+            if 'poseCoordinates' in result['data']:
+                if len(result['source_artifacts']) > 0:
+                    pose_result_by_artifact_id[result['source_artifacts'][0]] = json.loads(
+                        result['data']['poseCoordinates']
+                    )
+                else:
+                    print("More than one source artifact for result ")
+                    print(result['source_artifacts'])
+
+
+        # from pprint import pprint
+        # print("--------------Scan Level Results-------------------------------------")
+        # pprint(scan_level_app_pose_results)
+        # print("---------------------------------------------------------------------")
+
+        # print("self.artifacts ")
+        # print(self.artifacts)
+
+        logger.info("--------------Scan Level Results-------------------------------------")
+        logger.info(scan_level_app_pose_results)
+        logger.info("---------------------------------------------------------------------")
+
+        logger.info("self.artifacts ")
+        logger.info("%s %s", "abc ", self.artifacts)
+
         for artifact in self.artifacts:
-            # get the app pose from db
-            # parse and preprocess it to generate draw_kpt
-            artifact['app_pose_result'] = scan_level_app_pose_results[artifact['id']]
-            artifact['mlkit_draw_kpt'] = prepare_draw_kpts(artifact['app_pose_result'])
+            print("=================================================")
+            print("artifact id ")
+            print(artifact['id'])
+            print('artifact')
+            print(artifact)
+            if artifact['id'] in pose_result_by_artifact_id:
+                artifact['app_pose_result'] = pose_result_by_artifact_id[artifact['id']]
+                print('Pose result ')
+                print(artifact['app_pose_result'])
+                artifact['mlkit_draw_kpt'] = prepare_draw_kpts(artifact['app_pose_result'])
 
     def mlkit_pose_visualsation(self):
+        print("============================================================")
+        print(self.scan_directory)
+        # print(artifact['file'])
+        print("============================================================")
+
+        logger.info("============================================================")
+        logger.info(self.scan_directory)
+        # logger.info(artifact['file'])
+        logger.info("============================================================")
+
         for artifact in self.artifacts:
-            input_path = self.result_generation.get_input_path(self.scan_directory, artifact['file'])
+            artifact['pose_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+            input_path = self.result_generation.get_input_path(
+                self.scan_directory, artifact['file']
+                )
             logger.info("%s %s", "input_path of image to perform blur:", input_path)
             assert os.path.exists(input_path), f"{input_path} does not exist"
             rgb_image = cv2.imread(str(input_path))
@@ -94,8 +144,14 @@ class MLkitPoseVisualise:
             # So this expect one pose. For multi pose visualisation
             # we will need to modify the code accordingly
             pose_preds = artifact['mlkit_draw_kpt']
-            pose_img = draw_mlkit_pose(pose_preds, rgb_image)
+            print("pose_preds")
+            print(pose_preds)
+            pose_img = draw_mlkit_pose(np.asarray(pose_preds, dtype=np.float32), rgb_image)
             artifact['mlkit_pose_blurred_image'] = pose_img
+            # output_path = str(input_path) +'_pose.jpeg'
+            # print(output_path)
+            # cv2.imwrite(str(output_path), pose_img)
+
 
     def post_mlkit_pose_visualization_files(self):
         """Post the blurred file to the API"""
@@ -125,7 +181,7 @@ class MLkitPoseVisualise:
         return res
 
     def post_mlkit_pose_visualization_object(self):
-        res = self.prepare_pose_visualize_object()
+        res = self.prepare_mlkit_pose_visualize_object()
         res_object = self.result_generation.bunch_object_to_json_object(res)
         if self.result_generation.api.post_results(res_object) == 201:
             logger.info("%s %s", "successfully post pose results:", res_object)
