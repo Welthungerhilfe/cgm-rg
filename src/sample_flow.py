@@ -12,7 +12,7 @@ from pathlib import Path
 
 from api_endpoints import ApiEndpoints
 from process_workflows import ProcessWorkflows
-from get_scan_metadata import GetScanMetadata
+# from get_scan_metadata import GetScanMetadata
 from prepare_artifacts import PrepareArtifacts
 
 sys.path.append(str(Path(__file__).parents[1]))
@@ -20,7 +20,6 @@ from result_generation.pose_prediction.code.utils.utils import (
     draw_mlkit_pose,
     prepare_draw_kpts
 )
-
 
 
 scan_parent_dir = 'data/scans/'
@@ -31,11 +30,11 @@ url = os.getenv('APP_URL', 'http://localhost:5001')
 print("APP URL ", url)
 rgb_format = 'img'
 
-scan_dir= Path(scan_parent_dir) / scan_id
+scan_dir = Path(scan_parent_dir) / scan_id
 
 cgm_api = ApiEndpoints(url)
 workflow = ProcessWorkflows(cgm_api)
-#get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
+# get_scan_metadata = GetScanMetadata(cgm_api, scan_metadata_path)
 
 scan_metadata = cgm_api.get_scan_metadata(scan_id)
 
@@ -44,10 +43,10 @@ pprint(scan_metadata)
 
 
 data_processing = PrepareArtifacts(
-    cgm_api, 
-    scan_metadata, 
+    cgm_api,
+    scan_metadata,
     scan_parent_dir
-    )
+)
 
 data_processing.process_scan_metadata()
 data_processing.create_scan_dir()
@@ -56,10 +55,9 @@ rgb_artifacts = data_processing.download_artifacts('img')
 depth_artifacts = data_processing.download_artifacts('depth')
 
 
-result_metadata =  cgm_api.get_results(
-    scan_id = scan_id, 
-    workflow_id = workflow_id)
-
+result_metadata = cgm_api.get_results(
+    scan_id=scan_id,
+    workflow_id=workflow_id)
 
 
 print("result_metadata")
@@ -95,7 +93,6 @@ for artifact in rgb_artifacts:
         artifact['mlkit_draw_kpt'] = prepare_draw_kpts(artifact['app_pose_result'])
 
 
-
 for artifact in rgb_artifacts:
     print("=================================================")
     input_path = scan_dir / rgb_format / artifact['file']
@@ -120,26 +117,16 @@ for artifact in rgb_artifacts:
     cv2.imwrite(str(output_path), pose_img)
 
 
-
-
-
-
-
-
-
-
 # scan_id ==> scan_metadata ==> download artifacts
 
 
 # scan_id, workflow_id ==> results
 
 
-# parse ==> for each artifact ==> map with app pose results 
+# parse ==> for each artifact ==> map with app pose results
 
 
 # visualise on each artifact ==> generate result images
 
 # send result image
 # send result object
-
-

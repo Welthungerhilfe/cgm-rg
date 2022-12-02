@@ -208,6 +208,7 @@ def run_normal_flow():
             logger.exception(e)
             print(e)
 
+
 def run_retroactive_flow():
 
     args = parse_args()
@@ -228,8 +229,8 @@ def run_retroactive_flow():
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
 
-    app_pose_workflow_path = args.app_pose_workflow_path
-    mlkit_pose_visualize_pose_workflow_path = args.mlkit_pose_visualize_pose_workflow_path
+    # app_pose_workflow_path = args.app_pose_workflow_path
+    # mlkit_pose_visualize_pose_workflow_path = args.mlkit_pose_visualize_pose_workflow_path
 
     logger.info("Started Retroactive Flow")
     # Retrieve the connection string from an environment

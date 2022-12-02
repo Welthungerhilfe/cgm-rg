@@ -77,8 +77,8 @@ class MLkitPoseVisualise:
         cgm_api = ApiEndpoints(url)
 
         scan_level_app_pose_results = cgm_api.get_results(
-            scan_id = self.result_generation.scan_metadata['id'],
-            workflow_id = self.workflow_app_pose_obj['id']
+            scan_id=self.result_generation.scan_metadata['id'],
+            workflow_id=self.workflow_app_pose_obj['id']
         )
 
         pose_result_by_artifact_id = {}
@@ -91,7 +91,6 @@ class MLkitPoseVisualise:
                 else:
                     print("More than one source artifact for result ")
                     print(result['source_artifacts'])
-
 
         # from pprint import pprint
         # print("--------------Scan Level Results-------------------------------------")
@@ -135,7 +134,7 @@ class MLkitPoseVisualise:
             artifact['pose_start_time'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             input_path = self.result_generation.get_input_path(
                 self.scan_directory, artifact['file']
-                )
+            )
             logger.info("%s %s", "input_path of image to perform blur:", input_path)
             assert os.path.exists(input_path), f"{input_path} does not exist"
             rgb_image = cv2.imread(str(input_path))
@@ -151,7 +150,6 @@ class MLkitPoseVisualise:
             # output_path = str(input_path) +'_pose.jpeg'
             # print(output_path)
             # cv2.imwrite(str(output_path), pose_img)
-
 
     def post_mlkit_pose_visualization_files(self):
         """Post the blurred file to the API"""

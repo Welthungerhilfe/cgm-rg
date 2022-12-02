@@ -1,12 +1,12 @@
 import os
 import log
-import uuid
+# import uuid
 
 logger = log.setup_custom_logger(__name__)
 
 from api_endpoints import ApiEndpoints
 from process_workflows import ProcessWorkflows
-from get_scan_metadata import GetScanMetadata
+# from get_scan_metadata import GetScanMetadata
 from prepare_artifacts import PrepareArtifacts
 from result_generation.result_generation import ResultGeneration
 from result_generation.mlkit_pose_visual import MLkitPoseVisualise
@@ -24,7 +24,7 @@ def run_flow_on_single_scan(scan_id):
 
     app_pose_workflow_path = '/app/src/workflows/app_pose_workflow_path.json'
     mlkit_pose_visualize_pose_workflow_path = '/app/src/workflows/mlkit_pose_visualize_pose_workflow.json'
-    pose_visualization_workflow_path = '/app/src/workflows/pose-visualize-workflows.json'
+    # pose_visualization_workflow_path = '/app/src/workflows/pose-visualize-workflows.json'
     scan_parent_dir = '/app/data/scans/'
     # scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     # scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
@@ -41,7 +41,7 @@ def run_flow_on_single_scan(scan_id):
     # scan_metadata = get_scan_metadata.get_scan_metadata()
 
     scan_metadata = cgm_api.get_scan_metadata(scan_id)
-    
+
     scan_version = scan_metadata['version']
     scan_type = scan_metadata["type"]
     logger.info("%s %s", "Scan Type Version:", scan_version)
@@ -52,11 +52,11 @@ def run_flow_on_single_scan(scan_id):
     data_processing.create_scan_dir()
     data_processing.create_artifact_dir()
     rgb_artifacts = data_processing.download_artifacts('img')
-    depth_artifacts = data_processing.download_artifacts('depth')
-    person_details = person(cgm_api, scan_metadata['person'])
-    scan_meta_data_details = scan_id_meta_data(cgm_api, scan_metadata['id'])
+    # depth_artifacts = data_processing.download_artifacts('depth')
+    # person_details = person(cgm_api, scan_metadata['person'])
+    # scan_meta_data_details = scan_id_meta_data(cgm_api, scan_metadata['id'])
 
-    flows = []
+    # flows = []
 
     result_generation = ResultGeneration(cgm_api, workflow, scan_metadata, scan_parent_dir)
 

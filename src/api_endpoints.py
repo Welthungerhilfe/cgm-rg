@@ -246,14 +246,12 @@ class ApiEndpoints:
             return 0
 
 
-
 if __name__ == "__main__":
     url = os.getenv('APP_URL', 'http://localhost:5001')
     scan_endpoint = '/api/scans/unprocessed?limit=1'
 
     url = os.getenv('APP_URL', 'http://localhost:5001')
     logger.info("%s %s", "App URL:", url)
-
 
     scan_parent_dir = '/app/data/scans/'
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
@@ -262,4 +260,3 @@ if __name__ == "__main__":
     cgm_api = ApiEndpoints(url)
 
     cgm_api.get_scan(scan_metadata_path)
-
