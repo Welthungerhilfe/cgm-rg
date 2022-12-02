@@ -91,7 +91,8 @@ These utility command do not commit or tag the repository.
 
 
 ## Flake 8 linting
-Use below command to fix flake8 issue
+Use below command to check and fix flake8 issue
+flake8 --ignore=E501,E402
 autopep8 --in-place --aggressive --aggressive <filename>
 
 
