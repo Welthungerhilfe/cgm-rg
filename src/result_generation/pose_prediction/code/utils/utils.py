@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from pprint import pprint
 import torch
 import torch.nn.parallel
 import torch.optim
@@ -73,6 +74,8 @@ def draw_mlkit_pose(keypoints, img):
     assert keypoints.shape == (MLKIT_NUM_KPTS, 2)
     for i in range(len(MLKIT_SKELETON)):
         kpt_a, kpt_b = MLKIT_SKELETON[i][0], MLKIT_SKELETON[i][1]
+        kpt_a, kpt_b = kpt_a - 1, kpt_b - 1
+
         x_a, y_a = keypoints[kpt_a][0], keypoints[kpt_a][1]
         x_b, y_b = keypoints[kpt_b][0], keypoints[kpt_b][1]
         img = cv2.circle(img, (int(x_a), int(y_a)), 6, MlkitColors[i], -1)
@@ -86,9 +89,11 @@ def prepare_draw_kpts(mlkit_pose_result):
 
     intermediate_key_point_result = {}
     for key_point_result in key_point_result_list:
-        key_point, coordinate = key_point_result.items()[0]
+        key_point, coordinate = list(key_point_result.items())[0]
         x_coordinate, y_coordinate = coordinate['x'], coordinate['y']
         intermediate_key_point_result[key_point] = [x_coordinate, y_coordinate]
+
+    pprint(intermediate_key_point_result)
 
     draw_kpts = []
     for index, key_point in MLKIT_KEYPOINT_INDEXES.items():
