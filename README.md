@@ -93,3 +93,11 @@ These utility command do not commit or tag the repository.
 ## Flake 8 linting
 Use below command to fix flake8 issue
 autopep8 --in-place --aggressive --aggressive <filename>
+
+
+For running cgm-rg locally, Below command can be helpful:
+docker build -t cgm-rg .
+docker run --env-file .env.docker --rm -it cgm-rg bash
+
+Command to run result generation once from the container for testing.
+python src/result_gen_with_api.py  >> debug_log.txt 2>&1
