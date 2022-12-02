@@ -133,7 +133,7 @@ class ApiEndpoints:
         return str(uuid.uuid4()), 200
 
     def get_scan(self, scan_path):
-        """Get the scan metadata"""
+        """Get the scan metadata of unprocessed scans"""
         headers = self.prepare_header()
         response = requests.get(self.url + self.scan_endpoint, headers=headers)
 
@@ -225,7 +225,38 @@ class ApiEndpoints:
             logger.info("%s %s", "Response code :", response.status_code)
             return 0
 
+    def get_scan_metadata(self, scan_id):
+        """Get Result from scan id and workflow id """
+        headers = self.prepare_header()
+        response = requests.get(
+            self.url + self.mod_scan_endpoint,
+            params={
+                'workflow': None,
+                'show_results': False,
+                'scan_id': scan_id
+            },
+            headers=headers)
+        if response.status_code == 200:
+            content = response.json()
+            logger.info("Result Details :")
+            # result = content['scans'][0]['results']
+            return content['scans'][0]
+        else:
+            logger.info("%s %s", "Response code :", response.status_code)
+            return 0
+
 
 if __name__ == "__main__":
     url = os.getenv('APP_URL', 'http://localhost:5001')
     scan_endpoint = '/api/scans/unprocessed?limit=1'
+
+    url = os.getenv('APP_URL', 'http://localhost:5001')
+    logger.info("%s %s", "App URL:", url)
+
+    scan_parent_dir = '/app/data/scans/'
+    scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
+    scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
+
+    cgm_api = ApiEndpoints(url)
+
+    cgm_api.get_scan(scan_metadata_path)

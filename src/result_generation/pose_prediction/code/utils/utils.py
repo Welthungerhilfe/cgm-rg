@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from pprint import pprint
 import torch
 import torch.nn.parallel
 import torch.optim
@@ -11,7 +12,18 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parents[1]))  # noqa: E402
 import result_generation.pose_prediction.code.models.pose_hrnet  # noqa
 from result_generation.pose_prediction.code.config import cfg
-from result_generation.pose_prediction.code.config.constants import COCO_INSTANCE_CATEGORY_NAMES, NUM_KPTS, SKELETON, CocoColors
+from result_generation.pose_prediction.code.config.constants import (
+    COCO_INSTANCE_CATEGORY_NAMES,
+    NUM_KPTS,
+    SKELETON,
+    CocoColors,
+    MLKIT_SKELETON,
+    MLKIT_NUM_KPTS,
+    MLKIT_KEYPOINT_INDEXES,
+    MlkitColors
+)
+
+
 from result_generation.pose_prediction.code.utils.post_processing import get_final_preds
 from result_generation.pose_prediction.code.utils.transforms import get_affine_transform
 
@@ -52,6 +64,44 @@ def rot(keypoints, orientation, height, width):
             rot_x, rot_y = keypoints[i][1], height - keypoints[i][0]
         rotated_keypoints.append([rot_x, rot_y])
     return rotated_keypoints
+
+
+def draw_mlkit_pose(keypoints, img):
+    """draw the keypoints and the skeletons.
+    :params keypoints: the shape should be equal to [17,2]
+    :params img:
+    """
+    assert keypoints.shape == (MLKIT_NUM_KPTS, 2)
+    for i in range(len(MLKIT_SKELETON)):
+        kpt_a, kpt_b = MLKIT_SKELETON[i][0], MLKIT_SKELETON[i][1]
+        kpt_a, kpt_b = kpt_a - 1, kpt_b - 1
+
+        x_a, y_a = keypoints[kpt_a][0], keypoints[kpt_a][1]
+        x_b, y_b = keypoints[kpt_b][0], keypoints[kpt_b][1]
+        img = cv2.circle(img, (int(x_a), int(y_a)), 6, MlkitColors[i], -1)
+        img = cv2.circle(img, (int(x_b), int(y_b)), 6, MlkitColors[i], -1)
+        img = cv2.line(img, (int(x_a), int(y_a)), (int(x_b), int(y_b)), MlkitColors[i], 2)
+    return img
+
+
+def prepare_draw_kpts(mlkit_pose_result):
+    key_point_result_list = mlkit_pose_result['key_points_coordinate']
+
+    intermediate_key_point_result = {}
+    for key_point_result in key_point_result_list:
+        key_point, coordinate = list(key_point_result.items())[0]
+        x_coordinate, y_coordinate = coordinate['x'], coordinate['y']
+        intermediate_key_point_result[key_point] = [x_coordinate, y_coordinate]
+
+    pprint(intermediate_key_point_result)
+
+    draw_kpts = []
+    for index, key_point in MLKIT_KEYPOINT_INDEXES.items():
+        draw_kpts.append(
+            intermediate_key_point_result[key_point]
+        )
+
+    return draw_kpts
 
 
 def draw_pose(keypoints, img):

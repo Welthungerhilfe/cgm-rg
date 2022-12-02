@@ -25,7 +25,7 @@ laying_scan_type = ["201", "202", "203"]
 
 
 class PoseAndBlurFlow:
-    """Face blur results generation"""
+    """Face blur and Pose results generation"""
 
     def __init__(
             self,

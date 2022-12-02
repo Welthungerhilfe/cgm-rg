@@ -1,0 +1,9 @@
+{
+    "name": "app_pose_predicition",
+    "version": "1.0",
+    "result_format": "dict",
+    "result_binding": "artifact",
+    "data":{
+        "input_format":"image/jpeg"
+    }
+}

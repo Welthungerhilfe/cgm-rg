@@ -13,6 +13,7 @@ from get_scan_metadata import GetScanMetadata
 from prepare_artifacts import PrepareArtifacts
 from process_workflows import ProcessWorkflows
 from result_generation.blur_and_pose import PoseAndBlurFlow
+from result_generation.mlkit_pose_visual import MLkitPoseVisualise
 from result_generation.depthmap_image import DepthMapImgFlow
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
 from result_generation.height.height_rgbd import HeightFlowRGBD
@@ -53,6 +54,10 @@ def parse_args():
     parser.add_argument('--height_pose3d_workflow_scan_path', default=f"{workflow_dir}/height-pose3d-workflow-scan.json")  # noqa: E501
     parser.add_argument('--weight_workflow_artifact_path', default=f"{workflow_dir}/weight-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--weight_workflow_scan_path', default=f"{workflow_dir}/weight-workflow-scan.json")  # noqa: E501
+
+    parser.add_argument('--app_pose_workflow_path', default=f"{workflow_dir}/app_pose_workflow_path.json")  # noqa: E501
+    parser.add_argument('--mlkit_pose_visualize_pose_workflow_path', default=f"{workflow_dir}/mlkit_pose_visualize_pose_workflow.json")  # noqa: E501
+
     args = parser.parse_args()
     return args
 
@@ -74,6 +79,9 @@ def run_normal_flow():
     height_pose3d_workflow_scan_path = args.height_pose3d_workflow_scan_path
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
+
+    app_pose_workflow_path = args.app_pose_workflow_path
+    mlkit_pose_visualize_pose_workflow_path = args.mlkit_pose_visualize_pose_workflow_path
 
     scan_metadata_name = 'scan_meta_' + str(uuid.uuid4()) + '.json'
     scan_metadata_path = os.path.join(scan_parent_dir, scan_metadata_name)
@@ -118,6 +126,15 @@ def run_normal_flow():
         rgb_artifacts,
         scan_version,
         scan_type, ['POSE', 'BLUR'])
+    flows.append(flow)
+
+    flow = MLkitPoseVisualise(
+        result_generation,
+        app_pose_workflow_path,
+        mlkit_pose_visualize_pose_workflow_path,
+        rgb_artifacts,
+        scan_version,
+        scan_type)
     flows.append(flow)
 
     flow = StandingLaying(
@@ -186,8 +203,10 @@ def run_normal_flow():
     for flow in flows:
         try:
             flow.run_flow()
-        except Exception:
+        except Exception as e:
             logger.exception("Exception in Run Flow")
+            logger.exception(e)
+            print(e)
 
 
 def run_retroactive_flow():
@@ -209,6 +228,9 @@ def run_retroactive_flow():
 
     weight_workflow_artifact_path = args.weight_workflow_artifact_path
     weight_workflow_scan_path = args.weight_workflow_scan_path
+
+    # app_pose_workflow_path = args.app_pose_workflow_path
+    # mlkit_pose_visualize_pose_workflow_path = args.mlkit_pose_visualize_pose_workflow_path
 
     logger.info("Started Retroactive Flow")
     # Retrieve the connection string from an environment
@@ -252,7 +274,13 @@ def run_retroactive_flow():
         logger.info("%s %s", "Workflow ID :", workflow_id)
 
         # Match workflow with height artifact level workflow and skip data download and preprocessing
-        if workflow.match_workflows(height_workflow_artifact_path, workflow_id) or workflow.match_workflows(height_rgbd_workflow_artifact_path, workflow_id) or workflow.match_workflows(weight_workflow_artifact_path, workflow_id):
+        if workflow.match_workflows(
+                height_workflow_artifact_path,
+                workflow_id) or workflow.match_workflows(
+                height_rgbd_workflow_artifact_path,
+                workflow_id) or workflow.match_workflows(
+                weight_workflow_artifact_path,
+                workflow_id):
             queue_service.delete_message(queue_name, message.id, message.pop_receipt)
             logger.info("%s %s", "Skipped Artifact level workflow for Retroactive", workflow_id)
             continue
@@ -297,6 +325,16 @@ def run_retroactive_flow():
                 scan_type,
                 ['POSE'])
 
+        # if workflow.match_workflows(mlkit_pose_visualize_pose_workflow_path, workflow_id):
+        #     logger.info("Matched with MLKitPoseVisualiseFlow")
+        #     flow = MLkitPoseVisualise(
+        #         result_generation,
+        #         app_pose_workflow_path,
+        #         mlkit_pose_visualize_pose_workflow_path,
+        #         rgb_artifacts,
+        #         scan_version,
+        #         scan_type)
+
         elif workflow.match_workflows(standing_laying_workflow_path, workflow_id):
             logger.info("Matched with StandingLaying")
             flow = StandingLaying(
@@ -339,6 +377,7 @@ def run_retroactive_flow():
                 scan_version,
                 scan_meta_data_details,
                 standing_laying_workflow_path)
+
         elif workflow.match_workflows(height_pose3d_workflow_scan_path, workflow_id):
             logger.info("Matched with Height Flow Pose 3d")
             flow = HeightFlowPose3D(
@@ -372,8 +411,11 @@ def run_retroactive_flow():
         if workflow_matched:
             try:
                 flow.run_flow()
-            except Exception:
+            except Exception as e:
                 logger.exception("Error in Run Flow")
+                logger.exception(e)
+                print(e)
+
         queue_service.delete_message(queue_name, message.id, message.pop_receipt)
 
 
