@@ -8,6 +8,7 @@ RUN apt-get -y update && \
     git \
     wget \
     curl \
+    # nano \
     graphicsmagick \
     libgraphicsmagick1-dev \
     libatlas-base-dev \
@@ -40,6 +41,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir torch==1.9.0+cpu torchvision==0.10.0+cpu torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 
 ADD . /app
+
+
+# RUN pip install pytest
+# RUN pytest
+
 
 RUN crontab deployment/crontab
 RUN chmod +x entrypoint_with_api.sh
