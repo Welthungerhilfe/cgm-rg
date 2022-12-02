@@ -132,7 +132,6 @@ def run_normal_flow():
         result_generation,
         app_pose_workflow_path,
         mlkit_pose_visualize_pose_workflow_path,
-        pose_visualization_workflow_path,
         rgb_artifacts,
         scan_version,
         scan_type)
@@ -204,9 +203,10 @@ def run_normal_flow():
     for flow in flows:
         try:
             flow.run_flow()
-        except Exception:
+        except Exception as e:
             logger.exception("Exception in Run Flow")
-
+            logger.exception(e)
+            print(e)
 
 def run_retroactive_flow():
 
@@ -324,16 +324,15 @@ def run_retroactive_flow():
                 scan_type,
                 ['POSE'])
 
-        elif workflow.match_workflows(pose_workflow_path, workflow_id):
-            logger.info("Matched with MLKitPoseVisualiseFlow")
-            flow = MLkitPoseVisualise(
-                result_generation,
-                app_pose_workflow_path,
-                mlkit_pose_visualize_pose_workflow_path,
-                pose_visualization_workflow_path,
-                rgb_artifacts,
-                scan_version,
-                scan_type)
+        # if workflow.match_workflows(mlkit_pose_visualize_pose_workflow_path, workflow_id):
+        #     logger.info("Matched with MLKitPoseVisualiseFlow")
+        #     flow = MLkitPoseVisualise(
+        #         result_generation,
+        #         app_pose_workflow_path,
+        #         mlkit_pose_visualize_pose_workflow_path,
+        #         rgb_artifacts,
+        #         scan_version,
+        #         scan_type)
 
         elif workflow.match_workflows(standing_laying_workflow_path, workflow_id):
             logger.info("Matched with StandingLaying")
@@ -377,6 +376,7 @@ def run_retroactive_flow():
                 scan_version,
                 scan_meta_data_details,
                 standing_laying_workflow_path)
+
         elif workflow.match_workflows(height_pose3d_workflow_scan_path, workflow_id):
             logger.info("Matched with Height Flow Pose 3d")
             flow = HeightFlowPose3D(
@@ -410,8 +410,11 @@ def run_retroactive_flow():
         if workflow_matched:
             try:
                 flow.run_flow()
-            except Exception:
+            except Exception as e:
                 logger.exception("Error in Run Flow")
+                logger.exception(e)
+                print(e)
+
         queue_service.delete_message(queue_name, message.id, message.pop_receipt)
 
 
