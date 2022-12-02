@@ -48,8 +48,8 @@ NUM_KPTS = 17
 
 MLKIT_KEYPOINT_INDEXES = {
     "1": "nose",
-    "2": "lefy_eye_inner",
-    "3": "lefy_eye",
+    "2": "left_eye_inner",
+    "3": "left_eye",
     "4": "left_eye_outer",
     "5": "right_eye_inner",
     "6": "right_eye",
@@ -136,9 +136,9 @@ MLKIT_BODY_JOINTS = [
     ("right_ankle", "right_heel"),
     ("right_heel", "right_foot_index"),
     # Face
-    ("nose", "lefy_eye_inner"),
-    ("lefy_eye_inner", "lefy_eye"),
-    ("lefy_eye", "left_eye_outer"),
+    ("nose", "left_eye_inner"),
+    ("left_eye_inner", "left_eye"),
+    ("left_eye", "left_eye_outer"),
     ("left_eye_outer", "left_ear"),
     ("nose", "right_eye_inner"),
     ("right_eye_inner", "right_eye"),
