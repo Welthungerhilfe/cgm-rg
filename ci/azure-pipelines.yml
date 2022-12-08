@@ -250,6 +250,14 @@ stages:
                         IMAGE="$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
                         export IMAGE
                         yq eval '.properties.containers[0].properties.image = strenv(IMAGE)' "$TMP_CONF_FILE" -i
+                        
+                        # Update SP_PASSWD value if existing
+                        SP_PASSWD="$(TARGET_CONTAINER_SP_PASSWD)"
+                        export SP_PASSWD
+                        if [ -z ${SP_PASSWD+x} ]; then echo "SP_PASSWD is unset"; else yq eval '(.properties.containers[].properties.environmentVariables[]|select(.name == "SP_PASSWD").value |= strenv(SP_PASSWD)' "$TMP_CONF_FILE" -i; fi
+                        # yq e '(.spec.containers[].env[]|select(.name == "MONGO_HOST").value) |= "172.16.87.98"' yaml
+                        # https://stackoverflow.com/questions/59927271/replace-value-in-yaml-if-name-xxx-with-bash
+                        # https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
 
                         # Insert registry credentials
                         REGISTRY_CREDENTIALS=$(az acr credential show --name "$TARGET_REGISTRY")
