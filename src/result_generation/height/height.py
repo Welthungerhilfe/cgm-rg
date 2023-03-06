@@ -57,12 +57,14 @@ class HeightFlow:
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
         self.is_child_standing_age_lt_2 = is_child_standing_age_lt_2(
             self.scan_meta_data_details['age'], self.scan_meta_data_details['scan_type']
-            )
+        )
 
     def get_standing_results(self):
         url = os.getenv('APP_URL', 'http://localhost:5001')
         cgm_api = ApiEndpoints(url)
-        result = cgm_api.get_results(self.result_generation.scan_metadata['id'], self.standing_laying_workflow_obj['id'])
+        result = cgm_api.get_results(
+            self.result_generation.scan_metadata['id'],
+            self.standing_laying_workflow_obj['id'])
         artifact_id_dict_by_order_id = {}
         sl_data_dict_by_order_id = {}
         for image_artifact in self.image_artifacts:
@@ -70,7 +72,8 @@ class HeightFlow:
         for r in result:
             rgb_image_id = r['source_artifacts'][0]
             if rgb_image_id in artifact_id_dict_by_order_id:
-                sl_data_dict_by_order_id[artifact_id_dict_by_order_id[rgb_image_id]] = float(r['data']['standing'][1:-1])
+                sl_data_dict_by_order_id[artifact_id_dict_by_order_id[rgb_image_id]
+                                         ] = float(r['data']['standing'][1:-1])
             else:
                 logger.info("%s %s", rgb_image_id, "Id is not present in artifact_id_dict_by_order_id")
         for artifact in self.artifacts:
@@ -130,15 +133,15 @@ class HeightFlow:
                 source_results=[],
                 generated=generated_timestamp,
                 data={
-                    'height': str(prediction[0]), 
+                    'height': str(prediction[0]),
                     'pos_pe': artifact['percentile']['99_percentile_neg_error'],
-                    'neg_pe': artifact['percentile']['99_percentile_pos_error'], 
+                    'neg_pe': artifact['percentile']['99_percentile_pos_error'],
                     'mae': artifact['percentile']['mae']
-                    } if 'percentile' in artifact and bool(artifact['percentile']) else
+                } if 'percentile' in artifact and bool(artifact['percentile']) else
                 {
-                    'height': str(prediction[0]), 
-                    'pos_pe': None, 
-                    'neg_pe': None, 
+                    'height': str(prediction[0]),
+                    'pos_pe': None,
+                    'neg_pe': None,
                     'mae': None
                 },
                 start_time=start_time,
@@ -148,7 +151,15 @@ class HeightFlow:
         scan_99_percentile_pos_error, scan_99_percentile_neg_error, mae_scan = self.calculate_scan_level_error_stats()
         return res, scan_99_percentile_pos_error, scan_99_percentile_neg_error, mae_scan
 
-    def scan_level_height_result_object(self, predictions, generated_timestamp, workflow_obj, start_time, pos_percentile_error_99, neg_percentile_error_99, mae_scan):
+    def scan_level_height_result_object(
+            self,
+            predictions,
+            generated_timestamp,
+            workflow_obj,
+            start_time,
+            pos_percentile_error_99,
+            neg_percentile_error_99,
+            mae_scan):
         logger.info("%s", "Scan Level Result started")
         """Prepare scan level height result object"""
         res = Bunch(dict(results=[]))
@@ -200,7 +211,13 @@ class HeightFlow:
             logger.info("%s %s", "successfully post artifact level height results:", artifact_level_height_result_json)
 
         scan_level_height_result_bunch = self.scan_level_height_result_object(
-            predictions, generated_timestamp, self.scan_workflow_obj, start_time, pos_percentile_error_99, neg_percentile_error_99, mae_scan)
+            predictions,
+            generated_timestamp,
+            self.scan_workflow_obj,
+            start_time,
+            pos_percentile_error_99,
+            neg_percentile_error_99,
+            mae_scan)
         scan_level_height_result_json = self.result_generation.bunch_object_to_json_object(
             scan_level_height_result_bunch)
         if self.result_generation.api.post_results(scan_level_height_result_json) == 201:
@@ -218,9 +235,9 @@ class HeightFlow:
                 source_results=[],
                 generated=generated_timestamp,
                 data={
-                    'height': str(prediction[0]), 
+                    'height': str(prediction[0]),
                     'uncertainty': str(std[0])
-                    },
+                },
             ))
             res.results.append(result)
 
