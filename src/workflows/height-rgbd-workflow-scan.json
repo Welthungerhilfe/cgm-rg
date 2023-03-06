@@ -1,6 +1,6 @@
 {
     "name": "rgbd-plaincnn-height-5kscans-mean",
-    "version": "run-01_01",
+    "version": "run-01_02",
     "result_format": "dict",
     "result_binding": "scan",
     "data":{
