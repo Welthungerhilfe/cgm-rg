@@ -19,5 +19,3 @@ def is_child_standing_age_lt_2(age_in_days, scan_type):
         child_standing_age_lt_2 = True
 
     return child_standing_age_lt_2
-
-
