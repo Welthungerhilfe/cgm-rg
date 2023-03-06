@@ -13,7 +13,8 @@ from fastcore.basics import store_attr
 
 sys.path.append(str(Path(__file__).parents[1]))
 from result_generation.utils import (MAX_AGE, MAX_HEIGHT, MIN_HEIGHT,
-                                     calculate_age)
+                                     calculate_age,
+                                     is_child_standing_age_lt_2)
 
 logger = log.setup_custom_logger(__name__)
 
@@ -54,6 +55,9 @@ class HeightFlow:
             self.standing_laying_workflow_obj['name'], self.standing_laying_workflow_obj['version'])
         self.scan_workflow_obj['id'] = self.result_generation.workflows.get_workflow_id(
             self.scan_workflow_obj['name'], self.scan_workflow_obj['version'])
+        self.is_child_standing_age_lt_2 = is_child_standing_age_lt_2(
+            self.scan_meta_data_details['age'], self.scan_meta_data_details['scan_type']
+            )
 
     def get_standing_results(self):
         url = os.getenv('APP_URL', 'http://localhost:5001')
@@ -125,10 +129,18 @@ class HeightFlow:
                 source_artifacts=[artifact['id']],
                 source_results=[],
                 generated=generated_timestamp,
-                data={'height': str(prediction[0]), 'pos_pe': artifact['percentile']['99_percentile_neg_error'],
-                      'neg_pe': artifact['percentile']['99_percentile_pos_error'], 'mae': artifact['percentile']['mae']}
-                if 'percentile' in artifact and bool(artifact['percentile']) else
-                {'height': str(prediction[0]), 'pos_pe': None, 'neg_pe': None, 'mae': None},
+                data={
+                    'height': str(prediction[0]), 
+                    'pos_pe': artifact['percentile']['99_percentile_neg_error'],
+                    'neg_pe': artifact['percentile']['99_percentile_pos_error'], 
+                    'mae': artifact['percentile']['mae']
+                    } if 'percentile' in artifact and bool(artifact['percentile']) else
+                {
+                    'height': str(prediction[0]), 
+                    'pos_pe': None, 
+                    'neg_pe': None, 
+                    'mae': None
+                },
                 start_time=start_time,
                 end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             ))
@@ -205,7 +217,10 @@ class HeightFlow:
                 source_artifacts=[artifact['id']],
                 source_results=[],
                 generated=generated_timestamp,
-                data={'height': str(prediction[0]), 'uncertainty': str(std[0])},
+                data={
+                    'height': str(prediction[0]), 
+                    'uncertainty': str(std[0])
+                    },
             ))
             res.results.append(result)
 
