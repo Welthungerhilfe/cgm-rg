@@ -26,6 +26,11 @@ class HeightFlowRGBD(HeightFlow):
         start_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         rgbd_scans = self.process_rgbd()
         height_predictions = inference.get_height_rgbd_prediction_local(rgbd_scans)
+        if self.is_child_standing_age_lt_2:
+            logger.info("Child is age less than2 and standing")
+            logger.info("%s %s", "height Prediction before", height_predictions)
+            height_predictions = [[pred[0] + 0.7] for pred in height_predictions]
+            logger.info("%s %s", "height Prediction after", height_predictions)
         generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         self.get_standing_results()
         self.calculate_percentile()
