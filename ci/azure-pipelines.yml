@@ -223,6 +223,15 @@ stages:
                   - bash: pip install azure-cli==2.29.2
                     displayName: 'Downgrade Azure CLI to 2.29.2'
                   - task: AzureCLI@2
+                    displayName: Downgrade azure-devops extension to 0.25.0
+                    inputs:
+                      azureSubscription: cgm-${{ env }}-sub-cd
+                      scriptType: bash
+                      scriptLocation: inlineScript
+                      inlineScript: |
+                        az extension remove --name azure-devops
+                        az extension add --name azure-devops --version 0.25.0
+                  - task: AzureCLI@2
                     displayName: Update Container Instance
                     inputs:
                       azureSubscription: cgm-${{ env }}-sub-cd
