@@ -250,6 +250,12 @@ stages:
                       az --version
                     displayName: 'Downgrade Azure CLI to 2.29.2'
                     condition: always()
+                  - script: |
+                      az --version
+                      pip install "https://github.com/Azure/azure-devops-cli-extension/releases/download/20220324.1/azure_devops-0.25.0-py2.py3-none-any.whl"
+                      az --version
+                    displayName: 'Downgrade Azure CLI to 2.29.2'
+                    condition: always()
                   - script: | 
                       az --version
                     displayName: 'Show Azure CLI version'
