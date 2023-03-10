@@ -238,12 +238,12 @@ stages:
                   #   displayName: 'Downgrade Azure CLI to 2.29.2'
                   #   condition: always() # this step will always run, even if the pipeline is cancelled
 #end
-                  - script: pip install azure-cli==2.29.2 --extra-index-url https://azurecliprod.blob.core.windows.net/edge
+                  - script: pip install azure-cli==2.29.2 azure-devops==0.25.0 --extra-index-url https://azurecliprod.blob.core.windows.net/edge
                     displayName: 'Downgrade Azure CLI to 2.29.2'
                   - script: az --version 
                     displayName: 'Show Azure CLI version'
-                  - script: az extension add -n azure-devops 
-                    displayName: 'Install Azure DevOps Extension'
+                  # - script: az extension add -n azure-devops 
+                  #   displayName: 'Install Azure DevOps Extension'
                   - task: AzureCLI@1
                     inputs: 
                       azureSubscription: cgm-${{ env }}-sub-cd
@@ -259,6 +259,7 @@ stages:
                       scriptLocation: inlineScript
                       inlineScript: |
                         set -e
+                        az account show
                         az extension list
                   # - bash: pip install azure-devops==0.25.0
                   #   displayName: 'Downgrade azure-devops extension to 0.25.0'
