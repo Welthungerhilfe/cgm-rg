@@ -234,7 +234,7 @@ stages:
                       apt-cache policy azure-cli
                       sudo apt-get install azure-cli=2.29.2
                       az extension remove -n azure-devops
-                      az extension add -n azure-devops --version 0.21.0
+                      az extension add -n azure-devops --version 0.25.0
                     displayName: 'Downgrade Azure CLI to 2.29.2'
                     condition: always() # this step will always run, even if the pipeline is cancelled
                   - bash: pip install azure-devops==0.25.0
