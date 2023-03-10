@@ -238,7 +238,7 @@ stages:
                   #   displayName: 'Downgrade Azure CLI to 2.29.2'
                   #   condition: always() # this step will always run, even if the pipeline is cancelled
 #end
-                  - script: pip install azure-cli==2.29.2 azure-devops==0.26.0 --extra-index-url https://azurecliprod.blob.core.windows.net/edge
+                  - script: pip install azure-cli==2.29.2 --extra-index-url https://azurecliprod.blob.core.windows.net/edge
                     displayName: 'Downgrade Azure CLI to 2.29.2'
                     condition: always()
                   - script: az --version 
