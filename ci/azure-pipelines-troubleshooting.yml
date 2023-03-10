@@ -115,13 +115,13 @@ stages:
               # Setup Git
               git config --global user.email "noreply@childgrowthmonitor.org"
               git config --global user.name "CGM CI"
-              # # Tag current commit
-              # CURR_VERSION=$(head -n 1 VERSION)
-              # git tag -a "v$CURR_VERSION" -m "Result Generation version $CURR_VERSION"
-              # # Bump PATCH version
-              # bumpversion --commit patch
-              # # Push tag and bumped version
-              # git push --follow-tags origin HEAD:main
+              # Tag current commit
+              CURR_VERSION=$(head -n 1 VERSION)
+              git tag -a "v$CURR_VERSION" -m "Result Generation version $CURR_VERSION"
+              # Bump PATCH version
+              bumpversion --commit patch
+              # Push tag and bumped version
+              git push --follow-tags origin HEAD:main
             displayName: Tag and bump version
 
   - stage: Build
