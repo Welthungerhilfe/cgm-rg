@@ -8,9 +8,9 @@ trigger:
     exclude:
       - 'ml_rg*'
       - 'ml_rg'
-  tags:
-    include:
-      - 'v*'
+  # tags:
+  #   include:
+  #     - 'v*'
 
 variables:
   - group: cgm-rg
