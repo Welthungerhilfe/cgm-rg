@@ -1,13 +1,14 @@
 pool:
   vmImage: ubuntu-latest
 
-trigger:
-  branches:
-    include:
-      - '*'
-    exclude:
-      - 'ml_rg*'
-      - 'ml_rg'
+trigger: none
+# trigger:
+#   branches:
+#     include:
+#       - '*'
+#     exclude:
+#       - 'ml_rg*'
+#       - 'ml_rg'
   # tags:
   #   include:
   #     - 'v*'
