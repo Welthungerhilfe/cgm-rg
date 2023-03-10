@@ -160,6 +160,7 @@ stages:
       displayName: Deploy ${{ env }}
       dependsOn: 
         - Setup
+        - Verify
         # - Build
       # condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
       condition: succeeded()
