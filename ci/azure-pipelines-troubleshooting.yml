@@ -218,20 +218,28 @@ stages:
                       architecture: 'x64'
                   - bash: python -c "import azure.devops; print(azure.devops.__version__)"
                     displayName: Verify Azure DevOps version
+                    condition: always() # this step will always run, even if the pipeline is cancelled
                   - bash: pip list
                     displayName: List installed packages
+                    condition: always() # this step will always run, even if the pipeline is cancelled
                   - bash: pip show azure-devops
                     displayName: Show Azure DevOps package info
+                    condition: always() # this step will always run, even if the pipeline is cancelled
                   - bash: pip install azure-cli==2.29.2
                     displayName: 'Downgrade Azure CLI to 2.29.2'
+                    condition: always() # this step will always run, even if the pipeline is cancelled
                   - bash: pip install azure-devops==0.25.0
                     displayName: 'Downgrade azure-devops extension to 2.29.2'
+                    condition: always() # this step will always run, even if the pipeline is cancelled
                   - bash: python -c "import azure.devops; print(azure.devops.__version__)"
                     displayName: Verify Azure DevOps version
+                    condition: always() # this step will always run, even if the pipeline is cancelled
                   - bash: pip list
                     displayName: List installed packages
+                    condition: always() # this step will always run, even if the pipeline is cancelled
                   - bash: pip show azure-devops
                     displayName: Show Azure DevOps package info
+                    condition: always() # this step will always run, even if the pipeline is cancelled
                   # - task: AzureCLI@2
                   #   displayName: Downgrade azure-devops extension to 0.25.0
                   #   inputs:

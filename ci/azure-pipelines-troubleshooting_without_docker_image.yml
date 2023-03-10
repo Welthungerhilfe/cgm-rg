@@ -226,7 +226,15 @@ stages:
                   - bash: pip show azure-devops
                     displayName: Show Azure DevOps package info
                     condition: always() # this step will always run, even if the pipeline is cancelled
-                  - bash: pip install azure-cli==2.29.2
+                  # - bash: pip install azure-cli==2.29.2
+                  #   displayName: 'Downgrade Azure CLI to 2.29.2'
+                  #   condition: always() # this step will always run, even if the pipeline is cancelled
+                  - bash: |
+                      # pip install azure-cli==2.29.2
+                      apt-cache policy azure-cli
+                      sudo apt-get install azure-cli=2.29.2
+                      az extension remove -n azure-devops
+                      az extension add -n azure-devops --version 0.21.0
                     displayName: 'Downgrade Azure CLI to 2.29.2'
                     condition: always() # this step will always run, even if the pipeline is cancelled
                   - bash: pip install azure-devops==0.25.0
