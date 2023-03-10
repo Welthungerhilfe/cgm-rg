@@ -237,7 +237,14 @@ stages:
                   #     az extension add --name azure-devops
                   #   displayName: 'Downgrade Azure CLI to 2.29.2'
                   #   condition: always() # this step will always run, even if the pipeline is cancelled
-#end
+#end              
+                  - script: |
+                      az --version
+                      ls /opt/az/azcliextensions
+                      az extension add --name azure-devops==0.25.0
+                      az --version
+                    displayName: 'add 0.25.0 azure devops ext.'
+                    condition: always()
                   - script: |
                       az --version
                       pip install azure-cli==2.29.2 --extra-index-url https://azurecliprod.blob.core.windows.net/edge
@@ -252,11 +259,19 @@ stages:
                   #   condition: always()
                   - script: |
                       az --version
+                      ls /opt/az/azcliextensions
+                      az extension add --name azure-devops==0.25.0
+                      az --version
+                    displayName: 'Downgrade Azure CLI to 2.29.2'
+                    condition: always()
+                  - script: |
+                      az --version
+                      ls /opt/az/azcliextensions
                       az extension remove -n azure-devops
-                      az --verion
-                      az extension remove --name azure-devops
+                      az --debug
                       az --version
                       az extension add --source https://github.com/Azure/azure-devops-cli-extension/releases/download/20220324.1/azure_devops-0.25.0-py2.py3-none-any.whl
+                      az extension add --name azure-devops==0.25.0
                       az --version
                     displayName: 'Downgrade Azure CLI to 2.29.2'
                     condition: always()
