@@ -254,9 +254,9 @@ stages:
                       az --version
                       az extension remove -n azure-devops
                       az --verion
-                      pip install "https://github.com/Azure/azure-devops-cli-extension/releases/download/20220324.1/azure_devops-0.25.0-py2.py3-none-any.whl" --no-cache-dir --pre
+                      az extension remove --name azure-devops
                       az --version
-                      az extension add --name azure-devops
+                      az extension add --source https://github.com/Azure/azure-devops-cli-extension/releases/download/20220324.1/azure_devops-0.25.0-py2.py3-none-any.whl
                       az --version
                     displayName: 'Downgrade Azure CLI to 2.29.2'
                     condition: always()
