@@ -217,15 +217,24 @@ stages:
                       architecture: 'x64'
                   - bash: pip install azure-cli==2.29.2
                     displayName: 'Downgrade Azure CLI to 2.29.2'
-                  - task: AzureCLI@2
-                    displayName: Downgrade azure-devops extension to 0.25.0
-                    inputs:
-                      azureSubscription: cgm-${{ env }}-sub-cd
-                      scriptType: bash
-                      scriptLocation: inlineScript
-                      inlineScript: |
-                        az extension remove --name azure-devops
-                        az extension add --name azure-devops --version 0.25.0
+                  - bash: pip install azure-devops==0.25.0
+                    displayName: 'Downgrade azure-devops extension to 2.29.2'
+                  - name: Verify Azure DevOps version
+                    run: python -c "import azure.devops; print(azure.devops.__version__)"
+                  - name: List installed packages
+                    run: pip list
+                  - name: Show Azure DevOps package info
+                    run: pip show azure-devops
+                  
+                  # - task: AzureCLI@2
+                  #   displayName: Downgrade azure-devops extension to 0.25.0
+                  #   inputs:
+                  #     azureSubscription: cgm-${{ env }}-sub-cd
+                  #     scriptType: bash
+                  #     scriptLocation: inlineScript
+                  #     inlineScript: |
+                  #       az extension remove --name azure-devops
+                  #       az extension add --name azure-devops --version 0.25.0
                   # - task: AzureCLI@2
                   #   displayName: Update Container Instance
                   #   inputs:
