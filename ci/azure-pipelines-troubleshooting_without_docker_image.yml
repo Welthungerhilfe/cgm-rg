@@ -1,0 +1,297 @@
+pool:
+  vmImage: ubuntu-latest
+
+trigger:
+  branches:
+    include:
+      - '*'
+    exclude:
+      - 'ml_rg*'
+      - 'ml_rg'
+  # tags:
+  #   include:
+  #     - 'v*'
+
+variables:
+  - group: cgm-rg
+  - name: DOCKER_CACHE_DIR
+    value: $(Pipeline.Workspace)/docker_cache
+  - name: DOCKER_CACHE_IMG_FILE
+    value: image.tar
+  - name: VENV_CACHE_DIR
+    value: $(Pipeline.Workspace)/.venv
+  - name: System.Debug
+    value: 'true'
+
+parameters:
+  - name: var_groups
+    type: object
+    default:
+      - sandbox
+
+stages:
+  - stage: Setup
+    jobs:
+      - job: Variables
+        displayName: Setup pipeline variables
+        variables:
+          isRelease: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
+        steps:
+          - script: |
+              set -e
+              if [ "$(isRelease)" == 'True' ]
+              then
+                # Read version from version file
+                tag=$(head -n 1 VERSION)
+              else
+                # For feature commits tag containers with Git hash
+                tag=$(git rev-parse HEAD)
+              fi
+              echo "##[debug] tag: $tag"
+              echo "##vso[task.setvariable variable=TAG;isOutput=true]$tag"
+            name: ParseTag
+            displayName: Parse Docker tag
+
+  - stage: Verify
+    jobs:
+      - job: Verify
+        steps:
+          - script: |
+              set -e
+              sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt-get -y update && sudo apt-get install python3.7 python3.7-dev python3-venv python3.7-venv
+            displayName: Install python 3.7
+          - task: Cache@2
+            displayName: Cache Python dependencies
+            inputs:
+              key: 'rg-venv-cache | "$(Agent.OS)" | requirements.txt'
+              path: $(VENV_CACHE_DIR)
+              cacheHitVar: VENV_CACHE_RESTORED
+          - script: |
+              set -e
+              python3.7 -m venv $(VENV_CACHE_DIR)
+              source $(VENV_CACHE_DIR)/bin/activate
+              pip install setuptools==50.3.2 wheel==0.36.2
+              pip install -r requirements.txt
+            displayName: Install dependencies
+            condition: and(not(canceled()), eq(variables.VENV_CACHE_RESTORED, 'false'))
+          - script: |
+              set -e
+              source $(VENV_CACHE_DIR)/bin/activate
+              pip install importlib-metadata==4.13.0
+              flake8 src/ --ignore=E501,E402
+            displayName: Run Flake8
+          - script: |
+              set -e
+              source $(VENV_CACHE_DIR)/bin/activate
+              pytest --cov=src --cov-report=xml --junitxml="TEST-rg-pytest.xml"
+            displayName: Run unit tests
+            continueOnError: true
+          - task: PublishCodeCoverageResults@1
+            inputs:
+              codeCoverageTool: Cobertura
+              summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/TEST-*.xml'
+              failTaskOnFailedTests: true
+
+  - stage: Version
+    displayName: Tag & bump version
+    dependsOn: Verify
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - job:
+        displayName: Update version number
+        condition: ne(variables['Build.Reason'], 'Manual')
+        steps:
+          - checkout: self
+            fetchDepth: 1
+            persistCredentials: true
+          - script: pip install bump2version
+            displayName: Install bump2version
+          # - script: |
+          #     set -e
+          #     # Setup Git
+          #     git config --global user.email "noreply@childgrowthmonitor.org"
+          #     git config --global user.name "CGM CI"
+          #     # Tag current commit
+          #     CURR_VERSION=$(head -n 1 VERSION)
+          #     git tag -a "v$CURR_VERSION" -m "Result Generation version $CURR_VERSION"
+          #     # Bump PATCH version
+          #     bumpversion --commit patch
+          #     # Push tag and bumped version
+          #     git push --follow-tags origin HEAD:main
+          #   displayName: Tag and bump version
+
+  # - stage: Build
+  #   dependsOn:
+  #     - Setup
+  #     - Verify
+  #   condition: succeeded()
+  #   variables:
+  #     - name: TAG
+  #       value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
+  #   jobs:
+  #     - job: Build
+  #       displayName: Build Docker image
+  #       steps:
+  #         - task: Docker@2
+  #           displayName: Build Docker image
+  #           inputs:
+  #             command: build
+  #             repository: $(IMAGE_REPOSITORY)
+  #             tags: |
+  #               latest
+  #               $(Build.BuildId)
+  #               $(TAG)
+  #         - script: |
+  #             set -e
+  #             echo $(TAG)
+  #             echo "##[debug] TAG: $(TAG)"
+  #             mkdir -p $(DOCKER_CACHE_DIR)
+  #             docker image save --output "$(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)" $(IMAGE_REPOSITORY)
+  #           condition: not(canceled())
+  #         - publish: $(DOCKER_CACHE_DIR)
+  #           artifact: DockerCache
+
+  - ${{ each env in parameters.var_groups }}:
+    - stage: Deploy_${{ replace(env, '-', '_') }}
+      displayName: Deploy ${{ env }}
+      dependsOn: 
+        - Setup
+        # - Build
+      # condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+      condition: succeeded()
+      variables:
+        - group: cgm-rg-${{ env }}-ci
+        - name: TAG
+          value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
+      jobs:
+        - deployment: Deploy_Container_Instance
+          displayName: "Container Instance deployment ${{ env }}"
+          environment: cgm-rg-${{ env }}-env
+          variables:
+            isRelease: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
+          strategy:
+            runOnce:
+              deploy:
+                steps:
+                  - task: DownloadPipelineArtifact@2
+                    inputs:
+                      source: current
+                      artifact: DockerCache
+                      path: $(DOCKER_CACHE_DIR)
+                  # - script: |
+                  #     # echo all variables for debug
+                  #     echo "##[debug] TAG: $(TAG)"
+                  #     echo "##[debug] isRelease: $(isRelease)"
+                  #     echo "##[debug] DOCKER_CACHE_DIR: $(DOCKER_CACHE_DIR)"
+                  #     echo "##[debug] DOCKER_CACHE_IMG_FILE: $(DOCKER_CACHE_IMG_FILE)"
+                  #     echo "##[debug] IMAGE_REPOSITORY: $(IMAGE_REPOSITORY)"
+                  #     echo "##[debug] TARGET_REGISTRY: $(TARGET_REGISTRY)"
+
+                  #     set -e
+                  #     docker image load -i $(DOCKER_CACHE_DIR)/$(DOCKER_CACHE_IMG_FILE)
+                  #     echo "##[debug] IMAGE_REPOSITORY:tag : $(IMAGE_REPOSITORY):$TAG"
+                  #     docker tag "$(IMAGE_REPOSITORY):$TAG" "$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$TAG"
+                  #   displayName: Load and Tag image
+                  # - task: AzureCLI@2
+                  #   displayName: Push to target ACR
+                  #   inputs:
+                  #     azureSubscription: cgm-${{ env }}-sub-cd
+                  #     scriptType: bash
+                  #     scriptLocation: inlineScript
+                  #     inlineScript: |
+                  #       set -e
+                  #       # Login to ACR
+                  #       az acr login --name $(TARGET_REGISTRY)
+                  #       # Push Docker image
+                  #       IMAGE="$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
+                  #       docker push "$IMAGE"
+                  - script: sudo snap install yq
+                    displayName: Install yq utility
+                  - task: UsePythonVersion@0
+                    inputs:
+                      versionSpec: '3.x'
+                      architecture: 'x64'
+                  - bash: python -c "import azure.devops; print(azure.devops.__version__)"
+                    displayName: Verify Azure DevOps version
+                  - bash: pip list
+                    displayName: List installed packages
+                  - bash: pip show azure-devops
+                    displayName: Show Azure DevOps package info
+                  - bash: pip install azure-cli==2.29.2
+                    displayName: 'Downgrade Azure CLI to 2.29.2'
+                  - bash: pip install azure-devops==0.25.0
+                    displayName: 'Downgrade azure-devops extension to 2.29.2'
+                  - bash: python -c "import azure.devops; print(azure.devops.__version__)"
+                    displayName: Verify Azure DevOps version
+                  - bash: pip list
+                    displayName: List installed packages
+                  - bash: pip show azure-devops
+                    displayName: Show Azure DevOps package info
+                  # - task: AzureCLI@2
+                  #   displayName: Downgrade azure-devops extension to 0.25.0
+                  #   inputs:
+                  #     azureSubscription: cgm-${{ env }}-sub-cd
+                  #     scriptType: bash
+                  #     scriptLocation: inlineScript
+                  #     inlineScript: |
+                  #       az extension remove --name azure-devops
+                  #       az extension add --name azure-devops --version 0.25.0
+                  # - task: AzureCLI@2
+                  #   displayName: Update Container Instance
+                  #   inputs:
+                  #     azureSubscription: cgm-${{ env }}-sub-cd
+                  #     scriptType: bash
+                  #     scriptLocation: inlineScript
+                  #     inlineScript: |
+                  #       # sudo apt install -y --allow-downgrades azure-cli=2.29.2-1~bionic
+                  #       # sudo apt-get remove azure-cli
+                  #       # curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+                  #       # echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
+                  #       # sudo apt-get update
+                  #       # sudo apt-get install -y azure-cli=2.29.2-1~focal
+                        
+                  #       set -e
+                        
+                  #       # curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+                  #       # Export current setup -> modify and use as input for in-place update
+                  #       TMP_CONF_FILE=rg-ci-conf.yaml
+                  #       az container export \
+                  #         --name "$TARGET_CONTAINER_INSTANCE_NAME" \
+                  #         --resource-group "$TARGET_RESOURCE_GROUP" \
+                  #         --file "$TMP_CONF_FILE"
+
+                  #       # Replace image
+                  #       IMAGE="$(TARGET_REGISTRY)/$(IMAGE_REPOSITORY):$(TAG)"
+                  #       export IMAGE
+                  #       yq eval '.properties.containers[0].properties.image = strenv(IMAGE)' "$TMP_CONF_FILE" -i
+                        
+                  #       # Update SP_PASSWD value if existing
+                  #       SP_PASSWD="$(TARGET_CONTAINER_SP_PASSWD)"
+                  #       export SP_PASSWD
+                  #       if [ -z ${SP_PASSWD+x} ]; then echo "SP_PASSWD is unset"; else yq eval '(.properties.containers[].properties.environmentVariables[]|select(.name == "SP_PASSWD").value |= strenv(SP_PASSWD)' "$TMP_CONF_FILE" -i; fi
+                  #       # yq e '(.spec.containers[].env[]|select(.name == "MONGO_HOST").value) |= "172.16.87.98"' yaml
+                  #       # https://stackoverflow.com/questions/59927271/replace-value-in-yaml-if-name-xxx-with-bash
+                  #       # https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
+
+                  #       # Insert registry credentials
+                  #       REGISTRY_CREDENTIALS=$(az acr credential show --name "$TARGET_REGISTRY")
+
+                  #       REGISTRY_USERNAME=$(echo "$REGISTRY_CREDENTIALS" | jq '.username' --raw-output )
+                  #       export REGISTRY_USERNAME
+                  #       yq eval '.properties.imageRegistryCredentials[0].username = strenv(REGISTRY_USERNAME)' \
+                  #         "$TMP_CONF_FILE" --inplace
+
+                  #       REGISTRY_PASSWORD=$(echo "$REGISTRY_CREDENTIALS" | jq '.passwords[0].value' --raw-output )
+                  #       export REGISTRY_PASSWORD
+                  #       yq eval '.properties.imageRegistryCredentials[0].password = strenv(REGISTRY_PASSWORD)' \
+                  #         "$TMP_CONF_FILE" --inplace
+
+                  #       # Deploy updated image
+                  #       az container create \
+                  #         --name "$TARGET_CONTAINER_INSTANCE_NAME" \
+                  #         --resource-group "$TARGET_RESOURCE_GROUP" \
+                  #         --file "$TMP_CONF_FILE"
