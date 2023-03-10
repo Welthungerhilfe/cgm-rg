@@ -244,14 +244,14 @@ stages:
                     displayName: 'Show Azure CLI version'
                   - script: az extension add -n azure-devops 
                     displayName: 'Install Azure DevOps Extension'
-                  - task: AzureCLI@2
+                  - task: AzureCLI@1
                     inputs: 
                       azureSubscription: cgm-${{ env }}-sub-cd
                       scriptType: bash 
                       scriptLocation: 'inlineScript' 
                       inlineScript: | 
                         az account show
-                  - task: AzureCLI@2
+                  - task: AzureCLI@1
                     displayName: Downgrade azure-devops extension to 0.25.0
                     inputs:
                       azureSubscription: cgm-${{ env }}-sub-cd
