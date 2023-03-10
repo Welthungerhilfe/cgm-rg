@@ -179,11 +179,11 @@ stages:
             runOnce:
               deploy:
                 steps:
-                  - task: DownloadPipelineArtifact@2
-                    inputs:
-                      source: current
-                      artifact: DockerCache
-                      path: $(DOCKER_CACHE_DIR)
+                  # - task: DownloadPipelineArtifact@2
+                  #   inputs:
+                  #     source: current
+                  #     artifact: DockerCache
+                  #     path: $(DOCKER_CACHE_DIR)
                   # - script: |
                   #     # echo all variables for debug
                   #     echo "##[debug] TAG: $(TAG)"
