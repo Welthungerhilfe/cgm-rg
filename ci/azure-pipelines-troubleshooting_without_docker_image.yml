@@ -280,6 +280,15 @@ stages:
                       az --version
                     displayName: '[az --version]'
                     condition: always()
+                  - task: AzureCLI@2
+                    condition: always()
+                    displayName: '[az extension remove --name azure-devops]'
+                    inputs:
+                      azureSubscription: cgm-${{ env }}-sub-cd
+                      scriptType: bash
+                      scriptLocation: inlineScript
+                      inlineScript: |
+                        az extension remove --name azure-devops
                   # - script: az extension add -n azure-devops 
                   #   displayName: 'Install Azure DevOps Extension'
                   # - task: AzureCLI@2
