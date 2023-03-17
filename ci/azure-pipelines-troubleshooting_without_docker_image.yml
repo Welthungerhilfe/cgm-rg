@@ -97,33 +97,33 @@ stages:
           #     testResultsFiles: '**/TEST-*.xml'
           #     failTaskOnFailedTests: true
 
-  - stage: Version
-    displayName: Tag & bump version
-    # dependsOn: Verify
-    # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-    jobs:
-      - job:
-        displayName: Update version number
-        condition: ne(variables['Build.Reason'], 'Manual')
-        steps:
-          - checkout: self
-            fetchDepth: 1
-            persistCredentials: true
-          - script: pip install bump2version
-            displayName: Install bump2version
-          # - script: |
-          #     set -e
-          #     # Setup Git
-          #     git config --global user.email "noreply@childgrowthmonitor.org"
-          #     git config --global user.name "CGM CI"
-          #     # Tag current commit
-          #     CURR_VERSION=$(head -n 1 VERSION)
-          #     git tag -a "v$CURR_VERSION" -m "Result Generation version $CURR_VERSION"
-          #     # Bump PATCH version
-          #     bumpversion --commit patch
-          #     # Push tag and bumped version
-          #     git push --follow-tags origin HEAD:main
-          #   displayName: Tag and bump version
+  # - stage: Version
+  #   displayName: Tag & bump version
+  #   # dependsOn: Verify
+  #   # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  #   jobs:
+  #     - job:
+  #       displayName: Update version number
+  #       condition: ne(variables['Build.Reason'], 'Manual')
+  #       steps:
+  #         - checkout: self
+  #           fetchDepth: 1
+  #           persistCredentials: true
+  #         - script: pip install bump2version
+  #           displayName: Install bump2version
+  #         # - script: |
+  #         #     set -e
+  #         #     # Setup Git
+  #         #     git config --global user.email "noreply@childgrowthmonitor.org"
+  #         #     git config --global user.name "CGM CI"
+  #         #     # Tag current commit
+  #         #     CURR_VERSION=$(head -n 1 VERSION)
+  #         #     git tag -a "v$CURR_VERSION" -m "Result Generation version $CURR_VERSION"
+  #         #     # Bump PATCH version
+  #         #     bumpversion --commit patch
+  #         #     # Push tag and bumped version
+  #         #     git push --follow-tags origin HEAD:main
+  #         #   displayName: Tag and bump version
 
   # - stage: Build
   #   dependsOn:
@@ -237,18 +237,18 @@ stages:
                         sudo add-apt-repository https://packages.microsoft.com/repos/azure-cli
                         sudo apt update
                         apt-cache policy azure-cli
-                        sudo apt install -y --allow-downgrades azure-cli=2.29.2-1~focal
-                  - task: AzureCLI@1
+                        sudo apt install -y --allow-downgrades azure-cli=2.29.2-1~jammy
+                  - task: AzureCLI@2
                     displayName: "Azure CLI: [az extension add --name azure-devops --version 0.25.0]"
                     inputs:
-                      azureSubscription: "${{ parameters.AZURE_SUBSCRIPTION }}"
+                      azureSubscription: cgm-${{ env }}-sub-cd
                       scriptLocation: inlineScript
                       inlineScript: "az extension add --name azure-devops --version 0.25.0"
                       useGlobalConfig: true
-                  - task: AzureCLI@1
-                    displayName: "Azure CLI: [az extension add --name azure-devops --version 0.25.0]"
+                  - task: AzureCLI@2
+                    displayName: "Azure CLI: [az --version]"
                     inputs:
-                      azureSubscription: "${{ parameters.AZURE_SUBSCRIPTION }}"
+                      azureSubscription: cgm-${{ env }}-sub-cd
                       scriptLocation: inlineScript
                       inlineScript: "az --version"
                       useGlobalConfig: true
