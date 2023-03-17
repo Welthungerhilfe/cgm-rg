@@ -215,7 +215,8 @@ stages:
                     displayName: Install yq utility
                   - task: UsePythonVersion@0
                     inputs:
-                      versionSpec: '3.x'
+#                      versionSpec: '3.x'
+                      versionSpec: '3.10.7'
                       architecture: 'x64'
                   - bash: pip list
                     displayName: List installed packages
