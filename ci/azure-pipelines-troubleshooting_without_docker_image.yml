@@ -237,7 +237,7 @@ stages:
                         sudo add-apt-repository https://packages.microsoft.com/repos/azure-cli
                         sudo apt update
                         apt-cache policy azure-cli
-                        sudo apt install -y --allow-downgrades azure-cli=2.29.2-1~jammy
+                        sudo apt install -y --allow-downgrades azure-cli=2.29.2
                   - task: AzureCLI@2
                     displayName: "Azure CLI: [az extension add --name azure-devops --version 0.25.0]"
                     inputs:
