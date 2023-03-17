@@ -223,12 +223,19 @@ stages:
                   - bash: pip list
                     displayName: List installed packages
                     condition: always() # this step will always run, even if the pipeline is cancelled
-                  - bash: pip install --upgrade pip==22.0.4
+                  # ok but nothing happend to azure-devops
+                  # - bash: pip install --upgrade pip==22.0.4
+                  #   displayName: downgrade pip to 22.0.4
+                  #   condition: always() # this step will always run, even if the pipeline is cancelled
+                  - bash: pip install --force-reinstall -v "pip==22.0.4"
                     displayName: downgrade pip to 22.0.4
                     condition: always() # this step will always run, even if the pipeline is cancelled
                   - bash: pip list
                     displayName: List installed packages
                     condition: always() # this step will always run, even if the pipeline is cancelled
+                  #pip install --force-reinstall -v "MySQL_python==1.2.2"
+
+
                   # - bash: pip show azure-devops
                   #   displayName: Show Azure DevOps package info
                   #   condition: always() # this step will always run, even if the pipeline is cancelled
