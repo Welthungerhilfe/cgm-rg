@@ -217,31 +217,46 @@ stages:
                     inputs:
                       versionSpec: '3.x'
                       architecture: 'x64'
-                  # - bash: python -c "import azure.devops; print(azure.devops.__version__)"
-                  #   displayName: Verify Azure DevOps version
-                  #   condition: always() # this step will always run, even if the pipeline is cancelled
                   - bash: pip list
                     displayName: List installed packages
                     condition: always() # this step will always run, even if the pipeline is cancelled
-                  # ok but nothing happend to azure-devops
+              # ok but nothing happend to azure-devops
                   # - bash: pip install --upgrade pip==22.0.4
                   #   displayName: downgrade pip to 22.0.4
                   #   condition: always() # this step will always run, even if the pipeline is cancelled
-                  - bash: pip install --force-reinstall -v "pip==22.0.4"
-                    displayName: downgrade pip to 22.0.4
-                    condition: always() # this step will always run, even if the pipeline is cancelled
+                  # - bash: pip install --force-reinstall -v "pip==22.0.4"
+                  #   displayName: downgrade pip to 22.0.4
+                  #   condition: always() # this step will always run, even if the pipeline is cancelled
+              # end
+                  - task: Bash@3
+                    displayName: "Bash: Downgrade AZ CLI to [2.29.2]"
+                    inputs:
+                      targetType: "inline"
+                      workingDirectory: "$(Build.SourcesDirectory)"
+                      script: |
+                        sudo add-apt-repository https://packages.microsoft.com/repos/azure-cli
+                        sudo apt update
+                        apt-cache policy azure-cli
+                        sudo apt install -y --allow-downgrades azure-cli=2.29.2-1~focal
+                  - task: AzureCLI@1
+                    displayName: "Azure CLI: [az extension add --name azure-devops --version 0.25.0]"
+                    inputs:
+                      azureSubscription: "${{ parameters.AZURE_SUBSCRIPTION }}"
+                      scriptLocation: inlineScript
+                      inlineScript: "az extension add --name azure-devops --version 0.25.0"
+                      useGlobalConfig: true
+                  - task: AzureCLI@1
+                    displayName: "Azure CLI: [az extension add --name azure-devops --version 0.25.0]"
+                    inputs:
+                      azureSubscription: "${{ parameters.AZURE_SUBSCRIPTION }}"
+                      scriptLocation: inlineScript
+                      inlineScript: "az --version"
+                      useGlobalConfig: true
                   - bash: pip list
                     displayName: List installed packages
                     condition: always() # this step will always run, even if the pipeline is cancelled
                   #pip install --force-reinstall -v "MySQL_python==1.2.2"
 
-
-                  # - bash: pip show azure-devops
-                  #   displayName: Show Azure DevOps package info
-                  #   condition: always() # this step will always run, even if the pipeline is cancelled
-                  # - bash: pip install azure-cli==2.29.2
-                  #   displayName: 'Downgrade Azure CLI to 2.29.2'
-                  #   condition: always() # this step will always run, even if the pipeline is cancelled
 #seems to work somehow, keep in mind                  
                   # - bash: |
                   #     # pip install azure-cli==2.29.2
@@ -264,12 +279,6 @@ stages:
                       az --version
                     displayName: 'Downgrade Azure CLI to 2.29.2'
                     condition: always()
-                  # - script: |
-                  #     az --version
-                  #     pip install azure-devops==0.25.0 --extra-index-url https://azurecliprod.blob.core.windows.net/edge --trusted-host azurecliprod.blob.core.windows.net --no-cache-dir --pre
-                  #     az --version
-                  #   displayName: 'Downgrade Azure CLI to 2.29.2'
-                  #   condition: always()
                   - script: |
                       az --version
                       ls /opt/az/azcliextensions
@@ -313,18 +322,6 @@ stages:
                         set -e
                         az account show
                         az extension list
-                  # - bash: pip install azure-devops==0.25.0
-                  #   displayName: 'Downgrade azure-devops extension to 0.25.0'
-                  #   condition: always() # this step will always run, even if the pipeline is cancelled
-                  # - bash: python -c "import azure.devops; print(azure.devops.__version__)"
-                  #   displayName: Verify Azure DevOps version
-                  #   condition: always() # this step will always run, even if the pipeline is cancelled
-                  # - bash: pip list
-                  #   displayName: List installed packages
-                  #   condition: always() # this step will always run, even if the pipeline is cancelled
-                  # - bash: pip show azure-devops
-                  #   displayName: Show Azure DevOps package info
-                  #   condition: always() # this step will always run, even if the pipeline is cancelled
                   # - task: AzureCLI@2
                   #   displayName: Downgrade azure-devops extension to 0.25.0
                   #   inputs:
