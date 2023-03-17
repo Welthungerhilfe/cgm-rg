@@ -134,7 +134,7 @@ stages:
     dependsOn:
       - Setup
       - Verify
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+    condition: succeeded()
     variables:
       - name: TAG
         value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
@@ -167,7 +167,7 @@ stages:
       dependsOn: 
         - Setup
         - Build
-      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+      condition: succeeded()
       variables:
         - group: cgm-rg-${{ env }}-ci
         - name: TAG
