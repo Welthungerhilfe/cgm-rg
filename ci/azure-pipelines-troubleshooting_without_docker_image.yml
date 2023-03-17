@@ -167,8 +167,8 @@ stages:
       # condition: succeeded()
       variables:
         - group: cgm-rg-${{ env }}-ci
-        - name: TAG
-          value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
+        # - name: TAG
+        #   value: $[stageDependencies.Setup.Variables.outputs['ParseTag.TAG']]
       jobs:
         - deployment: Deploy_Container_Instance
           displayName: "Container Instance deployment ${{ env }}"
