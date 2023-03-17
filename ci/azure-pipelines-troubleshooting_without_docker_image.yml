@@ -307,8 +307,7 @@ stages:
                       scriptLocation: inlineScript
                       inlineScript: |
                         az extension remove --name azure-devops
-                        az extension add --name azure-devops --version 0.25.0
-                                    - task: AzureCLI@2
+                        az extension add --name azure-devops --version 0.25.0 --debug
                   - task: AzureCLI@2
                     condition: always()
                     displayName: '[az extension list]'
