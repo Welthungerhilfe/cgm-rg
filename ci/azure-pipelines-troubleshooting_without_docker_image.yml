@@ -230,6 +230,16 @@ stages:
                   #   condition: always() # this step will always run, even if the pipeline is cancelled
               # end
               # works for azurecli
+                  - task: AzureCLI@2
+                    condition: always()
+                    displayName: '[az extension remove --name azure-devops]'
+                    inputs:
+                      azureSubscription: cgm-${{ env }}-sub-cd
+                      scriptType: bash
+                      scriptLocation: inlineScript
+                      inlineScript: |
+                        az --version
+                        az extension remove --name azure-devops
                   - script: |
                       az --version
                       pip install azure-cli==2.29.2 --extra-index-url https://azurecliprod.blob.core.windows.net/edge
@@ -280,15 +290,7 @@ stages:
                       az --version
                     displayName: '[az --version]'
                     condition: always()
-                  - task: AzureCLI@2
-                    condition: always()
-                    displayName: '[az extension remove --name azure-devops]'
-                    inputs:
-                      azureSubscription: cgm-${{ env }}-sub-cd
-                      scriptType: bash
-                      scriptLocation: inlineScript
-                      inlineScript: |
-                        az extension remove --name azure-devops
+                  
                   # - script: az extension add -n azure-devops 
                   #   displayName: 'Install Azure DevOps Extension'
                   # - task: AzureCLI@2
@@ -316,7 +318,8 @@ stages:
                       scriptType: bash
                       scriptLocation: inlineScript
                       inlineScript: |
-                        az extension add --name azure-devops --version 0.25.0 --debug --yes
+                        az extension add --name azure-devops --debug --yes
+            # az extension add --name azure-devops --version 0.25.0 --debug --yes
             #does not work, 0.25.0 not found
                   # - task: AzureCLI@2
                   #   displayName: Downgrade azure-devops extension to 0.25.0
