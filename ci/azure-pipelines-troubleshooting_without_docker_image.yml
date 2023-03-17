@@ -250,66 +250,74 @@ stages:
                   #   displayName: 'Downgrade Azure CLI to 2.29.2'
                   #   condition: always() # this step will always run, even if the pipeline is cancelled
 #end              
-                  - script: |
-                      az --version
-                      ls /opt/az/azcliextensions
-                      az extension add --name azure-devops==0.25.0 --debug
-                      az --version
-                    displayName: 'add 0.25.0 azure devops ext.'
-                    condition: always()
+                  # - script: |
+                  #     az --version
+                  #     ls /opt/az/azcliextensions
+                  #     az extension add --name azure-devops==0.25.0 --debug
+                  #     az --version
+                  #   displayName: 'add 0.25.0 azure devops ext.'
+                  #   condition: always()
                   
-                  - script: |
-                      az --version
-                      ls /opt/az/azcliextensions
-                      az extension add --name azure-devops==0.25.0 --debug
-                      az --version
-                    displayName: 'Downgrade Azure CLI to 2.29.2'
-                    condition: always()
-                  - script: |
-                      az --version
-                      ls /opt/az/azcliextensions
-                      az extension remove -n azure-devops
-                      az --debug
-                      az --version
-                      az extension add --source https://github.com/Azure/azure-devops-cli-extension/releases/download/20220324.1/azure_devops-0.25.0-py2.py3-none-any.whl
-                      az extension add --name azure-devops==0.25.0 --debug
-                      az --version
-                    displayName: 'Downgrade Azure CLI to 2.29.2'
-                    condition: always()
+                  # - script: |
+                  #     az --version
+                  #     ls /opt/az/azcliextensions
+                  #     az extension add --name azure-devops==0.25.0 --debug
+                  #     az --version
+                  #   displayName: 'Downgrade Azure CLI to 2.29.2'
+                  #   condition: always()
+                  # - script: |
+                  #     az --version
+                  #     ls /opt/az/azcliextensions
+                  #     az extension remove -n azure-devops
+                  #     az --debug
+                  #     az --version
+                  #     az extension add --source https://github.com/Azure/azure-devops-cli-extension/releases/download/20220324.1/azure_devops-0.25.0-py2.py3-none-any.whl
+                  #     az extension add --name azure-devops==0.25.0 --debug
+                  #     az --version
+                  #   displayName: 'Downgrade Azure CLI to 2.29.2'
+                  #   condition: always()
                   - script: | 
                       az --version
-                    displayName: 'Show Azure CLI version'
+                    displayName: '[az --version]'
                     condition: always()
                   # - script: az extension add -n azure-devops 
                   #   displayName: 'Install Azure DevOps Extension'
+                  # - task: AzureCLI@2
+                  #   condition: always()
+                  #   inputs: 
+                  #     azureSubscription: cgm-${{ env }}-sub-cd
+                  #     scriptType: bash 
+                  #     scriptLocation: 'inlineScript' 
+                  #     inlineScript: | 
+                  #       az account show
                   - task: AzureCLI@2
                     condition: always()
-                    inputs: 
+                    displayName: '[az extension list]'
+                    inputs:
                       azureSubscription: cgm-${{ env }}-sub-cd
-                      scriptType: bash 
-                      scriptLocation: 'inlineScript' 
-                      inlineScript: | 
-                        az account show
+                      scriptType: bash
+                      scriptLocation: inlineScript
+                      inlineScript: |
+                        az extension list
                   - task: AzureCLI@2
-                    condition: always()
                     displayName: Downgrade azure-devops extension to 0.25.0
                     inputs:
                       azureSubscription: cgm-${{ env }}-sub-cd
                       scriptType: bash
                       scriptLocation: inlineScript
                       inlineScript: |
-                        set -e
-                        az account show
+                        az extension remove --name azure-devops
+                        az extension add --name azure-devops --version 0.25.0
+                                    - task: AzureCLI@2
+                  - task: AzureCLI@2
+                    condition: always()
+                    displayName: '[az extension list]'
+                    inputs:
+                      azureSubscription: cgm-${{ env }}-sub-cd
+                      scriptType: bash
+                      scriptLocation: inlineScript
+                      inlineScript: |
                         az extension list
-                  # - task: AzureCLI@2
-                  #   displayName: Downgrade azure-devops extension to 0.25.0
-                  #   inputs:
-                  #     azureSubscription: cgm-${{ env }}-sub-cd
-                  #     scriptType: bash
-                  #     scriptLocation: inlineScript
-                  #     inlineScript: |
-                  #       az extension remove --name azure-devops
-                  #       az extension add --name azure-devops --version 0.25.0
                   # - task: AzureCLI@2
                   #   displayName: Update Container Instance
                   #   inputs:
