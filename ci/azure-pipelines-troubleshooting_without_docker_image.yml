@@ -309,24 +309,37 @@ stages:
                       inlineScript: |
                         az extension list
                   - task: AzureCLI@2
-                    displayName: Downgrade azure-devops extension to 0.25.0
-                    inputs:
-                      azureSubscription: cgm-${{ env }}-sub-cd
-                      scriptType: bash
-                      scriptLocation: inlineScript
-                      inlineScript: |
-                        az extension remove --name azure-devops
-                        az extension add --name azure-devops --version 0.25.0 --debug --yes
-                  - task: AzureCLI@2
                     condition: always()
-                    displayName: Downgrade azure-devops extension to 0.21.0
+                    displayName: '[az extension add --name azure-devops --version 0.25.0]'
                     inputs:
                       azureSubscription: cgm-${{ env }}-sub-cd
                       scriptType: bash
                       scriptLocation: inlineScript
                       inlineScript: |
-                        az extension remove --name azure-devops
-                        az extension add --name azure-devops --version 0.21.0 --debug --yes
+                        az extension add --name azure-devops --version 0.25.0 --debug --yes
+            #does not work, 0.25.0 not found
+                  # - task: AzureCLI@2
+                  #   displayName: Downgrade azure-devops extension to 0.25.0
+                  #   inputs:
+                  #     azureSubscription: cgm-${{ env }}-sub-cd
+                  #     scriptType: bash
+                  #     scriptLocation: inlineScript
+                  #     inlineScript: |
+                  #       az extension remove --name azure-devops
+                  #       az extension add --name azure-devops --version 0.25.0 --debug --yes
+            #end
+            #seems to work for 0.21.0
+                  # - task: AzureCLI@2
+                  #   condition: always()
+                  #   displayName: Downgrade azure-devops extension to 0.21.0
+                  #   inputs:
+                  #     azureSubscription: cgm-${{ env }}-sub-cd
+                  #     scriptType: bash
+                  #     scriptLocation: inlineScript
+                  #     inlineScript: |
+                  #       az extension remove --name azure-devops
+                  #       az extension add --name azure-devops --version 0.21.0 --debug --yes
+            #end
                   - task: AzureCLI@2
                     condition: always()
                     displayName: '[az extension list]'
