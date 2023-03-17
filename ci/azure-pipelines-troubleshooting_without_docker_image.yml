@@ -235,29 +235,7 @@ stages:
                       pip install azure-cli==2.29.2 --extra-index-url https://azurecliprod.blob.core.windows.net/edge
                     displayName: 'Downgrade Azure CLI to 2.29.2'
                     condition: always()
-                  - task: AzureCLI@2
-                    displayName: "Azure CLI: [az --version]"
-                    inputs:
-                      azureSubscription: cgm-${{ env }}-sub-cd
-                      scriptLocation: inlineScript
-                      inlineScript: "az --version"
-                      useGlobalConfig: true
               # end works
-
-                  - task: AzureCLI@2
-                    displayName: "Azure CLI: [az extension add --name azure-devops --version 0.25.0]"
-                    inputs:
-                      azureSubscription: cgm-${{ env }}-sub-cd
-                      scriptLocation: inlineScript
-                      inlineScript: "az extension add --name azure-devops --version 0.25.0"
-                      useGlobalConfig: true
-                  - task: AzureCLI@2
-                    displayName: "Azure CLI: [az --version]"
-                    inputs:
-                      azureSubscription: cgm-${{ env }}-sub-cd
-                      scriptLocation: inlineScript
-                      inlineScript: "az --version"
-                      useGlobalConfig: true
                   - bash: pip list
                     displayName: List installed packages
                     condition: always() # this step will always run, even if the pipeline is cancelled
@@ -275,7 +253,7 @@ stages:
                   - script: |
                       az --version
                       ls /opt/az/azcliextensions
-                      az extension add --name azure-devops==0.25.0
+                      az extension add --name azure-devops==0.25.0 --debug
                       az --version
                     displayName: 'add 0.25.0 azure devops ext.'
                     condition: always()
@@ -283,7 +261,7 @@ stages:
                   - script: |
                       az --version
                       ls /opt/az/azcliextensions
-                      az extension add --name azure-devops==0.25.0
+                      az extension add --name azure-devops==0.25.0 --debug
                       az --version
                     displayName: 'Downgrade Azure CLI to 2.29.2'
                     condition: always()
@@ -294,7 +272,7 @@ stages:
                       az --debug
                       az --version
                       az extension add --source https://github.com/Azure/azure-devops-cli-extension/releases/download/20220324.1/azure_devops-0.25.0-py2.py3-none-any.whl
-                      az extension add --name azure-devops==0.25.0
+                      az extension add --name azure-devops==0.25.0 --debug
                       az --version
                     displayName: 'Downgrade Azure CLI to 2.29.2'
                     condition: always()
