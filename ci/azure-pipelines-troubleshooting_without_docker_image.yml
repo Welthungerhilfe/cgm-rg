@@ -215,8 +215,7 @@ stages:
                     displayName: Install yq utility
                   - task: UsePythonVersion@0
                     inputs:
-                      # versionSpec: '3.x'
-                      versionSpec: '3.10.7'
+                      versionSpec: '3.x'
                       architecture: 'x64'
                   - bash: pip list
                     displayName: List installed packages
@@ -245,11 +244,7 @@ stages:
                       pip install azure-cli==2.29.2 --extra-index-url https://azurecliprod.blob.core.windows.net/edge
                     displayName: 'Downgrade Azure CLI to 2.29.2'
                     condition: always()
-              # end works
-                  - bash: pip list
-                    displayName: List installed packages
-                    condition: always() # this step will always run, even if the pipeline is cancelled
-                  #pip install --force-reinstall -v "MySQL_python==1.2.2"
+              # end works              
 
 #seems to work somehow, keep in mind                  
                   # - bash: |
@@ -301,15 +296,15 @@ stages:
                   #     scriptLocation: 'inlineScript' 
                   #     inlineScript: | 
                   #       az account show
-                  - task: AzureCLI@2
-                    condition: always()
-                    displayName: '[az extension list]'
-                    inputs:
-                      azureSubscription: cgm-${{ env }}-sub-cd
-                      scriptType: bash
-                      scriptLocation: inlineScript
-                      inlineScript: |
-                        az extension list
+                  # - task: AzureCLI@2
+                  #   condition: always()
+                  #   displayName: '[az extension list]'
+                  #   inputs:
+                  #     azureSubscription: cgm-${{ env }}-sub-cd
+                  #     scriptType: bash
+                  #     scriptLocation: inlineScript
+                  #     inlineScript: |
+                  #       az extension list
                   - task: AzureCLI@2
                     condition: always()
                     displayName: '[az extension add --name azure-devops --version 0.25.0]'
