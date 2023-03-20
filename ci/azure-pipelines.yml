@@ -218,19 +218,37 @@ stages:
                     displayName: Install yq utility
                   - task: UsePythonVersion@0
                     inputs:
-                      versionSpec: '3.x'
+                      versionSpec: '3.10'
                       architecture: 'x64'
-                  - bash: pip install azure-cli==2.29.2
-                    displayName: 'Downgrade Azure CLI to 2.29.2'
                   - task: AzureCLI@2
-                    displayName: Downgrade azure-devops extension to 0.25.0
+                    displayName: 'Remove actual azure-devops extension'
                     inputs:
                       azureSubscription: cgm-${{ env }}-sub-cd
                       scriptType: bash
                       scriptLocation: inlineScript
                       inlineScript: |
+                        az --version
                         az extension remove --name azure-devops
-                        az extension add --name azure-devops --version 0.25.0
+                  - script: |
+                      az --version
+                      pip install azure-cli==2.29.2 --extra-index-url https://azurecliprod.blob.core.windows.net/edge
+                    displayName: 'Downgrade Azure CLI to 2.29.2'
+                  - task: AzureCLI@2
+                    displayName: 'Add azure-devops extension'
+                    inputs:
+                      azureSubscription: cgm-${{ env }}-sub-cd
+                      scriptType: bash
+                      scriptLocation: inlineScript
+                      inlineScript: |
+                        az extension add --name azure-devops --debug --yes
+                  - task: AzureCLI@2
+                    displayName: '[az extension list]'
+                    inputs:
+                      azureSubscription: cgm-${{ env }}-sub-cd
+                      scriptType: bash
+                      scriptLocation: inlineScript
+                      inlineScript: |
+                        az extension list
                   - task: AzureCLI@2
                     displayName: Update Container Instance
                     inputs:
