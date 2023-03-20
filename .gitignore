@@ -134,3 +134,6 @@ venv.bak/
 ../.amlignore.amltmp
 .amlignore
 .amlignore.amltmp
+
+# dev
+/dev
