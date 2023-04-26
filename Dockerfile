@@ -1,5 +1,7 @@
 FROM python:3.7-slim-stretch
 
+RUN echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.list
+
 RUN apt-get -y update && \
     apt-get install -y --fix-missing \
     build-essential \
