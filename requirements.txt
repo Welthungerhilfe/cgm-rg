@@ -28,7 +28,7 @@ pytest-azurepipelines==0.8.0
 mock==4.0.3
 coverage==6.0.2
 cgm-ml-common==3.1.7
-sklearn==0.0.post1
+scikit-learn==1.0.2
 protobuf==3.20.0
 joblib==1.2.0
 importlib-metadata==4.13.0
