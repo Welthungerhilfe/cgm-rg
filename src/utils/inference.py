@@ -66,6 +66,7 @@ except Exception as e:
 def get_height_predictions_local(numpy_array):
     return height_model.predict(numpy_array)
 
+
 def get_depthmap_height_predictions_local(numpy_array):
     return depthmap_height_model.predict(numpy_array)
 

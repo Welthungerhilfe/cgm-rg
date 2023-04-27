@@ -57,7 +57,6 @@ def parse_args():
     parser.add_argument('--height_pose3d_workflow_scan_path', default=f"{workflow_dir}/height-pose3d-workflow-scan.json")  # noqa: E501
     parser.add_argument('--weight_workflow_artifact_path', default=f"{workflow_dir}/weight-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--weight_workflow_scan_path', default=f"{workflow_dir}/weight-workflow-scan.json")  # noqa: E501
-
     parser.add_argument('--app_pose_workflow_path', default=f"{workflow_dir}/app_pose_workflow_path.json")  # noqa: E501
     parser.add_argument('--mlkit_pose_visualize_pose_workflow_path', default=f"{workflow_dir}/mlkit_pose_visualize_pose_workflow.json")  # noqa: E501
 
@@ -383,7 +382,7 @@ def run_retroactive_flow():
                 scan_version,
                 scan_meta_data_details,
                 standing_laying_workflow_path)
-        
+        # noqa: E501
         elif workflow.match_workflows(depthmap_height_workflow_scan_path, workflow_id):
             logger.info("Matched with DepthmapHeightFlowPlainCnn")
             flow = DepthmapHeightFlowPlainCnn(
