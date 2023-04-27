@@ -298,6 +298,8 @@ stages:
                         export REGISTRY_PASSWORD
                         yq eval '.properties.imageRegistryCredentials[0].password = strenv(REGISTRY_PASSWORD)' \
                           "$TMP_CONF_FILE" --inplace
+                        
+                        yq 'del(.properties.provisioningTimeoutInSeconds)' "$TMP_CONF_FILE" -i
 
                         # Deploy updated image
                         az container create \
