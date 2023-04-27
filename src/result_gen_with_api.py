@@ -16,6 +16,7 @@ from result_generation.blur_and_pose import PoseAndBlurFlow
 from result_generation.mlkit_pose_visual import MLkitPoseVisualise
 from result_generation.depthmap_image import DepthMapImgFlow
 from result_generation.height.height_plaincnn import HeightFlowPlainCnn
+from result_generation.height.depthmap_height_plaincnn import DepthmapHeightFlowPlainCnn
 from result_generation.height.height_rgbd import HeightFlowRGBD
 from result_generation.height.height_pose3d import HeightFlowPose3D
 from result_generation.result_generation import ResultGeneration
@@ -48,13 +49,14 @@ def parse_args():
     parser.add_argument('--depthmap_img_workflow_path', default=f"{workflow_dir}/depthmap-img-workflow.json")  # noqa: E501
     parser.add_argument('--height_workflow_artifact_path', default=f"{workflow_dir}/height-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
     parser.add_argument('--height_workflow_scan_path', default=f"{workflow_dir}/height-plaincnn-workflow-scan.json")  # noqa: E501
+    parser.add_argument('--depthmap_height_workflow_artifact_path', default=f"{workflow_dir}/height-depthmap-plaincnn-workflow-artifact.json", help='Height Workflow Artifact path')  # noqa: E501
+    parser.add_argument('--depthmap_height_workflow_scan_path', default=f"{workflow_dir}/height-depthmap-plaincnn-workflow-scan.json")  # noqa: E501
     parser.add_argument('--height_rgbd_workflow_artifact_path', default=f"{workflow_dir}/height-rgbd-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--height_rgbd_workflow_scan_path', default=f"{workflow_dir}/height-rgbd-workflow-scan.json")  # noqa: E501
     parser.add_argument('--height_pose3d_workflow_artifact_path', default=f"{workflow_dir}/height-pose3d-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--height_pose3d_workflow_scan_path', default=f"{workflow_dir}/height-pose3d-workflow-scan.json")  # noqa: E501
     parser.add_argument('--weight_workflow_artifact_path', default=f"{workflow_dir}/weight-workflow-artifact.json")  # noqa: E501
     parser.add_argument('--weight_workflow_scan_path', default=f"{workflow_dir}/weight-workflow-scan.json")  # noqa: E501
-
     parser.add_argument('--app_pose_workflow_path', default=f"{workflow_dir}/app_pose_workflow_path.json")  # noqa: E501
     parser.add_argument('--mlkit_pose_visualize_pose_workflow_path', default=f"{workflow_dir}/mlkit_pose_visualize_pose_workflow.json")  # noqa: E501
 
@@ -73,6 +75,8 @@ def run_normal_flow():
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
+    depthmap_height_workflow_artifact_path = args.depthmap_height_workflow_artifact_path
+    depthmap_height_workflow_scan_path = args.depthmap_height_workflow_scan_path
     height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
     height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
     height_pose3d_workflow_artifact_path = args.height_pose3d_workflow_artifact_path
@@ -163,6 +167,19 @@ def run_normal_flow():
         standing_laying_workflow_path)
     flows.append(flow)
 
+    flow = DepthmapHeightFlowPlainCnn(
+        result_generation,
+        depthmap_height_workflow_artifact_path,
+        depthmap_height_workflow_scan_path,
+        depth_artifacts,
+        person_details,
+        rgb_artifacts,
+        scan_type,
+        scan_version,
+        scan_meta_data_details,
+        standing_laying_workflow_path)
+    flows.append(flow)
+
     flow = HeightFlowRGBD(
         result_generation,
         height_rgbd_workflow_artifact_path,
@@ -221,6 +238,8 @@ def run_retroactive_flow():
     depthmap_img_workflow_path = args.depthmap_img_workflow_path
     height_workflow_artifact_path = args.height_workflow_artifact_path
     height_workflow_scan_path = args.height_workflow_scan_path
+    depthmap_height_workflow_artifact_path = args.depthmap_height_workflow_artifact_path
+    depthmap_height_workflow_scan_path = args.depthmap_height_workflow_scan_path
     height_rgbd_workflow_artifact_path = args.height_rgbd_workflow_artifact_path
     height_rgbd_workflow_scan_path = args.height_rgbd_workflow_scan_path
     height_pose3d_workflow_artifact_path = args.height_pose3d_workflow_artifact_path
@@ -356,6 +375,20 @@ def run_retroactive_flow():
                 result_generation,
                 height_workflow_artifact_path,
                 height_workflow_scan_path,
+                depth_artifacts,
+                person_details,
+                rgb_artifacts,
+                scan_type,
+                scan_version,
+                scan_meta_data_details,
+                standing_laying_workflow_path)
+        # noqa: E501
+        elif workflow.match_workflows(depthmap_height_workflow_scan_path, workflow_id):
+            logger.info("Matched with DepthmapHeightFlowPlainCnn")
+            flow = DepthmapHeightFlowPlainCnn(
+                result_generation,
+                depthmap_height_workflow_artifact_path,
+                depthmap_height_workflow_scan_path,
                 depth_artifacts,
                 person_details,
                 rgb_artifacts,

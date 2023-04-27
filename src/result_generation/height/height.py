@@ -14,6 +14,7 @@ from fastcore.basics import store_attr
 sys.path.append(str(Path(__file__).parents[1]))
 from result_generation.utils import (MAX_AGE, MAX_HEIGHT, MIN_HEIGHT,
                                      calculate_age,
+                                     remove_outliers,
                                      is_child_standing_age_lt_2)
 
 logger = log.setup_custom_logger(__name__)
@@ -173,6 +174,7 @@ class HeightFlow:
             start_time=start_time,
             end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         ))
+        predictions = remove_outliers(predictions)
         mean_prediction = self.result_generation.get_mean_scan_results(predictions)
         class_lhfa = self.zscore_lhfa(mean_prediction)
         result.data = {
@@ -254,6 +256,7 @@ class HeightFlow:
             source_results=[],
             generated=generated_timestamp,
         ))
+        predictions = remove_outliers(predictions)
         mean_prediction = self.result_generation.get_mean_scan_results(predictions)
         mean_std = self.result_generation.get_mean_scan_results(stds)
         class_lhfa = self.zscore_lhfa(mean_prediction)

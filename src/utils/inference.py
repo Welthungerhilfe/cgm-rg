@@ -31,6 +31,14 @@ except Exception as e:
     print(e)
 
 try:
+    depthmap_height_model = load_model(str(REPO_DIR / 'models/depthmapheight/outputs/best_model.ckpt'), compile=False)
+except OSError as error:
+    print(error)
+    print("Not able to load the Height model")
+except Exception as e:
+    print(e)
+
+try:
     weight_model = load_model(str(REPO_DIR / 'models/weight/outputs/best_model.ckpt'), compile=False)
 except OSError as error:
     print(error)
@@ -57,6 +65,10 @@ except Exception as e:
 
 def get_height_predictions_local(numpy_array):
     return height_model.predict(numpy_array)
+
+
+def get_depthmap_height_predictions_local(numpy_array):
+    return depthmap_height_model.predict(numpy_array)
 
 
 def get_weight_predictions_local(numpy_array):

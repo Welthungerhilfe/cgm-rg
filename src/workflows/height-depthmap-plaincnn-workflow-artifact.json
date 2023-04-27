@@ -1,0 +1,11 @@
+{
+    "name": "q4-depthmap-plaincnn-height-469k",
+    "version": "2.0.7",
+    "result_format": "dict",
+    "result_binding": "artifact",
+    "data": {
+        "input_format": "application/zip",
+        "model": "q4-depthmap-plaincnn-height",
+        "run_id": "q4-depthmap-plaincnn-height_1669110716_ae0979c7"
+    }
+}
