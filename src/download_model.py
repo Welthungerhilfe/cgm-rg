@@ -86,6 +86,13 @@ def main():
                    input_location=os.path.join('outputs', 'best_model.ckpt'),
                    output_location=REPO_DIR / 'models/height')
 
+    # Download model for depthmap height on 469k data
+    download_model(ws=ws,
+                   experiment_name='q4-depthmap-plaincnn-height',
+                   run_id='q4-depthmap-plaincnn-height_1669110716_ae0979c7',
+                   input_location=os.path.join('outputs', 'best_model.ckpt'),
+                   output_location=REPO_DIR / 'models/depthmapheight')
+
     # Download model for  weight
     download_model(ws=ws,
                    experiment_name='q4-depthmap-plaincnn-weight-264k',

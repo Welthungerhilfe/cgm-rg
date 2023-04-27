@@ -17,7 +17,7 @@ class DepthmapHeightFlowPlainCnn(HeightFlow):
     def run_flow(self):
         start_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         depthmaps = preprocessing.process_depthmaps(self.artifacts, self.scan_directory, self.result_generation)
-        height_predictions = inference.get_height_predictions_local(depthmaps)
+        height_predictions = inference.get_depthmap_height_predictions_local(depthmaps)
 
         if self.is_child_standing_age_lt_2:
             logger.info("Child is age less than2 and standing")
