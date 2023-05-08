@@ -5,7 +5,7 @@
 azure-functions
 azure-functions-durable
 requests==2.26.0
-opencv-python==4.4.0.46
+opencv-python
 bunch==1.0.1
 azureml-sdk
 scikit-image==0.18.3
