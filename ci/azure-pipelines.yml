@@ -4,7 +4,7 @@ pool:
 trigger:
   branches:
     include:
-      - 'ml_rg'
+      - 'rg-v2'
 
 variables:
   - group: cgm-rg-v2
