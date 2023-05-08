@@ -9,4 +9,4 @@ opencv-python==4.4.0.46
 bunch==1.0.1
 azureml-sdk
 scikit-image==0.18.3
-tensorflow
+tensorflow==2.12.0
