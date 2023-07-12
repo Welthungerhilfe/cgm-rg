@@ -1,0 +1,7 @@
+.git*
+.vscode/
+.venv/
+tests/
+local.settings.json
+.python-version
+.bumpversion.cfg

@@ -1,0 +1,24 @@
+{
+  "scriptFile": "__init__.py",
+  "bindings": [
+    {
+      "name": "msg",
+      "type": "queueTrigger",
+      "direction": "in",
+      "queueName": "result-generation",
+      "connection": "cgmbecidevsa_STORAGE"
+    },
+    {
+      "name": "starter",
+      "type": "orchestrationClient",
+      "direction": "in"
+    },
+    {
+      "type": "queue",
+      "direction": "out",
+      "name": "msg2",
+      "queueName": "rg-other-workflows",
+      "connection": "cgmbecidevsa_STORAGE"
+    }
+  ]
+}
