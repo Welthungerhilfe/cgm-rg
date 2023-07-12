@@ -1,9 +1,0 @@
-{
-    "name": "pose_prediction_visualization",
-    "version": "1.0.4",
-    "result_format": "img",
-    "result_binding": "artifact",
-    "data": {
-        "input_format": "image/jpeg"
-    }
-}
