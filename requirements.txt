@@ -12,3 +12,4 @@ scikit-image==0.18.3
 tensorflow
 protobuf==3.20.1
 sklearn-pandas==1.7.0
+azure-cognitiveservices-vision-face
