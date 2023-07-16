@@ -1,9 +1,0 @@
-{
-    "name": "mlkit_pose_visualisation",
-    "version": "0.1.0",
-    "result_format": "img",
-    "result_binding": "artifact",
-    "data":{
-        "input_format":"image/jpeg"
-    }
-}

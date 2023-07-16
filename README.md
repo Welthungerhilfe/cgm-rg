@@ -102,3 +102,5 @@ docker run --env-file .env.docker --rm -it cgm-rg bash
 
 Command to run result generation once from the container for testing.
 python src/result_gen_with_api.py  >> debug_log.txt 2>&1
+    
+Test
