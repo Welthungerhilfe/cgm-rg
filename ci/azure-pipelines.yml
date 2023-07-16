@@ -105,7 +105,7 @@ stages:
       dependsOn:
         - Setup
         - Verify_and_Build
-      # condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
       variables:
         - group: cgm-be-ci-${{ env }}-rg-ci
         - name: TAG
