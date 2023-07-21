@@ -183,4 +183,3 @@ MLKIT_BODY_JOINTS = [
 
 # All white colors
 MlkitColors = [[255, 255, 255]] * 33
-
