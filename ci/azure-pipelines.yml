@@ -19,7 +19,9 @@ parameters:
       - sandbox
       - demo-qa
       - inbmz
-      # - naunam
+      - nep
+      - uga
+      - ban
 
 stages:
   - stage: Setup
