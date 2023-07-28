@@ -39,3 +39,9 @@ def get_workflow(workflows, workflow_name, workflow_version):
     workflow = [w for w in workflows if w['name'] == workflow_name and w['version'] == workflow_version]
     
     return workflow[0]
+
+
+def check_if_results_exists(results, workflow_id):
+    if [r for r in results if r['workflow'] == workflow_id]:
+        return True
+    return False

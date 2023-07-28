@@ -36,6 +36,7 @@ def main(msg: func.QueueMessage) -> None:
     artifacts = scan_metadata['artifacts']
     version = scan_metadata['version']
     scan_type = scan_metadata['type']
+    results = scan_metadata['results']
     generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
     download_artifacts(artifacts)
@@ -43,8 +44,8 @@ def main(msg: func.QueueMessage) -> None:
     depth_artifacts = get_scan_by_format(artifacts, depth_format)
     rgb_artifacts = get_scan_by_format(artifacts, rgb_format)
 
-    run_blur_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version)
-    run_pose_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version)
-    depth_img_flow(cgm_api, scan_id, depth_artifacts, workflows)
-    run_app_pose_visualization_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version)
+    run_blur_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
+    run_pose_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
+    depth_img_flow(cgm_api, scan_id, depth_artifacts, workflows, results)
+    run_app_pose_visualization_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
     # sl_flow(cgm_api, scan_id, rgb_artifacts, workflows)

@@ -20,7 +20,7 @@ from utils.rest_api import CgmApi
 from utils.preprocessing import process_depthmaps
 from utils.inference import get_json_prediction
 from utils.constants import PLAINCNN_HEIGHT_WORKFLOW_NAME, PLAINCNN_HEIGHT_WORKFLOW_VERSION, MEAN_PLAINCNN_HEIGHT_WORKFLOW_NAME, MEAN_PLAINCNN_HEIGHT_WORKFLOW_VERSION
-from utils.result_utils import bunch_object_to_json_object, get_mean_scan_results, get_workflow
+from utils.result_utils import bunch_object_to_json_object, get_mean_scan_results, get_workflow, check_if_results_exists
 
 
 rgb_format = ["rgb", "image/jpeg"]
@@ -119,15 +119,17 @@ def main(payload):
         artifacts = scan_metadata['artifacts']
         version = scan_metadata['version']
         scan_type = scan_metadata['type']
+        results = scan_metadata['results']
         artifact_level_workflow = get_workflow(workflows, PLAINCNN_HEIGHT_WORKFLOW_NAME, PLAINCNN_HEIGHT_WORKFLOW_VERSION)
         scan_level_workflow = get_workflow(workflows, MEAN_PLAINCNN_HEIGHT_WORKFLOW_NAME, MEAN_PLAINCNN_HEIGHT_WORKFLOW_VERSION)
-        service_name = scan_level_workflow['data']['service_name']
-        generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-        depth_artifacts = get_scan_by_format(artifacts, depth_format)
-        depthmaps = process_depthmaps(depth_artifacts, cgm_api)
-        p_depthmaps = pickle.dumps(depthmaps)
-        predictions = get_json_prediction(p_depthmaps, service_name)
-        post_height_result_object(depth_artifacts, predictions, scan_id, artifact_level_workflow['id'], scan_level_workflow['id'], generated_timestamp)
+        if not (check_if_results_exists(results, artifact_level_workflow['id']) and check_if_results_exists(results, scan_level_workflow['id'])):
+            service_name = scan_level_workflow['data']['service_name']
+            generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+            depth_artifacts = get_scan_by_format(artifacts, depth_format)
+            depthmaps = process_depthmaps(depth_artifacts, cgm_api)
+            p_depthmaps = pickle.dumps(depthmaps)
+            predictions = get_json_prediction(p_depthmaps, service_name)
+            post_height_result_object(depth_artifacts, predictions, scan_id, artifact_level_workflow['id'], scan_level_workflow['id'], generated_timestamp)
         return f"Hello!"
     except Exception as e:
         logging.error(e)

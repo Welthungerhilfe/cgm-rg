@@ -7,30 +7,31 @@ from bunch import Bunch
 
 from utils.preprocessing import blur_input
 from utils.inference import get_blur_prediction
-from utils.result_utils import bunch_object_to_json_object, get_workflow
+from utils.result_utils import bunch_object_to_json_object, get_workflow, check_if_results_exists
 from utils.constants import BLUR_WORKFLOW_NAME, BLUR_WORKFLOW_VERSION, FACE_DETECTION_WORKFLOW_NAME, FACE_DETECTION_WORKFLOW_VERSION
 
 MAX_BATCH_SIZE = 13
 
-def run_blur_flow(cgm_api, scan_id, artifacts, workflows, scan_type, scan_version):
+def run_blur_flow(cgm_api, scan_id, artifacts, workflows, scan_type, scan_version, results):
     blur_workflow = get_workflow(workflows, BLUR_WORKFLOW_NAME, BLUR_WORKFLOW_VERSION)
     faces_workflow = get_workflow(workflows, FACE_DETECTION_WORKFLOW_NAME, FACE_DETECTION_WORKFLOW_VERSION)
-    blur_input_data = blur_input(artifacts)
-    total_data = len(blur_input_data)
-    if total_data <= MAX_BATCH_SIZE:
-        pickle_input = pickle.dumps([blur_input_data, scan_type, scan_version])
-        predictions = get_blur_prediction(pickle_input)
-    else:
-        i = 0
-        predictions = []
-        for i in range(0, total_data, MAX_BATCH_SIZE):
-            pickle_input = pickle.dumps([blur_input_data[i:i+MAX_BATCH_SIZE], scan_type, scan_version])
-            predictions.extend(get_blur_prediction(pickle_input))
-            i += MAX_BATCH_SIZE
-    for (artifact, prediction) in zip(artifacts, predictions):
-        artifact['blurred_image'] = prediction[0]
-        artifact['faces_detected'] = prediction[1]
-    post_results(artifacts, cgm_api, scan_id, blur_workflow['id'], faces_workflow['id'])
+    if not (check_if_results_exists(results, blur_workflow['id']) and check_if_results_exists(results, faces_workflow['id'])):
+        blur_input_data = blur_input(artifacts)
+        total_data = len(blur_input_data)
+        if total_data <= MAX_BATCH_SIZE:
+            pickle_input = pickle.dumps([blur_input_data, scan_type, scan_version])
+            predictions = get_blur_prediction(pickle_input)
+        else:
+            i = 0
+            predictions = []
+            for i in range(0, total_data, MAX_BATCH_SIZE):
+                pickle_input = pickle.dumps([blur_input_data[i:i+MAX_BATCH_SIZE], scan_type, scan_version])
+                predictions.extend(get_blur_prediction(pickle_input))
+                i += MAX_BATCH_SIZE
+        for (artifact, prediction) in zip(artifacts, predictions):
+            artifact['blurred_image'] = prediction[0]
+            artifact['faces_detected'] = prediction[1]
+        post_results(artifacts, cgm_api, scan_id, blur_workflow['id'], faces_workflow['id'])
 
 
 def post_results(artifacts, cgm_api, scan_id, blur_workflow_id, faces_workflow_id):
