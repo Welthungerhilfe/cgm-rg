@@ -59,7 +59,7 @@ class CgmApi(RestApi):
         return mms
 
     def get_scan_metadata(self, scan_id):
-        return self.get_json(f"/api/scans?scan_id={scan_id}")['scans'][0]
+        return self.get_json(f"/api/scans/{scan_id}")['scan']
 
     def get_workflows(self):
         return self.get_json('/api/workflows')['workflows']

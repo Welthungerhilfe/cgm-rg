@@ -7,15 +7,16 @@ import matplotlib.pyplot as plt
 from bunch import Bunch
 
 from utils.preprocessing import load_depth_from_file, prepare_depthmap
-from utils.result_utils import bunch_object_to_json_object, get_workflow
+from utils.result_utils import bunch_object_to_json_object, get_workflow, check_if_results_exists
 from utils.constants import DEPTH_IMG_WORKFLOW_NAME, DEPTH_IMG_WORKFLOW_VERSION
 
 
-def depth_img_flow(cgm_api, scan_id, artifacts, workflows):
+def depth_img_flow(cgm_api, scan_id, artifacts, workflows, results):
     generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
     depth_workflow = get_workflow(workflows, DEPTH_IMG_WORKFLOW_NAME, DEPTH_IMG_WORKFLOW_VERSION)
-    preprocess_and_post_depthmap(cgm_api, artifacts)
-    post_result_object(cgm_api, scan_id, artifacts, generated_timestamp, depth_workflow['id'])
+    if not check_if_results_exists(results, depth_workflow['id']):
+        preprocess_and_post_depthmap(cgm_api, artifacts)
+        post_result_object(cgm_api, scan_id, artifacts, generated_timestamp, depth_workflow['id'])
 
 
 def preprocess_and_post_depthmap(cgm_api, artifacts):

@@ -10,28 +10,29 @@ import cv2
 
 from utils.constants import APP_POSE_VISUALIZE_WORKFLOW_NAME, APP_POSE_VISUALIZE_WORKFLOW_VERSION, APP_POSE_WORKFLOW_NAME, APP_POSE_WORKFLOW_VERSION
 from utils.constants import MLKIT_KEYPOINT_INDEXES, MLKIT_SKELETON, MLKIT_NUM_KPTS, MLKIT_BODY_JOINTS, MlkitColors
-from utils.result_utils import bunch_object_to_json_object, get_workflow
+from utils.result_utils import bunch_object_to_json_object, get_workflow, check_if_results_exists
 
 
-def run_app_pose_visualization_flow(cgm_api, scan_id, artifacts, workflows, scan_type, scan_version):
+def run_app_pose_visualization_flow(cgm_api, scan_id, artifacts, workflows, scan_type, scan_version, results):
     app_pose_visualize_workflow = get_workflow(workflows, APP_POSE_VISUALIZE_WORKFLOW_NAME, APP_POSE_VISUALIZE_WORKFLOW_VERSION)
     app_pose_workflow = get_workflow(workflows, APP_POSE_WORKFLOW_NAME, APP_POSE_WORKFLOW_VERSION)
-    workflow_id = app_pose_visualize_workflow['id']
-    app_pose_workflow_id = app_pose_workflow['id']
-    results = cgm_api.get_results_for_workflow(scan_id, app_pose_workflow_id)
-    app_pose_results = [r for r in results if r['workflow']==app_pose_workflow_id]
-    app_pose_results_dict = {r['source_artifacts'][0]: json.loads(r['data']['poseCoordinates']) for r in app_pose_results}
-    for artifact in artifacts:
-        if artifact['id'] in app_pose_results_dict:
-            app_pose_input = deepcopy(artifact['blurred_image'])
-            pose_preds = prepare_draw_kpts(app_pose_results_dict[artifact['id']])
-            pose_img = draw_mlkit_pose(np.asarray(pose_preds, dtype=np.float32), app_pose_input)
-            _, bin_file = cv2.imencode('.JPEG', pose_img)
-            bin_file = bin_file.tostring()
-            artifact['app_pose_file_id_from_post_request'] = cgm_api.post_files(bin_file, 'rgb')
-    result_bunch_object = prepare_app_pose_visualize_result_object(artifacts, scan_id, workflow_id, app_pose_results_dict)
-    result_json_object = bunch_object_to_json_object(result_bunch_object)
-    cgm_api.post_results(result_json_object)
+    if not check_if_results_exists(results, app_pose_visualize_workflow['id']):
+        workflow_id = app_pose_visualize_workflow['id']
+        app_pose_workflow_id = app_pose_workflow['id']
+        # results = cgm_api.get_results_for_workflow(scan_id, app_pose_workflow_id)
+        app_pose_results = [r for r in results if r['workflow']==app_pose_workflow_id]
+        app_pose_results_dict = {r['source_artifacts'][0]: json.loads(r['data']['poseCoordinates']) for r in app_pose_results}
+        for artifact in artifacts:
+            if artifact['id'] in app_pose_results_dict:
+                app_pose_input = deepcopy(artifact['blurred_image'])
+                pose_preds = prepare_draw_kpts(app_pose_results_dict[artifact['id']])
+                pose_img = draw_mlkit_pose(np.asarray(pose_preds, dtype=np.float32), app_pose_input)
+                _, bin_file = cv2.imencode('.JPEG', pose_img)
+                bin_file = bin_file.tostring()
+                artifact['app_pose_file_id_from_post_request'] = cgm_api.post_files(bin_file, 'rgb')
+        result_bunch_object = prepare_app_pose_visualize_result_object(artifacts, scan_id, workflow_id, app_pose_results_dict)
+        result_json_object = bunch_object_to_json_object(result_bunch_object)
+        cgm_api.post_results(result_json_object)
 
 
 def prepare_app_pose_visualize_result_object(artifacts, scan_id, workflow_id, app_pose_results_dict):

@@ -8,29 +8,30 @@ import cv2
 
 from utils.preprocessing import pose_input
 from utils.inference import get_pose_prediction
-from utils.result_utils import bunch_object_to_json_object, get_workflow
+from utils.result_utils import bunch_object_to_json_object, get_workflow, check_if_results_exists
 from utils.constants import POSE_WORKFLOW_NAME, POSE_WORKFLOW_VERSION, POSE_VISUALIZE_WORKFLOW_NAME, POSE_VISUALIZE_WORKFLOW_VERSION, SKELETON, CocoColors, NUM_KPTS
 
 
 MAX_BATCH_SIZE = 13
 
 
-def run_pose_flow(cgm_api, scan_id, artifacts, workflows, scan_type, scan_version):
+def run_pose_flow(cgm_api, scan_id, artifacts, workflows, scan_type, scan_version, results):
     workflow = get_workflow(workflows, POSE_WORKFLOW_NAME, POSE_WORKFLOW_VERSION)
     visualize_workflow = get_workflow(workflows, POSE_VISUALIZE_WORKFLOW_NAME, POSE_VISUALIZE_WORKFLOW_VERSION)
-    pose_data, shape = pose_input(artifacts, scan_type)
-    total_data = len(pose_data)
-    if total_data <= MAX_BATCH_SIZE:
-        pickled_pose_data = pickle.dumps([scan_type, pose_data, shape])
-        pose_predictions = get_pose_prediction(pickled_pose_data)
-    else:
-        i = 0
-        pose_predictions = []
-        for i in range(0, total_data, MAX_BATCH_SIZE):
-            pickled_pose_data = pickle.dumps([scan_type, pose_data[i:i + MAX_BATCH_SIZE], shape])
-            pose_predictions.extend(get_pose_prediction(pickled_pose_data))
-            i += MAX_BATCH_SIZE
-    post_results(artifacts, pose_predictions, cgm_api, scan_id, workflow['id'], visualize_workflow['id'])
+    if not (check_if_results_exists(results, workflow['id']) and check_if_results_exists(results, visualize_workflow['id'])):
+        pose_data, shape = pose_input(artifacts, scan_type)
+        total_data = len(pose_data)
+        if total_data <= MAX_BATCH_SIZE:
+            pickled_pose_data = pickle.dumps([scan_type, pose_data, shape])
+            pose_predictions = get_pose_prediction(pickled_pose_data)
+        else:
+            i = 0
+            pose_predictions = []
+            for i in range(0, total_data, MAX_BATCH_SIZE):
+                pickled_pose_data = pickle.dumps([scan_type, pose_data[i:i + MAX_BATCH_SIZE], shape])
+                pose_predictions.extend(get_pose_prediction(pickled_pose_data))
+                i += MAX_BATCH_SIZE
+        post_results(artifacts, pose_predictions, cgm_api, scan_id, workflow['id'], visualize_workflow['id'])
 
 
 def get_pose_results(rgb_artifacts, pose_predictions, scan_id, workflow_id):

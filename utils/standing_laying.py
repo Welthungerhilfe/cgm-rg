@@ -6,18 +6,19 @@ import cv2
 from bunch import Bunch
 
 from utils.preprocessing import standing_laying_data_preprocessing_tf_batch
-from utils.result_utils import bunch_object_to_json_object, get_workflow
+from utils.result_utils import bunch_object_to_json_object, get_workflow, check_if_results_exists
 from utils.constants import STANDING_LAYING_WORKFLOW_NAME, STANDING_LAYING_WORKFLOW_VERSION
 from utils.inference import get_json_prediction
 
 
-def sl_flow(cgm_api, scan_id, artifacts, workflows):
+def sl_flow(cgm_api, scan_id, artifacts, workflows, results):
     sl_workflow = get_workflow(workflows, STANDING_LAYING_WORKFLOW_NAME, STANDING_LAYING_WORKFLOW_VERSION)
-    generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-    sl_input = standing_laying_data_preprocessing_tf_batch(artifacts)
-    sl_pickle = pickle.dumps(sl_input)
-    sl_predictions = get_json_prediction(sl_pickle, sl_workflow['data']['service_name'])
-    post_result_object(cgm_api, scan_id, artifacts, sl_predictions, generated_timestamp, sl_workflow['id'])
+    if not check_if_results_exists(results, sl_workflow['id']):
+        generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        sl_input = standing_laying_data_preprocessing_tf_batch(artifacts)
+        sl_pickle = pickle.dumps(sl_input)
+        sl_predictions = get_json_prediction(sl_pickle, sl_workflow['data']['service_name'])
+        post_result_object(cgm_api, scan_id, artifacts, sl_predictions, generated_timestamp, sl_workflow['id'])
 
 
 def post_result_object(cgm_api, scan_id, artifacts, predictions, generated_timestamp, workflow_id):
