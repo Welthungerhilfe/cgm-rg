@@ -13,6 +13,8 @@ from skimage.transform import resize
 from PIL import Image
 import io
 
+from constants import STANDING_SCAN_TYPE, LAYING_SCAN_TYPE
+
 
 IMAGE_TARGET_HEIGHT = 240
 IMAGE_TARGET_WIDTH = 180
@@ -174,6 +176,19 @@ def blur_input(artifacts):
         image_in.append(image_bgr)
 
     return image_in
+
+
+def blur_input_face_api(raw_file, scan_type):
+    image_rgb = np.asarray(Image.open(io.BytesIO(artifact['raw_file'])))
+    image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
+    image = image_bgr[:, :, ::-1]  # RGB -> BGR for OpenCV
+
+    if scan_type in STANDING_SCAN_TYPE:
+        image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+    elif scan_type in LAYING_SCAN_TYPE:
+        image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+    return image_bgr
 
 
 def standing_laying_data_preprocessing_tf_batch(artifacts):
