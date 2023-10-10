@@ -36,29 +36,27 @@ def post_results(artifacts, cgm_api, scan_id, blur_workflow_id, faces_workflow_i
 def post_blur_files(cgm_api, artifacts):
     """Post the blurred file to the API"""
     for artifact in artifacts:
-        if artifact['blurred_image']:
-            _, bin_file = cv2.imencode('.JPEG', artifact['blurred_image'])
-            bin_file = bin_file.tostring()
-            artifact['blur_id_from_post_request'] = cgm_api.post_files(bin_file, 'rgb')
+        _, bin_file = cv2.imencode('.JPEG', artifact['blurred_image'])
+        bin_file = bin_file.tostring()
+        artifact['blur_id_from_post_request'] = cgm_api.post_files(bin_file, 'rgb')
 
 
 def prepare_result_object(artifacts, scan_id, workflow_id):
     """Prepare result object for results generated"""
     res = Bunch(dict(results=[]))
     for artifact in artifacts:
-        if 'blur_id_from_post_request' in artifact:
-            result = Bunch(dict(
-                id=f"{uuid.uuid4()}",
-                scan=scan_id,
-                workflow=workflow_id,
-                source_artifacts=[artifact['id']],
-                source_results=[],
-                file=artifact['blur_id_from_post_request'],
-                generated=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
-                start_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
-                end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-            ))
-            res.results.append(result)
+        result = Bunch(dict(
+            id=f"{uuid.uuid4()}",
+            scan=scan_id,
+            workflow=workflow_id,
+            source_artifacts=[artifact['id']],
+            source_results=[],
+            file=artifact['blur_id_from_post_request'],
+            generated=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
+            start_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
+            end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        ))
+        res.results.append(result)
 
     return res
 

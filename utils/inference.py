@@ -127,14 +127,13 @@ def ms_face_api(input_image, scan_type):
         fr = face['faceRectangle']
         origin = (fr['left'], fr['top'])
         input_image = blur_img(input_image,fr['height'],fr['width'],origin)
-    if len(detected_faces) > 0:
-        if scan_type in STANDING_SCAN_TYPE:
-            image = cv2.rotate(input_image, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        elif scan_type in LAYING_SCAN_TYPE:
-            image = cv2.rotate(input_image, cv2.ROTATE_90_CLOCKWISE)
+    # if len(detected_faces) > 0:
+    if scan_type in STANDING_SCAN_TYPE:
+        image = cv2.rotate(input_image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    elif scan_type in LAYING_SCAN_TYPE:
+        image = cv2.rotate(input_image, cv2.ROTATE_90_CLOCKWISE)
 
-        return image, len(detected_faces)
-    return None, len(detected_faces)
+    return image, len(detected_faces)
 
 
 def blur_img(im,height,width,origin):
