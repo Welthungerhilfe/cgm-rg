@@ -133,7 +133,7 @@ def ms_face_api(input_image, scan_type):
     elif scan_type in LAYING_SCAN_TYPE:
         image = cv2.rotate(input_image, cv2.ROTATE_90_CLOCKWISE)
 
-    return image, len(detected_faces)
+    return image[:, :, ::-1], len(detected_faces)
 
 
 def blur_img(im,height,width,origin):
