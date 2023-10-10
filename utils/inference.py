@@ -121,7 +121,7 @@ def ms_face_api(input_image, scan_type):
         'returnFaceAttributes': '',  # Exclude attributes
         'detectionModel': 'detection_03',
     }
-    response = requests.post(face_api_url, headers=headers, params=params, data=bin_file)
+    response = requests.post(face_api_url, headers=ms_face_api_headers, params=params, data=bin_file)
     detected_faces = response.json()
     for face in detected_faces:
         fr = face['faceRectangle']
