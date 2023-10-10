@@ -115,6 +115,12 @@ def get_blur_prediction(pickled_data):
 def ms_face_api(input_image, scan_type):
     _, bin_file = cv2.imencode('.JPEG', input_image)
     bin_file = bin_file.tobytes()
+    params = {
+        'returnFaceId': 'false',  # Do not return face IDs
+        'returnFaceLandmarks': 'false',  # Do not return face landmarks
+        'returnFaceAttributes': '',  # Exclude attributes
+        'detectionModel': 'detection_03',
+    }
     response = requests.post(face_api_url, headers=headers, params=params, data=bin_file)
     detected_faces = response.json()
     for face in detected_faces:
