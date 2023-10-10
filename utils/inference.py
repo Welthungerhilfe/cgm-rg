@@ -29,7 +29,7 @@ workspace = Workspace(
 STANDING_SCAN_TYPE = [100, 101, 102]
 LAYING_SCAN_TYPE = [200, 201, 202]
 
-face_api_url = f'{getenv('MS_FACE_API_ENDPOINT')}/face/v1.0/detect'
+face_api_url = f"{getenv('MS_FACE_API_ENDPOINT')}/face/v1.0/detect"
 
 ms_face_api_headers = {
     'Content-Type': 'application/octet-stream',
