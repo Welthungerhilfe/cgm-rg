@@ -5,8 +5,8 @@ import cv2
 
 from bunch import Bunch
 
-from utils.preprocessing import blur_input
-from utils.inference import get_blur_prediction
+from utils.preprocessing import blur_input_face_api
+from utils.inference import ms_face_api
 from utils.result_utils import bunch_object_to_json_object, get_workflow, check_if_results_exists
 from utils.constants import BLUR_WORKFLOW_NAME, BLUR_WORKFLOW_VERSION, FACE_DETECTION_WORKFLOW_NAME, FACE_DETECTION_WORKFLOW_VERSION
 
@@ -16,21 +16,9 @@ def run_blur_flow(cgm_api, scan_id, artifacts, workflows, scan_type, scan_versio
     blur_workflow = get_workflow(workflows, BLUR_WORKFLOW_NAME, BLUR_WORKFLOW_VERSION)
     faces_workflow = get_workflow(workflows, FACE_DETECTION_WORKFLOW_NAME, FACE_DETECTION_WORKFLOW_VERSION)
     if not (check_if_results_exists(results, blur_workflow['id']) and check_if_results_exists(results, faces_workflow['id'])):
-        blur_input_data = blur_input(artifacts)
-        total_data = len(blur_input_data)
-        if total_data <= MAX_BATCH_SIZE:
-            pickle_input = pickle.dumps([blur_input_data, scan_type, scan_version])
-            predictions = get_blur_prediction(pickle_input)
-        else:
-            i = 0
-            predictions = []
-            for i in range(0, total_data, MAX_BATCH_SIZE):
-                pickle_input = pickle.dumps([blur_input_data[i:i+MAX_BATCH_SIZE], scan_type, scan_version])
-                predictions.extend(get_blur_prediction(pickle_input))
-                i += MAX_BATCH_SIZE
-        for (artifact, prediction) in zip(artifacts, predictions):
-            artifact['blurred_image'] = prediction[0]
-            artifact['faces_detected'] = prediction[1]
+        for artifact in artifacts:
+            in_image = blur_input_face_api(artifact['raw_file'], scan_type)
+            artifact['blurred_image'], artifact['faces_detected'] = ms_face_api(in_image, scan_type)
         post_results(artifacts, cgm_api, scan_id, blur_workflow['id'], faces_workflow['id'])
 
 
@@ -48,27 +36,29 @@ def post_results(artifacts, cgm_api, scan_id, blur_workflow_id, faces_workflow_i
 def post_blur_files(cgm_api, artifacts):
     """Post the blurred file to the API"""
     for artifact in artifacts:
-        _, bin_file = cv2.imencode('.JPEG', artifact['blurred_image'])
-        bin_file = bin_file.tostring()
-        artifact['blur_id_from_post_request'] = cgm_api.post_files(bin_file, 'rgb')
+        if artifact['blurred_image']:
+            _, bin_file = cv2.imencode('.JPEG', artifact['blurred_image'])
+            bin_file = bin_file.tostring()
+            artifact['blur_id_from_post_request'] = cgm_api.post_files(bin_file, 'rgb')
 
 
 def prepare_result_object(artifacts, scan_id, workflow_id):
     """Prepare result object for results generated"""
     res = Bunch(dict(results=[]))
     for artifact in artifacts:
-        result = Bunch(dict(
-            id=f"{uuid.uuid4()}",
-            scan=scan_id,
-            workflow=workflow_id,
-            source_artifacts=[artifact['id']],
-            source_results=[],
-            file=artifact['blur_id_from_post_request'],
-            generated=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
-            start_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
-            end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-        ))
-        res.results.append(result)
+        if 'blur_id_from_post_request' in artifact:
+            result = Bunch(dict(
+                id=f"{uuid.uuid4()}",
+                scan=scan_id,
+                workflow=workflow_id,
+                source_artifacts=[artifact['id']],
+                source_results=[],
+                file=artifact['blur_id_from_post_request'],
+                generated=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
+                start_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
+                end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+            ))
+            res.results.append(result)
 
     return res
 

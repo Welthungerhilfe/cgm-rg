@@ -18,8 +18,8 @@ IMAGE_TARGET_HEIGHT = 240
 IMAGE_TARGET_WIDTH = 180
 NORMALIZATION_VALUE = 7.5
 
-STANDING_SCAN_TYPE = ["100", "101", "102"]
-LAYING_SCAN_TYPE = ["200", "201", "202"]
+STANDING_SCAN_TYPE = [100, 101, 102]
+LAYING_SCAN_TYPE = [200, 201, 202]
 
 
 def efficient_process_depthmaps(artifacts, cgm_api):
@@ -174,6 +174,17 @@ def blur_input(artifacts):
         image_in.append(image_bgr)
 
     return image_in
+
+
+def blur_input_face_api(raw_file, scan_type):
+    image_rgb = np.asarray(Image.open(io.BytesIO(raw_file)))
+
+    if scan_type in STANDING_SCAN_TYPE:
+        image = cv2.rotate(image_rgb, cv2.ROTATE_90_CLOCKWISE)
+    elif scan_type in LAYING_SCAN_TYPE:
+        image = cv2.rotate(image_rgb, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+    return image
 
 
 def standing_laying_data_preprocessing_tf_batch(artifacts):
