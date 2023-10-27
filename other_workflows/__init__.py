@@ -10,6 +10,7 @@ from utils.blur import run_blur_flow
 from utils.standing_laying import sl_flow
 from utils.depth_img import depth_img_flow
 from utils.app_pose_visualization import run_app_pose_visualization_flow
+from utils.efficient_pose import run_efficient_pose_flow
 
 
 rgb_format = ["rgb", "image/jpeg"]
@@ -47,5 +48,6 @@ def main(msg: func.QueueMessage) -> None:
     run_blur_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
     run_pose_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
     depth_img_flow(cgm_api, scan_id, depth_artifacts, workflows, results)
+    run_efficient_pose_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
     run_app_pose_visualization_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
     # sl_flow(cgm_api, scan_id, rgb_artifacts, workflows)
