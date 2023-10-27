@@ -30,7 +30,6 @@ def run_pose_flow(cgm_api, scan_id, artifacts, workflows, scan_type, scan_versio
             for i in range(0, total_data, MAX_BATCH_SIZE):
                 pickled_pose_data = pickle.dumps([scan_type, pose_data[i:i + MAX_BATCH_SIZE], shape])
                 pose_predictions.extend(get_pose_prediction(pickled_pose_data))
-                i += MAX_BATCH_SIZE
         post_results(artifacts, pose_predictions, cgm_api, scan_id, workflow['id'], visualize_workflow['id'])
 
 
