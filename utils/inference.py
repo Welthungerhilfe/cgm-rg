@@ -146,3 +146,14 @@ def blur_img(im,height,width,origin):
     #Add blur to the overall img
     im[int(y):int(y)+int(h),int(x):int(x)+int(w)] = blurred_img
     return im
+
+
+def get_efficient_pose_prediction(pickled_data):
+    eff_pose_score_uri = 'https://efficient-pose-endpoint.centralindia.inference.ml.azure.com/score'
+    api_key = getenv("EFF_POSE_ENDPOINT_KEY")
+    headers_up = {'Content-Type':'application/octer-stream', 'Authorization':('Bearer '+ api_key), 'azureml-model-deployment': 'blue'}
+    response = requests_retry_session().post(eff_pose_score_uri, data=pickled_data, headers=headers_up)
+    logging.info(f"status code is {response.status_code}")
+    # predictions = response.json()
+
+    return pickle.loads(response.content)
