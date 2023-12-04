@@ -38,7 +38,7 @@ def run_efficient_pose_flow(cgm_api, scan_id, artifacts, workflows, scan_type, s
             i = 0
             pose_predictions = []
             for i in range(0, total_data, MAX_BATCH_SIZE):
-                pickled_pose_data = pickle.dumps(pose_data[i:i + MAX_BATCH_SIZE])
+                pickled_pose_data = pickle.dumps(eff_pose_input[i:i + MAX_BATCH_SIZE])
                 pose_predictions.extend(get_efficient_pose_prediction(pickled_pose_data))
         post_results(artifacts, pose_predictions, cgm_api, scan_id, workflow['id'], visualize_workflow['id'], scan_type)
 
