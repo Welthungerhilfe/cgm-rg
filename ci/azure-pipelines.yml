@@ -21,7 +21,8 @@ parameters:
       - inbmz
       - nep
       - uga
-      - ban
+      - mal
+      - sie
 
 stages:
   - stage: Setup
