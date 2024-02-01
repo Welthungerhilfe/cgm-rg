@@ -37,9 +37,9 @@ ms_face_api_headers = {
 }
 
 endpoint_urls = {
-    "aks-plaincnn-height": ("https://height-plaincnn-endpoint-test.centralindia.inference.ml.azure.com/score", getenv(PCC_HEIGHT_KEY)),
-    "aks-efficient-height": ("https://height-efficient-former.centralindia.inference.ml.azure.com/score", getenv(EFF_HEIGHT_KEY)),
-    "aks-plaincnn-weight": ("https://weight-plaincnn-endpoint.centralindia.inference.ml.azure.com/score", getenv(PCC_WEIGHT_KEY)),
+    "aks-plaincnn-height": ("https://height-plaincnn-endpoint-test.centralindia.inference.ml.azure.com/score", getenv('PCC_HEIGHT_KEY')),
+    "aks-efficient-height": ("https://height-efficient-former.centralindia.inference.ml.azure.com/score", getenv('EFF_HEIGHT_KEY')),
+    "aks-plaincnn-weight": ("https://weight-plaincnn-endpoint.centralindia.inference.ml.azure.com/score", getenv('PCC_WEIGHT_KEY')),
 }
 
 def requests_retry_session(
