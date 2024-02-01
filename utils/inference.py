@@ -36,6 +36,12 @@ ms_face_api_headers = {
     'Ocp-Apim-Subscription-Key': getenv('MS_FACE_API_KEY'),
 }
 
+endpoint_urls = {
+    "aks-plaincnn-height": ("https://height-plaincnn-endpoint-test.centralindia.inference.ml.azure.com/score", getenv(PCC_HEIGHT_KEY)),
+    "aks-efficient-height": ("https://height-efficient-former.centralindia.inference.ml.azure.com/score", getenv(EFF_HEIGHT_KEY)),
+    "aks-plaincnn-weight": ("https://weight-plaincnn-endpoint.centralindia.inference.ml.azure.com/score", getenv(PCC_WEIGHT_KEY)),
+}
+
 def requests_retry_session(
     retries=5,
     backoff_factor=2,
@@ -58,15 +64,18 @@ def requests_retry_session(
 
 
 def get_json_prediction(pickled_input_data, service_name):
-    service = Webservice(workspace=workspace, name=service_name)
-    scoring_uri = service.scoring_uri
-    
+    # service = Webservice(workspace=workspace, name=service_name)
+    # scoring_uri = service.scoring_uri
+    scoring_uri = endpoint_urls[service_name][0]
+    api_key = endpoint_urls[service_name][1]
+    headers = {'Content-Type':'application/octer-stream', 'Authorization':('Bearer '+ api_key), 'azureml-model-deployment': 'blue'}
+
     # data = {
     #      "data":img.tolist()
     # }
     # data = json.dumps(data)
     # headers = {"Content-Type": "application/json"}
-    headers = {"Content-Type": "application/octer-stream"}
+    # headers = {"Content-Type": "application/octer-stream"}
     response = requests_retry_session().post(scoring_uri, data=pickled_input_data, headers=headers)
     logging.info(f"status code is {response.status_code}")
     predictions = response.json()
