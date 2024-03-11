@@ -40,6 +40,7 @@ endpoint_urls = {
     "aks-plaincnn-height": ("https://height-plaincnn-endpoint-test.centralindia.inference.ml.azure.com/score", getenv('PCC_HEIGHT_KEY')),
     "aks-efficient-height": ("https://height-efficient-former.centralindia.inference.ml.azure.com/score", getenv('EFF_HEIGHT_KEY')),
     "aks-plaincnn-weight": ("https://weight-plaincnn-endpoint.centralindia.inference.ml.azure.com/score", getenv('PCC_WEIGHT_KEY')),
+    "mobilenet_height": ("https://mobilenet-v2-height-endpoint.centralindia.inference.ml.azure.com/score", getenv('MOBILENET_HEIGHT_KEY')),
 }
 
 def requests_retry_session(

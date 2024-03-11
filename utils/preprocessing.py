@@ -46,6 +46,18 @@ def process_depthmaps(artifacts, cgm_api):
     return depthmaps
 
 
+def mobilenet_process_depthmaps(artifacts, cgm_api):
+    depthmaps = []
+    for artifact in artifacts:
+        data, width, height, depth_scale, _max_confidence = load_depth(artifact['file'], cgm_api)
+        depthmap = prepare_depthmap(data, width, height, depth_scale)
+        depthmap = depthmap.astype("float32")
+        depthmap = np.expand_dims(depthmap, axis=2)
+        depthmaps.append(depthmap)
+    depthmaps = np.array(depthmaps)
+    return depthmaps
+
+
 def eval_preprocessing(depthmap):
     depthmap = depthmap.astype("float32")
     depthmap = depthmap / NORMALIZATION_VALUE

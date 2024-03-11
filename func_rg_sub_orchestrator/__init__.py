@@ -16,11 +16,13 @@ from utils.rest_api import CgmApi
 import height_plaincnn
 import Weight_plaincnn
 import height_efficient_former
+import height_mobilenet
 
 
 height_func_name = height_plaincnn.__name__
 weight_func_name = Weight_plaincnn.__name__
 eff_height_func_name = height_efficient_former.__name__
+mobilenet_height_func_name = height_mobilenet.__name__
 
 
 rgb_format = ["rgb", "image/jpeg"]
@@ -48,7 +50,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     }
 
     # h_result = yield context.call_activity(height_func_name, scan_metadata)
-    workflow_functions = [height_func_name, weight_func_name, eff_height_func_name]
+    workflow_functions = [height_func_name, weight_func_name, eff_height_func_name, mobilenet_height_func_name]
 
 
     transfer_tasks = [ context.call_activity(func_name, payload) for func_name in workflow_functions ]
