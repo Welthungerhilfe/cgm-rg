@@ -12,6 +12,7 @@ from utils.depth_img import depth_img_flow
 from utils.app_pose_visualization import run_app_pose_visualization_flow
 from utils.efficient_pose import run_efficient_pose_flow
 from utils.depth_features import run_depth_features_flow
+from utils.mobilenet_height import run_mobilenet_height_flow
 
 
 rgb_format = ["rgb", "image/jpeg"]
@@ -52,4 +53,5 @@ def main(msg: func.QueueMessage) -> None:
     run_efficient_pose_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
     run_depth_features_flow(cgm_api, scan_id, depth_artifacts, workflows, results)
     run_app_pose_visualization_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
+    run_mobilenet_height_flow(cgm_api, scan_id, depth_artifacts, workflows, results)
     # sl_flow(cgm_api, scan_id, rgb_artifacts, workflows)

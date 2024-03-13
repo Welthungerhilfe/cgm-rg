@@ -101,7 +101,7 @@ def artifact_level_result(artifacts, predictions, scan_id, workflow_id, generate
     return res
 
 
-def post_height_result_object(artifacts, predictions, scan_id, artifact_workflow_id, scan_workflow_id, generated_timestamp):
+def post_height_result_object(cgm_api, artifacts, predictions, scan_id, artifact_workflow_id, scan_workflow_id, generated_timestamp):
     res = artifact_level_result(artifacts, predictions, scan_id, artifact_workflow_id, generated_timestamp)
     res_object = bunch_object_to_json_object(res)
     # logging.info(f"posting artifact result {res_object}")
@@ -112,30 +112,19 @@ def post_height_result_object(artifacts, predictions, scan_id, artifact_workflow
     cgm_api.post_results(scan_res_object)
 
 
-def main(payload):
-    try:
-        scan_metadata = payload['scan_metadata']
-        workflows = payload['workflows']
-        scan_id = scan_metadata['id']
-        artifacts = scan_metadata['artifacts']
-        version = scan_metadata['version']
-        scan_type = scan_metadata['type']
-        results = scan_metadata['results']
-        artifact_level_workflow = get_workflow(workflows, MOBILENET_HEIGHT_WORKFLOW_NAME, MOBILENET_HEIGHT_WORKFLOW_VERSION)
-        scan_level_workflow = get_workflow(workflows, MEAN_MOBILENET_HEIGHT_WORKFLOW_NAME, MEAN_MOBILENET_HEIGHT_WORKFLOW_VERSION)
-        if not (check_if_results_exists(results, artifact_level_workflow['id']) and check_if_results_exists(results, scan_level_workflow['id'])):
-            service_name = scan_level_workflow['data']['service_name']
-            generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-            depth_artifacts = get_scan_by_format(artifacts, depth_format)
-            depthmaps = mobilenet_process_depthmaps(depth_artifacts, cgm_api)
-            total_data = len(depthmaps)
-            # p_depthmaps = pickle.dumps(depthmaps)
-            i = 0
-            predictions = []
-            for i in range(0, total_data, MAX_BATCH_SIZE):
-                pickled_data = pickle.dumps(depthmaps[i:i + MAX_BATCH_SIZE])
-                predictions.extend(get_json_prediction(pickled_data, service_name))
-            post_height_result_object(depth_artifacts, predictions, scan_id, artifact_level_workflow['id'], scan_level_workflow['id'], generated_timestamp)
-        return f"Hello!"
-    except Exception as e:
-        logging.error(e)
+def run_mobilenet_height_flow(cgm_api, scan_id, artifacts, workflows, results):
+    artifact_level_workflow = get_workflow(workflows, MOBILENET_HEIGHT_WORKFLOW_NAME, MOBILENET_HEIGHT_WORKFLOW_VERSION)
+    scan_level_workflow = get_workflow(workflows, MEAN_MOBILENET_HEIGHT_WORKFLOW_NAME, MEAN_MOBILENET_HEIGHT_WORKFLOW_VERSION)
+    if not (check_if_results_exists(results, artifact_level_workflow['id']) and check_if_results_exists(results, scan_level_workflow['id'])):
+        service_name = scan_level_workflow['data']['service_name']
+        generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        # depth_artifacts = get_scan_by_format(artifacts, depth_format)
+        depthmaps = mobilenet_process_depthmaps(artifacts, cgm_api)
+        total_data = len(depthmaps)
+        # p_depthmaps = pickle.dumps(depthmaps)
+        i = 0
+        predictions = []
+        for i in range(0, total_data, MAX_BATCH_SIZE):
+            pickled_data = pickle.dumps(depthmaps[i:i + MAX_BATCH_SIZE])
+            predictions.extend(get_json_prediction(pickled_data, service_name))
+        post_height_result_object(cgm_api, artifacts, predictions, scan_id, artifact_level_workflow['id'], scan_level_workflow['id'], generated_timestamp)
