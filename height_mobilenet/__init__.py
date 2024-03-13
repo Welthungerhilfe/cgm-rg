@@ -134,7 +134,7 @@ def main(payload):
             predictions = []
             for i in range(0, total_data, MAX_BATCH_SIZE):
                 pickled_data = pickle.dumps(depthmaps[i:i + MAX_BATCH_SIZE])
-                predictions.extend(get_json_prediction(p_depthmaps, service_name))
+                predictions.extend(get_json_prediction(pickled_data, service_name))
             post_height_result_object(depth_artifacts, predictions, scan_id, artifact_level_workflow['id'], scan_level_workflow['id'], generated_timestamp)
         return f"Hello!"
     except Exception as e:
