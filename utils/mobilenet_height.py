@@ -127,4 +127,4 @@ def run_mobilenet_height_flow(cgm_api, scan_id, artifacts, workflows, results):
         for i in range(0, total_data, MAX_BATCH_SIZE):
             pickled_data = pickle.dumps(depthmaps[i:i + MAX_BATCH_SIZE])
             predictions.extend(get_json_prediction(pickled_data, service_name))
-        post_height_result_object(cgm_api, depth_artifacts, predictions, scan_id, artifact_level_workflow['id'], scan_level_workflow['id'], generated_timestamp)
+        post_height_result_object(cgm_api, artifacts, predictions, scan_id, artifact_level_workflow['id'], scan_level_workflow['id'], generated_timestamp)
