@@ -22,6 +22,7 @@ from utils.inference import get_json_prediction
 from utils.constants import MOBILENET_HEIGHT_WORKFLOW_NAME, MOBILENET_HEIGHT_WORKFLOW_VERSION, MEAN_MOBILENET_HEIGHT_WORKFLOW_NAME, MEAN_MOBILENET_HEIGHT_WORKFLOW_VERSION
 from utils.result_utils import bunch_object_to_json_object, get_mean_scan_results, get_workflow, check_if_results_exists
 
+MAX_BATCH_SIZE = 9
 
 rgb_format = ["rgb", "image/jpeg"]
 depth_format = ["depth", "application/zip"]
@@ -127,8 +128,13 @@ def main(payload):
             generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             depth_artifacts = get_scan_by_format(artifacts, depth_format)
             depthmaps = mobilenet_process_depthmaps(depth_artifacts, cgm_api)
-            p_depthmaps = pickle.dumps(depthmaps)
-            predictions = get_json_prediction(p_depthmaps, service_name)
+            total_data = len(depthmaps)
+            # p_depthmaps = pickle.dumps(depthmaps)
+            i = 0
+            predictions = []
+            for i in range(0, total_data, MAX_BATCH_SIZE):
+                pickled_data = pickle.dumps(depthmaps[i:i + MAX_BATCH_SIZE])
+                predictions.extend(get_json_prediction(pickled_data, service_name))
             post_height_result_object(depth_artifacts, predictions, scan_id, artifact_level_workflow['id'], scan_level_workflow['id'], generated_timestamp)
         return f"Hello!"
     except Exception as e:
