@@ -47,11 +47,28 @@ def main(msg: func.QueueMessage) -> None:
     depth_artifacts = get_scan_by_format(artifacts, depth_format)
     rgb_artifacts = get_scan_by_format(artifacts, rgb_format)
 
-    run_blur_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
-    run_pose_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
-    depth_img_flow(cgm_api, scan_id, depth_artifacts, workflows, results)
-    run_efficient_pose_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
-    run_depth_features_flow(cgm_api, scan_id, depth_artifacts, workflows, results)
-    run_app_pose_visualization_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
-    run_mobilenet_height_flow(cgm_api, scan_id, depth_artifacts, workflows, results)
-    # sl_flow(cgm_api, scan_id, rgb_artifacts, workflows)
+    try:
+        run_blur_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
+        run_pose_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
+        run_efficient_pose_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
+        run_app_pose_visualization_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
+    except Exception as e:
+        logging.info("rgb workflows failed")
+        logging.error(e)
+
+    try:
+        depth_img_flow(cgm_api, scan_id, depth_artifacts, workflows, results)
+    except Exception as e:
+        logging.info("depth image workflow failed")
+        logging.error(e)
+
+    try:
+        run_depth_features_flow(cgm_api, scan_id, depth_artifacts, workflows, results)
+    except Exception as e:
+        logging.info("depth feature workflow failed")
+        logging.error(e)
+    try:
+        run_mobilenet_height_flow(cgm_api, scan_id, depth_artifacts, workflows, results)
+    except Exception as e:
+        logging.info("mobilenet height workflow failed")
+        logging.error(e)
