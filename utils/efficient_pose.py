@@ -12,7 +12,7 @@ import numpy as np
 # from utils.preprocessing import pose_input
 from utils.inference import get_efficient_pose_prediction
 from utils.result_utils import bunch_object_to_json_object, get_workflow, check_if_results_exists
-from utils.constants import EFFICIENT_POSE_WORKFLOW_NAME, EFFICIENT_POSE_WORKFLOW_VERSION, EFFICIENT_POSE_VISUALIZE_WORKFLOW_NAME, EFFICIENT_POSE_VISUALIZE_WORKFLOW_VERSION
+from utils.constants import EFFICIENT_POSE_WORKFLOW_NAME, EFFICIENT_POSE_WORKFLOW_VERSION, EFFICIENT_POSE_VISUALIZE_WORKFLOW_NAME, EFFICIENT_POSE_VISUALIZE_WORKFLOW_VERSION, STANDING_SCAN_TYPE, LAYING_SCAN_TYPE
 
 
 MAX_BATCH_SIZE = 13
@@ -25,9 +25,9 @@ def run_efficient_pose_flow(cgm_api, scan_id, artifacts, workflows, scan_type, s
         eff_pose_input = []
         for artifact in artifacts:
             im = Image.open(io.BytesIO(artifact['raw_file']))
-            if scan_type in [100, 101, 102]:
+            if scan_type in STANDING_SCAN_TYPE:
                 rotated_image = im.rotate(-90, expand=1)
-            elif scan_type in [200, 201, 202]:
+            elif scan_type in LAYING_SCAN_TYPE:
                 rotated_image = im.rotate(90, expand=1)
             eff_pose_input.append(np.asarray(rotated_image))
         total_data = len(eff_pose_input)
@@ -84,15 +84,15 @@ def pose_and_blur_visualsation(cgm_api, artifacts, predictions, scan_type):
     for (artifact, pose_prediction) in zip(artifacts, predictions):
         img = deepcopy(artifact['blurred_image'])
         image = Image.fromarray(img.astype('uint8'), 'RGB')
-        if scan_type in [100, 101, 102]:
+        if scan_type in STANDING_SCAN_TYPE:
             rotated_image = image.rotate(-90, expand=1)
-        elif scan_type in [200, 201, 202]:
+        elif scan_type in LAYING_SCAN_TYPE:
             rotated_image = image.rotate(90, expand=1)
         pose_vis = annotate_image(rotated_image, pose_prediction[0])
         np_pose_vis = np.asarray(pose_vis)
-        if scan_type in [100, 101, 102]:
+        if scan_type in STANDING_SCAN_TYPE:
             image = cv2.rotate(np_pose_vis, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        elif scan_type in [200, 201, 202]:
+        elif scan_type in LAYING_SCAN_TYPE:
             image = cv2.rotate(np_pose_vis, cv2.ROTATE_90_CLOCKWISE)
         _, bin_file = cv2.imencode('.JPEG', image)
         bin_file = bin_file.tostring()

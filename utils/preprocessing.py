@@ -13,13 +13,12 @@ from skimage.transform import resize
 from PIL import Image
 import io
 
+from utils.constants import STANDING_SCAN_TYPE, LAYING_SCAN_TYPE
+
 
 IMAGE_TARGET_HEIGHT = 240
 IMAGE_TARGET_WIDTH = 180
 NORMALIZATION_VALUE = 7.5
-
-STANDING_SCAN_TYPE = [100, 101, 102]
-LAYING_SCAN_TYPE = [200, 201, 202]
 
 
 def efficient_process_depthmaps(artifacts, cgm_api):
@@ -170,9 +169,9 @@ def pose_input(artifacts, scan_type):
         image_rgb = np.asarray(Image.open(io.BytesIO(artifact['raw_file'])))
         image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
         shape = image_bgr.shape
-        if scan_type in [100, 101, 102]:
+        if scan_type in STANDING_SCAN_TYPE:
             rotated_image = cv2.rotate(image_bgr, cv2.ROTATE_90_CLOCKWISE)  # Standing
-        elif scan_type in [200, 201, 202]:
+        elif scan_type in LAYING_SCAN_TYPE:
             rotated_image = cv2.rotate(image_bgr, cv2.ROTATE_90_COUNTERCLOCKWISE)  # Laying
         image_bgr_li.append(rotated_image)
     return image_bgr_li, shape
