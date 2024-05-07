@@ -13,13 +13,12 @@ from skimage.transform import resize
 from PIL import Image
 import io
 
+from utils.constants import STANDING_SCAN_TYPE, LAYING_SCAN_TYPE
+
 
 IMAGE_TARGET_HEIGHT = 240
 IMAGE_TARGET_WIDTH = 180
 NORMALIZATION_VALUE = 7.5
-
-STANDING_SCAN_TYPE = [100, 101, 102]
-LAYING_SCAN_TYPE = [200, 201, 202]
 
 
 def efficient_process_depthmaps(artifacts, cgm_api):
