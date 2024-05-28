@@ -45,3 +45,28 @@ def check_if_results_exists(results, workflow_id):
     if [r for r in results if r['workflow'] == workflow_id]:
         return True
     return False
+
+
+def calculate_TEM_precision(predicted_heights):
+    n = len(predicted_heights)
+    # Return NaN if there are less than two measurements
+    if n < 2:
+        return None
+
+    # Calculate all pairwise differences
+    differences = [predicted_heights[i] - predicted_heights[j]
+                   for i in range(n) for j in range(i+1, n)]
+
+    # Calculate TEM
+    tem = np.sqrt(np.sum(np.square(differences)) / (len(differences)))
+    return tem
+
+
+def calculate_TEM_accuracy(predicted_heights, actual_height):
+    m = len(predicted_heights)
+ 
+    # Calculate differences between actual height and each predicted height
+    differences = [actual_height - predicted_height for predicted_height in predicted_heights]
+    # Calculate TEM
+    inter_TEM = np.sqrt(np.sum(np.square(differences)) / (2 * m))
+    return inter_TEM
