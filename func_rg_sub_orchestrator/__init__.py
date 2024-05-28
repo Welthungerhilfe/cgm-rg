@@ -8,6 +8,7 @@
 
 import logging
 import json
+from datetime import datetime
 
 import azure.functions as func
 import azure.durable_functions as df
@@ -36,15 +37,16 @@ def get_scan_by_format(artifacts, file_format):
 def orchestrator_function(context: df.DurableOrchestrationContext):
     scan_id = context.get_input()
     scan_metadata = cgm_api.get_scan_metadata(scan_id)
-    # print(scan_metadata['type'])
-    # artifacts = scan_metadata['artifacts']
-    # version = scan_metadata['version']
-    # scan_type = scan_metadata['type']
+    person_id = scan_metadata['person']
+    scan_date = str(datetime.strptime(scan_metadata['scan_start'], '%Y-%m-%dT%H:%M:%SZ').date())
+    manual_measure = cgm_api.get_manual_measures(person_id, scan_date)
+    
     workflows = cgm_api.get_workflows()
 
     payload = {
         "scan_metadata": scan_metadata,
-        "workflows": workflows
+        "workflows": workflows,
+        "manual_measure": manual_measure
     }
 
     # h_result = yield context.call_activity(height_func_name, scan_metadata)

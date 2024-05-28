@@ -36,6 +36,9 @@ def main(msg: func.QueueMessage) -> None:
     scan_id = message_received['scan_id']
     scan_metadata = cgm_api.get_scan_metadata(scan_id)
     workflows = cgm_api.get_workflows()
+    person_id = scan_metadata['person']
+    scan_date = str(datetime.strptime(scan_metadata['scan_start'], '%Y-%m-%dT%H:%M:%SZ').date())
+    manual_measure = cgm_api.get_manual_measures(person_id, scan_date)
     artifacts = scan_metadata['artifacts']
     version = scan_metadata['version']
     scan_type = scan_metadata['type']
@@ -68,7 +71,7 @@ def main(msg: func.QueueMessage) -> None:
         logging.info("depth feature workflow failed")
         logging.error(e)
     try:
-        run_mobilenet_height_flow(cgm_api, scan_id, depth_artifacts, workflows, results)
+        run_mobilenet_height_flow(cgm_api, scan_id, depth_artifacts, workflows, results, manual_measure)
     except Exception as e:
         logging.info("mobilenet height workflow failed")
         logging.error(e)

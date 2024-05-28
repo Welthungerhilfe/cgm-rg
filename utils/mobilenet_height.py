@@ -20,7 +20,7 @@ from utils.rest_api import CgmApi
 from utils.preprocessing import mobilenet_process_depthmaps
 from utils.inference import get_json_prediction
 from utils.constants import MOBILENET_HEIGHT_WORKFLOW_NAME, MOBILENET_HEIGHT_WORKFLOW_VERSION, MEAN_MOBILENET_HEIGHT_WORKFLOW_NAME, MEAN_MOBILENET_HEIGHT_WORKFLOW_VERSION
-from utils.result_utils import bunch_object_to_json_object, get_mean_scan_results, get_workflow, check_if_results_exists
+from utils.result_utils import bunch_object_to_json_object, get_mean_scan_results, get_workflow, check_if_results_exists, calculate_TEM_precision, calculate_TEM_accuracy
 
 MAX_BATCH_SIZE = 9
 
@@ -60,7 +60,12 @@ def get_scan_by_format(artifacts, file_format):
     return [artifact for artifact in artifacts if artifact['format'] in file_format]
 
 
-def scan_level_height_result_object(artifacts, predictions, scan_id, workflow_id, generated_timestamp):
+def scan_level_height_result_object(artifacts, predictions, scan_id, workflow_id, generated_timestamp, manual_measure):
+    precision = calculate_TEM_precision(predictions)
+    if manual_measure:
+        accuracy = calculate_TEM_accuracy(predictions, manual_measure[-1]['height'])
+    else:
+        accuracy = None
     predictions = remove_outliers(predictions)
     lof_predictions = LOF(predictions)
     res = Bunch(dict(results=[]))
@@ -72,7 +77,9 @@ def scan_level_height_result_object(artifacts, predictions, scan_id, workflow_id
         source_results=[],
         data={
             'mean_height': get_mean_scan_results(predictions),
-            'lof_mean_height': get_mean_scan_results(lof_predictions)
+            'lof_mean_height': get_mean_scan_results(lof_predictions),
+            'accuracy_spread': accuracy,
+            'precision_spread': precision
         },
         start_time=generated_timestamp,
         end_time=generated_timestamp,
@@ -101,18 +108,18 @@ def artifact_level_result(artifacts, predictions, scan_id, workflow_id, generate
     return res
 
 
-def post_height_result_object(cgm_api, artifacts, predictions, scan_id, artifact_workflow_id, scan_workflow_id, generated_timestamp):
+def post_height_result_object(cgm_api, artifacts, predictions, scan_id, artifact_workflow_id, scan_workflow_id, generated_timestamp, manual_measure):
     res = artifact_level_result(artifacts, predictions, scan_id, artifact_workflow_id, generated_timestamp)
     res_object = bunch_object_to_json_object(res)
     # logging.info(f"posting artifact result {res_object}")
     cgm_api.post_results(res_object)
-    scan_res = scan_level_height_result_object(artifacts, predictions, scan_id, scan_workflow_id, generated_timestamp)
+    scan_res = scan_level_height_result_object(artifacts, predictions, scan_id, scan_workflow_id, generated_timestamp, manual_measure)
     scan_res_object = bunch_object_to_json_object(scan_res)
     # logging.info(f"posting scan result {scan_res_object}")
     cgm_api.post_results(scan_res_object)
 
 
-def run_mobilenet_height_flow(cgm_api, scan_id, artifacts, workflows, results):
+def run_mobilenet_height_flow(cgm_api, scan_id, artifacts, workflows, results, manual_measure):
     artifact_level_workflow = get_workflow(workflows, MOBILENET_HEIGHT_WORKFLOW_NAME, MOBILENET_HEIGHT_WORKFLOW_VERSION)
     scan_level_workflow = get_workflow(workflows, MEAN_MOBILENET_HEIGHT_WORKFLOW_NAME, MEAN_MOBILENET_HEIGHT_WORKFLOW_VERSION)
     if not (check_if_results_exists(results, artifact_level_workflow['id']) and check_if_results_exists(results, scan_level_workflow['id'])):
@@ -127,4 +134,4 @@ def run_mobilenet_height_flow(cgm_api, scan_id, artifacts, workflows, results):
         for i in range(0, total_data, MAX_BATCH_SIZE):
             pickled_data = pickle.dumps(depthmaps[i:i + MAX_BATCH_SIZE])
             predictions.extend(get_json_prediction(pickled_data, service_name))
-        post_height_result_object(cgm_api, artifacts, predictions, scan_id, artifact_level_workflow['id'], scan_level_workflow['id'], generated_timestamp)
+        post_height_result_object(cgm_api, artifacts, predictions, scan_id, artifact_level_workflow['id'], scan_level_workflow['id'], generated_timestamp, manual_measure)

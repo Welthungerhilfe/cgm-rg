@@ -48,7 +48,8 @@ class CgmApi(RestApi):
         return basic_info['date_of_birth'], basic_info['sex']
 
     def get_manual_measures(self, person_id, scan_date):
-        manual_measures = self.get_json(f'/api/persons/{person_id}/measurement')['measurements']
+        us_manual_measures = self.get_json(f'/api/persons/{person_id}/measurement')['measurements']
+        manual_measures = sorted(us_manual_measures, key=lambda m: m['measured'])
 
         mm_keys_keys = ['height', 'weight', 'muac', 'head_cir', 'oedema' ,'location']
         mms = []
