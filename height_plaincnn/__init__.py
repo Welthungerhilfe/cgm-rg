@@ -20,7 +20,7 @@ from utils.rest_api import CgmApi
 from utils.preprocessing import process_depthmaps
 from utils.inference import get_json_prediction
 from utils.constants import PLAINCNN_HEIGHT_WORKFLOW_NAME, PLAINCNN_HEIGHT_WORKFLOW_VERSION, MEAN_PLAINCNN_HEIGHT_WORKFLOW_NAME, MEAN_PLAINCNN_HEIGHT_WORKFLOW_VERSION
-from utils.result_utils import bunch_object_to_json_object, get_mean_scan_results, get_workflow, check_if_results_exists
+from utils.result_utils import bunch_object_to_json_object, get_mean_scan_results, get_workflow, check_if_results_exists, calculate_TEM_precision, calculate_TEM_accuracy
 
 
 rgb_format = ["rgb", "image/jpeg"]
@@ -59,7 +59,12 @@ def get_scan_by_format(artifacts, file_format):
     return [artifact for artifact in artifacts if artifact['format'] in file_format]
 
 
-def scan_level_height_result_object(artifacts, predictions, scan_id, workflow_id, generated_timestamp):
+def scan_level_height_result_object(artifacts, predictions, scan_id, workflow_id, generated_timestamp, manual_measure):
+    precision = calculate_TEM_precision(predictions)
+    if manual_measure:
+        accuracy = calculate_TEM_accuracy(predictions, manual_measure[-1]['height'])
+    else:
+        accuracy = None
     predictions = remove_outliers(predictions)
     lof_predictions = LOF(predictions)
     res = Bunch(dict(results=[]))
@@ -71,7 +76,9 @@ def scan_level_height_result_object(artifacts, predictions, scan_id, workflow_id
         source_results=[],
         data={
             'mean_height': get_mean_scan_results(predictions),
-            'lof_mean_height': get_mean_scan_results(lof_predictions)
+            'lof_mean_height': get_mean_scan_results(lof_predictions),
+            'accuracy_spread': accuracy,
+            'precision_spread': precision
         },
         start_time=generated_timestamp,
         end_time=generated_timestamp,
@@ -100,12 +107,12 @@ def artifact_level_result(artifacts, predictions, scan_id, workflow_id, generate
     return res
 
 
-def post_height_result_object(artifacts, predictions, scan_id, artifact_workflow_id, scan_workflow_id, generated_timestamp):
+def post_height_result_object(artifacts, predictions, scan_id, artifact_workflow_id, scan_workflow_id, generated_timestamp, manual_measure):
     res = artifact_level_result(artifacts, predictions, scan_id, artifact_workflow_id, generated_timestamp)
     res_object = bunch_object_to_json_object(res)
     # logging.info(f"posting artifact result {res_object}")
     cgm_api.post_results(res_object)
-    scan_res = scan_level_height_result_object(artifacts, predictions, scan_id, scan_workflow_id, generated_timestamp)
+    scan_res = scan_level_height_result_object(artifacts, predictions, scan_id, scan_workflow_id, generated_timestamp, manual_measure)
     scan_res_object = bunch_object_to_json_object(scan_res)
     # logging.info(f"posting scan result {scan_res_object}")
     cgm_api.post_results(scan_res_object)
@@ -115,6 +122,7 @@ def main(payload):
     try:
         scan_metadata = payload['scan_metadata']
         workflows = payload['workflows']
+        manual_measure = payload['manual_measure']
         scan_id = scan_metadata['id']
         artifacts = scan_metadata['artifacts']
         version = scan_metadata['version']
@@ -129,7 +137,7 @@ def main(payload):
             depthmaps = process_depthmaps(depth_artifacts, cgm_api)
             p_depthmaps = pickle.dumps(depthmaps)
             predictions = get_json_prediction(p_depthmaps, service_name)
-            post_height_result_object(depth_artifacts, predictions, scan_id, artifact_level_workflow['id'], scan_level_workflow['id'], generated_timestamp)
+            post_height_result_object(depth_artifacts, predictions, scan_id, artifact_level_workflow['id'], scan_level_workflow['id'], generated_timestamp, manual_measure)
         return f"Hello!"
     except Exception as e:
         logging.error(e)
