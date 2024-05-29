@@ -48,6 +48,7 @@ def check_if_results_exists(results, workflow_id):
 
 
 def calculate_TEM_precision(predicted_heights):
+    predicted_heights = [p[0] for p in predicted_heights]
     n = len(predicted_heights)
     # Return NaN if there are less than two measurements
     if n < 2:
@@ -63,6 +64,7 @@ def calculate_TEM_precision(predicted_heights):
 
 
 def calculate_TEM_accuracy(predicted_heights, actual_height):
+    predicted_heights = [p[0] for p in predicted_heights]
     m = len(predicted_heights)
  
     # Calculate differences between actual height and each predicted height
