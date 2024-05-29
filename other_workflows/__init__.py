@@ -37,7 +37,7 @@ def main(msg: func.QueueMessage) -> None:
     scan_metadata = cgm_api.get_scan_metadata(scan_id)
     workflows = cgm_api.get_workflows()
     person_id = scan_metadata['person']
-    scan_date = str(datetime.strptime(scan_metadata['scan_start'], '%Y-%m-%dT%H:%M:%SZ').date())
+    scan_date = datetime.strptime(scan_metadata['scan_start'], '%Y-%m-%dT%H:%M:%SZ').date()
     manual_measure = cgm_api.get_manual_measures(person_id, scan_date)
     artifacts = scan_metadata['artifacts']
     version = scan_metadata['version']

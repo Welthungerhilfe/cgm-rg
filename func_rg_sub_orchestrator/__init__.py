@@ -38,7 +38,7 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     scan_id = context.get_input()
     scan_metadata = cgm_api.get_scan_metadata(scan_id)
     person_id = scan_metadata['person']
-    scan_date = str(datetime.strptime(scan_metadata['scan_start'], '%Y-%m-%dT%H:%M:%SZ').date())
+    scan_date = datetime.strptime(scan_metadata['scan_start'], '%Y-%m-%dT%H:%M:%SZ').date()
     manual_measure = cgm_api.get_manual_measures(person_id, scan_date)
     
     workflows = cgm_api.get_workflows()
