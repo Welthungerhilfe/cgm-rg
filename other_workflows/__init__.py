@@ -60,7 +60,7 @@ def main(msg: func.QueueMessage) -> None:
         logging.error(e)
 
     try:
-        depth_img_flow(cgm_api, scan_id, depth_artifacts, workflows, results)
+        depth_img_flow(cgm_api, scan_id, depth_artifacts, version, workflows, results)
     except Exception as e:
         logging.info("depth image workflow failed")
         logging.error(e)
