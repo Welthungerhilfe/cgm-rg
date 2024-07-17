@@ -6,6 +6,7 @@ import io
 import cv2
 import matplotlib.pyplot as plt
 from bunch import Bunch
+import numpy as np
 
 from utils.preprocessing import load_depth_from_file, prepare_depthmap
 from utils.result_utils import bunch_object_to_json_object, get_workflow, check_if_results_exists
