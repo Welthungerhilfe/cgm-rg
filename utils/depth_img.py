@@ -26,6 +26,7 @@ def preprocess_and_post_depthmap(cgm_api, artifacts, version):
         data, width, height, depth_scale, _max_confidence = load_depth_from_file(artifact['raw_file'])
         if 'ir' in version:
             depthmap = np.frombuffer(data, dtype=np.uint16).reshape(height, width)
+            depthmap = depthmap * depth_scale
             depthmap = np.rot90(depthmap, k=-1)
         else:
             depthmap = prepare_depthmap(data, width, height, depth_scale)
@@ -60,6 +61,7 @@ def post_result_object(cgm_api, scan_id, artifacts, generated_timestamp, workflo
 
 def save_plot_as_binary(depthmap):
     plt.imshow(depthmap)
+    plt.colorbar(label='Depth')
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png')
     plt.close()
