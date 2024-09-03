@@ -71,7 +71,7 @@ def prepare_faces_result_object(artifacts, scan_id, workflow_id):
             source_artifacts=[artifact['id']],
             source_results=[],
             generated=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
-            data={'faces_detected': str(artifact['faces_detected'])},
+            data={'faces_detected': str(len(artifact['faces_detected'])), 'face_attributes': artifact['faces_detected']},
             start_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
             end_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         ))
