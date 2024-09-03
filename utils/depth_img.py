@@ -60,7 +60,7 @@ def post_result_object(cgm_api, scan_id, artifacts, generated_timestamp, workflo
 
 
 def save_plot_as_binary(depthmap):
-    plt.imshow(depthmap)
+    plt.imshow(depthmap,cmap='jet', vmin=0, vmax=3)
     plt.colorbar(label='Depth')
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png')
