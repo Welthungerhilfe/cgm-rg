@@ -127,7 +127,7 @@ def ms_face_api(input_image, scan_type):
     params = {
         'returnFaceId': 'false',  # Do not return face IDs
         'returnFaceLandmarks': 'false',  # Do not return face landmarks
-        'returnFaceAttributes': '',  # Exclude attributes
+        'returnFaceAttributes': 'headPose',  # Exclude attributes
         'detectionModel': 'detection_03',
     }
     response = requests.post(face_api_url, headers=ms_face_api_headers, params=params, data=bin_file)
@@ -142,7 +142,7 @@ def ms_face_api(input_image, scan_type):
     elif scan_type in LAYING_SCAN_TYPE:
         image = cv2.rotate(input_image, cv2.ROTATE_90_CLOCKWISE)
 
-    return image[:, :, ::-1], len(detected_faces)
+    return image[:, :, ::-1], detected_faces
 
 
 def blur_img(im,height,width,origin):
