@@ -23,6 +23,7 @@ parameters:
       - uga
       - mal
       - sie
+      - eth
 
 stages:
   - stage: Setup
