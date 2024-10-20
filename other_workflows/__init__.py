@@ -53,7 +53,7 @@ def main(msg: func.QueueMessage) -> None:
     try:
         run_blur_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
         run_pose_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
-        run_efficient_pose_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
+        # run_efficient_pose_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
         run_app_pose_visualization_flow(cgm_api, scan_id, rgb_artifacts, workflows, scan_type, version, results)
     except Exception as e:
         logging.info("rgb workflows failed")
