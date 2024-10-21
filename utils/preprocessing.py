@@ -227,8 +227,8 @@ def replace_values_above_threshold(depth_map, threshold):
                     the average of their four non-zero neighbors.
     """
     # Ensure depth_map is a 3D array (240, 180, 1)
-    if depth_map.shape != (240, 180, 1):
-        raise ValueError("Input depth_map should have a shape of (240, 180, 1)")
+    # if depth_map.shape != (240, 180, 1):
+    #     raise ValueError("Input depth_map should have a shape of (240, 180, 1)")
 
     # Create a binary mask for values above the threshold
     above_threshold_mask = depth_map > threshold
