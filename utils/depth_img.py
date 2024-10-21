@@ -8,10 +8,11 @@ import matplotlib.pyplot as plt
 from bunch import Bunch
 import numpy as np
 
-from utils.preprocessing import load_depth_from_file, prepare_depthmap
+from utils.preprocessing import load_depth_from_file, prepare_depthmap, fill_zeros_inpainting, replace_values_above_threshold
 from utils.result_utils import bunch_object_to_json_object, get_workflow, check_if_results_exists
 from utils.constants import DEPTH_IMG_WORKFLOW_NAME, DEPTH_IMG_WORKFLOW_VERSION
 
+NORMALIZATION_VALUE=3.0
 
 def depth_img_flow(cgm_api, scan_id, artifacts, version, workflows, results):
     generated_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -30,8 +31,10 @@ def preprocess_and_post_depthmap(cgm_api, artifacts, version):
             depthmap = np.rot90(depthmap, k=-1)
         else:
             depthmap = prepare_depthmap(data, width, height, depth_scale)
-        
-        bin_file = save_plot_as_binary(depthmap)
+        depthmap = depthmap.astype("float32")
+        depthmap = np.expand_dims(depthmap, axis=2)
+        in_depthmap = fill_zeros_inpainting(replace_values_above_threshold(depthmap, NORMALIZATION_VALUE))
+        bin_file = save_plot_as_binary(depthmap, in_depthmap)
         artifact['depth_image_file_id'] = cgm_api.post_files(bin_file, 'rgb')
 
 
@@ -59,9 +62,12 @@ def post_result_object(cgm_api, scan_id, artifacts, generated_timestamp, workflo
     cgm_api.post_results(res_object)
 
 
-def save_plot_as_binary(depthmap):
-    plt.imshow(depthmap,cmap='jet', vmin=0, vmax=3)
-    plt.colorbar(label='Depth')
+def save_plot_as_binary(depthmap, in_depthmap):
+    fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+    axs[0].set_title('Original depthmap')
+    axs[1].set_title('inpainted depthmap')
+    images = [axs[0].imshow(depthmap, cmap='jet', vmin=0, vmax=3), axs[1].imshow(in_depthmap, cmap='jet', vmin=0, vmax=3)]
+    fig.colorbar(images[0], ax=axs, orientation='horizontal', fraction=.1)
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png')
     plt.close()
