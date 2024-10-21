@@ -10,6 +10,7 @@ import logging
 import numpy as np
 import tensorflow as tf
 from skimage.transform import resize
+from skimage.restoration import inpaint
 from PIL import Image
 import io
 
@@ -210,3 +211,65 @@ def standing_laying_data_preprocessing_tf_batch(artifacts):
         images.append(img)
     
     return tf.convert_to_tensor(images)
+
+
+def replace_values_above_threshold(depth_map, threshold):
+    """
+    Replace depth values in a depth map above a given threshold with the average
+    of their four non-zero neighbors.
+
+    Args:
+    - depth_map (numpy.ndarray): The input depth map.
+    - threshold (float): The threshold value.
+
+    Returns:
+    - numpy.ndarray: The depth map with values above the threshold replaced by
+                    the average of their four non-zero neighbors.
+    """
+    # Ensure depth_map is a 3D array (240, 180, 1)
+    # if depth_map.shape != (240, 180, 1):
+    #     raise ValueError("Input depth_map should have a shape of (240, 180, 1)")
+
+    # Create a binary mask for values above the threshold
+    above_threshold_mask = depth_map > threshold
+
+    # Get the indices of the values above the threshold
+    above_threshold_indices = np.argwhere(above_threshold_mask)
+
+    # Iterate over the indices and replace values with the average of neighbors
+    for i, j, k in above_threshold_indices:
+        neighbors = [
+            depth_map[i - 1, j, k],  # Top neighbor
+            depth_map[i + 1, j, k],  # Bottom neighbor
+            depth_map[i, j - 1, k],  # Left neighbor
+            depth_map[i, j + 1, k],  # Right neighbor
+        ]
+        
+        # Filter out zero values
+        non_zero_neighbors = [neighbor for neighbor in neighbors if neighbor != 0]
+
+        if non_zero_neighbors:
+            # Calculate the average of non-zero neighbors
+            avg_neighbor_value = np.mean(non_zero_neighbors)
+            depth_map[i, j, k] = avg_neighbor_value
+        else:
+            # If all neighbors are zero, set the value to zero
+            depth_map[i, j, k] = 0
+
+    return depth_map
+
+
+def fill_zeros_inpainting(depth_map):
+    """
+    Fill zero values in a depth map using inpainting.
+
+    Args:
+        depth_map (numpy.ndarray): Input depth map with zero values.
+
+    Returns:
+        numpy.ndarray: Depth map with zero values filled using inpainting.
+    """
+    # Apply inpainting to fill in zero values using biharmonic interpolation
+    depth_map_filled = inpaint.inpaint_biharmonic(depth_map, mask=(depth_map == 0))
+    
+    return depth_map_filled
