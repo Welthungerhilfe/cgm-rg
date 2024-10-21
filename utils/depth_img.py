@@ -64,8 +64,8 @@ def post_result_object(cgm_api, scan_id, artifacts, generated_timestamp, workflo
 
 def save_plot_as_binary(depthmap, in_depthmap):
     fig, axs = plt.subplots(1, 2, figsize=(10, 5))
-    axs[0].set_title('Original depthmap')
-    axs[1].set_title('inpainted depthmap')
+    axs[0].set_title('Original Depthmap')
+    axs[1].set_title('Inpainted Depthmap')
     images = [axs[0].imshow(depthmap, cmap='jet', vmin=0, vmax=3), axs[1].imshow(in_depthmap, cmap='jet', vmin=0, vmax=3)]
     fig.colorbar(images[0], ax=axs, orientation='horizontal', fraction=.1)
     buffer = io.BytesIO()
