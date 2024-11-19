@@ -43,7 +43,7 @@ endpoint_urls = {
 }
 
 def requests_retry_session(
-    retries=5,
+    retries=3,
     backoff_factor=2,
     status_forcelist=(500, 502, 503, 504),
     session=None,
@@ -103,6 +103,7 @@ def get_pose_prediction(pickled_data):
     pose_score_uri = 'https://pose-endpoint.centralindia.inference.ml.azure.com/score'
     api_key = getenv("POSE_ENDPOINT_KEY")
     headers_up = {'Content-Type':'application/octer-stream', 'Authorization':('Bearer '+ api_key), 'azureml-model-deployment': 'blue'}
+    logging.info(f"sending request to endpoint")
     response = requests_retry_session().post(pose_score_uri, data=pickled_data, headers=headers_up)
     logging.info(f"status code is {response.status_code}")
     predictions = response.json()
