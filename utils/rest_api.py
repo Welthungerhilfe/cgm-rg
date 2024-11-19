@@ -30,8 +30,8 @@ class RestApi:
         resp.raise_for_status()
         return resp.json()
 
-    def post_binary(self, path, files):
-        resp = requests.post(self.url + path, headers=self.headers, files=files)
+    def post_binary(self, path, file_data, form_data):
+        resp = requests.post(self.url + path, headers=self.headers, files=file_data, data=form_data)
         resp.raise_for_status()
         return resp.content
 
@@ -76,17 +76,23 @@ class CgmApi(RestApi):
 
     def post_files(self, bin_file, file_format) -> str:
         if file_format == 'rgb':
-            filename = 'test.jpg'
+            form_data = {
+                'filename' : 'test.jpg'
+            }
+            file_data = {
+                'file': ('test.jpg', bin_file, 'image/jpeg')
+            }
         elif file_format == 'depth':
-            filename = 'test.depth'
+            form_data = {
+                'filename' : 'test.depth'
+            }
+            file_data = {
+                'file': ('test.depth', bin_file, 'application/zip')
+            }
         else:
             raise ValueError(f"Unrecognized file format: {file_format}.")
 
-        files = {
-            'file': bin_file,
-            'filename': filename
-        }
-        return self.post_binary('/api/files', files=files).decode('utf-8')
+        return self.post_binary('/api/files', file_data=file_data, form_data=form_data).decode('utf-8')
 
     def get_workflow_id(self, workflow_name, workflow_version):
         workflows = self.get_workflows()
