@@ -24,6 +24,7 @@ parameters:
       - mal
       - sie
       - eth
+      - syr
 
 stages:
   - stage: Setup
