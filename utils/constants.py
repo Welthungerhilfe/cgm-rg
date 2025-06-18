@@ -1,0 +1,85 @@
+from os import getenv
+
+MOBILENET_HEIGHT_WORKFLOW_NAME = "mobilenet-v2-height"
+MOBILENET_HEIGHT_WORKFLOW_VERSION = "2"
+MEAN_MOBILENET_HEIGHT_WORKFLOW_NAME = "mobilenet-v2-height_mean"
+MEAN_MOBILENET_HEIGHT_WORKFLOW_VERSION = "2"
+
+PLAINCNN_HEIGHT_WORKFLOW_NAME = "q4-depthmap-plaincnn-height-469k"
+PLAINCNN_HEIGHT_WORKFLOW_VERSION = "2.0.7"
+MEAN_PLAINCNN_HEIGHT_WORKFLOW_NAME = "q4-depthmap-plaincnn-height-469k-mean"
+MEAN_PLAINCNN_HEIGHT_WORKFLOW_VERSION = "2.0.7"
+
+EFFICIENT_HEIGHT_WORKFLOW_NAME = "efficient_former_model"
+EFFICIENT_HEIGHT_WORKFLOW_VERSION = "1.0.0"
+MEAN_EFFICIENT_HEIGHT_WORKFLOW_NAME = "efficient_former_model_mean"
+MEAN_EFFICIENT_HEIGHT_WORKFLOW_VERSION = "1.0.0"
+
+PLAINCNN_WEIGHT_WORKFLOW_NAME = "q4-depthmap-plaincnn-weight-264k"
+PLAINCNN_WEIGHT_WORKFLOW_VERSION = "1.0.1"
+MEAN_PLAINCNN_WEIGHT_WORKFLOW_NAME = "q4-depthmap-plaincnn-weight-264k-mean"
+MEAN_PLAINCNN_WEIGHT_WORKFLOW_VERSION = "1.0.1"
+
+STANDING_LAYING_WORKFLOW_NAME = "standing_laying"
+STANDING_LAYING_WORKFLOW_VERSION = "1.0.4"
+
+POSE_WORKFLOW_NAME = "pose_prediction"
+POSE_WORKFLOW_VERSION = "1.0.4"
+POSE_VISUALIZE_WORKFLOW_NAME = "pose_prediction_visualization"
+POSE_VISUALIZE_WORKFLOW_VERSION = "1.0.4"
+
+BLUR_WORKFLOW_NAME = "face_recognition"
+BLUR_WORKFLOW_VERSION = "3"
+FACE_DETECTION_WORKFLOW_NAME = "face_detection"
+FACE_DETECTION_WORKFLOW_VERSION = "3"
+
+DEPTH_IMG_WORKFLOW_NAME = "depthmap-image"
+DEPTH_IMG_WORKFLOW_VERSION = "3"
+
+APP_POSE_VISUALIZE_WORKFLOW_NAME = "mlkit_pose_visualisation"
+APP_POSE_VISUALIZE_WORKFLOW_VERSION = "0.1.0"
+APP_POSE_WORKFLOW_NAME = "app_pose_predicition"
+APP_POSE_WORKFLOW_VERSION = "1.0"
+
+EFFICIENT_POSE_WORKFLOW_NAME = "efficient_pose_prediction"
+EFFICIENT_POSE_WORKFLOW_VERSION = "1.0.0"
+EFFICIENT_POSE_VISUALIZE_WORKFLOW_NAME = "efficient_pose_prediction_visualization"
+EFFICIENT_POSE_VISUALIZE_WORKFLOW_VERSION = "1.0.0"
+
+DEPTH_FEATURE_WORKFLOW_NAME = "depth_features"
+DEPTH_FEATURE_WORKFLOW_VERSION = "1.0"
+
+RGB_DEPTH_ALLIGNMENT_WORKFLOW_NAME = "rgb_depth_allignment"
+RGB_DEPTH_ALLIGNMENT_WORKFLOW_VERSION = "1"
+
+RGB_OVERLAY_WORKFLOW_NAME = "rgb_overlay"
+RGB_OVERLAY_WORKFLOW_VERSION = "1"
+
+IN_DEPTH_IMG_WORKFLOW_NAME = "inpainted_depthmap_image"
+IN_DEPTH_IMG_WORKFLOW_VERSION = "1"
+
+rgb_format = ["rgb", "image/jpeg"]
+depth_format = ["depth", "application/zip"]
+
+STANDING_SCAN_TYPE = [100, 101, 102, 103, 104]
+LAYING_SCAN_TYPE = [200, 201, 202, 203, 204]
+
+STANDING_TYPE = 'standing'
+LYING_TYPE = 'lying'
+
+SKELETON = [
+    [1, 3], [1, 0], [2, 4], [2, 0], [0, 5], [0, 6], [5, 7], [7, 9], [6, 8], [
+        8, 10], [5, 11], [6, 12], [11, 12], [11, 13], [13, 15], [12, 14], [14, 16]
+]
+
+CocoColors = [[255, 0, 0], [255, 85, 0], [255, 170, 0], [255, 255, 0], [170, 255, 0], [85, 255, 0], [0, 255, 0],
+              [0, 255, 85], [0, 255, 170], [0, 255, 255], [
+                  0, 170, 255], [0, 85, 255], [0, 0, 255], [85, 0, 255],
+              [170, 0, 255], [255, 0, 255], [255, 0, 170], [255, 0, 85]]
+
+NUM_KPTS = 17
+
+hex_key = getenv("DECRYPTION_KEY", "")
+
+# Convert back to bytearray
+DECRYPTION_KEY = bytearray.fromhex(hex_key)
