@@ -3,13 +3,12 @@
 # Manually managing azure-functions-worker may cause unexpected issues
 
 azure-functions
-azure-functions-durable
-requests==2.26.0
-opencv-python==4.4.0.46
-bunch==1.0.1
-azureml-sdk
-scikit-image==0.18.3
-tensorflow
-protobuf
-sklearn-pandas==1.7.0
-azure-cognitiveservices-vision-face
+aiohttp
+anyio
+asyncer
+opencv-python
+Pillow
+aiolimiter
+matplotlib==3.10.1
+tensorflow==2.12.0
+scikit-image
