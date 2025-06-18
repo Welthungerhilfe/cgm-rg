@@ -1,6 +1,5 @@
 from os import getenv
 
-# workflow details
 MOBILENET_HEIGHT_WORKFLOW_NAME = "mobilenet-v2-height"
 MOBILENET_HEIGHT_WORKFLOW_VERSION = "2"
 MEAN_MOBILENET_HEIGHT_WORKFLOW_NAME = "mobilenet-v2-height_mean"
@@ -50,16 +49,23 @@ EFFICIENT_POSE_VISUALIZE_WORKFLOW_VERSION = "1.0.0"
 DEPTH_FEATURE_WORKFLOW_NAME = "depth_features"
 DEPTH_FEATURE_WORKFLOW_VERSION = "1.0"
 
+RGB_DEPTH_ALLIGNMENT_WORKFLOW_NAME = "rgb_depth_allignment"
+RGB_DEPTH_ALLIGNMENT_WORKFLOW_VERSION = "1"
+
+RGB_OVERLAY_WORKFLOW_NAME = "rgb_overlay"
+RGB_OVERLAY_WORKFLOW_VERSION = "1"
+
+IN_DEPTH_IMG_WORKFLOW_NAME = "inpainted_depthmap_image"
+IN_DEPTH_IMG_WORKFLOW_VERSION = "1"
+
+rgb_format = ["rgb", "image/jpeg"]
+depth_format = ["depth", "application/zip"]
+
 STANDING_SCAN_TYPE = [100, 101, 102, 103, 104]
 LAYING_SCAN_TYPE = [200, 201, 202, 203, 204]
 
-# # inference endpoints service names
-
-# HEIGHT_PLAINCNN_SERVICE_NAME = ""
-# WEIGHT_PLAINCNN_SERVICE_NAME = ""
-# POSE_SERVICE_NAME = ""
-# FACE_BLUR_SERVICE_NAME = ""
-# STANDING_LAYING_SERVICE_NAME = ""
+STANDING_TYPE = 'standing'
+LYING_TYPE = 'lying'
 
 SKELETON = [
     [1, 3], [1, 0], [2, 4], [2, 0], [0, 5], [0, 6], [5, 7], [7, 9], [6, 8], [
@@ -73,128 +79,7 @@ CocoColors = [[255, 0, 0], [255, 85, 0], [255, 170, 0], [255, 255, 0], [170, 255
 
 NUM_KPTS = 17
 
+hex_key = getenv("DECRYPTION_KEY", "")
 
-MLKIT_KEYPOINT_INDEXES = {
-    "1": "nose",
-    "2": "left_eye_inner",
-    "3": "left_eye",
-    "4": "left_eye_outer",
-    "5": "right_eye_inner",
-    "6": "right_eye",
-    "7": "right_eye_outer",
-    "8": "left_ear",
-    "9": "right_ear",
-    "10": "left_mouth",
-    "11": "right_mouth",
-    "12": "left_shoulder",
-    "13": "right_shoulder",
-    "14": "left_elbow",
-    "15": "right_elbow",
-    "16": "left_wrist",
-    "17": "right_wrist",
-    "18": "left_hip",
-    "19": "right_hip",
-    "20": "left_knee",
-    "21": "right_knee",
-    "22": "left_ankle",
-    "23": "right_ankle",
-    "24": "left_pinky",
-    "25": "right_pinky",
-    "26": "left_index",
-    "27": "right_index",
-    "28": "left_thumb",
-    "29": "right_thumb",
-    "30": "left_heel",
-    "31": "right_heel",
-    "32": "left_foot_index",
-    "33": "right_foot_index",
-}
-
-
-MLKIT_SKELETON = [
-    [15, 17],
-    [13, 19],
-    [13, 15],
-    [19, 21],
-    [21, 23],
-    [17, 29],
-    [17, 25],
-    [17, 27],
-    [27, 25],
-    [23, 31],
-    [31, 33],
-    [1, 2],
-    [2, 3],
-    [3, 4],
-    [4, 8],
-    [1, 5],
-    [5, 6],
-    [6, 7],
-    [7, 9],
-    [10, 11],
-    [12, 13],
-    [18, 19],
-    [12, 14],
-    [14, 16],
-    [12, 18],
-    [18, 20],
-    [20, 22],
-    [16, 28],
-    [16, 24],
-    [16, 26],
-    [26, 24],
-    [22, 30],
-    [30, 32],
-]
-
-MLKIT_NUM_KPTS = 33
-
-
-MLKIT_BODY_JOINTS = [
-    # Right body
-    ("right_shoulder", "right_elbow"),
-    ("right_elbow", "right_wrist"),
-    ("right_shoulder", "right_hip"),
-    ("right_hip", "right_knee"),
-    ("right_knee", "right_ankle"),
-    ("right_wrist", "right_thumb"),
-    ("right_wrist", "right_pinky"),
-    ("right_wrist", "right_index"),
-    ("right_index", "right_pinky"),
-    ("right_ankle", "right_heel"),
-    ("right_heel", "right_foot_index"),
-    # Face
-    ("nose", "left_eye_inner"),
-    ("left_eye_inner", "left_eye"),
-    ("left_eye", "left_eye_outer"),
-    ("left_eye_outer", "left_ear"),
-    ("nose", "right_eye_inner"),
-    ("right_eye_inner", "right_eye"),
-    ("right_eye", "right_eye_outer"),
-    ("right_eye_outer", "right_ear"),
-    ("left_mouth", "right_mouth"),
-    ("left_shoulder", "right_shoulder"),
-    ("left_hip", "right_hip"),
-    # Left body
-    ("left_shoulder", "left_elbow"),
-    ("left_elbow", "left_wrist"),
-    ("left_shoulder", "left_hip"),
-    ("left_hip", "left_knee"),
-    ("left_knee", "left_ankle"),
-    ("left_wrist", "left_thumb"),
-    ("left_wrist", "left_pinky"),
-    ("left_wrist", "left_index"),
-    ("left_index", "left_pinky"),
-    ("left_ankle", "left_heel"),
-    ("left_heel", "left_foot_index"),
-
-]
-
-
-# MlkitColors = [[255, 0, 0], [255, 85, 0], [255, 170, 0], [255, 255, 0], [170, 255, 0], [85, 255, 0], [0, 255, 0],
-#               [0, 255, 85], [0, 255, 170], [0, 255, 255], [
-#                   0, 170, 255], [0, 85, 255], [0, 0, 255], [85, 0, 255],
-#               [170, 0, 255], [255, 0, 255], [255, 0, 170], [255, 0, 85]]
-
-# All white colors
-MlkitColors = [[255, 255, 255]] * 33
+# Convert back to bytearray
+DECRYPTION_KEY = bytearray.fromhex(hex_key)
