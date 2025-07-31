@@ -69,6 +69,12 @@ def get_rgb_depth_allignment_result(scan_id, artifacts, workflow_id, similarity_
     return rd
 
 
+def get_mediapipe_distance_result(scan_id, artifacts, workflow_id, distance, center):
+    data = {"distance": str(distance), "center": str(center)}
+    rd = get_result_dict(scan_id, workflow_id, artifacts, data=data)
+    return rd
+
+
 def get_blur_json_results(artifacts, blur_results, workflow_id, results):
     blur_results = []
     for artifact, blur_result in zip(artifacts, blur_results):

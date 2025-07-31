@@ -4,7 +4,7 @@ import json
 import logging
 from typing import Any
 
-from rg.entry import run_rg, run_mean_rg, generate_new_visualizations
+from rg.entry import run_rg, run_mean_rg
 
 app = func.FunctionApp()
 

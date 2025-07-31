@@ -58,6 +58,12 @@ RGB_OVERLAY_WORKFLOW_VERSION = "1"
 IN_DEPTH_IMG_WORKFLOW_NAME = "inpainted_depthmap_image"
 IN_DEPTH_IMG_WORKFLOW_VERSION = "1"
 
+MEDIAPIPE_SEG_DISTANCE_WORKFLOW_NAME = "mediapipe_seg_distance"
+MEDIAPIPE_SEG_DISTANCE_WORKFLOW_VERSION = "1"
+
+MEDIAPIPE_POSE_DISTANCE_WORKFLOW_NAME = "mediapipe_pose_distance"
+MEDIAPIPE_POSE_DISTANCE_WORKFLOW_VERSION = "1"
+
 rgb_format = ["rgb", "image/jpeg"]
 depth_format = ["depth", "application/zip"]
 
@@ -83,3 +89,5 @@ hex_key = getenv("DECRYPTION_KEY", "")
 
 # Convert back to bytearray
 DECRYPTION_KEY = bytearray.fromhex(hex_key)
+
+AES_KEY = getenv("AES_KEY", "")

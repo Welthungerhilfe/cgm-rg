@@ -180,7 +180,7 @@ def get_depthmaps_old(artifacts, scan_version):
     return depthmaps, in_depthmaps
 
 
-def get_depthmaps(artifacts, scan_version):
+def get_depthmaps(artifacts, scan_version, max_depth):
     depthmaps, in_depthmaps, pc_dmaps, mn_depthmaps, device_poses = [], [], [], [], []
     for artifact in artifacts:
         data, width, height, depth_scale, _max_confidence, device_pose = load_depth(artifact['raw_file'])
@@ -188,6 +188,7 @@ def get_depthmaps(artifacts, scan_version):
             depthmap = np.frombuffer(data, dtype=np.uint16).reshape(height, width)
             depthmap = depthmap * depth_scale
             depthmap = np.rot90(depthmap, k=-1)
+            depthmap = np.clip(depthmap, 0, max_depth)
         else:
             depthmap = prepare_depthmap(data, width, height, depth_scale)
         depthmap = np.expand_dims(depthmap, axis=2)

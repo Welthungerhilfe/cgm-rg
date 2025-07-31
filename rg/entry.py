@@ -14,9 +14,11 @@ from utils.constants import *
 from utils.processing import download_artifacts, get_scan_by_format, get_workflow, check_rgb_depth_alignment, load_rgb_image, plot_with_masks_on_image
 from rg.rgb_workflows import run_rgb_flow
 from rg.depth_workflow import run_depth_img_flow
-from rg.results_utils import get_mean_result, get_mean_results, filter_results, pose_score_filter, depth_feature_filter, distance_to_child_filter, get_rgb_depth_allignment_result, get_result_dict, get_json_results
+from rg.results_utils import get_mean_result, get_mean_results, filter_results, pose_score_filter, depth_feature_filter, distance_to_child_filter, get_rgb_depth_allignment_result, get_result_dict, get_json_results, get_mediapipe_distance_result
 from utils.inference import call_sam_api, call_mn_height
 from utils.depth_preprocessing import get_raw_depthmap, inpaint_depth_all_masks, save_plot_as_binary_new, IMAGE_TARGET_HEIGHT, IMAGE_TARGET_WIDTH, NORMALIZATION_VALUE
+from utils.mediapipe_distance_calculation import estimate_distance_from_segmentation, estimate_distance_from_pose
+from utils.file_decryption import decrypt_xor_response_content, decrypt_aes_response_content
 
 
 async def run_rg(scan_ids):
@@ -38,6 +40,9 @@ async def run_rg(scan_ids):
         logging.info("downloading artifacts")
         await download_artifacts(cgm_api, artifacts, version)
         logging.info("finished downloading artifacts")
+        for artifact in artifacts:
+            if 'raw_file' not in artifact:
+                logging.info(f"no raw file")
         depth_artifacts = await asyncify(get_scan_by_format)(artifacts, depth_format)
         rgb_artifacts = await asyncify(get_scan_by_format)(artifacts, rgb_format)
         results = [result for data in scan_id_metadata for result in data["results"]]
@@ -54,6 +59,8 @@ async def run_rg(scan_ids):
         rgb_wf_status, rgb_images = rgb_workflow_status.value
         depth_wf_status, depthmaps = depth_workflow_status.value
         allignment_workflow = get_workflow(workflows, RGB_DEPTH_ALLIGNMENT_WORKFLOW_NAME, RGB_DEPTH_ALLIGNMENT_WORKFLOW_VERSION)
+        mediapipe_seg_distance_workflow = get_workflow(workflows, MEDIAPIPE_SEG_DISTANCE_WORKFLOW_NAME, MEDIAPIPE_SEG_DISTANCE_WORKFLOW_VERSION)
+        medispipe_pose_distance_workflow = get_workflow(workflows, MEDIAPIPE_POSE_DISTANCE_WORKFLOW_NAME, MEDIAPIPE_POSE_DISTANCE_WORKFLOW_VERSION)
         rgb_artifact_to_ord_mapping = {(ra['scan_id'], ra['order']): ra['id'] for ra in rgb_artifacts}
         if scan_type == STANDING_TYPE:
             max_depth = 3
@@ -61,9 +68,26 @@ async def run_rg(scan_ids):
             max_depth = 1.5
         alignment_rds = []
         for da, dm in zip(depth_artifacts, depthmaps):
-            rgb_a_id = rgb_artifact_to_ord_mapping[(da['scan_id'], da['order'])]
+            rgb_a_id = rgb_artifact_to_ord_mapping.get((da['scan_id'], da['order']), None)
+            if rgb_a_id is None:
+                logging.warning(f"No RGB artifact found for depth artifact {da['order']} in scan {da['scan_id']}")
+                continue
             similarity_index, alignment_status = check_rgb_depth_alignment(rgb_images[rgb_a_id], dm, max_depth, threshold=0.75)
             alignment_rds.append(get_rgb_depth_allignment_result(da['scan_id'], [da['id']], allignment_workflow['id'], similarity_index, alignment_status))
+            distance, center, _ = estimate_distance_from_segmentation(rgb_images[rgb_a_id], dm)
+            if distance is not None:
+                alignment_rds.append(get_mediapipe_distance_result(da['scan_id'], [da['id']], mediapipe_seg_distance_workflow['id'], distance, center))
+            else:
+                alignment_rds.append(get_mediapipe_distance_result(da['scan_id'], [da['id']], mediapipe_seg_distance_workflow['id'], 'NA', 
+                                                                   'NA'))
+                logging.warning(f"Distance estimation failed for scan {da['scan_id']} at order {da['order']}")
+            distance, center = estimate_distance_from_pose(rgb_images[rgb_a_id], dm)
+            if distance is not None:
+                alignment_rds.append(get_mediapipe_distance_result(da['scan_id'], [da['id']], medispipe_pose_distance_workflow['id'], distance, center))
+            else:
+                alignment_rds.append(get_mediapipe_distance_result(da['scan_id'], [da['id']], medispipe_pose_distance_workflow['id'], 'NA', 
+                                                                   'NA'))
+                logging.warning(f"Pose distance estimation failed for scan {da['scan_id']} at order {da['order']}")
         post_allignment_status = await cgm_api.post_results({"results": alignment_rds})
         logging.info(f"allignment post status {post_allignment_status}")
     finally:
@@ -219,3 +243,77 @@ async def generate_new_visualizations(scan_id):
     finally:
         await cgm_api.session.close()
         await session.close()
+
+
+def check_rgb_depth_alignment_by_overlap(
+    rgb_image, depth_image, child_mask, max_depth=3.0,
+    edge_thresh=(30, 180), overlap_thresh=0.15, show_edges=True,
+    missing_thresh=0.10
+):
+    depth_h, depth_w = depth_image.shape[:2]
+    rgb_image = cv2.resize(rgb_image, (depth_w, depth_h), interpolation=cv2.INTER_LINEAR)
+    child_mask = cv2.resize(child_mask.astype(np.uint8), (depth_w, depth_h), interpolation=cv2.INTER_NEAREST)
+
+    regions = {
+        "upper": np.zeros_like(child_mask),
+        "lower": np.zeros_like(child_mask),
+        "left": np.zeros_like(child_mask),
+        "right": np.zeros_like(child_mask)
+    }
+
+    mid_h, mid_w = depth_h // 2, depth_w // 2
+    regions["upper"][:mid_h, :] = 1
+    regions["lower"][mid_h:, :] = 1
+    regions["left"][:, :mid_w] = 1
+    regions["right"][:, mid_w:] = 1
+
+    insufficient_regions = []
+    valid_mask = (depth_image > 0).astype(np.uint8) * child_mask
+
+    for name, region_mask in regions.items():
+        region_mask = region_mask.astype(np.uint8) * child_mask
+        total = region_mask.sum()
+        if total == 0:
+            continue
+        valid = (valid_mask * region_mask).sum()
+        missing_ratio = 1 - valid / (total + 1e-6)
+        if missing_ratio > missing_thresh:
+            insufficient_regions.append(name)
+
+    if len(insufficient_regions) == 4:
+        return None, f"Insufficient Depth in All Regions"
+
+    # Build final mask using only sufficient regions
+    combined_region = np.zeros_like(child_mask)
+    for name, region_mask in regions.items():
+        if name not in insufficient_regions:
+            combined_region = np.logical_or(combined_region, region_mask * child_mask)
+
+    combined_region = combined_region.astype(np.uint8)
+
+    # Get child outline
+    child_outline = get_child_outline(combined_region)
+
+    # Convert RGB to grayscale
+    rgb_gray = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2GRAY)
+
+    # Normalize and convert depth to 8-bit
+    depth_image = np.clip(depth_image, 0, max_depth)
+    depth_8bit = (depth_image / max_depth * 255).astype(np.uint8)
+
+    # Edge detection
+    edges_rgb = cv2.Canny(rgb_gray, *edge_thresh)
+    edges_depth = cv2.Canny(depth_8bit, *edge_thresh)
+
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    edges_rgb_thick = cv2.dilate(edges_rgb, kernel, iterations=5)
+    edges_depth_thick = cv2.dilate(edges_depth, kernel, iterations=5)
+
+    rgb_outline_edges = cv2.bitwise_and(edges_rgb_thick, edges_rgb_thick, mask=child_outline)
+    depth_outline_edges = fill_missing_depth_edges(edges_depth_thick, child_outline)
+
+    intersection = np.logical_and(rgb_outline_edges > 0, depth_outline_edges > 0).sum()
+    denominator = (rgb_outline_edges > 0).sum()
+    overlap_ratio = intersection / (denominator + 1e-6)
+    overlap_ratio = round(overlap_ratio, 2)
+    alignment_status = "Aligned" if overlap_ratio >= overlap_thresh else "Misaligned"

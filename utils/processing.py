@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 from copy import deepcopy
 import anyio
 import asyncer
@@ -12,7 +13,7 @@ from io import BytesIO
 from matplotlib import pyplot as plt
 from utils.constants import *
 from skimage.metrics import structural_similarity as ssim
-from utils.file_decryption import decrypt_file_data
+from utils.file_decryption import decrypt_xor_response_content, decrypt_aes_response_content
 
 
 def get_scan_by_format(artifacts, file_format):
@@ -30,13 +31,17 @@ async def download_artifacts(cgm_api, artifacts, scan_version):
             content, status = result
             if status == 200:
                 if scan_version.startswith('ir-2.') or scan_version.startswith('v3.'):
-                    artifact['raw_file'] = await asyncify(decrypt_file_data)(content)
+                    artifact['raw_file'] = await asyncify(decrypt_xor_response_content)(content)
+                elif scan_version.startswith('ir-3.') or scan_version.startswith('v4.'):
+                    artifact['raw_file'] = await asyncify(decrypt_aes_response_content)(content)
                 else:
                     artifact['raw_file'] = content
             else:
                 content, status = await cgm_api.get_files(artifact['file'])
                 if scan_version.startswith('ir-2.') or scan_version.startswith('v3.'):
-                    artifact['raw_file'] = await asyncify(decrypt_file_data)(content)
+                    artifact['raw_file'] = await asyncify(decrypt_xor_response_content)(content)
+                elif scan_version.startswith('ir-3.') or scan_version.startswith('v4.'):
+                    artifact['raw_file'] = await asyncify(decrypt_aes_response_content)(content)
                 else:
                     artifact['raw_file'] = content
     except Exception as error:
@@ -75,9 +80,14 @@ def encode_image(img):
 
 def blur_img(im,height,width,origin):
     #Create ROI
+    im_h, im_w = im.shape[:2]
     h,w = height,width
     x,y = origin[0],origin[1]
-    roi = im[int(y):int(y)+int(h),int(x):int(x)+int(w)]
+    x = max(int(x), 0)
+    y = max(int(y), 0)
+    x1 = min(int(x)+int(w), im_w)
+    y1 = min(int(y)+int(h), im_h)
+    roi = im[y:y1,x:x1]
     #Blur image in ROI
     blurred_img = cv2.GaussianBlur(roi,(91,91),0)
     #Add blur to the overall img

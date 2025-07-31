@@ -21,8 +21,9 @@ async def run_depth_img_flow(cgm_api, session, artifacts, workflows, scan_versio
         pcnn_height_workflow = get_workflow(workflows, PLAINCNN_HEIGHT_WORKFLOW_NAME, PLAINCNN_HEIGHT_WORKFLOW_VERSION)
         pcnn_weight_workflow = get_workflow(workflows, PLAINCNN_WEIGHT_WORKFLOW_NAME, PLAINCNN_WEIGHT_WORKFLOW_VERSION)
         mn_height_workflow = get_workflow(workflows, MOBILENET_HEIGHT_WORKFLOW_NAME, MOBILENET_HEIGHT_WORKFLOW_VERSION)
+        max_depth = 1.5 if scan_type == "lying" else 3.0
         logging.info("starting preprocessing")
-        depthmaps, in_depthmaps, pc_dmaps, mn_depthmaps, device_poses = await asyncify(get_depthmaps)(artifacts, scan_version)
+        depthmaps, in_depthmaps, pc_dmaps, mn_depthmaps, device_poses = await asyncify(get_depthmaps)(artifacts, scan_version, max_depth)
         logging.info("starting no of zeroes")
         no_of_zeroes_results = await asyncify(compute_depth_metadata)(depthmaps)
         logging.info("starting angle")
